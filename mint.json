@@ -41,17 +41,17 @@
       "name": "Feature Requests",
       "icon": "comment",
       "url": "https://formo.canny.io"
-    },    
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://formo.so/blog"
     },
     {
       "name": "Status",
       "icon": "signal",
       "url": "https://status.formo.so"
-    }    
+    },    
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://formo.so/blog"
+    }   
   ],
   "navigation": [
     {
