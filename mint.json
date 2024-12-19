@@ -25,20 +25,20 @@
     "name": "Dashboard",
     "url": "https://app.formo.so"
   },
-  "tabs": [],
+  "tabs":  [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    }
+  ],
   "anchors": [
     {
       "name": "Help Center",
-      "icon": "support",
+      "icon": "circle-info",
       "url": "https://help.formo.so"
     },
     {
-      "name": "Status",
-      "icon": "signal",
-      "url": "https://status.formo.so"
-    },
-    {
-      "name": "Request Features",
+      "name": "Feature Requests",
       "icon": "comment",
       "url": "https://formo.canny.io"
     },    
@@ -46,7 +46,12 @@
       "name": "Blog",
       "icon": "newspaper",
       "url": "https://formo.so/blog"
-    }
+    },
+    {
+      "name": "Status",
+      "icon": "signal",
+      "url": "https://status.formo.so"
+    }    
   ],
   "navigation": [
     {
@@ -55,6 +60,20 @@
         "introduction",
         "quickstart",
         "development"
+      ]
+    },
+    {
+      "group": "API Documentation",
+      "pages": [
+        "api-reference/introduction"
+      ]
+    },
+    {
+      "group": "Endpoint Examples",
+      "pages": [
+        "api-reference/endpoint/get",
+        "api-reference/endpoint/create",
+        "api-reference/endpoint/delete"
       ]
     }
   ],
