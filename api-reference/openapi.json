@@ -78,6 +78,91 @@
 		}
 	},
 	"paths": {
+		"/webhooks/{formId}/poll": {
+			"get": {
+				"summary": "List Form Responses",
+				"description": "Retrieves recent form responses with transformed field data",
+				"operationId": "listFormResponses",
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "formId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "The unique identifier of the form"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved form responses",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Form ID is required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing or invalid API key",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Insufficient permissions",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found - Form not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/webhooks": {
 			"post": {
 				"summary": "Subscribe to Webhook",
@@ -191,13 +276,11 @@
 						}
 					}
 				}
-			}
-		},
-		"/webhooks/{formId}/poll": {
-			"get": {
-				"summary": "List Form Responses",
-				"description": "Retrieves recent form responses with transformed field data",
-				"operationId": "listFormResponses",
+			},
+			"delete": {
+				"summary": "Unsubscribe from Webhook",
+				"description": "Removes a webhook subscription",
+				"operationId": "unsubscribeWebhook",
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -205,32 +288,46 @@
 				],
 				"parameters": [
 					{
-						"name": "formId",
-						"in": "path",
-						"required": true,
+						"name": "webhookId",
+						"in": "query",
+						"required": false,
 						"schema": {
 							"type": "string"
 						},
-						"description": "The unique identifier of the form"
+						"description": "The unique identifier of the webhook subscription"
+					},
+					{
+						"name": "targetUrl",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"description": "The URL that receives webhook events"
 					}
 				],
 				"responses": {
 					"200": {
-						"description": "Successfully retrieved form responses",
+						"description": "Successfully unsubscribed from webhook",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/SuccessResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request - Form ID is required",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
+									"type": "object",
+									"properties": {
+										"isSuccess": {
+											"type": "boolean",
+											"example": true
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Webhook unsubscribed successfully"
+												}
+											}
+										}
+									}
 								}
 							}
 						}
@@ -256,7 +353,7 @@
 						}
 					},
 					"404": {
-						"description": "Not Found - Form not found",
+						"description": "Not Found - Webhook not found",
 						"content": {
 							"application/json": {
 								"schema": {
