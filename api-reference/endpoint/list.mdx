@@ -6,16 +6,21 @@ openapi: 'GET /webhooks/{formId}/poll'
 
 Retrieves form responses with transformed field data. Returns the most recent form submissions with field values mapped to readable keys based on the form configuration.
 
+<Note>
+	Need help finding your Form ID? Check out our guide on [Locating Your Form
+	ID](/api-reference/webhooks#finding-your-form-id).
+</Note>
+
 ## Field Value Transformations
 
 The API automatically transforms certain field values based on their type:
 
-- Select/Radio fields: Values are transformed to their display labels
-- Checkbox groups: Values are transformed into an array of `{label, value}` objects
-- Identity fields: Address objects are flattened to strings
+-   Select/Radio fields: Values are transformed to their display labels
+-   Checkbox groups: Values are transformed into an array of `{label, value}` objects
+-   Identity fields: Address objects are flattened to strings
 
 ## Notes
 
-- The endpoint returns the 10 most recent form submissions
-- Field names in the response are derived from form field labels, converted to snake_case
-- All timestamps are returned in ISO 8601 format
+-   The endpoint returns the 10 most recent form submissions
+-   Field names in the response are derived from form field labels, converted to snake_case
+-   All timestamps are returned in ISO 8601 format
