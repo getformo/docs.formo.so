@@ -1,195 +1,379 @@
 {
-  "openapi": "3.0.1",
-  "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
-  "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      }
-    }
-  }
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Formo Webhook API",
+		"version": "1.0.0",
+		"description": "API for managing webhook subscriptions and form responses"
+	},
+	"servers": [
+		{
+			"url": "https://api.formo.so/api",
+			"description": "Production server"
+		}
+	],
+	"components": {
+		"securitySchemes": {
+			"ApiKeyAuth": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "x-api-key"
+			}
+		},
+		"schemas": {
+			"FormResponse": {
+				"type": "object",
+				"properties": {
+					"formId": {
+						"type": "string",
+						"description": "Unique identifier of the form"
+					},
+					"formTitle": {
+						"type": "string",
+						"description": "Title of the form"
+					},
+					"submissionId": {
+						"type": "string",
+						"description": "Unique identifier of the submission"
+					},
+					"submittedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp of form submission"
+					}
+				},
+				"additionalProperties": true
+			},
+			"Error": {
+				"type": "object",
+				"properties": {
+					"isSuccess": {
+						"type": "boolean",
+						"example": false
+					},
+					"message": {
+						"type": "string"
+					}
+				}
+			},
+			"SuccessResponse": {
+				"type": "object",
+				"properties": {
+					"isSuccess": {
+						"type": "boolean",
+						"example": true
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"items": {
+								"type": "array",
+								"items": {
+									"$ref": "#/components/schemas/FormResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"paths": {
+		"/webhooks/{formId}/poll": {
+			"get": {
+				"summary": "List Form Responses",
+				"description": "Retrieves recent form responses with transformed field data",
+				"operationId": "listFormResponses",
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "formId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "The unique identifier of the form"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved form responses",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Form ID is required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing or invalid API key",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Insufficient permissions",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found - Form not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/webhooks": {
+			"post": {
+				"summary": "Subscribe to Webhook",
+				"description": "Creates a new webhook subscription for form events",
+				"operationId": "subscribeWebhook",
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": [
+									"formId",
+									"targetUrl",
+									"eventTypes"
+								],
+								"properties": {
+									"formId": {
+										"type": "string",
+										"description": "The unique identifier of the form"
+									},
+									"targetUrl": {
+										"type": "string",
+										"description": "The URL that will receive webhook events"
+									},
+									"eventTypes": {
+										"type": "array",
+										"items": {
+											"type": "string",
+											"enum": [
+												"FORM_SUBMISSION",
+												"FORM_UPDATED"
+											]
+										},
+										"description": "Types of events to subscribe to"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully subscribed to webhook",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"isSuccess": {
+											"type": "boolean",
+											"example": true
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"webhookId": {
+													"type": "string",
+													"description": "Unique identifier of the webhook subscription"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Missing required fields or invalid event types",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing or invalid API key",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Insufficient permissions",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "Unsubscribe from Webhook",
+				"description": "Removes a webhook subscription",
+				"operationId": "unsubscribeWebhook",
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "webhookId",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"description": "The unique identifier of the webhook subscription"
+					},
+					{
+						"name": "targetUrl",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"description": "The URL that receives webhook events"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully unsubscribed from webhook",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"isSuccess": {
+											"type": "boolean",
+											"example": true
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"message": {
+													"type": "string",
+													"example": "Webhook unsubscribed successfully"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing or invalid API key",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Insufficient permissions",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found - Webhook not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

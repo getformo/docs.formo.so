@@ -1,50 +1,21 @@
 ---
-title: 'List Webhooks'
-description: 'Retrieve data from Formo API'
-openapi: 'GET /webhooks/list'
+title: 'List Form Responses'
+description: 'Retrieve form response data from Formo API'
+openapi: 'GET /webhooks/{formId}/poll'
 ---
 
-Retrieves form responses and webhook configurations.
+Retrieves form responses with transformed field data. Returns the most recent form submissions with field values mapped to readable keys based on the form configuration.
 
-```
-GET https://api.formo.so/api/webhooks/list
-```
+## Field Value Transformations
 
-### Request Headers
+The API automatically transforms certain field values based on their type:
 
-```
-x-api-key: your_workspace_api_key
-```
+- Select/Radio fields: Values are transformed to their display labels
+- Checkbox groups: Values are transformed into an array of `{label, value}` objects
+- Identity fields: Address objects are flattened to strings
 
-### Query Parameters
+## Notes
 
-```
-formId: string (required)
-```
-
-### Response
-
-```json
-{
-	"isSuccess": true,
-	"data": {
-		"items": [
-			{
-				"formId": "string",
-				"formTitle": "string",
-				"submissionId": "string",
-				"submittedAt": "string"
-				// Additional form fields will be included based on form configuration
-			}
-		]
-	}
-}
-```
-
-### Error Responses
-
--   `400` - Missing form ID
--   `401` - Missing or invalid API key
--   `403` - Insufficient permissions
--   `404` - Form not found
--   `500` - Server error
+- The endpoint returns the 10 most recent form submissions
+- Field names in the response are derived from form field labels, converted to snake_case
+- All timestamps are returned in ISO 8601 format
