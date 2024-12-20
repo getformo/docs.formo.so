@@ -4,74 +4,18 @@ description: 'Retrieve form response data from Formo API'
 openapi: 'GET /webhooks/{formId}/poll'
 ---
 
-Retrieves form responses with transformed field data. The endpoint returns the most recent form submissions with field values mapped to readable keys based on the form configuration.
-
-## Request
-
-```http
-GET https://api.formo.so/api/webhooks/{formId}/poll
-```
-
-### Path Parameters
-
-| Parameter | Type   | Required | Description                       |
-| --------- | ------ | -------- | --------------------------------- |
-| formId    | string | Yes      | The unique identifier of the form |
-
-### Request Headers
-
-| Header    | Type   | Required | Description            |
-| --------- | ------ | -------- | ---------------------- |
-| x-api-key | string | Yes      | Your workspace API key |
-
-## Response
-
-### 200 Success Response
-
-```json
-{
-	"isSuccess": true,
-	"data": {
-		"items": [
-			{
-				"formId": "string",
-				"formTitle": "string",
-				"submissionId": "string",
-				"submittedAt": "string",
-				// Dynamic fields based on form configuration
-				// Field names are derived from form field labels:
-				// - Converted to lowercase
-				// - Special characters removed
-				// - Spaces replaced with underscores
-				"first_name": "string",
-				"email_address": "string"
-				// etc.
-			}
-		]
-	}
-}
-```
-
-### Error Responses
-
-| Status | Description  | Response Body                                                                                                |
-| ------ | ------------ | ------------------------------------------------------------------------------------------------------------ |
-| 400    | Bad Request  | `{"isSuccess": false, "message": "Form ID is required"}`                                                     |
-| 401    | Unauthorized | `{"isSuccess": false, "message": "Missing API key"}` or `{"isSuccess": false, "message": "Invalid API key"}` |
-| 403    | Forbidden    | `{"isSuccess": false, "message": "You do not have permission to view webhooks for this form"}`               |
-| 404    | Not Found    | `{"isSuccess": false, "message": "Form not found"}`                                                          |
-| 500    | Server Error | `{"isSuccess": false, "message": "An error occurred while processing form responses"}`                       |
+Retrieves form responses with transformed field data. Returns the most recent form submissions with field values mapped to readable keys based on the form configuration.
 
 ## Field Value Transformations
 
 The API automatically transforms certain field values based on their type:
 
--   Select/Radio fields: Values are transformed to their display labels
--   Checkbox groups: Values are transformed into an array of `{label, value}` objects
--   Identity fields: Address objects are flattened to strings
+- Select/Radio fields: Values are transformed to their display labels
+- Checkbox groups: Values are transformed into an array of `{label, value}` objects
+- Identity fields: Address objects are flattened to strings
 
 ## Notes
 
--   The endpoint returns the 10 most recent form submissions
--   Field names in the response are derived from form field labels, converted to snake_case
--   All timestamps are returned in ISO 8601 format
+- The endpoint returns the 10 most recent form submissions
+- Field names in the response are derived from form field labels, converted to snake_case
+- All timestamps are returned in ISO 8601 format
