@@ -60,16 +60,18 @@
 		},
 		{
 			"group": "API Documentation",
-			"pages": ["api-reference/introduction"]
+			"pages": [
+				"api-reference/introduction",
+				"api-reference/authentication",
+				"api-reference/webhooks"
+			]
 		},
 		{
 			"group": "Endpoint Examples",
 			"pages": [
-				"api-reference/endpoint/authentication",
-				"api-reference/endpoint/webhooks",
-				"api-reference/endpoint/get",
-				"api-reference/endpoint/create",
-				"api-reference/endpoint/delete"
+				"api-reference/endpoint/list",
+				"api-reference/endpoint/subscribe",
+				"api-reference/endpoint/unsubscribe"
 			]
 		}
 	],

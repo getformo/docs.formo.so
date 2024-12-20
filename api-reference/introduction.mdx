@@ -3,8 +3,6 @@ title: 'API Reference'
 description: 'Integrate Formo with your web3 application'
 ---
 
-# Formo API Reference
-
 The Formo API enables you to programmatically create and manage token-gated forms, handle wallet verification, and analyze onchain user data. Build powerful web3 experiences by integrating Formo with your dapp.
 
 ## API Capabilities
@@ -40,13 +38,16 @@ https://api.formo.so/api
 
 ## Authentication
 
-All requests require a Workspace API key in the headers:
+API requests require a Workspace API key in the request headers. Find your API key in your workspace settings.
 
 ```bash
 x-api-key: your_workspace_api_key
 ```
 
-Get your API key from your [workspace settings](https://app.formo.so/settings).
+<Info>
+	See our [Authentication Guide](/api-reference/authentication) for detailed
+	setup instructions and best practices.
+</Info>
 
 ## Response Format
 
