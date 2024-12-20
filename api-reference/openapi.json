@@ -78,6 +78,121 @@
 		}
 	},
 	"paths": {
+		"/webhooks": {
+			"post": {
+				"summary": "Subscribe to Webhook",
+				"description": "Creates a new webhook subscription for form events",
+				"operationId": "subscribeWebhook",
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": [
+									"formId",
+									"targetUrl",
+									"eventTypes"
+								],
+								"properties": {
+									"formId": {
+										"type": "string",
+										"description": "The unique identifier of the form"
+									},
+									"targetUrl": {
+										"type": "string",
+										"description": "The URL that will receive webhook events"
+									},
+									"eventTypes": {
+										"type": "array",
+										"items": {
+											"type": "string",
+											"enum": [
+												"FORM_SUBMISSION",
+												"FORM_UPDATED"
+											]
+										},
+										"description": "Types of events to subscribe to"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully subscribed to webhook",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"isSuccess": {
+											"type": "boolean",
+											"example": true
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"webhookId": {
+													"type": "string",
+													"description": "Unique identifier of the webhook subscription"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Missing required fields or invalid event types",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing or invalid API key",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Insufficient permissions",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/webhooks/{formId}/poll": {
 			"get": {
 				"summary": "List Form Responses",
