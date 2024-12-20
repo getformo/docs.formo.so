@@ -1,33 +1,76 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference'
+description: 'Integrate Formo with your web3 application'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+# Formo API Reference
 
-## Welcome
+The Formo API enables you to programmatically create and manage token-gated forms, handle wallet verification, and analyze onchain user data. Build powerful web3 experiences by integrating Formo with your dapp.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## API Capabilities
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+### Form Management
+
+-   Create and customize token-gated forms
+-   Set wallet verification requirements
+-   Manage form access controls
+-   Handle form submissions
+
+### Wallet Intelligence
+
+-   Access wallet profile data
+-   Query reputation scores
+-   Verify token holdings
+-   Track onchain activity
+
+### Analytics
+
+-   Monitor active wallet metrics
+-   Track form engagement
+-   Analyze user retention
+-   Measure onchain attribution
+
+## Base URL
+
+All API requests should be made to:
+
+```bash
+https://api.formo.so/api
+```
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All requests require a Workspace API key in the headers:
+
+```bash
+x-api-key: your_workspace_api_key
+```
+
+Get your API key from your [workspace settings](https://app.formo.so/settings).
+
+## Response Format
+
+All API responses follow this structure:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "isSuccess": boolean,
+  "data": object | null,
+  "message": string | null,
+  "error": object | null
+}
 ```
+
+## Quick Links
+
+-   [Authentication Guide](/api-reference/endpoint/authentication)
+-   [Webhook Integration](/api-reference/endpoint/webhooks)
+-   [Form Management](/api-reference/endpoint/get)
+
+## Support
+
+Need help with integration?
+
+-   Check our [Help Center](https://help.formo.so)
+-   Email us at [support@formo.so](mailto:support@formo.so)
+-   Join our [Discord community](https://discord.gg/formo)
