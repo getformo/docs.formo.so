@@ -1,0 +1,79 @@
+---
+title: 'Subscribe to Webhook'
+description: 'Create and update resources with Formo API'
+openapi: 'POST /webhooks/subscribe'
+---
+
+Creates a new webhook subscription for form events.
+
+```
+POST https://api.formo.so/api/webhooks/subscribe
+```
+
+### Request Headers
+
+```
+x-api-key: your_workspace_api_key
+```
+
+### Request Body
+
+```json
+{
+	"formId": "string",
+	"targetUrl": "string",
+	"eventTypes": ["FORM_SUBMISSION", "FORM_UPDATED"]
+}
+```
+
+### Response
+
+```json
+{
+	"isSuccess": true,
+	"data": {
+		"webhookId": "string"
+	}
+}
+```
+
+### Error Responses
+
+-   `400` - Missing required fields or invalid event types
+-   `401` - Missing or invalid API key
+-   `403` - Insufficient permissions
+-   `500` - Server error
+
+## Validate API Key
+
+Validates a workspace API key and returns workspace details.
+
+```
+POST https://api.formo.so/api/validate-api-key
+```
+
+### Request Body
+
+```json
+{
+	"apiKey": "string"
+}
+```
+
+### Response
+
+```json
+{
+	"isSuccess": true,
+	"data": {
+		"validated": true,
+		"details": "API key validated successfully for workspace: {workspace_name}",
+		"teamId": "string"
+	}
+}
+```
+
+### Error Responses
+
+-   `401` - Missing or invalid API key
+-   `500` - Server error

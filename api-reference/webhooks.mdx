@@ -1,0 +1,46 @@
+---
+title: 'Webhooks'
+description: 'Overview of Formo webhook functionality'
+---
+
+Formo uses webhooks to notify your application about form events in real-time. You can subscribe to different event types and receive notifications when forms are submitted or updated.
+
+## Available Webhook Events
+
+-   `FORM_SUBMISSION`: Triggered when a user submits a form
+-   `FORM_UPDATED`: Triggered when a form is updated
+
+## Managing Webhooks
+
+### Creating Webhooks
+
+To create a new webhook subscription, use the [Subscribe to Webhook](/api-reference/endpoint/subscribe) endpoint.
+
+### Listing Webhooks
+
+To view all your webhook subscriptions for a form, use the [List Webhooks](/api-reference/endpoint/list) endpoint.
+
+### Removing Webhooks
+
+To remove a webhook subscription, use the [Unsubscribe from Webhook](/api-reference/endpoint/unsubscribe) endpoint.
+
+## Event Payload
+
+When an event occurs, Formo will send a POST request to your webhook URL with the following payload structure:
+
+```json
+{
+	"formId": "string",
+	"formTitle": "string",
+	"submissionId": "string",
+	"submittedAt": "string"
+	// Form field data with transformed values
+}
+```
+
+## Best Practices
+
+1. **Verify Requests**: Always validate that requests are coming from Formo by checking the API key
+2. **Handle Retries**: Implement retry logic in case your endpoint is temporarily unavailable
+3. **Process Asynchronously**: Handle webhook events asynchronously to prevent timeouts
+4. **Monitor Events**: Keep track of webhook delivery status for debugging

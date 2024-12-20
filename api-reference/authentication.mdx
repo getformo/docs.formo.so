@@ -1,0 +1,63 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate your API requests with Formo'
+---
+
+All API endpoints require authentication using a Workspace API key. You'll need to include this key in the request headers for all API calls.
+
+<Frame>
+	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
+</Frame>
+
+## Workspace API Key
+
+Your Workspace API key can be found in your Formo dashboard settings. This key is unique to your workspace and should be kept secure.
+
+<Frame>
+	<img
+		src="/images/workspace-api-key.png"
+		alt="Where to find your Workspace API key"
+	/>
+</Frame>
+
+## API Key Authentication
+
+Include the API key in the request headers:
+
+```bash
+Authorization Header x-api-key: your_workspace_api_key
+```
+
+## Validate API Key
+
+Validates a workspace API key and returns workspace details.
+
+```bash
+POST https://api.formo.so/api/validate-api-key
+```
+
+### Request Body
+
+```json
+{
+	"apiKey": "string"
+}
+```
+
+### Response
+
+```json
+{
+	"isSuccess": true,
+	"data": {
+		"validated": true,
+		"details": "API key validated successfully for workspace: {workspace_name}",
+		"teamId": "string"
+	}
+}
+```
+
+### Error Responses
+
+-   `401` - Missing or invalid API key
+-   `500` - Server error

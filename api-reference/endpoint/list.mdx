@@ -1,0 +1,50 @@
+---
+title: 'List Webhooks'
+description: 'Retrieve data from Formo API'
+openapi: 'GET /webhooks/list'
+---
+
+Retrieves form responses and webhook configurations.
+
+```
+GET https://api.formo.so/api/webhooks/list
+```
+
+### Request Headers
+
+```
+x-api-key: your_workspace_api_key
+```
+
+### Query Parameters
+
+```
+formId: string (required)
+```
+
+### Response
+
+```json
+{
+	"isSuccess": true,
+	"data": {
+		"items": [
+			{
+				"formId": "string",
+				"formTitle": "string",
+				"submissionId": "string",
+				"submittedAt": "string"
+				// Additional form fields will be included based on form configuration
+			}
+		]
+	}
+}
+```
+
+### Error Responses
+
+-   `400` - Missing form ID
+-   `401` - Missing or invalid API key
+-   `403` - Insufficient permissions
+-   `404` - Form not found
+-   `500` - Server error

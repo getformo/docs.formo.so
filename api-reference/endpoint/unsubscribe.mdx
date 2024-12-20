@@ -1,0 +1,51 @@
+---
+title: 'Unsubscribe from Webhook'
+description: 'Remove resources with Formo API'
+openapi: 'DELETE /webhooks/unsubscribe'
+---
+
+Removes a webhook subscription.
+
+```
+DELETE https://api.formo.so/api/webhooks/unsubscribe
+```
+
+### Request Headers
+
+```
+x-api-key: your_workspace_api_key
+```
+
+### Request Body
+
+```json
+{
+	"webhookId": "string"
+}
+```
+
+OR
+
+```json
+{
+	"targetUrl": "string"
+}
+```
+
+### Response
+
+```json
+{
+	"isSuccess": true,
+	"data": {
+		"message": "Webhook unsubscribed successfully"
+	}
+}
+```
+
+### Error Responses
+
+-   `401` - Missing or invalid API key
+-   `403` - Insufficient permissions
+-   `404` - Webhook not found
+-   `500` - Server error
