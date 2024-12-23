@@ -5,17 +5,11 @@ description: 'Installing Formo is easy. This guide will show you how to do it wi
 
 Pick your stack and add the code below to your codebase.
 
-<AccordionGroup>
-  <Accordion icon="code" title="Browser">
-    
-    <Info>
-      **Prerequisite**: Please find your project API key in the Formo dashboard.
-    </Info>
-
+<Tabs>
+  <Tab icon="code" title="Browser">
     Install this script in the `<head>` tag of your website:
 
     <CodeGroup>
-
       ```bash html
       <script>
         const script = document.createElement('script');
@@ -35,29 +29,32 @@ Pick your stack and add the code below to your codebase.
         document.head.appendChild(script);
       </script>
       ```
-
-    ```bash yarn
-    yarn global add mintlify
-    ```
-
     </CodeGroup>
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Next.js">
-    TODO
-  </Accordion>  
-  <Accordion icon="react" title="React">
-    TODO
-  </Accordion>
-</AccordionGroup>
+
+    Replace `<your-project-api-key>` with your project API key.
+  </Tab>
+  <Tab icon="rectangle-terminal" title="Next.js">
+    ✌️ Here's content that's only inside the second Tab.
+  </Tab>
+  <Tab icon="react" title="React">
+    💪 Here's content that's only inside the third Tab.
+  </Tab>
+</Tabs>
+
+
+## Code Examples
+
+You can check out example code for Next.js and React apps on Github:
 
 <CardGroup>
-
-<Card title="Example Next.js App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-next">
-  View a working example of Formo in a Next.js app.
-</Card>
-
-<Card title="Example React App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-react">
-  View a working example of Formo in a React app.
-</Card>
-
+  <Card title="Example Next.js App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-next">
+    A working example of Formo in a Next.js app.
+  </Card>
+  <Card title="Example React App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-react">
+    A working example of Formo in a React app.
+  </Card>
 </CardGroup>
+
+## Troubleshooting
+
+Please contact us at [support@formo.so](mailto:support@formo.so) if you run into issues. We're here to help!
