@@ -10,10 +10,10 @@ Pick your stack and add the code below to your codebase.
     Install this script in the `<head>` tag of your website:
 
     <CodeGroup>
-      ```bash html
+      ```html
       <script>
         const script = document.createElement('script');
-        const apiKey = '<your-project-api-key>';
+        const apiKey = '<YOUR_API_KEY>';
 
         script.src = 'https://unpkg.com/@formo/analytics';
         script.onload = function () {
@@ -31,14 +31,118 @@ Pick your stack and add the code below to your codebase.
       ```
     </CodeGroup>
 
-    Replace `<your-project-api-key>` with your project API key.
+    Replace `<YOUR_API_KEY>` with your project API key.
   </Tab>
-  <Tab icon="rectangle-terminal" title="Next.js">
-    ✌️ Here's content that's only inside the second Tab.
+  <Tab icon="rectangle-terminal" title="React">
+    For a React app, the best approach is installing the NPM package rather than using the inlined script.
+
+    #### 1. Install the Formo Analytics SDK
+
+    ```bash
+      npm install @formo/analytics --save
+    ```
+
+    #### 2. Use `FormoAnalyticsProvider` in your app
+
+    Wrap your React app in the FormoAnalyticsProvider provided by the SDK.
+
+    ```tsx
+      // App.tsx (or App.js)
+
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+      import { FormoAnalyticsProvider } from '@formo/analytics';
+      import App from './App';
+
+      const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+
+      root.render(
+        <React.StrictMode>
+          <FormoAnalyticsProvider apiKey="<YOUR_API_KEY>">
+            <App />
+          </FormoAnalyticsProvider>
+        </React.StrictMode>
+      );
+    ```
+
+    #### 3. Tracking Events
+
+    Formo autocaptures events like page views, wallet connects, and wallet actions for you. 
+    You can use the `useFormoAnalytics` hook to track custom dapp events.
+
+    ```tsx
+      import React, { useEffect } from 'react';
+      import { useFormoAnalytics } from '@formo/analytics';
+
+      const HomePage = () => {
+        const analytics = useFormoAnalytics();
+
+        useEffect(() => {
+          // Track a custom event
+          analytics.track('custom_event', { key: 'value' });
+        }, [analytics]);
+
+        return <div>Welcome to the Home Page!</div>;
+      };
+
+      export default HomePage;
+    ```
   </Tab>
-  <Tab icon="react" title="React">
-    💪 Here's content that's only inside the third Tab.
-  </Tab>
+  <Tab icon="react" title="Next.js">
+    For a NextJS app, the best approach is installing the NPM package rather than using the inlined script.
+
+    #### 1. Install the Formo Analytics SDK
+
+    ```bash
+      npm install @formo/analytics --save
+    ```
+
+    #### 2. Use `FormoAnalyticsProvider` in your app
+
+    Wrap your Next.js app in the FormoAnalyticsProvider provided by the SDK.
+
+    ```tsx
+      // App.tsx (or App.js)
+
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+      import { FormoAnalyticsProvider } from '@formo/analytics';
+      import App from './App';
+
+      const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+
+      root.render(
+        <React.StrictMode>
+          <FormoAnalyticsProvider apiKey="<YOUR_API_KEY>">
+            <App />
+          </FormoAnalyticsProvider>
+        </React.StrictMode>
+      );
+    ```
+
+    #### 3. Tracking Events
+
+    Formo autocaptures events like page views, wallet connects, and wallet actions for you. 
+    You can use the `useFormoAnalytics` hook to track custom dapp events.
+
+    ```tsx
+      import React, { useEffect } from 'react';
+      import { useFormoAnalytics } from '@formo/analytics';
+
+      const HomePage = () => {
+        const analytics = useFormoAnalytics();
+
+        useEffect(() => {
+          // Track a custom event
+          analytics.track('custom_event', { key: 'value' });
+        }, [analytics]);
+
+        return <div>Welcome to the Home Page!</div>;
+      };
+
+      export default HomePage;
+    ```
+  </Tab>  
 </Tabs>
 
 
@@ -47,12 +151,12 @@ Pick your stack and add the code below to your codebase.
 You can check out example code for Next.js and React apps on Github:
 
 <CardGroup>
-  <Card title="Example Next.js App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-next">
-    A working example of Formo in a Next.js app.
-  </Card>
   <Card title="Example React App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-react">
     A working example of Formo in a React app.
   </Card>
+  <Card title="Example Next.js App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-next">
+    A working example of Formo in a Next.js app.
+  </Card>  
 </CardGroup>
 
 ## Troubleshooting
