@@ -17,8 +17,8 @@
 	},
 	"topbarLinks": [
 		{
-			"name": "Support",
-			"url": "mailto:support@formo.so"
+			"name": "Status",
+			"url": "https://status.formo.so"
 		}
 	],
 	"topbarCtaButton": {
@@ -33,19 +33,14 @@
 	],
 	"anchors": [
 		{
-			"name": "Help Center",
-			"icon": "circle-info",
-			"url": "https://help.formo.so"
-		},
-		{
-			"name": "Feature Requests",
+			"name": "Request Features",
 			"icon": "comment",
 			"url": "https://formo.canny.io"
 		},
 		{
-			"name": "Status",
-			"icon": "signal",
-			"url": "https://status.formo.so"
+			"name": "Help Center",
+			"icon": "life-ring",
+			"url": "https://help.formo.so"
 		},
 		{
 			"name": "Blog",
@@ -55,8 +50,8 @@
 	],
 	"navigation": [
 		{
-			"group": "Get Started",
-			"pages": ["introduction", "quickstart", "development"]
+			"group": "Getting Started",
+			"pages": ["start-here", "install"]
 		},
 		{
 			"group": "API Documentation",
