@@ -56,7 +56,11 @@
 	"navigation": [
 		{
 			"group": "Get Started",
-			"pages": ["introduction", "quickstart", "development"]
+			"pages": ["start-here", "install"]
+		},
+		{
+			"group": "SDK",
+			"pages": ["browser", "react", "next"]
 		},
 		{
 			"group": "API Documentation",
