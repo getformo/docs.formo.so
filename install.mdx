@@ -99,25 +99,58 @@ Pick your stack and add the code below to your codebase.
 
     #### 2. Use `FormoAnalyticsProvider` in your app
 
-    Wrap your Next.js app in the FormoAnalyticsProvider provided by the SDK.
+    Create a new `AnalyticsProvider.tsx` client component.
 
     ```tsx
-      // App.tsx (or App.js)
+      // AnalyticsProvider.tsx
 
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      import { FormoAnalyticsProvider } from '@formo/analytics';
-      import App from './App';
+      'use client';
 
-      const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+      import { FormoAnalytics, FormoAnalyticsProvider } from '@formo/analytics';
+      import React, { FC, useEffect } from 'react';
 
-      root.render(
-        <React.StrictMode>
-          <FormoAnalyticsProvider apiKey="<YOUR_API_KEY>">
-            <App />
+      type FormoAnalyticsProviderProps = {
+        apiKey: string,
+        children: React.ReactNode,
+      };
+
+      // The provider component
+      export const AnalyticsProvider: FC<FormoAnalyticsProviderProps> = ({
+        apiKey,
+        children,
+      }) => {
+        return (
+          <FormoAnalyticsProvider apiKey={apiKey}>
+            {children}
           </FormoAnalyticsProvider>
-        </React.StrictMode>
-      );
+        );
+      };
+
+      export default AnalyticsProvider;
+    ```
+
+    Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component: 
+
+    ```tsx
+      // app/layout.tsx
+
+      import { AnalyticsProvider } from './AnalyticsProvider';
+
+      export default function RootLayout({
+        children,
+      }: {
+        children: React.ReactNode,
+      }) {
+        return (
+          <html lang='en'>
+            <body>
+              <AnalyticsProvider apiKey='YOUR_API_KEY'>
+                Your Page Content
+              </AnalyticsProvider>
+            </body>
+          </html>
+        );
+      }
     ```
 
     #### 3. Tracking Events
