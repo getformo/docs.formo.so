@@ -17,8 +17,8 @@
 	},
 	"topbarLinks": [
 		{
-			"name": "Status",
-			"url": "https://status.formo.so"
+			"name": "Help Center",
+			"url": "https://help.formo.so"
 		}
 	],
 	"topbarCtaButton": {
@@ -33,15 +33,15 @@
 	],
 	"anchors": [
 		{
-			"name": "Request Features",
+			"name": "Feedback",
 			"icon": "comment",
 			"url": "https://formo.canny.io"
 		},
 		{
-			"name": "Help Center",
-			"icon": "life-ring",
-			"url": "https://help.formo.so"
-		},
+			"name": "Status",
+			"icon": "chart-line",
+			"url": "https://status.formo.so"
+		},		
 		{
 			"name": "Blog",
 			"icon": "newspaper",
