@@ -1,6 +1,6 @@
 ---
-title: 'Install Formo'
-description: 'Installing Formo is easy. This guide will show you how to do it with our SDKs.'
+title: "Install Formo"
+description: "Installing Formo is easy. This guide will show you how to do it with our SDKs."
 ---
 
 Pick your stack and add the code below to your codebase.
@@ -20,7 +20,6 @@ Pick your stack and add the code below to your codebase.
           FormoAnalytics.init(apiKey)
             .then((sdkInstance) => {
               window.formo = sdkInstance;
-              window.formo.page();
             })
             .catch((error) => {
               console.error('Error initializing FormoAnalytics:', error);
@@ -32,6 +31,7 @@ Pick your stack and add the code below to your codebase.
     </CodeGroup>
 
     Replace `<YOUR_API_KEY>` with your project API key. You can find it in your project settings.
+
   </Tab>
   <Tab icon="rectangle-terminal" title="React">
     For a React app, the best approach is installing the NPM package rather than using the inlined script.
@@ -69,7 +69,7 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Tracking Events
 
-    Formo autocaptures events like page views, wallet connects, and wallet actions for you. 
+    Formo autocaptures events like page views, wallet connects, and wallet actions for you.
     You can use the `useFormoAnalytics` hook to track custom dapp events.
 
     ```tsx
@@ -89,6 +89,7 @@ Pick your stack and add the code below to your codebase.
 
       export default HomePage;
     ```
+
   </Tab>
   <Tab icon="react" title="Next.js">
     For a NextJS app, the best approach is installing the NPM package rather than using the inlined script.
@@ -131,7 +132,7 @@ Pick your stack and add the code below to your codebase.
       export default AnalyticsProvider;
     ```
 
-    Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component: 
+    Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component:
 
     ```tsx
       // app/layout.tsx
@@ -159,7 +160,7 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Tracking Events
 
-    Formo autocaptures events like page views, wallet connects, and wallet actions for you. 
+    Formo autocaptures events like page views, wallet connects, and wallet actions for you.
     You can use the `useFormoAnalytics` hook to track custom dapp events.
 
     ```tsx
@@ -179,29 +180,36 @@ Pick your stack and add the code below to your codebase.
 
       export default HomePage;
     ```
+
   </Tab>  
 </Tabs>
-
 
 ## Code Examples
 
 You can check out example code for Next.js and React apps on Github:
 
 <CardGroup>
-  <Card title="Example React App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-react">
+  <Card
+    title="Example React App"
+    icon="file-code"
+    href="https://github.com/getformo/formo-analytics-example-react"
+  >
     A working example of Formo in a React app.
   </Card>
-  <Card title="Example Next.js App" icon="file-code" href="https://github.com/getformo/formo-analytics-example-next">
+  <Card
+    title="Example Next.js App"
+    icon="file-code"
+    href="https://github.com/getformo/formo-analytics-example-next"
+  >
     A working example of Formo in a Next.js app.
-  </Card>  
+  </Card>
 </CardGroup>
 
 ## Troubleshooting
 
-- API Key Not Provided: Ensure you pass a valid apiKey when initializing the SDK. 
-- SDK Not Initialized: If you encounter issues with initialization, check the console logs for errors and ensure the project ID and API key are correct. 
+- API Key Not Provided: Ensure you pass a valid apiKey when initializing the SDK.
+- SDK Not Initialized: If you encounter issues with initialization, check the console logs for errors and ensure the project ID and API key are correct.
 - Network Errors: Verify that the analytics service URL is accessible from your network.
-
 
 ## Support
 
