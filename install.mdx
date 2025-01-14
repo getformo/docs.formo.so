@@ -18,8 +18,8 @@ Pick your stack and add the code below to your codebase.
         script.src = 'https://unpkg.com/@formo/analytics';
         script.onload = function () {
           FormoAnalytics.init(apiKey)
-            .then((sdkInstance) => {
-              window.formo = sdkInstance;
+            .then((formo) => {
+              window.formo = formo;
             })
             .catch((error) => {
               console.error('Error initializing FormoAnalytics:', error);
