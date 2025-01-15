@@ -9,26 +9,24 @@ Pick your stack and add the code below to your codebase.
   <Tab icon="code" title="Browser">
     Install this script in the `<head>` tag of your website:
 
-    <CodeGroup>
-      ```html
-      <script>
-        const script = document.createElement('script');
-        const apiKey = '<YOUR_API_KEY>';
+    ```html
+    <script>
+      const script = document.createElement('script');
+      const apiKey = '<YOUR_API_KEY>';
 
-        script.src = 'https://unpkg.com/@formo/analytics';
-        script.onload = function () {
-          FormoAnalytics.init(apiKey)
-            .then((formo) => {
-              window.formo = formo;
-            })
-            .catch((error) => {
-              console.error('Error initializing FormoAnalytics:', error);
-            });
-        };
-        document.head.appendChild(script);
-      </script>
-      ```
-    </CodeGroup>
+      script.src = 'https://unpkg.com/@formo/analytics';
+      script.onload = function () {
+        FormoAnalytics.init(apiKey)
+          .then((formo) => {
+            window.formo = formo;
+          })
+          .catch((error) => {
+            console.error('Error initializing FormoAnalytics:', error);
+          });
+      };
+      document.head.appendChild(script);
+    </script>
+    ```
 
     Replace `<YOUR_API_KEY>` with your project API key. You can find it in your project settings.
 
@@ -181,27 +179,80 @@ Pick your stack and add the code below to your codebase.
       export default HomePage;
     ```
 
-  </Tab>  
+  </Tab> 
+  <Tab icon="code" title="Google Tag Manager">
+    You can install Formo on your site with [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager/).
+
+    #### 1. Go to your Google Tag Manager workspace. 
+
+    Choose **New Tag** too add a new tag.
+
+    ![Add new tag](/images/gtm-0.png)
+
+    You will need to specify your **Tag Configuration** and **Triggering**.
+
+    ![Tag configuration and triggering](/images/gtm-1.png)
+    
+    #### 2. **Tag Configuration:** Choose the 'Custom HTML' tag type.
+
+    ![Choose Custom HTML tag](/images/gtm-2.png)
+
+    #### 3. Paste in this Formo script:
+
+    <CodeGroup>
+      ```html
+      <script>
+        var script = document.createElement('script');
+        var apiKey = '<YOUR_API_KEY>';
+
+        script.src = 'https://unpkg.com/@formo/analytics';
+        script.onload = function () {
+          FormoAnalytics.init(apiKey)
+            .then(function(formo) {
+              window.formo = formo;
+            })
+            .catch(function(error) {
+              console.error('Error initializing FormoAnalytics:', error);
+            });
+        };
+        document.head.appendChild(script);
+      </script>
+      ```
+    </CodeGroup>
+
+    Replace `<YOUR_API_KEY>` with your project API key. You can find it in your project settings.
+
+    #### 4. **Triggering:** Choose 'Initialization - All Pages'.
+
+    ![Choose Initialization - All Pages](/images/gtm-3.png)
+
+    #### 5. **Save and Submit:** 
+
+    Click Save and don't forget to Submit the changes at the top right once you're ready.
+
+    Once submitted, you should shortly see events in your Activity page on the Formo Dashboard.
+
+  </Tab> 
 </Tabs>
 
 ## Code Examples
 
-You can check out example code for Next.js and React apps on Github:
+Looking for sample codes? You can check out working examples of Formo on Github:
 
 <CardGroup>
-  <Card
-    title="Example React App"
-    icon="file-code"
-    href="https://github.com/getformo/formo-analytics-example-react"
-  >
-    A working example of Formo in a React app.
-  </Card>
   <Card
     title="Example Next.js App"
     icon="file-code"
     href="https://github.com/getformo/formo-analytics-example-next"
   >
     A working example of Formo in a Next.js app.
+  </Card>
+  <Card
+    title="Example React App"
+    icon="file-code"
+    href="https://github.com/getformo/formo-analytics-example-react"
+  >
+    A working example of Formo in a React app.
   </Card>
 </CardGroup>
 
