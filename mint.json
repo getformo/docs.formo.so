@@ -46,11 +46,10 @@
 			"name": "Blog",
 			"icon": "newspaper",
 			"url": "https://formo.so/blog"
-		},
-		,		
+		},		
 		{
 			"name": "Contact",
-			"icon": "email",
+			"icon": "envelope",
 			"url": "mailto:gm@formo.so"
 		}
 	],
@@ -58,6 +57,10 @@
 		{
 			"group": "Getting Started",
 			"pages": ["start-here", "install"]
+		},
+		{
+			"group": "Features",
+			"pages": ["features/dapp-analytics", "features/wallet-intelligence", "features/token-gated-forms"]
 		},
 		{
 			"group": "API Documentation",
