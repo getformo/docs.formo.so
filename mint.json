@@ -46,6 +46,12 @@
 			"name": "Blog",
 			"icon": "newspaper",
 			"url": "https://formo.so/blog"
+		},
+		,		
+		{
+			"name": "Contact",
+			"icon": "email",
+			"url": "mailto:gm@formo.so"
 		}
 	],
 	"navigation": [
