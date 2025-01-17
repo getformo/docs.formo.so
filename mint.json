@@ -61,6 +61,7 @@
 		{
 			"group": "Features",
 			"pages": [
+				"features/key-concepts",
 				{
 					"group": "Dapp Analytics",
 					"pages": ["features/dapp-analytics/overview", "features/dapp-analytics/activity"]
@@ -78,7 +79,7 @@
 	
 		{
 			"group": "Data",
-			"pages": ["data/key-concepts", "data/metrics", "data/what-we-collect"]
+			"pages": ["data/metrics", "data/what-we-collect"]
 		},
 		{
 			"group": "API Documentation",
