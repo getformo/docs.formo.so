@@ -63,15 +63,15 @@
 			"pages": [
 				{
 					"group": "Dapp Analytics",
-					"pages": ["features/dapp-analytics/overview"]
+					"pages": ["features/dapp-analytics/overview", "features/dapp-analytics/activity"]
 				}, 
 				{
 					"group": "Wallet Intelligence",
-					"pages": ["features/wallet-intelligence/overview"]
+					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles"]
 				}, 
 				{
 					"group": "Token Gated Forms",
-					"pages": ["features/token-gated-forms/overview"]
+					"pages": ["features/token-gated-forms/token-gating"]
 				}
 			]
 		},
