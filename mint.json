@@ -63,8 +63,8 @@
 			"pages": ["features/dapp-analytics", "features/wallet-intelligence", "features/token-gated-forms"]
 		},
 		{
-			"group": "Other",
-			"pages": ["other/metrics", "other/web-sdk"]
+			"group": "Data",
+			"pages": ["data/metrics", "data/what-we-collect"]
 		},
 		{
 			"group": "API Documentation",
