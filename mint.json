@@ -60,11 +60,25 @@
 		},
 		{
 			"group": "Features",
-			"pages": ["features/dapp-analytics", "features/wallet-intelligence", "features/token-gated-forms"]
+			"pages": [
+				{
+					"group": "Dapp Analytics",
+					"pages": ["features/dapp-analytics/overview"]
+				}, 
+				{
+					"group": "Wallet Intelligence",
+					"pages": ["features/wallet-intelligence/overview"]
+				}, 
+				{
+					"group": "Token Gated Forms",
+					"pages": ["features/token-gated-forms/overview"]
+				}
+			]
 		},
+	
 		{
 			"group": "Data",
-			"pages": ["data/metrics", "data/what-we-collect"]
+			"pages": ["data/key-concepts", "data/metrics", "data/what-we-collect"]
 		},
 		{
 			"group": "API Documentation",
