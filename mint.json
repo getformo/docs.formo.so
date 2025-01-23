@@ -46,12 +46,40 @@
 			"name": "Blog",
 			"icon": "newspaper",
 			"url": "https://formo.so/blog"
+		},		
+		{
+			"name": "Contact",
+			"icon": "envelope",
+			"url": "mailto:gm@formo.so"
 		}
 	],
 	"navigation": [
 		{
 			"group": "Getting Started",
 			"pages": ["start-here", "install"]
+		},
+		{
+			"group": "Features",
+			"pages": [
+				"features/key-concepts",
+				{
+					"group": "Dapp Analytics",
+					"pages": ["features/dapp-analytics/overview", "features/dapp-analytics/activity"]
+				}, 
+				{
+					"group": "Wallet Intelligence",
+					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles"]
+				}, 
+				{
+					"group": "Token Gated Forms",
+					"pages": ["features/token-gated-forms/form-builder", "features/token-gated-forms/token-gating"]
+				}
+			]
+		},
+	
+		{
+			"group": "Data",
+			"pages": ["data/metrics", "data/what-we-collect"]
 		},
 		{
 			"group": "API Documentation",
