@@ -72,7 +72,7 @@
 				}, 
 				{
 					"group": "Token Gated Forms",
-					"pages": ["features/token-gated-forms/token-gating"]
+					"pages": ["features/token-gated-forms/form-builder", "features/token-gated-forms/token-gating"]
 				}
 			]
 		},
