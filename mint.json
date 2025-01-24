@@ -63,7 +63,7 @@
 				}, 
 				{
 					"group": "Wallet Intelligence",
-					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles"]
+					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles","features/wallet-intelligence/wallet-reputation-score"]
 				}, 
 				{
 					"group": "Token Gated Forms",
