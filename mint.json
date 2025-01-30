@@ -17,8 +17,8 @@
 	},
 	"topbarLinks": [
 		{
-			"name": "Help Center",
-			"url": "https://help.formo.so"
+			"name": "Book a Demo",
+			"url": "https://cal.com/formo/demo"
 		}
 	],
 	"topbarCtaButton": {
@@ -33,24 +33,19 @@
 	],
 	"anchors": [
 		{
-			"name": "Feedback",
-			"icon": "comment",
-			"url": "https://formo.canny.io"
-		},
-		{
 			"name": "Status",
-			"icon": "chart-line",
+			"icon": "signal",
 			"url": "https://status.formo.so"
 		},		
 		{
-			"name": "Blog",
-			"icon": "newspaper",
-			"url": "https://formo.so/blog"
-		},		
+			"name": "Support",
+			"icon": "life-ring",
+			"url": "https://help.formo.so"
+		},
 		{
-			"name": "Contact",
-			"icon": "envelope",
-			"url": "mailto:gm@formo.so"
+			"name": "Feedback",
+			"icon": "comment",
+			"url": "https://formo.canny.io"
 		}
 	],
 	"navigation": [
@@ -68,7 +63,7 @@
 				}, 
 				{
 					"group": "Wallet Intelligence",
-					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles"]
+					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles","features/wallet-intelligence/wallet-reputation-score"]
 				}, 
 				{
 					"group": "Token Gated Forms",
