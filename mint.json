@@ -34,7 +34,7 @@
 	"anchors": [
 		{
 			"name": "Status",
-			"icon": "signal",
+			"icon": "check",
 			"url": "https://status.formo.so"
 		},		
 		{
@@ -95,7 +95,7 @@
 	],
 	"footerSocials": {
 		"x": "https://x.com/getformo",
-		"github": "https://github.com/getformo",
-		"linkedin": "https://linkedin.com/company/getformo"
+		"linkedin": "https://linkedin.com/company/getformo",
+		"discord": "https://discord.com/invite/GNwtNPBeTJ"
 	}
 }
