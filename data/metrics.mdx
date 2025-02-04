@@ -5,7 +5,8 @@ description: 'A list of metrics you can track with Formo and their definitions.'
 
 ### Visitors
 
-How many unique visitors are interacting with your site or dapp.
+How many unique visitors are interacting with your site or dapp across multiple page views and events. 
+A visitor is only counted once within a 24 hour window. The 24 hour limit is necessary to comply with GDPR.
 
 ### Current Visitors
 
@@ -29,7 +30,11 @@ How many times a page has been viewed across your site or dapp.
 
 ### Sessions
 
-A session (also known as a visit) is a set of actions that a user takes on your site.
+A session (also known as a visit) is a set of actions that a user takes on your site. 
+Each session is a 24 hour window. If a visitor returns after this window, a new session is counted.
+
+This is useful for debugging and identifying problems on your site. 
+For example, if visitors are not completing transactions, you can see which pages were visited and what events were triggered to identify a common problem on your site that is preventing visitors from completing.
 
 ### Average Session Time
 
@@ -37,7 +42,7 @@ How long a user spends on your site or dapp.
 
 ### Bounce Rate
 
-How many users leave your site or dapp after viewing only one page.
+The bounce rate is the relative number of visitors who have left the site after a single page view, compared to the total number of unique visitors.
 
 ### UTM parameters
 
@@ -49,7 +54,7 @@ How many users come to your site or dapp from a particular source. We track thes
 
 ### Countries
 
-How many users are from a particular country.
+Countries are the statistics for the country of origin of the visitors.
 
 ### Devices
 
@@ -57,7 +62,7 @@ How many users are using a particular device such as desktop, mobile, tablet, et
 
 ### Browsers
 
-How many users are using a particular browser such as Chrome, Firefox, etc.
+Browser is the statistics of the browser used by the visitor. It is extracted from the User-Agent and Client Hints HTTP headers.
 
 ### Referrals
 
@@ -66,6 +71,14 @@ How many users are referred to your site or dapp by a particular user. We use th
 ### Referrers / Sources
 
 How many users are referred to your site or dapp by a particular source such as a search engines, social media platform, etc.
+
+Referrers are the statistics for the referring site. The data is extracted from the Referers (with a r) HTTP header and may not be set by the browser. In these cases it will be listed as unknown.
+
+### Events
+
+Events are user-defined custom events. They have a name and optional metadata key/value pairs. When you expand the activity feed, you can view and filter the metadata.
+
+Metadata can be anything. For example, you can define an event Button clicked and track which button was clicked as the metadata field `button=Header`. 
 
 ### Wallet Type
 
@@ -111,3 +124,10 @@ How much revenue you've made from your site or dapp.
 ### Customer Lifetime Value (CLV)
 
 CLV estimates the total revenue a user generates over their entire engagement with your dapp.
+
+### Funnels
+
+Funnel
+Funnels are essentially multi-stage conversion targets. 
+Each step has it's own filter that calculates the visitor drop off and the conversion rate (CR). 
+The main difference between regular CR and funnel CR is that funnel CR is always based on the previous step, not the total number of visitors.
