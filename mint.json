@@ -56,7 +56,7 @@
 		{
 			"group": "Features",
 			"pages": [
-				"features/key-concepts",
+				"features/concepts",
 				{
 					"group": "Dapp Analytics",
 					"pages": ["features/dapp-analytics/overview", "features/dapp-analytics/activity"]
