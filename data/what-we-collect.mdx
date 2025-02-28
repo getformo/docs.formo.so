@@ -6,25 +6,6 @@ We collect as little information as is necessary to give you actionable analytic
 
 Here is a list of what we do and don’t collect from your visitors.
 
-### NO Fingerprinting
-
-> We do NOT use device fingerprinting.
-
-We do not attempt to generate a device-persistent identifier because they are considered personal data under GDPR. 
-Every single HTTP request sends the IP address and the User-Agent to the server so that’s what we use. 
-
-We generate a daily changing identifier using the visitor’s IP address and User-Agent. 
-To anonymize these datapoints and make them impossible to relate back to the user, we run them through a hash function with a rotating salt.
-
-```
-hash(daily_salt + website_domain + ip_address + user_agent)
-```
-
-This generates a random string of letters and numbers that is used to calculate unique visitor numbers for the day.
-
-The biggest limitation with this approach is that we cannot do good retention analysis without a persistent user identifier. 
-If the same visitor visits your site five times in one day we will show that as one unique visitor. But if the same visitor visits your site on five different days in a month we would show that as five unique visitors.
-
 ### NO Cookies
 
 > We do NOT read nor set any cookies.
