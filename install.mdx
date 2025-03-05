@@ -30,7 +30,7 @@ Pick your stack and add the code below to your codebase.
     </script>
     ```
 
-    Replace `<YOUR_WRITE_KEY>` with your project Write key. You can find it in your project settings.
+    Replace `<YOUR_WRITE_KEY>` with your project's **SDK Write Key**. Find it in your project settings.
 
   </Tab>
   <Tab icon="rectangle-terminal" title="React">
@@ -237,9 +237,15 @@ Pick your stack and add the code below to your codebase.
   </Tab> */}
 </Tabs>
 
+## Troubleshooting
+
+Ensure you pass a valid `writeKey` when initializing the SDK.
+
+To test that things are working, navigate to your site and open the network tab of the developer tools in your browser (usually F12 or Ctrl/Command + Shift + I). Search for 'events' and make sure you get a 200 response code in the status column.
+
 ## Code Examples
 
-Looking for sample codes? You can check out working examples of Formo on Github:
+Check out working examples of Formo on Github:
 
 <CardGroup>
   <Card
@@ -257,12 +263,6 @@ Looking for sample codes? You can check out working examples of Formo on Github:
     A working example of Formo in a React app.
   </Card>
 </CardGroup>
-
-## Troubleshooting
-
-Ensure you pass a valid `writeKey` when initializing the SDK.
-
-To test that things are working, navigate to your site and open the network tab of the developer tools in your browser (usually F12 or Ctrl/Command + Shift + I). Search for 'events' and make sure you get a 200 response code in the status column.
 
 ## Support & Feedback
 
