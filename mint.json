@@ -74,7 +74,7 @@
 	
 		{
 			"group": "Data",
-			"pages": ["data/supported-chains", "data/metrics", "data/what-we-collect"]
+			"pages": ["data/metrics", "data/what-we-collect", "data/supported-chains"]
 		},
 		{
 			"group": "API Documentation",
@@ -85,7 +85,7 @@
 			]
 		},
 		{
-			"group": "Endpoint Examples",
+			"group": "API Endpoints",
 			"pages": [
 				"api-reference/endpoint/list",
 				"api-reference/endpoint/subscribe",
