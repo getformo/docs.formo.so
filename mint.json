@@ -33,20 +33,19 @@
 	],
 	"anchors": [
 		{
-			"name": "Status",
-			"icon": "check",
-			"url": "https://status.formo.so"
-		},		
+			"name": "Slack",
+			"icon": "slack",
+			"url": "https://formo.so/slack"
+		},	
 		{
 			"name": "Support",
 			"icon": "life-ring",
 			"url": "https://help.formo.so"
-		},
-		{
-			"name": "Request Features",
-			"icon": "comment",
-			"url": "https://formo.canny.io/feature-requests"
-		}
+		}, {
+			"name": "Status",
+			"icon": "check",
+			"url": "https://status.formo.so"
+		}	
 	],
 	"navigation": [
 		{
