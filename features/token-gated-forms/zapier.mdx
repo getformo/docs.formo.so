@@ -1,0 +1,89 @@
+---
+title: 'Zapier integration'
+---
+
+## What is Zapier?
+
+Zapier lets you [connect Formo to 2,000+ other web services](https://zapier.com/apps/formo/integrations). Automated connections called Zaps, set up in minutes with no coding, can automate your day-to-day tasks and build workflows between apps that otherwise wouldn't be possible.
+
+Each Zap has one app as the Trigger, where your information comes from and which causes one or more Actions in other apps, where your data gets sent automatically.
+
+Sign up for a free Zapier account, from there you can jump right in. To help you hit the ground running, here are some Zap ideas:
+
+## Setting Up Slack Integration in Zapier
+
+### Prerequisites
+
+- A Zapier account
+- Your Formo Workspace API Key
+
+### Get your API Key
+
+To find your API Key, go to your workspace settings page with the 'Settings' link on the left sidebar:
+
+<Frame caption="Find your API Key in your workspace settings page.">
+    <img src="/images/zapier-0.png" alt="Token Gated Forms Zapier" />
+</Frame>
+
+- Click the copy button in the 'Workspace API Key' to copy it.
+- You will need this in Step 2.
+
+### Step 1: Initial Zapier Setup
+
+1. Log into your Zapier account.
+2. Click "Create Zap" in the top navigation.
+
+### Step 2: Configure Formo Trigger
+
+1. In the trigger section, search for and select "Formo."
+2. Choose "New Form Event" as your trigger event.
+3. Connect your Formo account:
+   - Go to your Formo team settings page.
+   - Paste your Formo API key in Zapier to authenticate.
+
+### Step 3: Configure Form Settings
+
+1. Locate your Form ID:
+   - Navigate to your form's edit page in Formo.
+   - Copy the Form ID from your current URL (e.g., the form ID of `https://app.formo.so/20uTXhGkUKCYkssRDKLtm/edit` is `20uTXhGkUKCYkssRDKLtm`)
+2. In Zapier, paste in your Form ID.
+3. Select your desired event type:
+   - "New Form Response" - triggers when someone submits a response to your form.
+   - "Form Updates" - triggers when form data is modified.
+
+### Step 4: Configure Slack Action (Slack Example)
+
+1. Click the plus (+) icon to add an action.
+2. Search for and select "Slack" as your action app.
+3. Choose your desired Slack action:
+   - "Send Channel Message" (recommended for team notifications.)
+   - "Send Direct Message" (for individual notifications.)
+4. Connect your Slack account if not already connected.
+
+### Step 5: Customize Slack Message
+
+1. Select the Slack channel or user to receive notifications.
+2. Design your message format using Formo form fields.
+3. Include relevant information such as:
+   - Submission timestamp
+   - Form name
+   - Response data
+   - Any custom fields
+
+### Step 6: Test and Enable
+
+1. Click "Test & Review" to verify your setup.
+2. Check your Slack channel to confirm the test message.
+3. If everything looks correct, click "Publish" to enable your Zap.
+
+### Troubleshooting
+
+- If triggers aren't working, verify your API key is correct.
+- Ensure your Form ID matches exactly.
+- Check that your Slack permissions are properly configured.
+
+## Setting Up Other Integrations in Zapier
+
+You can set up Formo to integrate with thousands of apps in the [Zapier app marketplace](https://zapier.com/apps)!
+
+Follow our Slack integration guide as an example.

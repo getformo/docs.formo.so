@@ -29,19 +29,28 @@
 		{
 			"name": "API Reference",
 			"url": "api-reference"
+		},
+		{
+			"name": "Chains",
+			"url": "chains"
 		}
 	],
 	"anchors": [
 		{
+			"name": "Changelog",
+			"icon": "list",
+			"url": "https://formo.so/changelog"
+		},	
+		{
+			"name": "Blog",
+			"icon": "blog",
+			"url": "https://formo.so/blog"
+		}, {
 			"name": "Slack",
 			"icon": "slack",
 			"url": "https://formo.so/slack"
-		},	
+		},
 		{
-			"name": "Support",
-			"icon": "life-ring",
-			"url": "https://help.formo.so"
-		}, {
 			"name": "Status",
 			"icon": "check",
 			"url": "https://status.formo.so"
@@ -58,27 +67,27 @@
 				"features/concepts",
 				{
 					"group": "Dapp Analytics",
-					"pages": ["features/dapp-analytics/overview", "features/dapp-analytics/activity"]
+					"pages": ["features/dapp-analytics/overview", "features/dapp-analytics/activity", "features/dapp-analytics/custom-events", "features/dapp-analytics/funnels"]
 				}, 
 				{
 					"group": "Wallet Intelligence",
-					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles","features/wallet-intelligence/wallet-reputation-score"]
+					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles","features/wallet-intelligence/wallet-score"]
 				}, 
 				{
 					"group": "Token Gated Forms",
-					"pages": ["features/token-gated-forms/form-builder", "features/token-gated-forms/token-gating"]
+					"pages": ["features/token-gated-forms/form-builder", "features/token-gated-forms/token-gating", "features/token-gated-forms/world-id", "features/token-gated-forms/zapier"]
 				}
 			]
 		},
 	
 		{
 			"group": "Data",
-			"pages": ["data/metrics", "data/what-we-collect", "data/supported-chains"]
+			"pages": ["data/metrics", "data/what-we-collect"]
 		},
 		{
 			"group": "API Documentation",
 			"pages": [
-				"api-reference/introduction",
+				"api-reference/overview",
 				"api-reference/authentication",
 				"api-reference/webhooks"
 			]
@@ -90,6 +99,10 @@
 				"api-reference/endpoint/subscribe",
 				"api-reference/endpoint/unsubscribe"
 			]
+		},
+		{
+			"group": "Chains",
+			"pages": ["chains/overview"]
 		}
 	],
 	"footerSocials": {
