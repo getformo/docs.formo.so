@@ -66,8 +66,8 @@
 			"pages": [
 				"features/concepts",
 				{
-					"group": "Dapp Analytics",
-					"pages": ["features/dapp-analytics/overview", "features/dapp-analytics/activity", "features/dapp-analytics/custom-events", "features/dapp-analytics/funnels"]
+					"group": "Product Analytics",
+					"pages": ["features/product-analytics/overview", "features/product-analytics/activity", "features/product-analytics/custom-events", "features/product-analytics/funnels"]
 				}, 
 				{
 					"group": "Wallet Intelligence",
