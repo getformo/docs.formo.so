@@ -20,6 +20,15 @@ We care about the privacy of your visitors. Cookies are something that can track
 
 The raw IP address data is never stored in our logs, databases or anywhere on disk at all.
 
+### NO Fingerprinting
+
+> We do NOT use device fingerprinting.
+We do not attempt to generate a device-persistent identifier because they are considered personal data under GDPR. 
+Every single HTTP request sends the IP address and the User-Agent to the server so that’s what we use. 
+
+We generate a daily changing identifier using the visitor’s IP address and User-Agent. 
+To anonymize these datapoints and make them impossible to relate back to the user, we run them through a hash function with a rotating salt.
+
 ### User Agent
 
 > We collect and store user agents.
