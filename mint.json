@@ -43,7 +43,7 @@
 		},	
 		{
 			"name": "Blog",
-			"icon": "blog",
+			"icon": "book",
 			"url": "https://formo.so/blog"
 		}, {
 			"name": "Slack",
