@@ -71,7 +71,7 @@
 				}, 
 				{
 					"group": "Wallet Intelligence",
-					"pages": ["features/wallet-intelligence/overview", "features/wallet-intelligence/users", "features/wallet-intelligence/wallet-profiles", "features/wallet-intelligence/wallet-labels", "features/wallet-intelligence/wallet-score", "features/wallet-intelligence/audience-insights", "features/wallet-intelligence/segmentation"]
+					"pages": ["features/wallet-intelligence/overview", "features/wallet-intelligence/users", "features/wallet-intelligence/wallet-profiles", "features/wallet-intelligence/wallet-labels", "features/wallet-intelligence/wallet-score", "features/wallet-intelligence/wallet-messaging", "features/wallet-intelligence/audience-insights", "features/wallet-intelligence/segments"]
 				}, 
 				{
 					"group": "Token Gated Forms",
