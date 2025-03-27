@@ -67,11 +67,11 @@
 				"features/concepts",
 				{
 					"group": "Product Analytics",
-					"pages": ["features/product-analytics/overview", "features/product-analytics/activity", "features/product-analytics/custom-events", "features/product-analytics/funnels"]
+					"pages": ["features/product-analytics/overview", "features/product-analytics/growth-metrics", "features/product-analytics/activity", "features/product-analytics/custom-events", "features/product-analytics/funnels"]
 				}, 
 				{
 					"group": "Wallet Intelligence",
-					"pages": ["features/wallet-intelligence/users","features/wallet-intelligence/wallet-profiles","features/wallet-intelligence/wallet-score"]
+					"pages": ["features/wallet-intelligence/overview", "features/wallet-intelligence/users", "features/wallet-intelligence/audience-insights", "features/wallet-intelligence/wallet-profiles", "features/wallet-intelligence/wallet-labels", "features/wallet-intelligence/wallet-score"]
 				}, 
 				{
 					"group": "Token Gated Forms",
