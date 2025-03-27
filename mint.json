@@ -67,7 +67,7 @@
 				"features/concepts",
 				{
 					"group": "Product Analytics",
-					"pages": ["features/product-analytics/overview", "features/product-analytics/growth-metrics", "features/product-analytics/activity", "features/product-analytics/custom-events", "features/product-analytics/funnels"]
+					"pages": ["features/product-analytics/overview", "features/product-analytics/growth-metrics", "features/product-analytics/activity", "features/product-analytics/custom-events", "features/product-analytics/funnels", "features/product-analytics/alerts"]
 				}, 
 				{
 					"group": "Wallet Intelligence",
