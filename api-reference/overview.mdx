@@ -1,21 +1,21 @@
 ---
-title: 'Platform API Reference'
-description: 'Integrate Formo with your favourite apps'
+title: 'Overview'
+description: 'Integrate Formo with your product and third-party apps.'
 ---
 
-## Events API
+## SQL Query API
 
-- Query raw analytics events, materialized views, and metrics with SQL.
+- Query and filter raw analytics events, materialized views, and metrics.
+- Return an activity/event stream for a user.
 - Export analytics data periodically to Kafka or AWS S3.
 
 > 🚧 In development. <a href="https://cal.com/formo/30min">Reach out</a> to get early access. 🚧
 
 ## Wallet Profiles API
 
-- Identify wallets with the Wallet Profiles API
-- Fetch wallet profile properties such as net worth and wallet labels
+- Fetch wallet profile properties including net worth and wallet labels
 - Detect if a user is a bot with wallet reputation scores
-- Real-time personalized activation through wallet messaging
+- Real-time activation API that unifies wallet profile data with in-app wallet messaging
 
 > 🚧 In development. <a href="https://cal.com/formo/30min">Reach out</a> to get early access. 🚧
 
@@ -38,7 +38,7 @@ https://api.formo.so/api
 
 ## Authentication
 
-API requests require a Workspace API key in the request headers. Find your API key in your workspace settings.
+API requests require a Workspace API key in the request headers.
 
 ```bash
 x-api-key: your_workspace_api_key
