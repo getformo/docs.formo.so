@@ -29,5 +29,10 @@ Each user has a unique identifier that you can use to track their activity. Form
 ### Properties
 
 Properties are **additional information about users and events.**
+- Event properties are attributes that describe details specific to the particular instance of an event. For example, if you had a Purchase Completed event, you could specify what the user purchased, the total value of the order, and the payment method used.
+- User properties are traits describing the user and apply across all their future events until the properties are modified. Formo's SDK captures several user properties by default, and you can also set up your own properties to track.
 
-A Connect Wallet event has wallet address and chain ID (Ethereum, Base, etc.) A Page View event has page URL, referrer URL, and other metadata.
+More Examples:
+- A Connect Wallet event has wallet address and chain ID (Ethereum, Base, etc.) 
+- A Page View event has page URL, referrer URL, and other metadata.
+- A User has net worth and first-touch UTM parameter properties.
