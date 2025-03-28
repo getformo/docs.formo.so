@@ -25,7 +25,18 @@
 		"name": "Dashboard",
 		"url": "https://app.formo.so"
 	},
+	"primaryTab": {
+    	"name": "Get Started"
+  	},	
 	"tabs": [
+		{
+			"name": "Data",
+			"url": "data"
+		},
+		{
+			"name": "SDKs",
+			"url": "sdks"
+		},
 		{
 			"name": "API Reference",
 			"url": "api-reference"
@@ -38,12 +49,12 @@
 	"anchors": [
 		{
 			"name": "Changelog",
-			"icon": "list",
+			"icon": "calendar",
 			"url": "https://formo.so/changelog"
 		},	
 		{
 			"name": "Blog",
-			"icon": "book",
+			"icon": "write",
 			"url": "https://formo.so/blog"
 		}, {
 			"name": "Slack",
@@ -58,7 +69,7 @@
 	],
 	"navigation": [
 		{
-			"group": "Getting Started",
+			"group": "Quickstart",
 			"pages": ["start-here", "install"]
 		},
 		{
@@ -76,13 +87,13 @@
 				{
 					"group": "Token Gated Forms",
 					"pages": ["features/token-gated-forms/form-builder", "features/token-gated-forms/token-gating", "features/token-gated-forms/world-id", "features/token-gated-forms/zapier"]
-				}
+				},
+				"features/metrics" 
 			]
-		},
-	
+		},	
 		{
 			"group": "Data",
-			"pages": ["data/metrics", "data/what-we-collect"]
+			"pages": ["data/what-we-collect"]
 		},
 		{
 			"group": "API Documentation",
@@ -99,6 +110,10 @@
 				"api-reference/endpoint/subscribe",
 				"api-reference/endpoint/unsubscribe"
 			]
+		},
+		{
+			"group": "SDKs",
+			"pages": ["sdks/web"]
 		},
 		{
 			"group": "Chains",
