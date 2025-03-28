@@ -26,6 +26,7 @@
               "features/concepts",
               {
                 "group": "Product Analytics",
+                "icon": "chart-line",
                 "pages": [
                   "features/product-analytics/overview",
                   "features/product-analytics/growth-metrics",
@@ -38,6 +39,7 @@
               },
               {
                 "group": "Wallet Intelligence",
+                "icon": "user",
                 "pages": [
                   "features/wallet-intelligence/overview",
                   "features/wallet-intelligence/users",
@@ -51,6 +53,7 @@
               },
               {
                 "group": "Token Gated Forms",
+                "icon": "passport",
                 "pages": [
                   "features/token-gated-forms/form-builder",
                   "features/token-gated-forms/token-gating",
