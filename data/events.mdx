@@ -1,6 +1,40 @@
 ---
 title: 'Event Specification'
+description: 'Learn the fields and properties associated with Formo events.'
 icon: cube
 ---
 
-> 🚧 This page is in progress. Please come back later. 🚧
+The Formo Event Spec outlines how to send event data to Formo's APIs and the proper format to capture events using Formo's SDKs.
+
+## Events API
+
+The Formo API spec supports the following calls, each gathering important data about the user:
+
+| API call | Description |
+| -------- | ----------- |
+| Identify | Identifies a visitor or user |
+| Page | Records when a user visits a new page in your application |
+| Track | Records custom events with arbitrary data |
+| Reset | Resets all stored information about the previously identified user |
+| Connect | Records when a user connects their wallet to your application |
+| Disconnect | Records when a user disconnects their wallet |
+| Chain | Records when a user switches to a different blockchain network |
+| Signature | Records signature requests and their statuses |
+| Transaction | Records blockchain transactions and their statuses |
+
+## Event data format
+
+The event data is collected as JSON and includes common properties along with API-specific properties in the `payload`.
+
+```
+`id` String `json:$.id`
+`project_id` String `json:$.project_id`,
+`session_id` String `json:$.session_id`,
+`anonymous_id` String `json:$.anonymous_id`,
+`user_id` Nullable(String) `json:$.user_id`,
+`address` Nullable(String) `json:$.address`,
+`action` LowCardinality(String) `json:$.action`,
+`version` LowCardinality(String) `json:$.version`,
+`payload` String `json:$.payload`,
+`timestamp` DateTime `json:$.timestamp`,
+```

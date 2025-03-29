@@ -72,9 +72,9 @@
           {
             "group": "Data",
             "pages": [
+              "data/what-we-collect",
               "data/events",
-              "data/schema",
-              "data/what-we-collect"
+              "data/schema"
             ]
           },
           {
