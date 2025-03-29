@@ -22,7 +22,7 @@ The Formo API spec supports the following calls, each gathering important data a
 | Signature | Records signature requests and their statuses |
 | Transaction | Records blockchain transactions and their statuses |
 
-## Event data format
+## Event Properties
 
 The event data is collected as JSON and includes common properties along with API-specific properties in the `payload`.
 
@@ -38,3 +38,27 @@ The event data is collected as JSON and includes common properties along with AP
 `payload` String `json:$.payload`,
 `timestamp` DateTime `json:$.timestamp`,
 ```
+
+## User Properties
+
+```
+`project_id` String,
+`address` String,
+`first_seen` SimpleAggregateFunction(min, DateTime),
+`last_seen` SimpleAggregateFunction(max, DateTime),
+`first_utm_source` SimpleAggregateFunction(any, String),
+`first_utm_medium` SimpleAggregateFunction(any, String),
+`first_utm_campaign` SimpleAggregateFunction(any, String),
+`first_utm_content` SimpleAggregateFunction(any, String),
+`first_utm_term` SimpleAggregateFunction(any, String),
+`first_ref` SimpleAggregateFunction(any, String),
+`num_sessions` AggregateFunction(uniq, String),
+`last_action` SimpleAggregateFunction(anyLast, String),
+`last_payload` SimpleAggregateFunction(anyLast, String)
+```
+
+> 🚧 In development. Additional properties coming soon. 🚧
+
+## Wallet Profile Properties
+
+> 🚧 In development. 🚧
