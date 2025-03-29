@@ -4,10 +4,71 @@ icon: globe
 iconType: solid
 ---
 
-> 🚧 This page is in progress. Please come back later. 🚧
+## Installation
 
-### Installation
+[Install](/install) the JavaScript SDK via CDN or NPM.
 
-### Usage
+```bash
+npm install @formo/analytics --save
+```
 
-### API
+## API
+
+The Web3 SDK implements the standard [Events API](/data/events#events-api).
+
+```ts
+interface IFormoAnalytics {
+  identify(params: { address: Address }): Promise<void>;
+  page(): void;
+  track(action: string, payload: Record<string, any>): Promise<void>;
+  reset(): void;
+  connect(params: { chainId: ChainID; address: Address }): Promise<void>;
+  disconnect(params: { chainId?: ChainID; address?: Address }): Promise<void>;
+  chain(params: { chainId: ChainID; address?: Address }): Promise<void>;
+  signature(params: { status: SignatureStatus; chainId?: ChainID; address: Address; message: string; signatureHash?: string; }): Promise<void>;
+  transaction(params: { status: TransactionStatus; chainId: ChainID; address: Address; data?: string; to?: string; value?: string; transactionHash?: string; }): Promise<void>;
+}
+```
+
+## Configuration
+
+### Batching
+
+To support high-performance environments, the SDK sends events in batches. 
+The SDK queues in memory every event the track method logs. 
+
+```tsx
+<AnalyticsProvider
+    writeKey={API_KEY}
+    options={{
+        flushAt: 3,
+        flushInterval: 1000 * 10, // 10 secs
+    }}
+>
+```
+
+Customize this behavior with the `flushAt` and `flushInterval` configuration parameters. 
+
+### Debugging
+
+Control the level of logs the SDK prints to the console with the following logLevel settings:
+
+```tsx
+<AnalyticsProvider
+    writeKey={API_KEY}
+    options={{
+        logger: {
+            enabled: true,
+            levels: ["error", "warn", "info"],
+        },
+    }}
+>
+```
+
+| Log Level | Description |
+|-----------|-------------|
+| trace | Shows the most detailed diagnostic information, useful for tracing program execution flow. |
+| debug | Shows all messages, including function context information for each public method the SDK invokes. |
+| info | Shows informative messages about normal application operation. |
+| warn | Default. Shows error and warning messages. |
+| error | Shows error messages only. |
