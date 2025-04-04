@@ -1,0 +1,18 @@
+---
+title: 'Spec: Chain'
+---
+
+The `chain_changed` event is emitted whenever the user's chain network changes.
+It includes the chain ID the user switched to.
+
+Here’s the payload of a typical call with most common fields removed:
+
+```json
+{
+    "action": "chain_changed", 
+    "payload": {
+        "chain_id": 1,
+        "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154"
+    }
+}
+```

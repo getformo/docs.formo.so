@@ -1,0 +1,18 @@
+---
+title: 'Spec: Connect'
+---
+
+The `connect` event is emitted whenever the user's connects a wallet.
+It includes the newly connected chain ID and wallet address of the user.
+
+Here’s the payload of a typical call with most common fields removed:
+
+```json
+{
+    "action": "connect",
+    "payload": {
+        "chain_id": 1,
+        "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154"
+    } 
+}
+```

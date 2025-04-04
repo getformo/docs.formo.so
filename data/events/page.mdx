@@ -1,0 +1,19 @@
+---
+title: 'Spec: Page'
+---
+
+The `page_hit` event records whenever a user views a page of your website.
+
+Here’s the payload of a typical call with most common fields removed:
+
+
+```json
+{
+    "action": "page_hit",   
+    "payload": {
+        "pathname": "/faucets",
+        "href": "https://formo.so/faucets?utm_source=chatgpt.com",
+        "hash": "#submit"
+    }
+}
+```

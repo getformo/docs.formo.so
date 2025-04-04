@@ -1,0 +1,68 @@
+---
+title: 'Overview'
+description: 'Learn the fields and properties associated with Formo events.'
+---
+
+The Formo Event Spec outlines how to send event data to Formo's APIs and the proper format to capture events using Formo's SDKs and APIs.
+
+## Events API
+
+The Events API supports the following calls, each gathering important data about the user:
+
+| API call | Description |
+| -------- | ----------- |
+| [Identify](/data/events/identify) | Identifies a visitor or user |
+| [Track](/data/events/track) | Records a custom action with arbitrary data |
+| [Page](/data/events/page) | Records a page view on your app |
+| [Connect](/data/events/connect) | Records when a user connects their wallet to your application |
+| [Disconnect](/data/events/disconnect) | Records when a user disconnects their wallet |
+| [Chain](/data/events/chain) | Records when a user switches to a different blockchain network |
+| [Signature](/data/events/signature) | Records signature requests and their statuses |
+| [Transaction](/data/events/transaction) | Records blockchain transactions and their statuses |
+
+## Event Properties
+
+Event data is collected as JSON and includes common properties along with API-specific properties in the `payload`.
+
+```
+`id` String
+`project_id` String
+`session_id` String
+`anonymous_id` String
+`user_id` Nullable(String)
+`address` Nullable(String)
+`action` LowCardinality(String)
+`version` LowCardinality(String)
+`payload` String
+`timestamp` DateTime
+```
+
+## User Properties
+
+```
+`project_id` String,
+`address` String,
+`first_seen` DateTime,
+`last_seen` DateTime,
+`first_utm_source` String,
+`last_utm_source` String,
+`first_utm_medium` String,
+`last_utm_medium` String,
+`first_utm_campaign` String,
+`last_utm_campaign` String,
+`first_utm_content` String,
+`last_utm_content` String,
+`first_utm_term` String,
+`last_utm_term` String,
+`first_referrer` String,
+`last_referrer` String,
+`first_ref` String,
+`last_ref` String,
+`num_sessions` String,
+`last_action` String,
+`last_payload` String
+```
+
+## Wallet Profile Properties
+
+> 🚧 In development. 🚧
