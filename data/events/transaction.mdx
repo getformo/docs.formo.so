@@ -1,0 +1,23 @@
+---
+title: 'Spec: Transaction'
+---
+
+The `transaction` event is emitted whenever the user's performs a transaction.
+It includes the transaction status (started, broadcasted, rejected), to address, data, value, transaction hash, chain ID, and wallet address.
+
+Here’s the payload of a typical call with most common fields removed:
+
+```json
+{
+    "action": "transaction",
+    "payload": {
+        "status": "broadcasted",
+        "chain_id": 84532,
+        "data": "0xa4136862000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000086173646661647366000000000000000000000000000000000000000000000000",
+        "to": "0x76BB9C9758F62822Abaa652D49e52Ce85383FC26",
+        "value": "0x1",
+        "transaction_hash": "0x489daee9ded2bfcceb9f9c3edeaf695bd2c3acef0dfb7558e461b2aba59378ba"
+    }
+}
+```
+
