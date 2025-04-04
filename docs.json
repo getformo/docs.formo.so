@@ -72,6 +72,7 @@
           {
             "group": "Data",
             "pages": [
+              "data/what-we-collect",
               {
                 "group": "Event Spec",
                 "icon": "cube",
@@ -84,11 +85,11 @@
                   "data/events/disconnect",
                   "data/events/chain",
                   "data/events/signature",
-                  "data/events/transaction"
+                  "data/events/transaction",
+                  "data/events/common"
                 ]
               },
-              "data/schema",
-              "data/what-we-collect"
+              "data/schema"
             ]
           },
           {
@@ -105,7 +106,9 @@
           {
             "group": "SDKs",
             "pages": [
-              "sdks/web"
+              "sdks/web",
+              "sdks/mobile",
+              "sdks/server"
             ]
           }
         ]
