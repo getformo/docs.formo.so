@@ -151,22 +151,22 @@
         {
           "anchor": "Changelog",
           "href": "https://formo.so/changelog",
-          "icon": "calendar"
+          "icon": "map"
         },
         {
-          "anchor": "Blog",
-          "href": "https://formo.so/blog",
-          "icon": "book-open-reader"
-        },
+          "anchor": "Status",
+          "href": "https://status.formo.so",
+          "icon": "square-check"
+        },        
         {
           "anchor": "Slack",
           "href": "https://formo.so/slack",
           "icon": "slack"
         },
         {
-          "anchor": "Status",
-          "href": "https://status.formo.so",
-          "icon": "square-check"
+          "anchor": "Support",
+          "href": "https://formo.so/support",
+          "icon": "headset"
         }
       ]
     }
