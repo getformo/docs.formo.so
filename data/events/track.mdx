@@ -4,3 +4,47 @@ title: 'Spec: Track'
 
 The Track API call is how you record any [custom events](/features/product-analaytics/custom-events) your users perform, 
 along with any properties that describe the action.
+
+## Event Names
+
+Use a descriptive human readable name. Adopt nouns and past tense verbs like **Swap Reviewed** and **Order Submitted**.
+This allows everyone (including you 6 months from now) to instantly understand the meaning of an event.
+
+## Fields
+
+Apart from the [common fields](/data/events/common), the `track` call accepts the following fields:
+
+| Field | Type | Required | Description |
+|:------|:-----|:---------|:------------|
+| `event` | String | ✓ | Name of the user action |
+| `properties` | Object |  | Includes the properties associated with the event. For more information, check the Properties section below. |
+
+
+## Properties
+
+Properties are additional information that give more clarity of your users' actions.
+
+Formo has reserved some standard properties listed in the following table and handles them in a special manner.
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `revenue` | Number | The revenue amount as a result of an event. For e.g., a transaction worth $20.00 would result in a revenue of 20.00. |
+| `currency` | String | The currency of the revenue as a result of the event, set in ISO 4127 format. If this is not set, Formo assumes the revenue is in USD. |
+| `value` | String | An abstract value such as points or XP associated with an event, to be used by various teams. |
+
+## Sample Payload
+
+```json
+{
+  "type": "track",
+  "event": "Product Reviewed",
+  "properties": {
+    "revenue": "20.5",
+    "currency": "USD",
+    "value": "100",
+    "product_id" : "9578257311",
+    "rating" : 3.0,
+    "review_body" : "Good value for the price."
+  }
+}
+```
