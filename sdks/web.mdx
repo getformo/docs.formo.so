@@ -65,6 +65,21 @@ Control the level of logs the SDK prints to the console with the following logLe
 >
 ```
 
+The SDK omits logs in localhost by default. To enable logs, set `trackLocalhost` to `true`:
+
+```tsx
+<AnalyticsProvider
+    writeKey={API_KEY}
+    options={{
+        trackLocalhost: true,
+        logger: {
+            enabled: true,
+            levels: ["error", "warn", "info"],
+        },
+    }}
+>
+```
+
 | Log Level | Description |
 |-----------|-------------|
 | trace | Shows the most detailed diagnostic information, useful for tracing program execution flow. |
