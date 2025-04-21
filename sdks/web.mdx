@@ -16,20 +16,6 @@ npm install @formo/analytics --save
 
 The Web3 SDK implements the standard [Events API](/data/events#events-api).
 
-```ts
-interface IFormoAnalytics {
-  identify(params: { address: Address }): Promise<void>;
-  page(): void;
-  track(action: string, payload: Record<string, any>): Promise<void>;
-  reset(): void;
-  connect(params: { chainId: ChainID; address: Address }): Promise<void>;
-  disconnect(params: { chainId?: ChainID; address?: Address }): Promise<void>;
-  chain(params: { chainId: ChainID; address?: Address }): Promise<void>;
-  signature(params: { status: SignatureStatus; chainId?: ChainID; address: Address; message: string; signatureHash?: string; }): Promise<void>;
-  transaction(params: { status: TransactionStatus; chainId: ChainID; address: Address; data?: string; to?: string; value?: string; transactionHash?: string; }): Promise<void>;
-}
-```
-
 ## Configuration
 
 ### Batching

@@ -72,7 +72,6 @@
           {
             "group": "Data",
             "pages": [
-              "data/what-we-collect",
               {
                 "group": "Event Spec",
                 "icon": "cube",
@@ -90,7 +89,8 @@
                   "data/events/common"
                 ]
               },
-              "data/schema"
+              "data/schema",
+              "data/what-we-collect"
             ]
           },
           {

@@ -37,11 +37,17 @@ To anonymize these datapoints and make them impossible to relate back to the use
 User agents are the identifiers of the browser and device of the visitor. Browsers or devices identify themselves to websites. 
 We collect and store the user agent to identify the browser and device of the visitor.
 
+### Timezone
+
+> We collect and store the timezone of each visitor.
+
 ### Country
 
 > We collect and store country of each visitor.
 
-We collect visitor country based on the their time zone, not their IP address. Every country has their own time zone and modern devices automatically update the time zone when the device travels. 
+We collect visitor country based on the their time zone, not their IP address. 
+
+Every country has their own time zone and modern devices automatically update the time zone when the device travels. 
 The time zone is limited to a country, so we can’t get data about a city or region within a country.
 
 ### Language
@@ -63,7 +69,7 @@ We collect the URL to track page visits and referrers.
 Referrers answer the question “Where did this visitor come from?”. Browsers send the URL of the previous website as a referrer. 
 We also check UTM-parameters. You can see a list of your site's referrers in your dashboard.
 
-### UTM parameters
+### UTM
 
 > We collect and store UTM parameters.
 
@@ -78,7 +84,7 @@ We track these UTM codes:
 - `utm_content` (e.g.: summer_sale)
 - `utm_term` (e.g.: summer_sale)
 
-### Referral parameters
+### Referral
 
 > We collect and store referral parameters.
 
@@ -90,7 +96,7 @@ We track these UTM codes and assign it to each user:
 - `referral` (e.g.: google.com)
 - `ref` (e.g.: search)
 
-### Wallet Type
+### Wallet Provider
 
 > We collect and store the crypto wallet type of visitors.
 
@@ -114,9 +120,10 @@ We collect the chain id to identify the connected chain of the visitor.
 
 We collect the wallet connected status to identify if a visitor has connected their wallet.
 
-### Sig and Tx Metadata
+### Wallet Metadata
 
 > We collect and store signature and transaction metadata.
 
-We show you user activity feeds, similar to a blockchain explorer.
-To display this data, we collect signature and transaction metadata such as statuses (success, failed, pending, etc.) and hashes.
+We collect signature and transaction metadata such as statuses (success, failed, pending, etc.) and transaction hashes.
+
+
