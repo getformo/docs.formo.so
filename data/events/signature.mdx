@@ -9,8 +9,8 @@ Here’s the payload of a typical call with most common fields removed:
 
 ```json
 {
-    "action": "signature", 
-    "payload": {
+    "type": "signature", 
+    "properties": {
         "status": "confirmed",
         "chain_id": 84532,
         "message": "{\"domain\":{\"name\":\"Example DApp\",\"version\":\"1\",\"chainId\":84532,\"verifyingContract\":\"0xcccccccccccccccccccccccccccccccccccccccc\"},\"message\":{\"from\":{\"name\":\"Alice\",\"wallet\":\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"},\"to\":{\"name\":\"Bob\",\"wallet\":\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"},\"content\":\"zcvzxcvzxvc\"},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallet\",\"type\":\"address\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person\"},{\"name\":\"content\",\"type\":\"string\"}]}}",

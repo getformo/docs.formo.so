@@ -1,23 +1,74 @@
 ---
 title: 'Spec: Common Fields'
+description: 'Understand the common fields that define the core Formo event data structure.'
 ---
 
-Here’s the payload of a typical call with common fields included:
+Formo defines some common fields (event type, timestamps, and more) across all API calls that make up the core event data structure. 
+This guide covers the common and contextual fields in detail.
+
+## Common Fields
+
+> The Formo SDKs populate the required information automatically.
+
+| Name | Data type | Required | Description |
+|------|-----------|----------|-------------|
+| type | String | ✓ | Captures the type of event. Values can be either identify, track, connect, signature, transaction, and others. |
+| channel | String | ✓ | Identifies the source of the event. Permitted values are mobile, web, server and sources. |
+| version | String | ✓ | Version of the event spec. |
+| project_id | String | ✓ | Unique identification for the project in the database. |
+| session_id | String | ✓ | Privacy-friendly daily changing session identifier. |
+| anonymous_id | String | ✓ | Pseudo-identifier for the user in cases where userId is absent. Equivalent to a device ID. |
+| user_id | String |  | Unique identification for the user in the database. |
+| address | String |  | Unique wallet address of the user. |
+| event | String |  | Captures the user action that you want to record. |
+| context | Object | ✓ | Contains all additional user information. |
+| properties | Object |  | Passes all relevant information associated with the event. |
+| timestamp | Timestamp | ✓ | Records the actual time (in UTC) when the event occurred. Make sure it conforms to the ISO 8601 date format yyyy-MM-ddTHH:mm:ss.SSSZ. For e.g., 2022-02-01T19:14:18.381Z. |
+| message_id | String | ✓ | Unique identification for the event.|
+
+## Contextual Fields
+
+Contextual fields give additional information about a particular event. The following table describes the available contextual fields.
+
+| Name | Data type | Required | Description |
+|------|-----------|----------|-------------|
+| user_agent | String |  | The user agent of the device that you are tracking. |
+| locale | String |  | Captures the language of the device. |
+| location | String |  | Geographic location of the user. |
+| timezone | String |  | Captures the timezone of the user you are tracking. |
+| referrer | String |  | The referrer URL where the user came from. |
+| utm_source | String |  | Identifies which site sent the traffic. |
+| utm_medium | String |  | Identifies what type of link was used. |
+| utm_campaign | String |  | Identifies a specific product promotion or strategic campaign. |
+| utm_term | String |  | Identifies search terms. |
+| utm_content | String |  | Identifies what specifically was clicked to bring the user to the site. |
+| ref | String |  | Referral code or identifier. |
+| page_url | String |  | Full URL of the page. |
+| page_path | String |  | Path component of the URL. |
+| page_title | String |  | Title of the page. |
+| library_name | String |  | Name of the SDK used to capture the event. |
+| library_version | String |  | Version of the SDK used to capture the event. |
+
+## Sample Event
+
+Here's an example event with common and contextual fields included:
 
 ```json
 {
-    "id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
-    "action": "page_hit",
+    "type": "page",
+    "channel": "web",
     "version": "1",
-    "project_id": "d5naNbBlqxSBXLuNa6zwc"
+    "project_id": "d5naNbBlqxSBXLuNa6zwc",
     "session_id": "117b982a451dc22edea6413b8e20958216c0a5b3baaa1d90699c42dbf4e74e33",    
     "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
     "user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
-    "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154",    
-    "payload": {
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+    "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154",   
+    "event": "FooBar", 
+    "context": {
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
         "locale": "en-US",
         "location": "ID",
+        "timezone": "Asia/Saigon",
         "referrer": "https://chatgpt.com/",
         "utm_source": "chatgpt.com",
         "utm_medium": "linkedin",
@@ -25,9 +76,21 @@ Here’s the payload of a typical call with common fields included:
         "utm_term": null,
         "utm_content": null,
         "ref": "vitalik.eth",
-        ...
-    }
-    "timestamp": "2025-04-03 18:21:00",    
+        "page_url": "https://www.estore.com/best-seller/1",
+        "page_path": "/best-seller/1",
+        "page_title": "The best sellers offered by EStore",
+        "library_name": "Formo Web SDK",
+        "library_version": "1.16.2"
+    },
+    "properties": {
+        "name": "Best Seller",
+        "category": "Docs",
+        "url": "https://formo.so/faucets?utm_source=chatgpt.com",
+        "path": "/best-seller/1",
+        "hash": "#submit",
+        "title": "The best sellers offered by EStore"
+    },
+    "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f",
+    "timestamp": "2025-04-03 18:21:00"
 }
 ```
-

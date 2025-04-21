@@ -12,6 +12,7 @@ The Events API supports the following calls, each gathering important data about
 | API call | Description |
 | -------- | ----------- |
 | [Identify](/data/events/identify) | Identifies a visitor or user |
+| [Detect](/data/events/detect) | Identifies a user's wallet provider |
 | [Track](/data/events/track) | Records a custom action with arbitrary data |
 | [Page](/data/events/page) | Records a page view on your app |
 | [Connect](/data/events/connect) | Records when a user connects their wallet to your application |
@@ -19,20 +20,3 @@ The Events API supports the following calls, each gathering important data about
 | [Chain](/data/events/chain) | Records when a user switches to a different blockchain network |
 | [Signature](/data/events/signature) | Records signature requests and their statuses |
 | [Transaction](/data/events/transaction) | Records blockchain transactions and their statuses |
-
-## Event Properties
-
-Event data is collected as JSON and includes common properties along with API-specific properties in the `payload`.
-
-```
-`id` String
-`project_id` String
-`session_id` String
-`anonymous_id` String
-`user_id` Nullable(String)
-`address` Nullable(String)
-`action` LowCardinality(String)
-`version` LowCardinality(String)
-`payload` String
-`timestamp` DateTime
-```

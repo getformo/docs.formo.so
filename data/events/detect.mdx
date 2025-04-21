@@ -1,0 +1,17 @@
+---
+title: 'Spec: Detect'
+---
+
+The `detect` event lets identify a visitor's wallet name and rdns.
+
+Here’s the payload of a typical call with most common fields removed:
+
+```json
+{
+    "type": "detect",   
+    "properties": {
+        "provider_name": "MetaMask",
+        "rdns": "io.metamask"
+    }
+}
+```
