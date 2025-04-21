@@ -9,11 +9,14 @@ Here’s the payload of a typical call with most common fields removed:
 
 ```json
 {
-    "action": "page_hit",   
-    "payload": {
-        "pathname": "/faucets",
-        "href": "https://formo.so/faucets?utm_source=chatgpt.com",
+    "type": "page",   
+    "properties": {
+        "name": "Faucets",
+        "category": "Docs",
+        "url": "https://formo.so/faucets?utm_source=chatgpt.com",
+        "path": "/best-seller/1",
         "hash": "#submit"
+        "title": "Free testnet faucets in web3"
     }
 }
 ```

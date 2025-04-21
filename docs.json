@@ -79,6 +79,7 @@
                 "pages": [
                   "data/events/overview",
                   "data/events/identify",
+                  "data/events/detect",
                   "data/events/track",
                   "data/events/page",
                   "data/events/connect",
