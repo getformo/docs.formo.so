@@ -23,7 +23,10 @@ This guide covers the common and contextual fields in detail.
 | `event` | String |  | Captures the user action that you want to record. |
 | `context` | Object | ✓ | Contains all additional user information. |
 | `properties` | Object |  | Passes all relevant information associated with the event. |
-| `timestamp` | Timestamp | ✓ | Records the actual time (in UTC) when the event occurred. Make sure it conforms to the ISO 8601 date format yyyy-MM-ddTHH:mm:ss.SSSZ. For e.g., 2022-02-01T19:14:18.381Z. |
+| `original_timestamp` | Timestamp | ✓ | Records the actual time (in UTC) when the event occurred.|
+| `sent_at` | Timestamp | ✓ | Captures the time (in UTC) when the event was sent from the client to Formo.|
+| `received_at` | Timestamp | ✓ | Time in UTC when Formo ingests the event. |
+| `timestamp` | Timestamp | ✓ | Formo calculates this field to account for any client-side clock skew using the formula: timestamp = receivedAt - (sentAt - originalTimestamp). Note that this time is in UTC. |
 | `message_id` | String | ✓ | Unique identification for the event.|
 
 ## Contextual Fields
@@ -91,6 +94,9 @@ Here's an example event with common and contextual fields included:
         "title": "The best sellers offered by EStore"
     },
     "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f",
+    "original_timestamp": "2025-04-03 18:21:00",
+    "sent_at": "2025-04-03 18:21:00",
+    "received_at": "2025-04-03 18:21:00",
     "timestamp": "2025-04-03 18:21:00"
 }
 ```
