@@ -25,7 +25,7 @@ The SDK queues in memory every event the track method logs.
 
 ```tsx
 <AnalyticsProvider
-    writeKey={API_KEY}
+    writeKey={WRITE_KEY}
     options={{
         flushAt: 3,
         flushInterval: 1000 * 10, // 10 secs
@@ -41,7 +41,7 @@ Control the level of logs the SDK prints to the console with the following logLe
 
 ```tsx
 <AnalyticsProvider
-    writeKey={API_KEY}
+    writeKey={WRITE_KEY}
     options={{
         logger: {
             enabled: true,
@@ -55,7 +55,7 @@ The SDK omits logs in localhost by default. To enable logs, set `trackLocalhost`
 
 ```tsx
 <AnalyticsProvider
-    writeKey={API_KEY}
+    writeKey={WRITE_KEY}
     options={{
         trackLocalhost: true,
         logger: {
