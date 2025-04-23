@@ -23,46 +23,8 @@ iconType: solid
 
 ## Forms API
 
-Use the Forms API to trigger webhooks based on form responses. 
-
-## Base URL
-
-All API requests should be made to:
-
-```bash
-https://api.formo.so/api
-```
-
-## Authentication
-
-API requests require a Workspace API key in the request headers.
-
-```bash
-x-api-key: your_workspace_api_key
-```
-
-<Info>
-	See our [Authentication Guide](/api-reference/authentication) for detailed
-	setup instructions and best practices.
-</Info>
-
-## Response Format
-
-All API responses follow this structure:
-
-```json
-{
-  "isSuccess": boolean,
-  "data": object | null,
-  "message": string | null,
-  "error": object | null
-}
-```
-
-## Quick Links
-
--   [Authentication Guide](/api-reference/authentication)
--   [Webhook Integration](/api-reference/webhooks)
+- Use the Forms API to trigger [webhooks](/api-reference/webhooks) based on form responses. 
+- Trigger thousands of other apps such as Google Sheets, and more whenever you get a new form response on Formo.
 
 ## Support & Feedback
 

@@ -126,7 +126,7 @@
             ]
           },
           {
-            "group": "API Endpoints",
+            "group": "Forms API Endpoints",
             "pages": [
               "api-reference/endpoint/list",
               "api-reference/endpoint/subscribe",

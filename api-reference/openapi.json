@@ -1,14 +1,14 @@
 {
 	"openapi": "3.0.0",
 	"info": {
-		"title": "Formo Webhook API",
+		"title": "Formo Forms API",
 		"version": "1.0.0",
-		"description": "API for managing webhook subscriptions and form responses"
+		"description": "API for managing form webhook subscriptions and form responses"
 	},
 	"servers": [
 		{
 			"url": "https://api.formo.so/api",
-			"description": "Production server"
+			"description": "Formo Forms API"
 		}
 	],
 	"components": {
