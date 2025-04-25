@@ -5,13 +5,34 @@ icon: key
 iconType: solid
 ---
 
-All API endpoints require authentication using a Workspace API key. You'll need to include this key in the request headers for all API calls.
+All API endpoints require authentication using either: 
+- a SDK Write Key, for sending events
+- a Query API Read Token, and querying events
+- a Workspace API key, for managing projects and forms
+
+You'll need to include the key or token in the request headers for all API calls.
+
+## Tokens
+
+<Frame>
+	<img src="/images/project-settings.png" alt="Tokens in project settings page" />
+</Frame>
+
+To send events, use the SDK Write Key in your project settings.
+
+To query events, use the Query API Read Token in your project settings.
+
+Include the Token in the request headers:
+
+```bash
+Authorization: Bearer <token>
+```
+
+## Workspace API Key
 
 <Frame>
 	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
 </Frame>
-
-## Workspace API Key
 
 Find your API key in your workspace settings. This key is unique to your workspace and should be kept secure.
 
@@ -22,44 +43,14 @@ Find your API key in your workspace settings. This key is unique to your workspa
 	/>
 </Frame>
 
-## API Key Authentication
-
 Include the API key in the request headers:
 
 ```bash
-Authorization Header x-api-key: your_workspace_api_key
+x-api-key: <your_workspace_api_key>
 ```
 
-## Validate API Key
-
-Validates a workspace API key and returns workspace details.
+Call this endpoint with the workspace API key to view your workspace details.
 
 ```bash
 POST https://api.formo.so/api/validate-api-key
 ```
-
-### Request Body
-
-```json
-{
-	"apiKey": "string"
-}
-```
-
-### Response
-
-```json
-{
-	"isSuccess": true,
-	"data": {
-		"validated": true,
-		"details": "API key validated successfully for workspace: {workspace_name}",
-		"teamId": "string"
-	}
-}
-```
-
-### Error Responses
-
--   `401` - Missing or invalid API key
--   `500` - Server error

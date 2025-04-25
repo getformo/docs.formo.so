@@ -1,14 +1,18 @@
 {
 	"openapi": "3.0.0",
 	"info": {
-		"title": "Formo Forms API",
+		"title": "Formo API",
 		"version": "1.0.0",
-		"description": "API for managing form webhook subscriptions and form responses"
+		"description": "API for managing form webhook subscriptions, form responses, and event tracking"
 	},
 	"servers": [
 		{
 			"url": "https://api.formo.so/api",
-			"description": "Formo Forms API"
+			"description": "Forms API"
+		},
+		{
+			"url": "https://events.formo.so",
+			"description": "Events API"
 		}
 	],
 	"components": {
@@ -17,6 +21,12 @@
 				"type": "apiKey",
 				"in": "header",
 				"name": "x-api-key"
+			},
+			"BearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "JWT Bearer token for authentication. Format: 'Bearer <token>'"
 			}
 		},
 		"schemas": {
@@ -74,6 +84,75 @@
 						}
 					}
 				}
+			},
+			"Event": {
+				"type": "object",
+				"properties": {
+					"project_id": {
+						"type": "string",
+						"description": "Project identifier"
+					},
+					"session_id": {
+						"type": "string",
+						"description": "Session identifier"
+					},
+					"channel": {
+						"type": "string",
+						"description": "Channel of the event"
+					},
+					"type": {
+						"type": "string",
+						"description": "Type of the event"
+					},
+					"anonymous_id": {
+						"type": "string",
+						"description": "Anonymous user identifier"
+					},
+					"user_id": {
+						"type": "string",
+						"description": "User identifier"
+					},
+					"address": {
+						"type": "string",
+						"description": "Wallet address"
+					},
+					"event": {
+						"type": "string",
+						"description": "Name of the event"
+					},
+					"context": {
+						"type": "string",
+						"description": "Event context as JSON string"
+					},
+					"properties": {
+						"type": "string",
+						"description": "Event properties as JSON string"
+					},
+					"version": {
+						"type": "string",
+						"description": "Event version"
+					},
+					"original_timestamp": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Original timestamp of the event"
+					},
+					"sent_at": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp when the event was sent"
+					},
+					"received_at": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp when the event was received"
+					},
+					"message_id": {
+						"type": "string",
+						"description": "Unique message identifier"
+					}
+				},
+				"required": ["event", "project_id"]
 			}
 		}
 	},
@@ -83,6 +162,7 @@
 				"summary": "List Form Responses",
 				"description": "Retrieves recent form responses with transformed field data",
 				"operationId": "listFormResponses",
+				"tags": ["Forms API"],
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -165,9 +245,10 @@
 		},
 		"/webhooks": {
 			"post": {
-				"summary": "Subscribe to Webhook",
+				"summary": "Subscribe to Form Events",
 				"description": "Creates a new webhook subscription for form events",
-				"operationId": "subscribeWebhook",
+				"operationId": "subscribeFormEvents",
+				"tags": ["Forms API"],
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -278,9 +359,10 @@
 				}
 			},
 			"delete": {
-				"summary": "Unsubscribe from Webhook",
+				"summary": "Unsubscribe from Form Events",
 				"description": "Removes a webhook subscription",
-				"operationId": "unsubscribeWebhook",
+				"operationId": "unsubscribeFormEvents",
+				"tags": ["Forms API"],
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -354,6 +436,106 @@
 					},
 					"404": {
 						"description": "Not Found - Webhook not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v0/events": {
+			"post": {
+				"summary": "Track Event",
+				"description": "Sends an event to the Formo Events API",
+				"operationId": "trackEvent",
+				"tags": ["Events API"],
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "name",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"default": "raw_events"
+						},
+						"description": "Name of the event pipeline"
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Event"
+							},
+							"example": {
+								"project_id": "test-project-id",
+								"session_id": "b6035b24-3fcb-4089-8cdd-a26d53f8f1b5",
+								"channel": "web",
+								"type": "page",
+								"anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
+								"user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
+								"address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+								"event": "page_hit",
+								"context": "{\"user_agent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36\",\"locale\":\"en-US\",\"location\":\"ID\",\"timezone\":\"Asia/Saigon\",\"referrer\":\"https://chatgpt.com/\",\"utm_source\":\"chatgpt.com\",\"utm_medium\":\"linkedin\",\"utm_campaign\":\"early-access\",\"utm_term\":null,\"utm_content\":null,\"ref\":\"vitalik.eth\",\"page_url\":\"https://www.estore.com/best-seller/1\",\"page_path\":\"/best-seller/1\",\"page_title\":\"The best sellers offered by EStore\",\"library_name\":\"Formo Web SDK\",\"library_version\":\"1.16.2\"}",
+								"properties": "{\"name\":\"Best Seller\",\"category\":\"Docs\",\"url\":\"https://formo.so/faucets?utm_source=chatgpt.com\",\"path\":\"/best-seller/1\",\"hash\":\"#submit\",\"title\":\"The best sellers offered by EStore\"}",
+								"version": "1",
+								"original_timestamp": "2025-04-23T13:15:17.000Z",
+								"sent_at": "2025-04-23T13:15:18.000Z",
+								"received_at": "2025-04-23T13:15:00.000Z",
+								"message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Event successfully tracked",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"example": true
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Invalid event data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing or invalid Bearer token",
 						"content": {
 							"application/json": {
 								"schema": {

@@ -126,11 +126,17 @@
             ]
           },
           {
-            "group": "Forms API Endpoints",
+            "group": "Events API",
             "pages": [
-              "api-reference/endpoint/list",
-              "api-reference/endpoint/subscribe",
-              "api-reference/endpoint/unsubscribe"
+              "api-reference/events/track"
+            ]
+          },
+          {
+            "group": "Forms API",
+            "pages": [
+              "api-reference/forms/list",
+              "api-reference/forms/subscribe",
+              "api-reference/forms/unsubscribe"
             ]
           }
         ]
