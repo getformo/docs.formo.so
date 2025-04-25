@@ -163,6 +163,12 @@
 				"description": "Retrieves recent form responses with transformed field data",
 				"operationId": "listFormResponses",
 				"tags": ["Forms API"],
+				"servers": [
+					{
+						"url": "https://api.formo.so/api",
+						"description": "Forms API"
+					}
+				],
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -249,6 +255,12 @@
 				"description": "Creates a new webhook subscription for form events",
 				"operationId": "subscribeFormEvents",
 				"tags": ["Forms API"],
+				"servers": [
+					{
+						"url": "https://api.formo.so/api",
+						"description": "Forms API"
+					}
+				],
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -363,6 +375,12 @@
 				"description": "Removes a webhook subscription",
 				"operationId": "unsubscribeFormEvents",
 				"tags": ["Forms API"],
+				"servers": [
+					{
+						"url": "https://api.formo.so/api",
+						"description": "Forms API"
+					}
+				],
 				"security": [
 					{
 						"ApiKeyAuth": []
@@ -463,6 +481,12 @@
 				"description": "Sends an event to the Formo Events API",
 				"operationId": "trackEvent",
 				"tags": ["Events API"],
+				"servers": [
+					{
+						"url": "https://events.formo.so",
+						"description": "Events API"
+					}
+				],
 				"security": [
 					{
 						"BearerAuth": []

@@ -6,9 +6,9 @@ iconType: solid
 ---
 
 All API endpoints require authentication using either: 
-- a SDK Write Key, for sending events
-- a Query API Read Token, and querying events
-- a Workspace API key, for managing projects and forms
+- a **SDK Write Key** to send events
+- a **Query API Read Token** to query events
+- a **Workspace API Key** to manage forms
 
 You'll need to include the key or token in the request headers for all API calls.
 
@@ -18,21 +18,19 @@ You'll need to include the key or token in the request headers for all API calls
 	<img src="/images/project-settings.png" alt="Tokens in project settings page" />
 </Frame>
 
-To send events, use the SDK Write Key in your project settings.
+Send events with the SDK Write Key in your project settings.
 
-To query events, use the Query API Read Token in your project settings.
+Query events with the Query API Read Token in your project settings.
 
-Include the Token in the request headers:
+### Request Headers
+
+Include the Token in your request headers:
 
 ```bash
 Authorization: Bearer <token>
 ```
 
 ## Workspace API Key
-
-<Frame>
-	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
-</Frame>
 
 Find your API key in your workspace settings. This key is unique to your workspace and should be kept secure.
 
@@ -43,7 +41,13 @@ Find your API key in your workspace settings. This key is unique to your workspa
 	/>
 </Frame>
 
-Include the API key in the request headers:
+### Request Headers
+
+<Frame>
+	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
+</Frame>
+
+Include the API key in your request headers:
 
 ```bash
 x-api-key: <your_workspace_api_key>
