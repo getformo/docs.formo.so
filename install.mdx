@@ -71,8 +71,8 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Tracking Events
 
-    Formo autocaptures events like page views, wallet connects, and wallet actions for you.
-    You can use the `useFormo` hook to track custom dapp events.
+    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
+    You can use the `useFormo` hook to track custom user actions.
 
     ```tsx
       import React, { useEffect } from 'react';
@@ -83,7 +83,7 @@ Pick your stack and add the code below to your codebase.
 
         useEffect(() => {
           // Track a custom event
-          analytics.track('custom_event', { key: 'value' });
+          analytics.track('custom_event', { points: 100 });
         }, [analytics]);
 
         return <div>Welcome to the Home Page!</div>;
@@ -162,8 +162,8 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Tracking Events
 
-    Formo autocaptures events like page views, wallet connects, and wallet actions for you.
-    You can use the `useFormo` hook to track custom dapp events.
+    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
+    You can use the `useFormo` hook to track custom user actions.
 
     ```tsx
       import React, { useEffect } from 'react';
@@ -174,7 +174,7 @@ Pick your stack and add the code below to your codebase.
 
         useEffect(() => {
           // Track a custom event
-          analytics.track('custom_event', { key: 'value' });
+          analytics.track('custom_event', { points: 100 });
         }, [analytics]);
 
         return <div>Welcome to the Home Page!</div>;

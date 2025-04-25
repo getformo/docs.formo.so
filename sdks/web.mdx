@@ -16,6 +16,22 @@ npm install @formo/analytics --save
 
 The Web3 SDK implements the standard [Events API](/data/events#events-api).
 
+### Tracking custom events
+
+Once the `analytics` object is available in `window.formo` or the `useFormo()` hook, call the `track()` function:
+
+```ts
+analytics.track(
+  "Liquidity Added",  // event name
+  {
+    pool_id: "LINK/ETH",
+    revenue: 99.99,     // revenue or fees
+    currency: "USD",    // currency
+    points: 99.99        // points for XP or rewards
+  }
+)
+```
+
 ## Configuration
 
 ### Batching
