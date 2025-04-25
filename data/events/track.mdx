@@ -2,8 +2,11 @@
 title: 'Spec: Track'
 ---
 
-The Track API call is how you record any [custom events](/features/product-analaytics/custom-events) your users perform, 
+The Track API call is how you record any [custom actions](/features/product-analytics/custom-events) your users are doing, 
 along with any properties that describe the action.
+
+Track events can capture a broad range of actions, such as clicking a button or completing a purchase.
+Additional information about the event can be included in the properties field. For example, for a Purchase Complete event, you may want to include the product ids of the purchased products.
 
 ## Event Names
 
@@ -30,7 +33,9 @@ Formo has reserved some standard properties listed in the following table and ha
 |:---------|:-----|:------------|
 | `revenue` | Number | The revenue amount as a result of an event. For e.g., a transaction worth $20.00 would result in a revenue of 20.00. |
 | `currency` | String | The currency of the revenue as a result of the event, set in ISO 4127 format. If this is not set, Formo assumes the revenue is in USD. |
-| `value` | String | An abstract value such as points or XP associated with an event, to be used by various teams. |
+| `points` | String | An abstract value such as points or XP associated with an event, to be used by various teams. |
+
+The above properties are used in the dashboards for calculate total revenue and points.
 
 ## Sample Payload
 
@@ -41,7 +46,7 @@ Formo has reserved some standard properties listed in the following table and ha
   "properties": {
     "revenue": "20.5",
     "currency": "USD",
-    "value": "100",
+    "points": "100",
     "product_id" : "9578257311",
     "rating" : 3.0,
     "review_body" : "Good value for the price."
