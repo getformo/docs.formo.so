@@ -3,10 +3,11 @@ title: 'Custom events'
 description: 'Track custom events and user actions such as clicks and conversions with structured data collection.'
 ---
 
-> 🚧 In development. <a href="https://cal.com/formo/30min">Reach out</a> to get early access. 🚧
 
 The Formo SDK offers an easy-to-use event collection library that allows you to track custom events in your dapp.
 Ensure high quality, structured data with Formo. 
+
+Formo also supports `revenue` and `points` tracking. [Learn more about tracking revenue](/data/events/track#properties).
 
 ```js
     formo.track(
@@ -14,17 +15,17 @@ Ensure high quality, structured data with Formo.
 			product_id: "123",
 			product_name: "Formo T-shirt",
 			price: 100,
-			quantity: 2
+			revenue: 10.5,
+			points: 4.1
 		}
 	)
 ```
 
 When naming events, Formo recommends establishing a consistent naming convention that uses:
 
-- Consistent formatting: Formo converts all events to be lower case with underscores: `song_played`. Otherwise, 'Song Played' and 'song played' will be two separate events. This naming convention helps to prevent messy data, especially when multiple teams send the same event.
+- Consistent formatting: Event names are case sensitive.
 - A consistent syntax: Song Played and Played Song are also considered separate events. For example, a standard of `[Noun] + [Past-Tense Verb]` ensures all your events are consistent.
 - A consistent actor: Does 'Message Sent' mean that the user sent a message or that you sent a message to the user? If all your events are named in a way that reflects the user's perspective, the meaning is clear immediately.
 
-Seamlessly integrate with Formo's [Wallet Intelligence](/features/wallet-intelligence) to get a holistic view of each customer from anonymous to known.
-
-Use [Funnels](/features/product-analytics/funnels) to understand how users interact with your dapp.
+Custom events integrates with Formo's [Wallet Intelligence](/features/wallet-intelligence) to give you a complete picture of each user's journey.
+[Funnels](/features/product-analytics/funnels) help you understand how your users interact with your dapp.
