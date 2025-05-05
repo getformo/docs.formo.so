@@ -12,13 +12,72 @@ description: 'Track user events in web applications with the Formo Web SDK.'
 npm install @formo/analytics --save
 ```
 
-## API
+```tsx
+// App.tsx (or App.js)
 
-The Web3 SDK implements the standard [Events API](/data/events#events-api).
+  import React from 'react';
+  import ReactDOM from 'react-dom/client';
+  import { FormoAnalyticsProvider } from '@formo/analytics';
+  import App from './App';
 
-### Tracking custom events
+  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-Once the `analytics` object is available in `window.formo` or the `useFormo()` hook, call the `track()` function:
+  root.render(
+    <React.StrictMode>
+      <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>">
+        <App />
+      </FormoAnalyticsProvider> 
+    </React.StrictMode>
+  );
+```
+
+```tsx
+// Usage on a page component
+
+import React, { useEffect } from 'react';
+  import { useFormo } from '@formo/analytics';
+
+  const HomePage = () => {
+    const analytics = useFormo();
+
+    useEffect(() => {
+      // Track a custom event
+      analytics.track('custom_event', { points: 100 });
+    }, [analytics]);
+
+    return <div>Welcome to the Home Page!</div>;
+  };
+
+  export default HomePage;
+```
+
+## Autocapture
+
+The Web SDK automatically captures the events such as page views and wallet events (connect, disconnect, signature, transaction, etc) automatically with full attribution (referrer, UTM, referrals.)
+
+## Identify wallets
+
+As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load for logged-in users, if possible.
+
+Call `identify()` after a user connects their wallet or signs in on your website or app:
+
+```ts
+analytics.identify({ address }, {
+  "name": "Alex Smith",
+  "email": "alex@example.com"
+});
+
+OR
+
+window.formo.identify();
+```
+
+If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address. Note that most wallets block wallet fingerprinting by default.
+
+## Track custom events
+
+Record [custom user actions](/data/events/track) with the `track()` function:
+
 
 ```ts
 analytics.track(
@@ -30,21 +89,28 @@ analytics.track(
     points: 99.99        // points for XP or rewards
   }
 )
+
+OR 
+
+window.formo.track()
 ```
+
+## API
+
+The Web3 SDK implements the standard [Events API](/data/events#events-api).
 
 ## Configuration
 
 ### Batching
 
 To support high-performance environments, the SDK sends events in batches. 
-The SDK queues in memory every event the track method logs. 
 
 ```tsx
 <AnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
-        flushAt: 3,
-        flushInterval: 1000 * 10, // 10 secs
+        flushAt: 20, // defaults to batches of 20 events
+        flushInterval: 1000 * 60, // defaults to 1 min
     }}
 >
 ```
