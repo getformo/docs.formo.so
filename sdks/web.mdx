@@ -4,6 +4,8 @@ icon: browser
 description: 'Track user events in web applications with the Formo Web SDK.'
 ---
 
+> The Web3 SDK implements the standard [Events API](/data/events#events-api).
+
 ## Installation
 
 [Install](/install) the JavaScript SDK via CDN or NPM.
@@ -53,26 +55,23 @@ import React, { useEffect } from 'react';
 
 ## Autocapture
 
-The Web SDK automatically captures the events such as page views and wallet events (connect, disconnect, signature, transaction, etc) automatically with full attribution (referrer, UTM, referrals.)
+The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
+
+You do not need to configure anything to track these events.
 
 ## Identify wallets
 
-As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load for logged-in users, if possible.
-
-Call `identify()` after a user connects their wallet or signs in on your website or app:
+Call [`identify()`](/data/events/identify) after a user connects their wallet or signs in on your website or app:
 
 ```ts
-analytics.identify({ address }, {
-  "name": "Alex Smith",
-  "email": "alex@example.com"
-});
+analytics.identify({ address });
 
 OR
 
-window.formo.identify();
+window.formo.identify(...);
 ```
 
-If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address. Note that most wallets block wallet fingerprinting by default.
+> If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address. Note that most wallets block automatic wallet fingerprinting by default.
 
 ## Track custom events
 
@@ -92,30 +91,23 @@ analytics.track(
 
 OR 
 
-window.formo.track()
+window.formo.track(...)
 ```
-
-## API
-
-The Web3 SDK implements the standard [Events API](/data/events#events-api).
 
 ## Configuration
 
-### Batching
+### Local testing
 
-To support high-performance environments, the SDK sends events in batches. 
+The SDK skips tracking in localhost by default. To enable tracking locally during development, set `trackLocalhost` to `true`:
 
 ```tsx
 <AnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
-        flushAt: 20, // defaults to batches of 20 events
-        flushInterval: 1000 * 60, // defaults to 1 min
+        trackLocalhost: true,
     }}
 >
 ```
-
-Customize this behavior with the `flushAt` and `flushInterval` configuration parameters. 
 
 ### Debugging
 
@@ -133,20 +125,22 @@ Control the level of logs the SDK prints to the console with the following logLe
 >
 ```
 
-The SDK omits logs in localhost by default. To enable logs, set `trackLocalhost` to `true`:
+### Batching
+
+To support high-performance environments, the SDK sends events in batches. 
 
 ```tsx
 <AnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
-        trackLocalhost: true,
-        logger: {
-            enabled: true,
-            levels: ["error", "warn", "info"],
-        },
+        flushAt: 20, // defaults to batches of 20 events
+        flushInterval: 1000 * 60, // defaults to 1 min
     }}
 >
 ```
+
+Customize this behavior with the `flushAt` and `flushInterval` configuration parameters. 
+
 
 | Log Level | Description |
 |-----------|-------------|

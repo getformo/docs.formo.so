@@ -5,10 +5,15 @@ icon: rocket-launch
 iconType: solid
 ---
 
+## Instructions
+
 Pick your stack and add the code below to your codebase.
 
 <Tabs>
   <Tab icon="code" title="Browser">
+
+    #### 1. Install the Formo SDK
+
     Install this script in the `<head>` tag of your website:
 
     ```html
@@ -30,16 +35,22 @@ Pick your stack and add the code below to your codebase.
     </script>
     ```
 
-    The write key is a unique identifier for your project. Formo uses this key to send events from a source to the correct destination.
-    Ensure you pass a valid `writeKey` when initializing the SDK. Replace `<YOUR_WRITE_KEY>` with your project's **Write Key** in your project settings. 
-    
+    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
+    #### 2. Identify users (Optional)
+
+    Call `identify` to tie a user to their actions. 
+    As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load, if possible.
+    
+    ```tsx
+    ...
+    window.formo = formo;
+    window.formo.identify();
+    ```    
 
   </Tab>
   <Tab icon="rectangle-terminal" title="React">
-    For a React app, the best approach is installing the NPM package rather than using the inlined script.
-
-    #### 1. Install the Formo Analytics SDK
+    #### 1. Install the Formo SDK
 
     ```bash
       npm install @formo/analytics --save
@@ -47,13 +58,11 @@ Pick your stack and add the code below to your codebase.
 
     #### 2. Use `FormoAnalyticsProvider` in your app
 
-    Wrap your React app in the FormoAnalyticsProvider provided by the SDK.
+    Wrap your React app in the provider provided by the SDK.
 
     ```tsx
       // App.tsx (or App.js)
 
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
       import { FormoAnalyticsProvider } from '@formo/analytics';
       import App from './App';
 
@@ -68,15 +77,37 @@ Pick your stack and add the code below to your codebase.
       );
     ```
 
-    Replace `<YOUR_WRITE_KEY>` with your project Write key. You can find it in your project settings.
+    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
-    #### 3. Tracking Events
+    #### 3. Identify users (Optional)
+
+    Call `identify` to tie a user to their actions. 
+    As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load, if possible.
+    
+    ```tsx
+
+    import { useFormo } from "@formo/analytics";
+    import { useAccount } from "wagmi";
+    
+    const HomePage = () => {
+      const { address } = useAccount();
+      const analytics = useFormo();
+
+      useEffect(() => {
+        if (address && analytics) {
+          analytics.identify({ address });
+        }
+      }, [address, analytics]);
+    }
+    ```    
+    
+    #### 4. Track custom events (Optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
-    You can use the `useFormo` hook to track custom user actions.
+    
+    Use the `track()` function to track custom user actions specific to your app.
 
     ```tsx
-      import React, { useEffect } from 'react';
       import { useFormo } from '@formo/analytics';
 
       const HomePage = () => {
@@ -95,9 +126,7 @@ Pick your stack and add the code below to your codebase.
 
   </Tab>
   <Tab icon="react" title="Next.js">
-    For a NextJS app, the best approach is installing the NPM package rather than using the inlined script.
-
-    #### 1. Install the Formo Analytics SDK
+    #### 1. Install the Formo SDK
 
     ```bash
       npm install @formo/analytics --save
@@ -113,7 +142,6 @@ Pick your stack and add the code below to your codebase.
       'use client';
 
       import { FormoAnalytics, FormoAnalyticsProvider } from '@formo/analytics';
-      import React, { FC, useEffect } from 'react';
 
       type FormoAnalyticsProviderProps = {
         writeKey: string,
@@ -159,15 +187,36 @@ Pick your stack and add the code below to your codebase.
       }
     ```
 
-    Replace `<YOUR_WRITE_KEY>` with your project Write key. You can find it in your project settings.
+    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
-    #### 3. Tracking Events
+    #### 3. Identify users (Optional)
+
+    Call `identify` to tie a user to their actions. 
+    As a best practice, make sure it is called at the start of every session or page load, if possible.
+    
+    ```tsx
+    import { useFormo } from "@formo/analytics";
+    import { useAccount } from "wagmi";
+    
+    const HomePage = () => {
+      const { address } = useAccount();
+      const analytics = useFormo();
+
+      useEffect(() => {
+        if (address && analytics) {
+          analytics.identify({ address });
+        }
+      }, [address, analytics]);
+    }
+    ```    
+
+    #### 4. Track custom events (Optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
-    You can use the `useFormo` hook to track custom user actions.
+    
+    Use the `track()` function to track custom user actions specific to your app.
 
     ```tsx
-      import React, { useEffect } from 'react';
       import { useFormo } from '@formo/analytics';
 
       const HomePage = () => {
@@ -187,12 +236,17 @@ Pick your stack and add the code below to your codebase.
   </Tab> 
 </Tabs>
 
-To test that things are working, navigate to your site and open the network tab of the developer tools in your browser (usually F12 or Ctrl/Command + Shift + I). 
-Search for 'events' and make sure you get a 200 response code in the status column.
+## Verification
 
-## SDK API Reference
+To verify that the SDK is installed correctly, navigate to your site and open the network tab of the developer tools in your browser. 
 
-Refer to the corresponding SDK documentation for additional information:
+Search a 'raw_events' request in the console and make sure you get a 202 response code in the status column.
+
+> You can [enable logs on localhost](/sdks/web#configuration) to ease debugging.
+
+## SDK Reference
+
+Refer to the corresponding SDK documentation for additional information and configuration options:
 
 <CardGroup>
   <Card
@@ -211,14 +265,14 @@ Check out working examples of Formo on Github:
 
 <CardGroup>
   <Card
-    title="Example Next.js App"
+    title="Example Next.js app"
     icon="file-code"
     href="https://github.com/getformo/formo-analytics-example-next"
   >
     A working example of Formo in a Next.js app.
   </Card>
   <Card
-    title="Example React App"
+    title="Example React app"
     icon="file-code"
     href="https://github.com/getformo/formo-analytics-example-react"
   >
@@ -226,7 +280,7 @@ Check out working examples of Formo on Github:
   </Card>
 </CardGroup>
 
-## Support & Feedback
+## Support
 
 <CardGroup cols={2}>
   <Card title="Slack" icon="slack" href="https://formo.so/slack">
