@@ -34,6 +34,9 @@
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
                   "features/product-analytics/funnels",
+                  "features/product-analytics/flows",
+                  "features/product-analytics/charts",
+                  "features/product-analytics/retention",
                   "features/product-analytics/alerts"
                 ]
               },
@@ -43,12 +46,12 @@
                 "pages": [
                   "features/wallet-intelligence/overview",
                   "features/wallet-intelligence/users",
-                  "features/wallet-intelligence/wallet-profiles",
-                  "features/wallet-intelligence/wallet-labels",
-                  "features/wallet-intelligence/wallet-score",
-                  "features/wallet-intelligence/wallet-messaging",
                   "features/wallet-intelligence/audience-insights",
-                  "features/wallet-intelligence/segments"
+                  "features/wallet-intelligence/wallet-profiles",
+                  "features/wallet-intelligence/segments",
+                  "features/wallet-intelligence/wallet-labels",
+                  "features/wallet-intelligence/wallet-messaging",
+                  "features/wallet-intelligence/wallet-score"
                 ]
               },
               {
