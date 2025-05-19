@@ -92,8 +92,8 @@
                   "data/events/common"
                 ]
               },
-              "data/schema",
-              "data/what-we-collect"
+              "data/what-we-collect",
+              "data/schema"
             ]
           },
           {
