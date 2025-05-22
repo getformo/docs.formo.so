@@ -4,7 +4,7 @@ icon: browser
 description: 'Track user events in web applications with the Formo Web SDK.'
 ---
 
-> The Web3 SDK implements the standard [Events API](/data/events#events-api).
+The [Formo Web SDK](https://github.com/getformo/sdk) is **open source** and implements the standard [Events API](/data/events#events-api).
 
 ## Installation
 
@@ -53,13 +53,34 @@ import React, { useEffect } from 'react';
   export default HomePage;
 ```
 
+### Code examples
+
+Check out working examples of Formo on Github:
+
+<CardGroup>
+  <Card
+    title="Example Next.js app"
+    icon="file-code"
+    href="https://github.com/getformo/formo-analytics-example-next"
+  >
+    A working example of Formo in a Next.js app.
+  </Card>
+  <Card
+    title="Example React app"
+    icon="file-code"
+    href="https://github.com/getformo/formo-analytics-example-react"
+  >
+    A working example of Formo in a React app.
+  </Card>
+</CardGroup>
+
 ## Autocapture
 
 The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
 
 You do not need to configure anything to track these events.
 
-## Identify wallets
+## Identify
 
 Call [`identify()`](/data/events/identify) after a user connects their wallet or signs in on your website or app:
 
@@ -73,9 +94,9 @@ window.formo.identify(...);
 
 > If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address. Note that most wallets block automatic wallet fingerprinting by default.
 
-## Track custom events
+## Custom events
 
-Record [custom user actions](/data/events/track) with the `track()` function:
+Track [custom user actions](/data/events/track) with the `track()` function:
 
 
 ```ts
@@ -141,7 +162,6 @@ To support high-performance environments, the SDK sends events in batches.
 
 Customize this behavior with the `flushAt` and `flushInterval` configuration parameters. 
 
-
 | Log Level | Description |
 |-----------|-------------|
 | trace | Shows the most detailed diagnostic information, useful for tracing program execution flow. |
@@ -149,3 +169,4 @@ Customize this behavior with the `flushAt` and `flushInterval` configuration par
 | info | Shows informative messages about normal application operation. |
 | warn | Default. Shows error and warning messages. |
 | error | Shows error messages only. |
+
