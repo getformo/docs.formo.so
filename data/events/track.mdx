@@ -6,12 +6,18 @@ The Track API call is how you record any [custom actions](/features/product-anal
 along with any properties that describe the action.
 
 Track events can capture a broad range of actions, such as clicking a button or completing a purchase.
+
 Additional information about the event can be included in the properties field. For example, for a Purchase Complete event, you may want to include the product ids of the purchased products.
 
-## Event Names
+## Naming events
 
-Use a descriptive human readable name. Adopt nouns and past tense verbs like **Swap Reviewed** and **Order Submitted**.
-This allows everyone (including you 6 months from now) to instantly understand the meaning of an event.
+When naming events, Formo recommends establishing a consistent naming convention that uses:
+
+- Consistent formatting: Event names are case sensitive.
+- A consistent syntax:  Adopt nouns and past tense verbs like **Swap Reviewed** and **Order Submitted**. A standard of `[Noun] + [Past-Tense Verb]` ensures all your events are consistent.
+- A consistent actor: Does 'Message Sent' mean that the user sent a message or that you sent a message to the user? If all your events are named in a way that reflects the user's perspective, the meaning is clear immediately.
+
+This allows everyone including you 6 months from now to instantly understand the meaning of an event.
 
 ## Fields
 
