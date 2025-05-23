@@ -44,7 +44,7 @@ import React, { useEffect } from 'react';
 
     useEffect(() => {
       // Track a custom event
-      analytics.track('custom_event', { points: 100 });
+      analytics.track('Swap Completed', { points: 100 });
     }, [analytics]);
 
     return <div>Welcome to the Home Page!</div>;
@@ -101,7 +101,7 @@ Track user actions by calling the SDK [`track()`](/data/events/track) function:
 
 ```ts
 analytics.track(
-  "Liquidity Added",  // event name
+  "Position Opened",  // event name
   {
     pool_id: "LINK/ETH",
     revenue: 99.99,     // revenue or fees

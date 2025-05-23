@@ -33,9 +33,9 @@
                   "features/product-analytics/activity",
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
+                  "features/product-analytics/charts",
                   "features/product-analytics/funnels",
                   "features/product-analytics/flows",
-                  "features/product-analytics/charts",
                   "features/product-analytics/retention",
                   "features/product-analytics/alerts"
                 ]
