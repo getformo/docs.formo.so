@@ -22,7 +22,9 @@ Pick your stack and add the code below to your codebase.
       const script = document.createElement('script');
       const writeKey = '<YOUR_WRITE_KEY>';
 
-      script.src = 'https://unpkg.com/@formo/analytics';
+      script.src = 'https://unpkg.com/@formo/analytics@1.16.20';
+      script.integrity = 'sha256-dsgplPgTPDQ4QThDJD15veQO9Yyb0co9aHoZN6DhQsQ=';
+      script.crossorigin = 'anonymous';
       script.onload = function () {
         FormoAnalytics.init(writeKey)
           .then((formo) => {
@@ -40,14 +42,14 @@ Pick your stack and add the code below to your codebase.
 
     #### 2. Identify users (Optional)
 
-    Call `identify` to tie a user to their actions. 
+    Call `identify` to tie a user to their actions.
     As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load, if possible.
-    
+
     ```tsx
     ...
     window.formo = formo;
     window.formo.identify();
-    ```    
+    ```
 
   </Tab>
   <Tab icon="rectangle-terminal" title="React">
@@ -82,14 +84,14 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users (Optional)
 
-    Call `identify` to tie a user to their actions. 
+    Call `identify` to tie a user to their actions.
     As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load, if possible.
-    
+
     ```tsx
 
     import { useFormo } from "@formo/analytics";
     import { useAccount } from "wagmi";
-    
+
     const HomePage = () => {
       const { address } = useAccount();
       const analytics = useFormo();
@@ -100,12 +102,12 @@ Pick your stack and add the code below to your codebase.
         }
       }, [address, analytics]);
     }
-    ```    
-    
+    ```
+
     #### 4. Track custom events (Optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
-    
+
     Use the `track()` function to track custom user actions specific to your app.
 
     ```tsx
@@ -192,13 +194,13 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users (Optional)
 
-    Call `identify` to tie a user to their actions. 
+    Call `identify` to tie a user to their actions.
     As a best practice, make sure it is called at the start of every session or page load, if possible.
-    
+
     ```tsx
     import { useFormo } from "@formo/analytics";
     import { useAccount } from "wagmi";
-    
+
     const HomePage = () => {
       const { address } = useAccount();
       const analytics = useFormo();
@@ -209,12 +211,12 @@ Pick your stack and add the code below to your codebase.
         }
       }, [address, analytics]);
     }
-    ```    
+    ```
 
     #### 4. Track custom events (Optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
-    
+
     Use the `track()` function to track custom user actions specific to your app.
 
     ```tsx
@@ -239,7 +241,7 @@ Pick your stack and add the code below to your codebase.
 
 ## Verification
 
-To verify that the SDK is installed correctly, navigate to your site and open the network tab of the developer tools in your browser. 
+To verify that the SDK is installed correctly, navigate to your site and open the network tab of the developer tools in your browser.
 
 Search a 'raw_events' request in the console and make sure you get a 202 response code in the status column.
 
@@ -250,12 +252,7 @@ Search a 'raw_events' request in the console and make sure you get a 202 respons
 Refer to the corresponding SDK documentation for additional information and configuration options:
 
 <CardGroup>
-  <Card
-    title="Web SDK"
-    icon="globe"
-    iconType="solid"
-    href="/sdks/web"
-  >
+  <Card title="Web SDK" icon="globe" iconType="solid" href="/sdks/web">
     Web SDK (Browser, React, Next.js)
   </Card>
 </CardGroup>
@@ -273,6 +270,7 @@ Refer to the corresponding SDK documentation for additional information and conf
     Email us at [support@formo.so](mailto:support@formo.so)
   </Card>
   <Card title="Founder" icon="comments" href="mailto:yos@formo.so">
-    Bug him at [yos@formo.so](mailto:yos@formo.so) (share anything that's on your mind - the good and the bad).
+    Bug him at [yos@formo.so](mailto:yos@formo.so) (share anything that's on
+    your mind - the good and the bad).
   </Card>
 </CardGroup>
