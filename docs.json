@@ -75,6 +75,7 @@
           {
             "group": "Data",
             "pages": [
+              "data/what-we-collect",
               {
                 "group": "Event Spec",
                 "icon": "cube",
@@ -92,7 +93,6 @@
                   "data/events/common"
                 ]
               },
-              "data/what-we-collect",
               "data/schema"
             ]
           },
@@ -113,6 +113,12 @@
               "sdks/web",
               "sdks/mobile",
               "sdks/server"
+            ]
+          },
+          {
+            "group": "Security",
+            "pages": [
+              "security/sri"
             ]
           }
         ]
