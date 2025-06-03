@@ -9,13 +9,17 @@ icon: chart-simple
 How many unique visitors are interacting with your site or dapp across multiple page views and events. 
 A visitor is only counted once within a 24 hour window. The 24 hour limit is necessary to comply with GDPR.
 
-### Current Visitors
+### Live Visitors
 
 How many unique visitors are currently interacting with your site or dapp.
 
-### Unique Active Wallets
+### Visitors
 
-How many unique wallets are actively interacting with your site or dapp.
+How many daily / weekly / monthly visitors who arrive on your site or dapp.
+
+### Active Wallets
+
+How many unique daily / weekly / monthly wallets are active on with your site or dapp.
 
 We also collect other wallet details, such as the wallet address, wallet type, and wallet profiles.
 
@@ -47,6 +51,12 @@ How long a user spends on your site or dapp.
 
 The bounce rate is the relative number of visitors who have left the site after a single page view, compared to the total number of unique visitors.
 
+### Referrers / Sources
+
+How many users are referred to your site or dapp by a particular source such as a search engines, social media platform, etc.
+
+Referrers are the statistics for the referring site. The data is extracted from the Referers (with a r) HTTP header and may not be set by the browser. In these cases it will be listed as unknown.
+
 ### UTM parameters
 
 How many users come to your site or dapp from a particular source. We track these UTM codes:
@@ -54,6 +64,10 @@ How many users come to your site or dapp from a particular source. We track thes
 - `utm_source` (e.g.: google.com)
 - `utm_medium` (e.g.: search)
 - `utm_campaign` (e.g.: summer_sale)
+
+### Referrals
+
+How many users are referred to your site or dapp by a particular user. We use the `referral` and `ref` query parameters to track referrals.
 
 ### Countries
 
@@ -67,25 +81,29 @@ How many users are using a particular device such as desktop, mobile, tablet, et
 
 Browser is the statistics of the browser used by the visitor. It is extracted from the User-Agent and Client Hints HTTP headers.
 
-### Referrals
-
-How many users are referred to your site or dapp by a particular user. We use the `referral` and `ref` query parameters to track referrals.
-
-### Referrers / Sources
-
-How many users are referred to your site or dapp by a particular source such as a search engines, social media platform, etc.
-
-Referrers are the statistics for the referring site. The data is extracted from the Referers (with a r) HTTP header and may not be set by the browser. In these cases it will be listed as unknown.
-
 ### Events
 
 Events are user-defined custom events. They have a name and optional metadata key/value pairs. When you expand the activity feed, you can view and filter the metadata.
 
 Metadata can be anything. For example, you can define an event Button clicked and track which button was clicked as the metadata field `button=Header`. 
 
+### Top dapps
+
+The most popular dapps used by wallets in your audience.
+
+### Top chains
+
+The most popular chains used by wallets in your audience.
+
+### Top tokens
+
+The most popular tokens held by wallets in your audience.
+
 ### Wallet Profiles
 
 Wallet profiles are a collection of onchain and offchain data about a wallet.
+
+A profile includes a list of properties such as their address, type, net worth, and more.
 
 ### Wallet Address
 
@@ -95,7 +113,11 @@ Formo uses the wallet address as a persistent identifier for a visitor where ava
 
 How many users are using a particular wallet type such as MetaMask, Rainbow Wallet, etc.
 
-### Wallet Reputation Score
+### Wallet Net Worth
+
+The total net worth of a wallet on the top chains across DeFi positions and token balances.
+
+### Wallet Score
 
 A score that indicates the quality and intent of a wallet address.
 
@@ -115,6 +137,10 @@ How many users are using a particular dapp such as Uniswap, OpenSea, etc.
 
 How many users hold a particular token such as USDC, USDT, etc.
 
+### Conversion Rate
+
+Calculate the conversion rate of key user flows with the Funnels feature.
+
 ### Retention Rate
 
 Retention rates: the percentage of customers who continue to use your service or product over a predetermined period.
@@ -122,11 +148,6 @@ Retention rates: the percentage of customers who continue to use your service or
 ### Churn Rate
 
 The percentage of customers who stop using your service or product over a predetermined period.
-
-### Active users
-
-The number of users interacting with your community or platform within a certain time frame.
-Expressed through monthly, weekly, or daily active users (MAUs, WAUs, and DAUs). 
 
 ### Customer Acquisition Cost (CAC)
 
@@ -139,3 +160,7 @@ How much revenue you've made from your site or dapp.
 ### Customer Lifetime Value (CLTV)
 
 CLV estimates the total revenue a user generates over their entire engagement with your dapp.
+
+### User lifecycle
+
+Whether each wallet or visitor is a New or Returning user.

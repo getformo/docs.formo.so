@@ -24,7 +24,7 @@ Pick your stack and add the code below to your codebase.
 
       script.src = 'https://unpkg.com/@formo/analytics@1.16.20';
       script.integrity = 'sha256-dsgplPgTPDQ4QThDJD15veQO9Yyb0co9aHoZN6DhQsQ=';
-      script.crossorigin = 'anonymous';
+      script.crossOrigin = 'anonymous';
       script.onload = function () {
         FormoAnalytics.init(writeKey)
           .then((formo) => {
@@ -243,9 +243,9 @@ Pick your stack and add the code below to your codebase.
 
 To verify that the SDK is installed correctly, navigate to your site and open the network tab of the developer tools in your browser.
 
-Search a 'raw_events' request in the console and make sure you get a 202 response code in the status column.
+Wait and look for a 'raw_events' request to Formo in the network console. Check that the request returns a 202 response status. If so, you're done!
 
-> [Eenable logs on localhost](/sdks/web#configuration) to help with debugging.
+> [Enable logs on localhost](/sdks/web#configuration) to help with debugging or reach out to [support](mailto:support@formo.so).
 
 ## SDK Reference
 
