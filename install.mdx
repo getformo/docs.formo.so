@@ -1,5 +1,5 @@
 ---
-title: "Quickstart"
+title: "Install"
 description: "Installing Formo is easy. This guide will show you how to do it with our SDKs."
 icon: rocket-launch
 ---
@@ -42,13 +42,24 @@ Pick your stack and add the code below to your codebase.
 
     #### 2. Identify users (Optional)
 
-    Call `identify` to tie a user to their actions.
-    As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load, if possible.
+    Call [`identify`](/data/events/identify) to tie a user to their actions.
+    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
 
     ```tsx
-    ...
-    window.formo = formo;
-    window.formo.identify();
+    window.formo.identify({
+      address: "0xEee...",
+      userId: "foobar"
+    });
+    ```
+
+    #### 3. Track events (Optional)
+
+    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+
+    ```html
+    <button type="button" onclick="window.formo.track('Swap Completed', { foo: 'bar' })">
+      Track event
+    </button>
     ```
 
   </Tab>
@@ -84,8 +95,8 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users (Optional)
 
-    Call `identify` to tie a user to their actions.
-    As a best practice, make sure [identify](/data/events/identify) is called at the start of every session or page load, if possible.
+    Call [`identify`](/data/events/identify) to tie a user to their actions.
+    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
 
     ```tsx
 
@@ -104,11 +115,11 @@ Pick your stack and add the code below to your codebase.
     }
     ```
 
-    #### 4. Track custom events (Optional)
+    #### 4. Track events (Optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
-    Use the `track()` function to track custom user actions specific to your app.
+    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
@@ -194,8 +205,8 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users (Optional)
 
-    Call `identify` to tie a user to their actions.
-    As a best practice, make sure it is called at the start of every session or page load, if possible.
+    Call [`identify`](/data/events/identify) to tie a user to their actions.
+    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
 
     ```tsx
     import { useFormo } from "@formo/analytics";
@@ -213,11 +224,11 @@ Pick your stack and add the code below to your codebase.
     }
     ```
 
-    #### 4. Track custom events (Optional)
+    #### 4. Track events (Optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
-    Use the `track()` function to track custom user actions specific to your app.
+    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
@@ -248,8 +259,6 @@ Wait and look for a 'raw_events' request to Formo in the network console. Check 
 > [Enable logs on localhost](/sdks/web#configuration) to help with debugging or reach out to [support](mailto:support@formo.so).
 
 ## SDK Reference
-
-Refer to the corresponding SDK documentation for additional information and configuration options:
 
 <CardGroup>
   <Card title="Web SDK" icon="globe" iconType="solid" href="/sdks/web">

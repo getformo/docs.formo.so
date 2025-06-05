@@ -29,7 +29,7 @@
                 "icon": "chart-line",
                 "pages": [
                   "features/product-analytics/overview",
-                  "features/product-analytics/growth-metrics",
+                  "features/product-analytics/growth-analytics",
                   "features/product-analytics/activity",
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
@@ -45,9 +45,8 @@
                 "icon": "user",
                 "pages": [
                   "features/wallet-intelligence/overview",
-                  "features/wallet-intelligence/users",
-                  "features/wallet-intelligence/audience-insights",
                   "features/wallet-intelligence/wallet-profiles",
+                  "features/wallet-intelligence/audience-insights",
                   "features/wallet-intelligence/segments",
                   "features/wallet-intelligence/wallet-labels",
                   "features/wallet-intelligence/wallet-messaging",
@@ -200,7 +199,7 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
+      "label": "Sign in",
       "href": "https://app.formo.so"
     }
   },

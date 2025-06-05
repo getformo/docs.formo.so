@@ -4,16 +4,6 @@ icon: cubes-stacked
 description: 'Learn about what data Formo collects and how we protect user privacy.'
 ---
 
-Formo is **privacy-friendly by design.** 
-
-You do not need to tweak any settings to be privacy-friendly:
-- We do not collect any personal data. We do not use third-party cookies and never collect information that could be used to fingerprint a user. 
-- We collect as little information as is necessary to give you actionable analytics for onchain apps. 
-- The data we collect belongs to you. We only collect non-personal data and don't share the data with third parties or transfer it overseas. 
-- Your data never leaves the E.U. Also, no other third-party vendors have access to any data outside the hosting company that owns the servers on which the data is stored.
-
-Read more for a detailed list of what we do and don’t collect from your visitors.
-
 ### NO Third-party Cookies
 
 > We do NOT read nor set any third-party cookies.
@@ -24,20 +14,24 @@ We care about the privacy of your visitors. Cookies are something that can track
 
 We do use first-party cookies to support cross-subdomain tracking. This is necessary to see when visitors go from your site (formo.so) to your app (app.formo.so).
 
+### NO Fingerprinting
+
+> We do NOT use device fingerprinting.
+We do not attempt to generate a device-persistent identifier because they are considered personal data under GDPR. 
+
+To count user sessions, we generate a daily changing identifier using the visitor’s IP address and User-Agent. Every single HTTP request sends this information to the server so that’s what we use. 
+
+```
+hash(daily_salt + website_domain + ip_address + user_agent)
+```
+
+To anonymize these datapoints and make them impossible to relate back to the user, we run them through a hash function with a rotating salt.
+
 ### NO IP addresses
 
 > We do NOT collect IP addresses.
 
 The raw IP address data is never stored in our logs, databases, or anywhere on disk at all.
-
-### NO Fingerprinting
-
-> We do NOT use device fingerprinting.
-We do not attempt to generate a device-persistent identifier because they are considered personal data under GDPR. 
-Every single HTTP request sends the IP address and the User-Agent to the server so that’s what we use. 
-
-We generate a daily changing identifier using the visitor’s IP address and User-Agent. 
-To anonymize these datapoints and make them impossible to relate back to the user, we run them through a hash function with a rotating salt.
 
 ### User Agent
 

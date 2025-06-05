@@ -84,7 +84,7 @@ The Web SDK automatically captures common events such as page views and wallet e
 
 You do not need to configure anything to track these events.
 
-## Identify
+## Identify users
 
 Call [`identify()`](/data/events/identify) after a user connects their wallet or signs in on your website or app:
 
@@ -98,7 +98,7 @@ window.formo.identify(...);
 
 > If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address. Note that most wallets block automatic wallet fingerprinting by default.
 
-## Custom events
+## Track events
 
 Track user actions by calling the SDK [`track()`](/data/events/track) function:
 
@@ -118,8 +118,6 @@ OR
 
 window.formo.track(...)
 ```
-
-Include the optional `revenue` property to track revenue associated with a user action.
 
 ## Configuration
 
