@@ -26,7 +26,7 @@ This guide covers the common and contextual fields in detail.
 | `original_timestamp` | Timestamp | ✓ | Records the actual time (in UTC) when the event occurred.|
 | `sent_at` | Timestamp | ✓ | Captures the time (in UTC) when the event was sent from the client to Formo.|
 | `received_at` | Timestamp | ✓ | Time in UTC when Formo ingests the event. |
-| `timestamp` | Timestamp | ✓ | Formo calculates this field to account for any client-side clock skew using the formula: timestamp = receivedAt - (sentAt - originalTimestamp). Note that this time is in UTC. |
+| `timestamp` | Timestamp | ✓ | Formo calculates this field to account for any client-side clock skew using the formula: timestamp = received_at - (sent_at - original_timestamp). Note that this time is in UTC. |
 | `message_id` | String | ✓ | Unique identification for the event.|
 
 ## Contextual Fields
@@ -51,6 +51,46 @@ Contextual fields give additional information about a particular event. The foll
 | `page_title` | String |  | Title of the page. |
 | `library_name` | String |  | Name of the SDK used to capture the event. |
 | `library_version` | String |  | Version of the SDK used to capture the event. |
+
+## Timestamps
+
+Every API call has four timestamps: `original_timestamp`, `timestamp`, `sent_at`, and `received_at`. They're used for very different purposes.
+
+All timestamps are ISO-8601 date strings, and are in the UTC timezone. To see the user's timezone information, check the `timezone` property that's automatically collected by client-side SDKs.
+
+### Timestamp overview
+
+| Name               | Calculated / Value                                                                 |
+|--------------------|-----------------------------------------------------------------------------------|
+| original_timestamp | Time on the client device when call was invoked OR The timestamp value manually passed in through server-side libraries. |
+| sent_at            | Time on client device when call was sent OR sent_at value manually passed in.      |
+| received_at        | Time on Formo server clock when call was received                                  |
+| timestamp          | Calculated by Formo to correct client-device clock skew using the following formula: `received_at - (sent_at - original_timestamp)` |
+
+### Original Timestamp
+
+The `original_timestamp` tells you when call was invoked on the client device or the value of timestamp that you manually passed in.
+
+> Note: The `original_timestamp` timestamp is not useful for any analysis since it's not always trustworthy as it can be easily adjusted and affected by clock skew.
+
+### Sent At
+The `sent_at` timestamp specifies the clock time for the client's device when the network request was made to the Formo API. 
+
+For libraries and systems that send batched requests, there can be a long gap between a datapoint's timestamp and sent_at. Combined with `received_at`, Formo uses `sent_at` to correct the `original_timestamp` in situations where a user's device clock cannot be trusted (mobile phones and browsers). The `sent_at` and `received_at` timestamps are assumed to occur at the same time (maximum a few hundred milliseconds), and therefore the difference is the user's device clock skew, which can be applied back to correct the timestamp.
+
+> Note: The `sent_at` timestamp is not useful for any analysis since it's tainted by user's clock skew.
+
+### Received At
+
+The `received_at` timestamp is added to incoming messages as soon as they hit the API. It's used in combination with `sent_at` to correct clock skew, and also to aid with debugging libraries and systems that deliver events in batches.
+
+### Timestamp
+
+The `timestamp` specifies when the data point occurred, corrected for client-device clock skew. This is the timestamp that is passed to downstream destinations and used for historical replays. It is important to use this timestamp for importing historical data to the API.
+
+Formo automatically generates `timestamp` and you cannot manually set one directly in the call payload.
+
+Formo calculates timestamp as `timestamp = received_at - (sent_at - original_timestamp)`.
 
 ## Sample Event
 
