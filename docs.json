@@ -26,7 +26,7 @@
               "features/concepts",
               {
                 "group": "Product Analytics",
-                "icon": "chart-line",
+                "icon": "compass",
                 "pages": [
                   "features/product-analytics/overview",
                   "features/product-analytics/growth-analytics",
@@ -55,15 +55,14 @@
               },
               {
                 "group": "Token Gated Forms",
-                "icon": "passport",
+                "icon": "scroll",
                 "pages": [
                   "features/token-gated-forms/form-builder",
                   "features/token-gated-forms/token-gating",
                   "features/token-gated-forms/world-id",
                   "features/token-gated-forms/zapier"
                 ]
-              },
-              "features/metrics"
+              }
             ]
           }
         ]
@@ -75,6 +74,7 @@
             "group": "Data",
             "pages": [
               "data/what-we-collect",
+              "data/metrics",
               {
                 "group": "Event Spec",
                 "icon": "cube",
@@ -93,6 +93,12 @@
                 ]
               },
               "data/schema"
+            ]
+          },
+          {
+            "group": "Methodology",
+            "pages": [
+              "data/attribution"
             ]
           },
           {
