@@ -110,10 +110,10 @@
         ]
       },
       {
-        "tab": "SDKs",
+        "tab": "SDK Reference",
         "groups": [
           {
-            "group": "SDKs",
+            "group": "SDK",
             "pages": [
               "sdks/web",
               "sdks/mobile",
