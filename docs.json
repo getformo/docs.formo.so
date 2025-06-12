@@ -156,6 +156,17 @@
         ]
       },
       {
+        "tab": "Integrations",
+        "groups": [
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/overview"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Chains",
         "groups": [
           {
