@@ -17,25 +17,14 @@ Pick your stack and add the code below to your codebase.
 
     Install this script in the `<head>` tag of your website:
 
-    ```js
-    <script>
-      const script = document.createElement('script');
-      const writeKey = '<YOUR_WRITE_KEY>';
-
-      script.src = 'https://unpkg.com/@formo/analytics@1.16.20';
-      script.integrity = 'sha256-dsgplPgTPDQ4QThDJD15veQO9Yyb0co9aHoZN6DhQsQ=';
-      script.crossOrigin = 'anonymous';
-      script.onload = function () {
-        FormoAnalytics.init(writeKey)
-          .then((formo) => {
-            window.formo = formo;
-          })
-          .catch((error) => {
-            console.error('Error initializing FormoAnalytics:', error);
-          });
-      };
-      document.head.appendChild(script);
-    </script>
+    ```html
+    <script
+      src="https://unpkg.com/@formo/analytics@1.17.7/dist/index.umd.min.js"
+      integrity="sha384-8uwi9qxWhCmRA/oydggCdi2RCw1OwdjodB/xM8wtJLWzdpcZLgx0u8U1a7q5tDAF"
+      crossorigin="anonymous"
+      defer
+      onload="window.formofy('<YOUR_WRITE_KEY>');"
+    ></script>
     ```
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
