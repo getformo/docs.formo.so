@@ -12,14 +12,28 @@ If an attacker exploited a content delivery network (CDN) and modified the conte
 
 SRI helps prevent attacks like cross-site scripting (XSS) by ensuring that the resources delivered to your site are exactly what they should be.
 
+
 ### Solution
 
 Formo supports SRI integration, providing an additional layer of security for your data and users.
+Enable SRI on the browser [install](/install) snippet by updating the `src` and `integrity` fields:
 
-**You do need to do anything to enable SRI.** Formo uses SRI in its [install](/install) snippet to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
+```html
+<script
+  src="https://unpkg.com/@formo/analytics@1.17.8/dist/index.umd.min.js"
+  integrity="sha384-YT9NpJXXJ7yEQhqLi5hukWO/MvuUX9TM3rNeQUS2lXXd0SdS2xJiA7n8T6IDAU4A"
+  crossorigin="anonymous"
+  defer
+  onload="window.formofy('<YOUR_WRITE_KEY>');"
+></script>
+```
 
-The hash in the integrity attribute within the Formo install script works with SRI out of the box. If the file is modified after this point, the hash won't match, and supporting web browsers will refuse to load it.
+> [Get the latest version number and integrity hash on Github](https://github.com/getformo/sdk/releases).
 
-This ensures that the script you’re running is exactly the one provided by Formo, without any hidden changes or malicious code.
+
+
+The hash in the integrity attribute within the Formo install script works with SRI  to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
+
+If the file is modified after this point, the hash won't match, and supporting web browsers will refuse to load it. This ensures that the script you’re running is exactly the one provided by Formo, without any hidden changes or malicious code.
 
 
