@@ -62,13 +62,15 @@
                   "features/token-gated-forms/world-id",
                   "features/token-gated-forms/zapier"
                 ]
+              },
+              {
+                "group": "Security",
+                "icon": "shield-check",
+                "pages": [
+                  "security/sri",
+                  "security/csp"
+                ]
               }
-            ]
-          },
-          {
-            "group": "Security",
-            "pages": [
-              "security/sri"
             ]
           }
         ]

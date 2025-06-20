@@ -1,9 +1,9 @@
 ---
-title: "Subresource integrity (SRI)"
+title: "Subresource Integrity (SRI)"
 description: "Learn how Formo uses SRI to protect your users and your data. SRI helps prevent attacks like cross-site scripting (XSS) and NPM hijacking."
 ---
 
-### Problem
+### Overview
 
 [Subresource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/SRI) enables browsers to verify that resources they fetch are delivered without unexpected manipulation. It works by allowing you to provide a cryptographic hash that the fetched resource must match.
 
@@ -12,7 +12,7 @@ If an attacker exploited a content delivery network (CDN) and modified the conte
 
 SRI helps prevent attacks like cross-site scripting (XSS) by ensuring that the resources delivered to your site are exactly what they should be.
 
-### Solution
+### How to Enable SRI 
 
 Formo supports SRI integration, providing an additional layer of security for your data and users.
 Enable SRI on the browser [install](/install) snippet by updating the `src` and `integrity` fields:

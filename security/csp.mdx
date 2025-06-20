@@ -1,0 +1,34 @@
+---
+title: "Content Security Policy (CSP)"
+description: "Learn how you can use CSP to protect your users and your data. CSP helps prevent attacks like cross-site scripting (XSS) and data injection attacks."
+---
+
+### Overview
+
+As [described on MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP): Content Security Policy (CSP) is a feature that helps to prevent or minimize the risk of certain types of security threats. It consists of a series of instructions from a website to a browser, which instruct the browser to place restrictions on the things that the code comprising the site is allowed to do.
+
+The primary use case for CSP is to control which resources, in particular JavaScript resources, a document is allowed to load. This is mainly used as a defense against cross-site scripting (XSS) attacks, in which an attacker is able to inject malicious code into the victim's site.
+
+If you choose to use a CSP it is important to ensure that Formo domains are permitted.
+
+### How to Enable CSP
+
+Below is an example of a relatively restrictive CSP that limits only scripts and API calls to all Formo domains.
+
+```html
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self'; 
+  script-src 'self' https://*.formo.so; 
+  connect-src 'self' https://*.formo.so;
+">
+```
+
+Add the script above within the `<head>` tag of your site to enable CSP.
+
+### Domains used by Formo
+
+| Domain | Usage |
+| :--- | :--- |
+| `events.formo.so` | Ingestion endpoint for SDK API calls |
+| `cdn.formo.so` | CDN for SDK assets |
+
