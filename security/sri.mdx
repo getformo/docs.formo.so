@@ -1,5 +1,5 @@
 ---
-title: 'Subresource integrity (SRI)'
+title: "Subresource integrity (SRI)"
 description: "Learn how Formo uses SRI to protect your users and your data. SRI helps prevent attacks like cross-site scripting (XSS) and NPM hijacking."
 ---
 
@@ -7,11 +7,10 @@ description: "Learn how Formo uses SRI to protect your users and your data. SRI 
 
 [Subresource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/SRI) enables browsers to verify that resources they fetch are delivered without unexpected manipulation. It works by allowing you to provide a cryptographic hash that the fetched resource must match.
 
-SRI matters because it offers **protection against malicious tampering**. 
-If an attacker exploited a content delivery network (CDN) and modified the contents of JavaScript libraries hosted on that CDN, it would create vulnerabilities in all websites that use those libraries. 
+SRI matters because it offers **protection against malicious tampering**.
+If an attacker exploited a content delivery network (CDN) and modified the contents of JavaScript libraries hosted on that CDN, it would create vulnerabilities in all websites that use those libraries.
 
 SRI helps prevent attacks like cross-site scripting (XSS) by ensuring that the resources delivered to your site are exactly what they should be.
-
 
 ### Solution
 
@@ -20,7 +19,7 @@ Enable SRI on the browser [install](/install) snippet by updating the `src` and 
 
 ```html
 <script
-  src="https://unpkg.com/@formo/analytics@1.17.8/dist/index.umd.min.js"
+  src="https://cdn.formo.so/analytics@1.17.8"
   integrity="sha384-YT9NpJXXJ7yEQhqLi5hukWO/MvuUX9TM3rNeQUS2lXXd0SdS2xJiA7n8T6IDAU4A"
   crossorigin="anonymous"
   defer
@@ -30,10 +29,6 @@ Enable SRI on the browser [install](/install) snippet by updating the `src` and 
 
 > [Get the latest version number and integrity hash on Github](https://github.com/getformo/sdk/releases).
 
-
-
-The hash in the integrity attribute within the Formo install script works with SRI  to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
+The hash in the integrity attribute within the Formo install script works with SRI to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
 
 If the file is modified after this point, the hash won't match, and supporting web browsers will refuse to load it. This ensures that the script you’re running is exactly the one provided by Formo, without any hidden changes or malicious code.
-
-
