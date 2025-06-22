@@ -36,13 +36,14 @@ Properties are additional information that give more clarity of your users' acti
 
 Formo has reserved some standard properties listed in the following table and handles them in a special manner.
 
+> Include the optional `revenue` property to track revenue associated with an action.
+
 | Property | Type | Description |
 |:---------|:-----|:------------|
 | `revenue` | Number | The revenue amount as a result of an event. For e.g., a transaction worth $20.00 would result in a revenue of 20.00. |
 | `currency` | String | The currency of the revenue as a result of the event, set in ISO 4127 format. If this is not set, Formo assumes the revenue is in USD. |
 | `points` | String | An abstract value such as points or XP associated with an event, to be used by various teams. |
 
-> Include the optional `revenue` property to track revenue associated with an action.
 
 The above properties are used in the dashboards for calculate total revenue and points.
 

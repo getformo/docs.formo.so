@@ -79,9 +79,15 @@
         "tab": "Data",
         "groups": [
           {
-            "group": "Data",
+            "group": "Methodology",
             "pages": [
               "data/what-we-collect",
+              "data/attribution"
+            ]
+          },
+          {
+            "group": "Data",
+            "pages": [
               "data/metrics",
               {
                 "group": "Event Spec",
@@ -99,15 +105,14 @@
                   "data/events/transaction",
                   "data/events/common"
                 ]
-              },
-              "data/schema",
-              "data/reverse-etl"
+              }
             ]
           },
           {
-            "group": "Methodology",
+            "group": "Data Warehouse",
             "pages": [
-              "data/attribution"
+              "data/schema",
+              "data/reverse-etl"
             ]
           }
         ]
@@ -188,14 +193,14 @@
           "icon": "square-check"
         },        
         {
-          "anchor": "Slack",
-          "href": "https://formo.so/slack",
-          "icon": "slack"
-        },
-        {
           "anchor": "Support",
           "href": "https://formo.so/support",
           "icon": "headset"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://formo.so/slack",
+          "icon": "slack"
         }
       ]
     }
