@@ -96,7 +96,7 @@ OR
 window.formo.identify(...);
 ```
 
-> If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address. Note that most wallets block automatic wallet fingerprinting by default.
+> If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address.
 
 ## Track events
 
@@ -104,11 +104,14 @@ Track user actions by calling the SDK [`track()`](/data/events/track) function:
 
 
 ```ts
-analytics.track(
-  "Position Opened",  // event name
+import { useFormo } from '@formo/analytics';
+
+const analytics = useFormo();
+
+analytics.track("Position Opened",  // event name
   {
     pool_id: "LINK/ETH",
-    revenue: 99.99,     // revenue or fees
+    revenue: 99.99,     // revenue
     currency: "USD",    // currency
     points: 99.99        // points for XP or rewards
   }
