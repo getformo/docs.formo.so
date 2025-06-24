@@ -57,25 +57,18 @@ sequenceDiagram
     participant Chain
     participant Formo
 
-    note over User,App: Detect timezone, device, os, UTMs, referrers
+    note over User,App: Detect timezone, UTM, referrer, referral
         activate Formo    
 
 
     %% Session start
-    User->>Website: visit (via links / ads / campaigns)
-Website->>App: internal site navigation
-    Website->>Formo: record session start and offchain context
-        App->>Formo: record session events
+    User->>App: visit (via links / ads / campaigns)
+    Website->>Formo: record session, wallet events, and offchain context
 
-note over Website,Wallet: Detect user identity, wallet address, rdns provider
-note over App,Formo: Index transactions, wallets, contracts
+note over Website,Wallet: Detect wallet address, rdns provider, identity
+note over Wallet,Formo: Index transactions, wallets, contracts
 
-    User->>Wallet: connect wallet & sign transactions
-
-    App->>Chain: contract calls (e.g. swap, mint, stake)
-
-    App->>Formo: record transaction
-    Chain-->>App: return tx status & hash    
+    User->>Wallet: connect wallet 
 
     Formo->>Wallet: index wallet
     activate Wallet
@@ -83,15 +76,19 @@ note over App,Formo: Index transactions, wallets, contracts
     deactivate Wallet
     Formo->>Formo: identity resolution
 
+    User->>Wallet: sign transactions
+
+    App->>Chain: contract calls (e.g. swap, mint, stake)
+
     Formo->>Chain: index contract events
     activate Chain
-    Chain-->>Formo: record tx receipt & events
+    Chain-->>Formo: record tx receipt and logs
     deactivate Chain
 
     Formo->>Formo: match events with context
     Formo->>Formo: calculate attribution
 
-    Formo-->>App: unified identity and attribution for onchain apps
+    Formo-->>App: unified identity and attribution
     Formo-->>User: wallet-aware personalized experiences
     deactivate Formo
 ```
