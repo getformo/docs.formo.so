@@ -1,14 +1,14 @@
 ---
 title: 'Metrics'
-description: 'A list of metrics you can track with Formo.'
+description: 'A list of all metrics you can track with Formo and their definitions.'
 icon: chart-simple
 iconType: solid
 ---
 
-
-### Live Visitors
+### Current Visitors
 
 How many unique visitors are currently interacting with your site or dapp.
+It includes all visitors who have viewed a page in the last 5 minutes.
 
 ### Unique Visitors
 
@@ -60,6 +60,7 @@ How long a user spends on your site or dapp.
 ### Bounce Rate
 
 The bounce rate is the relative number of visitors who have left the site after a single page view, compared to the total number of unique visitors.
+Formo counts a "bounce" if the visitor visits only a single page and leave without performing an engaging action. 
 
 ### Referrers / Sources
 
@@ -74,10 +75,14 @@ How many users come to your site or dapp from a particular source. We track thes
 - `utm_source` (e.g.: google.com)
 - `utm_medium` (e.g.: search)
 - `utm_campaign` (e.g.: summer_sale)
+- `utm_content`
+- `utm_term`
+
+To minimize the amount of traffic that falls within the "Direct / None" category, you can add special query parameters (UTMs) to your links.
 
 ### Referrals
 
-How many users are referred to your site or dapp by a particular user. We use the `referral` and `ref` query parameters to track referrals.
+How many users are referred to your site or dapp by a particular user. We use the `ref` query parameters to track referrals.
 
 ### Countries
 
@@ -90,6 +95,10 @@ How many users are using a particular device such as desktop, mobile, tablet, et
 ### Browsers
 
 Browser is the statistics of the browser used by the visitor. It is extracted from the User-Agent and Client Hints HTTP headers.
+
+### Operating System
+
+Shows the operating systems used by your visitors.
 
 ### First Seen
 
@@ -176,7 +185,11 @@ The percentage of users or wallets who have used a specific feature of your app,
 
 ### Conversion Rate
 
-Calculate the conversion rate of key user flows with the Funnels feature.
+Calculate the conversion rate of key user flows with the [Funnels](/features/product-analytics/funnels) feature.
+
+### Funnels
+
+You can follow the visitor journey from a landing page to a conversion with funnel analysis.
 
 ### Retention Rate
 
@@ -193,6 +206,7 @@ How much you've spent to acquire a customer.
 ### Average Revenue Per User (ARPU)
 
 How much revenue you've made from your site or dapp.
+This is a part of [revenue attribution tracking](/features/product-analytics/custom-events#tracking-revenue).
 
 ### Customer Lifetime Value (CLTV)
 

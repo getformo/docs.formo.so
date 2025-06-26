@@ -212,13 +212,13 @@
   "navbar": {
     "links": [
       {
-        "label": "Book a Demo",
+        "label": "Demo",
         "href": "https://cal.com/formo/demo"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Sign in",
+      "label": "Dashboard",
       "href": "https://app.formo.so"
     }
   },
