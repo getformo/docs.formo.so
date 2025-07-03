@@ -26,7 +26,7 @@ Attribution in web3 is *complex*. As you've seen in the above example, not every
 Consider the following example user journey for a DEX called FooSwap with many touchpoints:
 
 - A user sees an tweet thread about an app on X (*"referrer"*) clicks on a referral link 
-- The user visits the app's website (fooswap.com) (*"session start"*)
+- The user visits the app's website (fooswap.com) 
 - The user visits the app (app.fooswap.com)
 - The user connects their wallet on the app
 - The user signs a token approval message
@@ -85,11 +85,11 @@ note over Wallet,Formo: Index transactions, wallets, contracts
     Chain-->>Formo: record tx receipt and logs
     deactivate Chain
 
-    Formo->>Formo: match events with context
+    Formo->>Formo: match txs with context
     Formo->>Formo: calculate attribution
 
-    Formo-->>App: unified identity and attribution
-    Formo-->>User: wallet-aware personalized experiences
+    Formo-->>App: unified identity and attribution for apps
+    Formo-->>User: wallet-aware personalized experiences for users
     deactivate Formo
 ```
 
