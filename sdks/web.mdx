@@ -124,6 +124,34 @@ window.formo.track(...)
 
 ## Configuration
 
+### Autocapture
+
+You can configure which events are automatically captured by the SDK:
+
+```js
+// Enable all autocapture features with default settings
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: true
+});
+
+// Disable all autocapture features
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: false
+});
+
+// Customize individual autocapture settings
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: {
+    page: true,        // Page visits
+    detect: true,      // Wallet detection
+    connect: false,    // Wallet connections/disconnections
+    chain: false,      // Chain/network changes
+    signature: true,   // Message signing
+    transaction: false, // Transaction events
+  }
+});
+```
+
 ### Local testing
 
 The SDK skips tracking in localhost by default. To enable tracking locally during development, set `trackLocalhost` to `true`:
