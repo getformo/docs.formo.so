@@ -12,6 +12,19 @@ The Formo Web SDK is [open source](https://github.com/getformo/sdk) and implemen
 
 ## Installation
 
+### Websites
+
+Install this snippet at the `<head>` of your website:
+
+```html
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer onload="window.formofy('<YOUR_WRITE_KEY>');"
+></script>
+```
+
+### React and Next.js
+
 [Install](/install) the JavaScript SDK via CDN or NPM.
 
 ```bash
@@ -21,62 +34,37 @@ npm install @formo/analytics --save
 ```tsx
 // App.tsx (or App.js)
 
-  import React from 'react';
-  import ReactDOM from 'react-dom/client';
-  import { FormoAnalyticsProvider } from '@formo/analytics';
-  import App from './App';
+import { FormoAnalyticsProvider } from '@formo/analytics';
 
-  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-  root.render(
-    <React.StrictMode>
-      <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>">
-        <App />
-      </FormoAnalyticsProvider> 
-    </React.StrictMode>
-  );
+root.render(
+  <React.StrictMode>
+    <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>">
+      <App />
+    </FormoAnalyticsProvider> 
+  </React.StrictMode>
+);
 ```
 
 ```tsx
 // Usage on a page component
 
-import React, { useEffect } from 'react';
-  import { useFormo } from '@formo/analytics';
+import { useFormo } from '@formo/analytics';
 
-  const HomePage = () => {
-    const analytics = useFormo();
+const HomePage = () => {
+  const analytics = useFormo();
 
-    useEffect(() => {
-      // Track a custom event
-      analytics.track('Swap Completed', { points: 100 });
-    }, [analytics]);
+  useEffect(() => {
+    // Track a custom event
+    analytics.track('Swap Completed', { points: 100 });
+  }, [analytics]);
 
-    return <div>Welcome to the Home Page!</div>;
-  };
+  return <div>Welcome to the Home Page!</div>;
+};
 
-  export default HomePage;
+export default HomePage;
 ```
-
-## Code examples
-
-Check out working examples of Formo on Github:
-
-<CardGroup>
-  <Card
-    title="Example Next.js app"
-    icon="file-code"
-    href="https://github.com/getformo/formo-analytics-example-next"
-  >
-    A working example of Formo in a Next.js app.
-  </Card>
-  <Card
-    title="Example React app"
-    icon="file-code"
-    href="https://github.com/getformo/formo-analytics-example-react"
-  >
-    A working example of Formo in a React app.
-  </Card>
-</CardGroup>
 
 ## Autocapture
 
@@ -121,6 +109,27 @@ OR
 
 window.formo.track(...)
 ```
+
+## Code examples
+
+Check out working examples of Formo on Github:
+
+<CardGroup>
+  <Card
+    title="Example Next.js app"
+    icon="file-code"
+    href="https://github.com/getformo/formo-analytics-example-next"
+  >
+    A working example of Formo in a Next.js app.
+  </Card>
+  <Card
+    title="Example React app"
+    icon="file-code"
+    href="https://github.com/getformo/formo-analytics-example-react"
+  >
+    A working example of Formo in a React app.
+  </Card>
+</CardGroup>
 
 ## Configuration
 

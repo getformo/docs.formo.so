@@ -24,9 +24,9 @@ Pick your stack and add the code below to your codebase.
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
-    Optional: Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
+    Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
 
-    #### 2. Identify users (Optional)
+    #### 2. Identify users
 
     Call [`identify`](/data/events/identify) to tie a user to their actions.
     As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
@@ -38,7 +38,7 @@ Pick your stack and add the code below to your codebase.
     });
     ```
 
-    #### 3. Track events (Optional)
+    #### 3. Track events
 
     Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
@@ -79,7 +79,7 @@ Pick your stack and add the code below to your codebase.
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
-    #### 3. Identify users (Optional)
+    #### 3. Identify users
 
     Call [`identify`](/data/events/identify) to tie a user to their actions.
     As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
@@ -101,7 +101,7 @@ Pick your stack and add the code below to your codebase.
     }
     ```
 
-    #### 4. Track events (Optional)
+    #### 4. Track events
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
@@ -189,7 +189,7 @@ Pick your stack and add the code below to your codebase.
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
-    #### 3. Identify users (Optional)
+    #### 3. Identify users
 
     Call [`identify`](/data/events/identify) to tie a user to their actions.
     As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
@@ -210,7 +210,7 @@ Pick your stack and add the code below to your codebase.
     }
     ```
 
-    #### 4. Track events (Optional)
+    #### 4. Track events
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
@@ -235,6 +235,12 @@ Pick your stack and add the code below to your codebase.
 
   </Tab> 
 </Tabs>
+
+## Autocapture
+
+The Formo SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
+
+You do not need to configure anything to track these events.
 
 ## Verification
 
