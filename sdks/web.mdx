@@ -84,7 +84,7 @@ OR
 window.formo.identify(...);
 ```
 
-> If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address.
+If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address.
 
 ## Track events
 
@@ -112,7 +112,7 @@ window.formo.track(...)
 
 ## Code examples
 
-Check out working examples of Formo on Github:
+Check out working examples on Github:
 
 <CardGroup>
   <Card
@@ -161,18 +161,47 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 });
 ```
 
+
 ### Local testing
 
-The SDK skips tracking in localhost by default. To enable tracking locally during development, set `trackLocalhost` to `true`:
+The SDK skips tracking in localhost by default. 
+To enable tracking locally during development, set `tracking` to `true`:
 
 ```tsx
 <AnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
-        trackLocalhost: true,
+        tracking: true, // enable tracking on localhost
     }}
 >
 ```
+
+### Environments
+
+You can control tracking behavior in different environments (test, staging) with the `tracking` option:
+
+```javascript
+// Initialize with a boolean (simple on/off)
+const analytics = await FormoAnalytics.init('your-write-key', {
+  tracking: true // Enable tracking everywhere, including localhost
+});
+
+// Initialize only on production environment
+const analytics = await FormoAnalytics.init('your-write-key', {
+  tracking: ENV === 'production'
+});
+
+// Initialize with an object for exclusion rules
+const analytics = await FormoAnalytics.init('your-write-key', {
+  tracking: {
+    excludeHosts: ['stage-v2.puri.fi'], // Exclude tracking based on window.location.hostname
+    excludePaths: ['/test', '/debug'], // Exclude tracking based on window.location.pathname
+    excludeChains: [5] // Exclude tracking on Goerli testnet (5)
+  }
+});
+```
+
+Specify exact hostnames and exact paths in exclusion lists.
 
 ### Logging
 
