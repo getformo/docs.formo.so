@@ -125,7 +125,7 @@ Pick your stack and add the code below to your codebase.
     ```
 
   </Tab>
-  <Tab icon="react" title="Next.js">
+  <Tab icon="react" title="Next.js (app)">
     #### 1. Install the Formo SDK
 
     ```bash
@@ -141,7 +141,7 @@ Pick your stack and add the code below to your codebase.
 
       'use client';
 
-      import { FormoAnalytics, FormoAnalyticsProvider } from '@formo/analytics';
+      import { FormoAnalyticsProvider } from '@formo/analytics';
 
       type FormoAnalyticsProviderProps = {
         writeKey: string,
@@ -185,6 +185,107 @@ Pick your stack and add the code below to your codebase.
           </html>
         );
       }
+    ```
+
+    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
+
+    #### 3. Identify users
+
+    Call [`identify`](/data/events/identify) to tie a user to their actions.
+    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
+
+    ```tsx
+    import { useFormo } from "@formo/analytics";
+    import { useAccount } from "wagmi";
+
+    const HomePage = () => {
+      const { address } = useAccount();
+      const analytics = useFormo();
+
+      useEffect(() => {
+        if (address && analytics) {
+          analytics.identify({ address });
+        }
+      }, [address, analytics]);
+    }
+    ```
+
+    #### 4. Track events
+
+    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
+
+    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+
+    ```tsx
+      import { useFormo } from '@formo/analytics';
+
+      const HomePage = () => {
+        const analytics = useFormo();
+
+        useEffect(() => {
+          // Track a custom event
+          analytics.track('Swap Completed', { points: 100 });
+        }, [analytics]);
+
+        return <div>Welcome to the Home Page!</div>;
+      };
+
+      export default HomePage;
+    ```
+
+  </Tab> 
+  <Tab icon="react" title="Next.js (page)">
+    #### 1. Install the Formo SDK
+
+    ```bash
+      npm install @formo/analytics --save
+    ```
+
+    #### 2. Use `FormoAnalyticsProvider` in your app
+
+    Create a new `AnalyticsProvider.tsx` client component.
+
+    ```tsx
+      // AnalyticsProvider.tsx
+
+      import { FormoAnalyticsProvider } from "@formo/analytics";
+
+      type FormoAnalyticsProviderProps = {
+        writeKey: string;
+        children: React.ReactNode;
+      };
+
+      // The provider component
+      export const AnalyticsProvider: FC<FormoAnalyticsProviderProps> = ({
+        writeKey,
+        children,
+      }) => {
+        return (
+          <FormoAnalyticsProvider writeKey={writeKey}>
+            {children}
+          </FormoAnalyticsProvider>
+        );
+      };
+
+      export default AnalyticsProvider;
+    ```
+
+    Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component:
+
+    ```tsx
+      // app/layout.tsx
+
+      import AnalyticsProvider from "@/AnalyticsProvider";
+      import type { AppProps } from "next/app";
+
+      export default function App({ Component, pageProps }: AppProps) {
+        return (
+          <AnalyticsProvider writeKey='YOUR_WRITE_KEY'>
+            <Component {...pageProps} />
+          </AnalyticsProvider>
+        );
+      }
+
     ```
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
