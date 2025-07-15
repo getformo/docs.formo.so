@@ -183,16 +183,6 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Changelog",
-          "href": "https://formo.so/changelog",
-          "icon": "map"
-        },
-        {
-          "anchor": "Status",
-          "href": "https://status.formo.so",
-          "icon": "square-check"
-        },        
-        {
           "anchor": "Support",
           "href": "https://formo.so/support",
           "icon": "headset"
@@ -201,6 +191,16 @@
           "anchor": "Community",
           "href": "https://formo.so/slack",
           "icon": "slack"
+        },
+        {
+          "anchor": "Changelog",
+          "href": "https://formo.so/changelog",
+          "icon": "map"
+        },
+        {
+          "anchor": "Status",
+          "href": "https://status.formo.so",
+          "icon": "square-check"
         }
       ]
     }
