@@ -12,15 +12,15 @@ If an attacker exploited a content delivery network (CDN) and modified the conte
 
 SRI helps prevent attacks like cross-site scripting (XSS) by ensuring that the resources delivered to your site are exactly what they should be.
 
-### How to Enable SRI 
+### How to Enable SRI
 
 Formo supports SRI integration, providing an additional layer of security for your data and users.
 Enable SRI on the browser [install](/install) snippet by updating the `src` and `integrity` fields:
 
 ```html
 <script
-  src="https://unpkg.com/@formo/analytics@1.19.0/dist/index.umd.min.js"
-  integrity="sha384-D1rbCoA73w153b4D5sVnt0ZAOPvUabAbaMax4KsQXsDg7Isw3QAIOLpc622XuiaE"
+  src="https://unpkg.com/@formo/analytics@1.19.2/dist/index.umd.min.js"
+  integrity="sha384-PmA7CScDgxGe53CD6YHvQUohUxDy42+/veXDFIKAZLNbo7rg+m8LOqJ6t0D4xyF3"
   crossorigin="anonymous"
   defer
   onload="window.formofy('<YOUR_WRITE_KEY>');"
