@@ -8,29 +8,4 @@ description: 'Track custom events and user actions such as clicks and conversion
 The Formo SDK offers an easy-to-use event collection library that allows you to track custom events in your dapp.
 Ensure high quality, structured data with Formo. 
 
-Start tracking custom events with the [Web SDK](/sdks/web#custom-events) to get started.
-
- ```tsx
-	import { useFormo } from '@formo/analytics';
-
-	const HomePage = () => {
-	const analytics = useFormo();
-
-	useEffect(() => {
-		// Track a custom event
-		analytics.track("Product Added", {
-		product_id: "123",
-		product_name: "Formo T-shirt",
-		price: 100,
-		revenue: 10.5,
-		points: 4.1
-	});
-	}, [analytics]);
-
-	return <div>Welcome to the Home Page!</div>;
-	};
-
-	export default HomePage;
-```
-
-Custom events integrates with [Wallet intelligence](/features/wallet-intelligence) and [Funnels](/features/product-analytics/funnels) to give you a complete picture of each user's journey.
+Start tracking custom events with the [Web SDK](/sdks/web#custom-events) to get started. Custom events works with [Wallet Intelligence](/features/wallet-intelligence) and [Funnels](/features/product-analytics/funnels) to give you a complete picture of each user's journey.

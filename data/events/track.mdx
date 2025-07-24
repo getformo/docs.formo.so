@@ -1,22 +1,22 @@
 ---
 title: 'Spec: Track'
-description: 'Get started with the custom Track event.'
+description: 'Get started with tracking custom events.'
 ---
 
 The Track API call is how you record any [custom actions](/features/product-analytics/custom-events) your users are doing, 
-along with any properties that describe the action.
+along with properties that describe the action. 
 
-Track events can capture a broad range of actions, such as clicking a button or completing a purchase.
+Custom events can capture a broad range of actions, such as clicking a button or completing a purchase.
 
-Additional information about the event can be included in the properties field. For example, for a Purchase Complete event, you may want to include the product ids of the purchased products.
+Additional information about the event can be included in the properties field. For example, for a `Purchase Completed` event, you may want to include the product ids of the purchased products.
 
 ## Naming events
 
 When naming events, Formo recommends establishing a consistent naming convention that uses:
 
 - Consistent formatting: Event names are case sensitive.
-- A consistent syntax:  Adopt nouns and past tense verbs like **Swap Reviewed** and **Order Submitted**. A standard of `[Noun] + [Past-Tense Verb]` ensures all your events are consistent.
-- A consistent actor: Does 'Message Sent' mean that the user sent a message or that you sent a message to the user? If all your events are named in a way that reflects the user's perspective, the meaning is clear immediately.
+- A consistent syntax:  Adopt nouns and past tense verbs like `Swap Reviewed` and `Order Submitted`. A standard of `[Noun] + [Past-Tense Verb]` ensures all your events are consistent.
+- A consistent actor: Does `Message Sent` mean that the user sent a message or that you sent a message to the user? If all your events are named in a way that reflects the user's perspective, the meaning is clear immediately.
 
 This allows everyone including you 6 months from now to instantly understand the meaning of an event.
 
@@ -38,7 +38,13 @@ Formo has reserved some standard properties listed in the following table and ha
 
 ### Tracking volume, revenue, points
 
-You can track `volume`, `revenue`, and `points` in your events.
+You can track `volume`, `revenue`, and `points` in your events. 
+Once tracked, they are shown on the dashboard.
+
+<Frame caption="Revenue tracking.">
+	<img src="/images/revenue.png" alt="Revenue tracking." />
+</Frame>
+
 
 Include these optional properties in a custom event to track values associated with an action.
 
@@ -49,11 +55,6 @@ Include these optional properties in a custom event to track values associated w
 | `currency` | String | The currency of the revenue as a result of the event, set in ISO 4127 format. If this is not set, Formo assumes the revenue is in USD. |
 | `points` | String | An abstract value such as points or XP associated with an event, to be used by various teams. |
 
-The above properties are used in the dashboards for calculate total revenue and points.
-
-<Frame caption="Revenue tracking.">
-	<img src="/images/revenue.png" alt="Revenue tracking." />
-</Frame>
 
 ## Sample Payload
 
