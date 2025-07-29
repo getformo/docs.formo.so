@@ -1,6 +1,6 @@
 ---
-title: 'Alerts'
-description: 'Get notified of high-value users and important actions.'
+title: "Alerts"
+description: "Get notified of high-value users and important actions."
 ---
 
 <Frame caption="Alerts">
@@ -8,10 +8,42 @@ description: 'Get notified of high-value users and important actions.'
 </Frame>
 
 Get notified on Email or Slack of high-value whales and important user actions:
+
 - Key user events (connect wallet events, conversions, drop off)
 - When whales and high-value users visit your app
 
 In the project settings page, you can create an alert that will notify you via:
+
 - Email
-- Webhooks (coming soon)
+- Webhooks
 - Slack (coming soon)
+
+### Webhooks
+
+Webhooks allow you to send alerts to your own server or third-party service. You can set up a webhook URL in the project settings, and when an alert is triggered, a POST request will be sent to that URL with the alert data.
+
+Here's an example of the JSON payload that will be sent to your webhook:
+
+```json
+{
+  "alert_id": "XXXX_Test Alert 3_1753771336519_1753771433251",
+  "alert_name": "Test Alert 3",
+  "project_id": "XXXX",
+  "project_name": "Example",
+  "team_id": "XXXX",
+  "event": {
+    "properties": {
+      "chain_id": 84532
+    },
+    "address": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc",
+    "type": "connect",
+    "locale": "en-US",
+    "timezone": "Asia/Saigon",
+    "location": "VN",
+    "timestamp": "2025-07-29T06:42:16.519Z",
+    "anonymous_id": "4b48c7b6-3d61-409f-b695-1d9452954d6b"
+  },
+  "timestamp": "2025-07-29T06:43:53.268Z",
+  "webhook_version": "1.0"
+}
+```
