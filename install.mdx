@@ -15,22 +15,6 @@ Pick your stack and add the code below to your codebase.
 
     Install this script in the `<head>` tag of your website:
 
-    ```js
-    <script
-      src="https://cdn.formo.so/analytics@latest"
-      defer onload="window.formofy('<YOUR_WRITE_KEY>');"
-    ></script>
-    ```
-
-    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
-
-    Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
-
-    #### 2. Identify users
-
-    Call [`identify`](/data/events/identify) to link a wallet address to a session.
-    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
-
     ```tsx
     <script
       src="https://cdn.formo.so/analytics@latest"
@@ -44,7 +28,13 @@ Pick your stack and add the code below to your codebase.
     ></script>
     ```
 
-    #### 3. Track events (optional)
+    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
+
+    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
+
+    Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
+
+    #### 2. Track events (optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
@@ -89,8 +79,7 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users
 
-    Call [`identify`](/data/events/identify) to link a wallet address to a session.
-    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
+    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
 
     ```tsx
 
@@ -199,8 +188,7 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users
 
-    Call [`identify`](/data/events/identify) to link a wallet address to a session.
-    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
+    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
 
     ```tsx
     import { useFormo } from "@formo/analytics";
@@ -300,8 +288,7 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users
 
-    Call [`identify`](/data/events/identify) to link a wallet address to a session.
-    As a best practice, make sure `identify` is called at the start of every session or page load, if possible.
+    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
 
     ```tsx
     import { useFormo } from "@formo/analytics";
