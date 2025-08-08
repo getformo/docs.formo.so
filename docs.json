@@ -183,6 +183,11 @@
     "global": {
       "anchors": [
         {
+          "anchor": "Changelog",
+          "href": "https://formo.so/changelog",
+          "icon": "map"
+        },
+        {
           "anchor": "Support",
           "href": "https://formo.so/support",
           "icon": "headset"
@@ -191,11 +196,6 @@
           "anchor": "Community",
           "href": "https://formo.so/slack",
           "icon": "slack"
-        },
-        {
-          "anchor": "Changelog",
-          "href": "https://formo.so/changelog",
-          "icon": "map"
         },
         {
           "anchor": "Status",
@@ -212,7 +212,7 @@
   "navbar": {
     "links": [
       {
-        "label": "Book a Demo",
+        "label": "Book Demo",
         "href": "https://cal.com/formo/demo"
       }
     ],
