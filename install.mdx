@@ -20,10 +20,11 @@ Pick your stack and add the code below to your codebase.
       src="https://cdn.formo.so/analytics@latest"
       defer
       onload="
-        window.formofy(
-          '<YOUR_WRITE_KEY>',
-        );
-        window.formo.identify();
+        window.formofy('<YOUR_WRITE_KEY>', {
+          ready: function(formo) {
+            formo.identify();
+          }
+        });
       "
     ></script>
     ```

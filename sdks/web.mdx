@@ -213,6 +213,39 @@ To support high-performance environments, the SDK sends events in batches.
 
 Customize this behavior with the `flushAt` and `flushInterval` configuration parameters. 
 
+### Ready Callback
+
+The `ready` callback function executes once the Formo SDK is fully loaded and ready to use. This is useful for performing initialization tasks or calling SDK methods that require the SDK to be ready.
+
+```tsx
+<AnalyticsProvider
+    writeKey={WRITE_KEY}
+    options={{
+        ready: function(formo) {
+            // SDK is ready
+            console.log('Formo SDK is ready!');            
+            formo.identify(); // Auto-identify user
+        },
+    }}
+>
+```
+
+For Browser installations, you can use the ready callback in the `onload` attribute:
+
+```html
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer
+  onload="
+    window.formofy('<YOUR_WRITE_KEY>', {
+      ready: function(formo) {
+        formo.identify();
+      }
+    });
+  "
+></script>
+```
+
 | Log Level | Description |
 |-----------|-------------|
 | trace | Shows the most detailed diagnostic information, useful for tracing program execution flow. |
