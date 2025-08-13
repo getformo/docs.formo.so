@@ -13,26 +13,25 @@ Pick your stack and add the code below to your codebase.
 
     #### 1. Install the Formo SDK
 
-    Install this script in the `<head>` tag of your website:
+    Install this script in the `<head>` tag of your website. Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings:
 
     ```tsx
     <script
       src="https://cdn.formo.so/analytics@latest"
       defer
       onload="
-        window.formofy(
-          '<YOUR_WRITE_KEY>',
-        );
-        window.formo.identify();
+        window.formofy('<YOUR_WRITE_KEY>', {
+          ready: function(formo) {
+            formo.identify();
+          }
+        });
       "
     ></script>
     ```
 
-    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
+    Calling [`identify`](/data/events/identify) at the start of every session or page load links wallets to user sessions.
 
-    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
-
-    Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
+    To improve securiy, enable [Subresource Integrity (SRI)](/security/sri).
 
     #### 2. Track events (optional)
 
