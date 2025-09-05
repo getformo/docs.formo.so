@@ -67,6 +67,7 @@
                 "group": "Security",
                 "icon": "shield-check",
                 "pages": [
+                  "security/roles",
                   "security/sri",
                   "security/csp"
                 ]

@@ -1,0 +1,46 @@
+---
+title: "Role Based Access Control (RBAC)"
+description: "RBAC enforces the least privilege principle, ensuring users only have access to the resources necessary for their specific roles."
+---
+
+## Overview
+
+- **Owner**: The creator of the team with full control over all aspects. Can transfer ownership and delete the team. Only one owner per team.
+- **Admin**: Help with managing the team. Can manage members, roles, and settings but cannot transfer ownership or delete the team.
+- **Editor**: Manage forms and submissions. Can create and edit content but cannot manage team members or settings.
+- **Member**: View projects and forms. Read-only access to view content and analytics.
+
+## User Roles and Permissions
+
+| Action | Owner | Admin | Editor | Member |
+|--------|-------|-------|--------|--------|
+| **Team Management** | | | | |
+| Add, remove, and manage members | ✅ | ✅ | ❌ | ❌ |
+| Manage roles of members | ✅ | ✅ | ❌ | ❌ |
+| Manage workspace settings | ✅ | ✅ | ❌ | ❌ |
+| Update workspace tier | ✅ | ✅ | ❌ | ❌ |
+| Delete the workspace | ✅ | ❌ | ❌ | ❌ |
+| Transfer ownership to another member | ✅ | ❌ | ❌ | ❌ |
+| **Forms Management** | | | | |
+| View forms and responses | ✅ | ✅ | ✅ | ✅ |
+| Manage responses of forms | ✅ | ✅ | ✅ | ❌ |
+| Create and edit forms | ✅ | ✅ | ✅ | ❌ |
+| Archive forms | ✅ | ✅ | ✅ | ❌ |
+| Close forms | ✅ | ✅ | ✅ | ❌ |
+| Delete forms | ✅ | ❌ | ❌ | ❌ |
+| **Projects Management** | | | | |
+| View projects | ✅ | ✅ | ✅ | ✅ |
+| Create and edit projects | ✅ | ✅ | ❌ | ❌ |
+| Delete projects | ✅ | ❌ | ❌ | ❌ |
+| **Contracts & Pipeline** | | | | |
+| View project contracts | ✅ | ✅ | ✅ | ✅ |
+| Create, edit, delete project contracts | ✅ | ✅ | ✅ | ❌ |
+| Deploy/pause project pipeline | ✅ | ✅ | ❌ | ❌ |
+| **Analytics & Charts** | | | | |
+| View charts | ✅ | ✅ | ✅ | ✅ |
+| Create, delete, edit charts | ✅ | ✅ | ✅ | ❌ |
+| **Alerts & Monitoring** | | | | |
+| View project alerts | ✅ | ✅ | ✅ | ✅ |
+| Create, delete, edit project alerts | ✅ | ✅ | ✅ | ❌ |
+| **Data Management** | | | | |
+| Import wallet addresses | ✅ | ✅ | ✅ | ❌ |
