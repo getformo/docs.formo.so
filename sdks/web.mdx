@@ -222,7 +222,7 @@ To support high-performance environments, the SDK sends events in batches.
 
 Customize this behavior with the `flushAt` and `flushInterval` configuration parameters. 
 
-### Ready Callback
+### Ready callback
 
 The `ready` callback function executes once the Formo SDK is fully loaded and ready to use. This is useful for performing initialization tasks or calling SDK methods that require the SDK to be ready.
 
@@ -262,4 +262,36 @@ For Browser installations, you can use the ready callback in the `onload` attrib
 | info | Shows informative messages about normal application operation. |
 | warn | Default. Shows error and warning messages. |
 | error | Shows error messages only. |
+
+### Consent management
+
+The Formo Web SDK includes simplified consent management functionality to help you comply with privacy regulations like GDPR, CCPA, and ePrivacy Directive.
+
+Control user tracking preferences with simple opt-out and opt-in methods:
+
+```javascript
+import { useFormo } from '@formo/analytics';
+
+const analytics = useFormo();
+
+// Check if user has opted out of tracking
+console.log(analytics.hasOptedOutTracking())
+
+// If user has not opted out, tracking is enabled
+analytics.track('page_view');
+
+// Opt out of tracking (stops all tracking for the user)
+analytics.optOutTracking();
+
+// Opt back into tracking (re-enables tracking for the user)
+analytics.optInTracking();
+```
+
+For browser installations:
+
+```javascript
+// Manage consent
+window.formo.optOutTracking();
+window.formo.optInTracking();
+```
 
