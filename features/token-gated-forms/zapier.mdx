@@ -1,6 +1,6 @@
 ---
 title: 'Zapier integration'
-description: 'Formo integrates with thousands of other platforms so you can trigger actions from offchain to onchain.'
+description: 'Formo integrates with thousands of other platforms.'
 ---
 
 ## What is Zapier?
@@ -10,22 +10,24 @@ Zapier lets you [connect Formo to 2,000+ other web services](https://zapier.com/
 Each Zap has one app as the Trigger, where your information comes from and which causes one or more Actions in other apps, where your data gets sent automatically.
 
 Sign up for a free Zapier account, from there you can jump right in. To help you hit the ground running, here are some Zap ideas: 
+- Get a [Slack notification](/setting-up-slack-notifications-in-zapier) on a new form submission
+- Get an [email notification](setting-up-slack-notifications-in-zapier) on a new form submission
 
 ## Prerequisites
 
 - A Zapier account
 - Your Formo Workspace API Key
 
-### Get your API Key
+### Get your Workspace API Key
 
-To find your API Key, go to your workspace settings page with the 'Settings' link on the left sidebar:
+Go to your workspace settings page with the 'Settings' link on the top left workspace dropdown and find:
 
 <Frame caption="Find your API Key in your workspace settings page.">
     <img src="/images/zapier-0.png" alt="Token Gated Forms Zapier" />
 </Frame>
 
 - Click the copy button in the 'Workspace API Key' to copy it.
-- You will need this in Step 2.
+- You will need this in the next step.
 
 ## Create a new Zap
 
@@ -44,15 +46,11 @@ To find your API Key, go to your workspace settings page with the 'Settings' lin
 
 ### Step 3: Configure Form Settings
 
-1. Locate your Form ID:
-   - Navigate to your form's edit page in Formo.
-   - Copy the Form ID from your current URL (e.g., the form ID of `https://app.formo.so/20uTXhGkUKCYkssRDKLtm/edit` is `20uTXhGkUKCYkssRDKLtm`)
+1. Copy the Form ID from your form link (e.g. the form ID of `https://app.formo.so/20uTXhGkUKCYkssRDKLtm` is `20uTXhGkUKCYkssRDKLtm`)
 2. In Zapier, paste in your Form ID.
-3. Select your desired event type:
-   - "New Form Response" - triggers when someone submits a response to your form.
-   - "Form Updates" - triggers when form data is modified.
+3. Select your desired event type "New Form Response" - triggers when someone submits your form.
 
-From here, you can choose to create a Slack, Email, or other integration.
+From here, you can choose to create a Slack or Email integration.
 
 ## Setting Up Slack Notifications in Zapier
 
@@ -79,7 +77,7 @@ From here, you can choose to create a Slack, Email, or other integration.
    - Response data
    - Any custom fields
 
-### Step 6: Test and Enable
+### Step 6: Test and Publish
 
 1. Click "Test & Review" to verify your setup.
 2. Check your Slack channel to confirm the test message.
@@ -108,7 +106,7 @@ From here, you can choose to create a Slack, Email, or other integration.
    - Response data
    - Any custom fields
 
-### Step 6: Test and Enable
+### Step 6: Test and Publish
 
 1. Click "Test & Review" to verify your setup.
 2. Check your email to confirm the test message.
@@ -117,8 +115,6 @@ From here, you can choose to create a Slack, Email, or other integration.
 ## Setting Up Other Integrations in Zapier
 
 You can set up Formo to integrate with thousands of apps in the [Zapier app marketplace](https://zapier.com/apps)!
-
-Follow our Slack integration guide as an example.
 
 ## Troubleshooting
 
