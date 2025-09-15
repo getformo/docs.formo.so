@@ -1,0 +1,90 @@
+---
+title: 'BI Support'
+description: 'Connect popular BI tools and data visualization platforms directly to your data on Formo.'
+icon: chart-line
+---
+
+Formo is compatible with BI tools through our HTTP interface, enabling you to connect popular BI tools, SQL clients, and data visualization platforms directly to your Formo Data Sources.
+
+This interface provides a standardized way to query your data using SQL, making it easy to integrate Formo with your existing analytics workflow and third-party tools.
+
+## Configuration
+
+To connect to Formo, use these standard connection parameters:
+
+### Connection settings
+
+- **Protocol**: HTTPS
+- **Host**: `clickhouse.eu-central-1.aws.tinybird.co`
+- **Port**: `443`
+- **SSL/TLS**: Required (enabled)
+
+### Authentication settings
+
+- **Database name**: `formo`
+- **Username**: `formo`
+- **Password**: `<Your BI Read Key>` (Your Formo BI Read Token)
+
+Find your **BI Read key** in the project settings page under 'Credentials'.
+
+<Frame caption="Your BI Read Key under project settings">
+  <img src="/images/project-credentials.png" />
+</Frame>
+
+BI read keys expire in one week, but you can get a fresh key on the project settings page.
+
+## Compatible tools
+
+Formo works with various BI tools and SQL clients:
+- Grafana
+- Hex 
+- Metabase
+- Superset
+- Power BI
+- Tableau
+
+
+Any tool that supports ClickHouse® HTTP interface can potentially work with Formo.
+
+## Limitations
+
+The BI interface to Formo is read-only. You can use it to query, visualize, and analyze data from your Formo Data Sources, but you cannot modify data through this connection.
+
+You cannot perform `INSERT`, `UPDATE`, `DELETE`, or any DDL operations (`CREATE`, `ALTER`, `DROP`).
+
+## Troubleshooting
+
+**Authentication failures**
+
+Error: Authentication failed
+
+- Check your BI Read Token is valid and not expired
+- Ensure the token has read permissions for the workspace
+- Verify the token is entered in the password field
+
+**SSL/TLS errors**
+
+Error: SSL connection error
+
+- Ensure SSL/TLS is enabled in your client
+- Use port 443 with HTTPS protocol
+- Check that your client supports TLS 1.2 or higher
+
+**Query timeouts**
+
+Error: Query timeout
+
+- Add appropriate WHERE clauses to filter data
+- Use LIMIT to reduce result set size
+- Consider querying materialized views instead of raw data
+
+## Support
+
+<CardGroup cols={2}>
+  <Card title="Slack" icon="slack" href="https://formo.so/slack">
+    Join our Slack community
+  </Card>
+  <Card title="Email" icon="envelope" href="mailto:support@formo.so">
+    Email us at support@formo.so
+  </Card>
+</CardGroup>

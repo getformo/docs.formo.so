@@ -113,6 +113,7 @@
             "group": "Data Warehouse",
             "pages": [
               "data/schema",
+              "data/bi",
               "data/reverse-etl"
             ]
           }
