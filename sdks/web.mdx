@@ -198,33 +198,6 @@ To enable tracking locally during development, set `tracking` to `true`:
 >
 ```
 
-### Environments
-
-You can control tracking behavior in different environments (test, staging) with the `tracking` option:
-
-```javascript
-// Initialize with a boolean (simple on/off)
-const analytics = await FormoAnalytics.init('your-write-key', {
-  tracking: true // Enable tracking everywhere, including localhost
-});
-
-// Initialize only on production environment
-const analytics = await FormoAnalytics.init('your-write-key', {
-  tracking: ENV === 'production'
-});
-
-// Initialize with an object for exclusion rules
-const analytics = await FormoAnalytics.init('your-write-key', {
-  tracking: {
-    excludeHosts: ['stage-v2.puri.fi'], // Exclude tracking based on window.location.hostname
-    excludePaths: ['/test', '/debug'], // Exclude tracking based on window.location.pathname
-    excludeChains: [5] // Exclude tracking on Goerli testnet (5)
-  }
-});
-```
-
-Specify exact hostnames and exact paths in exclusion lists.
-
 ### Logging
 
 Control the level of logs the SDK prints to the console with the following logLevel settings:
@@ -240,6 +213,14 @@ Control the level of logs the SDK prints to the console with the following logLe
     }}
 >
 ```
+
+| Log Level | Description |
+|-----------|-------------|
+| trace | Shows the most detailed diagnostic information, useful for tracing program execution flow. |
+| debug | Shows all messages, including function context information for each public method the SDK invokes. |
+| info | Shows informative messages about normal application operation. |
+| warn | Default. Shows error and warning messages. |
+| error | Shows error messages only. |
 
 ### Batching
 
@@ -290,13 +271,32 @@ For Browser installations, you can use the ready callback in the `onload` attrib
 ></script>
 ```
 
-| Log Level | Description |
-|-----------|-------------|
-| trace | Shows the most detailed diagnostic information, useful for tracing program execution flow. |
-| debug | Shows all messages, including function context information for each public method the SDK invokes. |
-| info | Shows informative messages about normal application operation. |
-| warn | Default. Shows error and warning messages. |
-| error | Shows error messages only. |
+### Environments
+
+You can control tracking behavior in different environments (test, staging) with the `tracking` option:
+
+```javascript
+// Initialize with a boolean (simple on/off)
+const analytics = await FormoAnalytics.init('your-write-key', {
+  tracking: true // Enable tracking everywhere, including localhost
+});
+
+// Initialize only on production environment
+const analytics = await FormoAnalytics.init('your-write-key', {
+  tracking: ENV === 'production'
+});
+
+// Initialize with an object for exclusion rules
+const analytics = await FormoAnalytics.init('your-write-key', {
+  tracking: {
+    excludeHosts: ['stage-v2.puri.fi'], // Exclude tracking based on window.location.hostname
+    excludePaths: ['/test', '/debug'], // Exclude tracking based on window.location.pathname
+    excludeChains: [5] // Exclude tracking on Goerli testnet (5)
+  }
+});
+```
+
+Specify exact hostnames and exact paths in exclusion lists.
 
 ### Consent management
 
