@@ -37,7 +37,8 @@
                   "features/product-analytics/funnels",
                   "features/product-analytics/retention",
                   "features/product-analytics/alerts",
-                  "features/product-analytics/flows"                  
+                  "features/product-analytics/flows",
+                  "features/product-analytics/ai"              
                 ]
               },
               {
