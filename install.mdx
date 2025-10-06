@@ -33,13 +33,13 @@ Pick your stack and add the code below to your codebase.
 
     Calling [`identify`](/data/events/identify) at the start of every session or page load links wallets to user sessions.
 
-    To improve securiy, enable [Subresource Integrity (SRI)](/security/sri).
+    To improve security, enable [Subresource Integrity (SRI)](/security/sri).
 
     #### 2. Track events (optional)
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
-    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
     ```html
     <button type="button" onclick="window.formo.track('Swap Completed', { foo: 'bar' })">
@@ -80,7 +80,7 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users
 
-    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
+    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session.
 
     ```tsx
 
@@ -103,7 +103,7 @@ Pick your stack and add the code below to your codebase.
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
-    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
@@ -189,7 +189,7 @@ Pick your stack and add the code below to your codebase.
 
     #### 3. Identify users
 
-    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
+    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session.
 
     ```tsx
     import { useFormo } from "@formo/analytics";
@@ -211,7 +211,7 @@ Pick your stack and add the code below to your codebase.
 
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
-    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
