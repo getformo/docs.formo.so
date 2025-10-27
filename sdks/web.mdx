@@ -330,3 +330,29 @@ window.formo.optOutTracking();
 window.formo.optInTracking();
 ```
 
+### Autocapture
+
+You can configure which wallet events are automatically captured by the SDK:
+
+```javascript
+// Enable full autocapture (default)
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: true
+});
+
+// Disable autocapture for signature and transaction events
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: {
+    connect: true,
+    disconnect: true,
+    signature: false,    // Disable signature tracking
+    transaction: false,  // Disable transaction tracking
+    chain: true
+  }
+});
+
+// Disable all autocapture
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: false
+});
+```
