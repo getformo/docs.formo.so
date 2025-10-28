@@ -343,7 +343,9 @@ You do not need to configure anything to track these events.
 
 To verify that the SDK is installed correctly, navigate to your site and open the network tab of the developer tools in your browser.
 
-Wait and look for a 'raw_events' request to Formo in the network console. Check that the request returns a 202 response status. If so, you're done!
+Go to your browser's Network tab and and look for successful 'raw_events' request in the network console. Check that the request returns a 202 response status. (Note that it may take up to a minute due to the flush interval.)
+
+Events that are tracked correctly should also show up in the Activity page of your Formo workspace.
 
 ## SDK Reference
 
