@@ -362,7 +362,7 @@ To avoid ad-blockers from blocking your requests, we recommend setting up a reve
   <img src="/images/proxy.png" alt="Reverse proxy data flow" />
 </Frame>
 
-The following table lists the two domains that are used by Formo to successfully load the SDK and send events to Formo:
+Here are the domains used by Formo to load the SDK and send data:
 
 | Domain | Use case |
 |--------|----------|
@@ -374,7 +374,7 @@ The following table lists the two domains that are used by Formo to successfully
 Some ad blockers block specific SDK-related downloads and API calls based on the domain name and URL. 
 To circumvent this issue:
 
-- The Formo SDK is also available on [unpkg](https://unpkg.com/) (`https://unpkg.com/@formo/analytics`)
+- The Formo SDK is also available on [unpkg](https://unpkg.com/) at `https://unpkg.com/@formo/analytics`
 - You can serve the Formo SDK on your own domain.
 
 #### Next.js rewrites
@@ -387,7 +387,7 @@ module.exports = {
   async rewrites() {
     return [
       {
-        source: "/api/events",
+        source: "/api/ingest",
         destination: "https://events.formo.so/v0/raw_events",
       },
     ];
@@ -401,7 +401,7 @@ Then, configure the Formo SDK to send requests via your rewrite. Update the `api
 <AnalyticsProvider
   writeKey={WRITE_KEY}
   options={{
-    apiHost: "/api/events",
+    apiHost: "/api/ingest",
   }}
 >
 ```
@@ -477,5 +477,5 @@ To verify the proxy is working:
 
 - Visit your website / app
 - Open the network tab in your browser's developer tools
-- Check that analytics requests are going through your domain instead of events.formo.so
+- Check that analytics requests are going through your domain instead of `events.formo.so`
 - Check that events show up in the Activity page on the Formo dashboard
