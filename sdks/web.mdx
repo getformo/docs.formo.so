@@ -70,12 +70,6 @@ const HomePage = () => {
 export default HomePage;
 ```
 
-## Autocapture
-
-The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
-
-You do not need to configure anything to track these events.
-
 ## Identify users
 
 Call [`identify()`](/data/events/identify) after a user connects their wallet or signs in on your website or app:
@@ -92,7 +86,11 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
 ## Track events
 
-Track user actions by calling the [`track`](/data/events/track) function:
+The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
+
+You do not need to configure anything to track wallet events.
+
+To track custom events (in-app actions, key conversions) use the [`track`](/data/events/track) function with send details about the action:
 
 
 ```ts
@@ -100,12 +98,11 @@ import { useFormo } from '@formo/analytics';
 
 const analytics = useFormo();
 
-analytics.track("Position Opened",  // event name
+analytics.track("Position Opened",  // custom event name
   {
-    pool_id: "LINK/ETH",
-    revenue: 99.99,     // revenue
-    currency: "USD",    // currency
-    points: 99.99        // points for XP or rewards
+    pool_id: "LINK/ETH", // custom event property
+    amount: "1200", // custom event property
+    revenue: 99.99,     // revenue (reserved property)
   }
 )
 
@@ -356,3 +353,129 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
   autocapture: false
 });
 ```
+
+### Proxy
+
+To avoid ad-blockers from blocking your requests, we recommend setting up a reverse proxy.
+
+<Frame caption="What happens under the hood when you forward the data to Formo via a reverse proxy">
+  <img src="/images/proxy.png" alt="Reverse proxy data flow" />
+</Frame>
+
+The following table lists the two domains that are used by Formo to successfully load the SDK and send events to Formo:
+
+| Domain | Use case |
+|--------|----------|
+| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) |
+| events.formo.so | Receives data from the SDK (`http://events.formo.so/v0/raw_events`)|
+
+#### CDN
+
+Some ad blockers block specific SDK-related downloads and API calls based on the domain name and URL. 
+To circumvent this issue:
+
+- The Formo SDK is also available on [unpkg](https://unpkg.com/) (`https://unpkg.com/@formo/analytics`)
+- You can serve the Formo SDK on your own domain.
+
+#### Next.js rewrites
+
+If you are using Next.js, you can take advantage of [rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites) to behave like a reverse proxy. To do so, add a `rewrites()` function to your next.config.js file:
+
+```javascript
+// next.config.js
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: "/api/events",
+        destination: "https://events.formo.so/v0/raw_events",
+      },
+    ];
+  },
+};
+```
+
+Then, configure the Formo SDK to send requests via your rewrite. Update the `apiHost` parameter in the Formo SDK:
+
+```javascript
+<AnalyticsProvider
+  writeKey={WRITE_KEY}
+  options={{
+    apiHost: "/api/events",
+  }}
+>
+```
+
+> See an [example Next.js app](https://github.com/getformo/formo-example-next-app-router) here.
+
+#### Next.js middleware
+
+If you are using Next.js and rewrites aren't working for you, you can write [custom middleware](https://nextjs.org/docs/14/pages/building-your-application/routing/middleware) to proxy requests to Formo.
+
+Create a file named `middleware.js/ts` in your base directory (same level as the app folder).
+
+```javascript
+import { NextResponse } from "next/server";
+
+export function middleware(request: any) {
+  const hostname = "events.formo.so";
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("host", hostname);
+
+  let url = request.nextUrl.clone();
+  url.protocol = "https";
+  url.hostname = hostname;
+  url.port = 443;
+  url.pathname = url.pathname.replace(/^\/ingest/, "");
+
+  return NextResponse.rewrite(url, {
+    headers: requestHeaders,
+  });
+}
+
+export const config = {
+  matcher: "/ingest/:path*",
+};
+```
+
+In this file, set up code to match requests to a custom route, set a new host header, change the URL to point to Formo, and rewrite the response.
+
+Once done, configure the Formo SDK to send requests via your rewrite:
+
+```javascript
+<AnalyticsProvider
+  writeKey={WRITE_KEY}
+  options={{
+    apiHost: "https://your-host-url.com/ingest",
+  }}
+>
+```
+
+#### Others
+
+Alternatively, you can set up your own proxy (with Cloudfront, Cloudflare, etc) and pass the URL as the SDK `apiHost`:
+
+```javascript
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer
+  onload="
+    window.formofy('<YOUR_WRITE_KEY>', {
+      apiHost: 'https://your-host-url.com/ingest',
+      ready: function(formo) {
+        formo.identify();
+      }
+    });
+  "
+></script>
+```
+
+#### Verification
+
+To verify the proxy is working:
+
+- Visit your website / app
+- Open the network tab in your browser's developer tools
+- Check that analytics requests are going through your domain instead of events.formo.so
+- Check that events show up in the Activity page on the Formo dashboard
