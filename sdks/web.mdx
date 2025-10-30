@@ -366,16 +366,13 @@ Here are the domains used by Formo to load the SDK and send data:
 
 | Domain | Use case |
 |--------|----------|
-| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) |
+| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) e.g. `https://cdn.formo.so/analytics@1.23.0` |
 | events.formo.so | Receives data from the SDK (`http://events.formo.so/v0/raw_events`)|
 
 #### CDN
 
 Some ad blockers block specific SDK-related downloads and API calls based on the domain name and URL. 
-To circumvent this issue:
-
-- The Formo SDK is also available on [unpkg](https://unpkg.com/) at `https://unpkg.com/@formo/analytics`
-- You can serve the Formo SDK on your own domain.
+To circumvent this issue you can download and serve the Formo SDK from `cdn.formo.so` to your own domain e.g. `yourdomain.com/formo.js`.
 
 #### Next.js rewrites
 
