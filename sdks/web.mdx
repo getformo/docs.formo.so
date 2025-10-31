@@ -354,7 +354,7 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 });
 ```
 
-### Proxy
+## Proxy
 
 To avoid ad-blockers from blocking your requests, we recommend setting up a reverse proxy.
 
@@ -369,12 +369,12 @@ Here are the domains used by Formo to load the SDK and send data:
 | cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) e.g. `https://cdn.formo.so/analytics@1.23.0` |
 | events.formo.so | Receives data from the SDK (`http://events.formo.so/v0/raw_events`)|
 
-#### CDN
+### CDN
 
 Some ad blockers block specific SDK-related downloads and API calls based on the domain name and URL. 
 To circumvent this issue you can download and serve the Formo SDK from `cdn.formo.so` to your own domain e.g. `yourdomain.com/formo.js`.
 
-#### Next.js rewrites
+### Next.js rewrites
 
 If you are using Next.js, you can take advantage of [rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites) to behave like a reverse proxy. To do so, add a `rewrites()` function to your next.config.js file:
 
@@ -384,12 +384,25 @@ module.exports = {
   async rewrites() {
     return [
       {
+        source: "/formo.js",
+        destination: "https://cdn.formo.so/analytics@1.23.0", // If using website install script
+      },
+      {
         source: "/api/ingest",
         destination: "https://events.formo.so/v0/raw_events",
       },
     ];
   },
 };
+```
+
+Then, replace the website install script to:
+
+```javascript
+<script
+    src="https://yourdomain.com/formo.js"
+  ...
+></script>
 ```
 
 Then, configure the Formo SDK to send requests via your rewrite. Update the `apiHost` parameter in the Formo SDK:
@@ -405,7 +418,7 @@ Then, configure the Formo SDK to send requests via your rewrite. Update the `api
 
 > See an [example Next.js app](https://github.com/getformo/formo-example-next-app-router) here.
 
-#### Next.js middleware
+### Next.js middleware
 
 If you are using Next.js and rewrites aren't working for you, you can write [custom middleware](https://nextjs.org/docs/14/pages/building-your-application/routing/middleware) to proxy requests to Formo.
 
@@ -449,7 +462,7 @@ Once done, configure the Formo SDK to send requests via your rewrite:
 >
 ```
 
-#### Others
+### Others
 
 Alternatively, you can set up your own proxy (with Cloudfront, Cloudflare, etc) and pass the URL as the SDK `apiHost`:
 
@@ -468,7 +481,7 @@ Alternatively, you can set up your own proxy (with Cloudfront, Cloudflare, etc) 
 ></script>
 ```
 
-#### Verification
+### Verification
 
 To verify the proxy is working:
 
