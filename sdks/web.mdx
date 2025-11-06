@@ -354,6 +354,23 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 });
 ```
 
+### Referrals
+
+Formo autodetects `ref`, `referral`, and `refcode` query parameters in the URL. You can customize how referrals are detected by the SDK:
+
+```javascript
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  referral: {
+    queryParams: ['via', 'ref'],
+    pathPattern: '/referral/([^/]+)'
+  }
+});
+```
+
+In the above configuration, Formo will detect referrals from:
+- the `via` and `ref` query parameters in the URL, and 
+- from the `/referral/([^/]+)` path pattern
+
 ## Proxy
 
 To avoid ad-blockers from blocking your requests, we recommend setting up a reverse proxy.
