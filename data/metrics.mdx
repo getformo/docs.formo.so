@@ -53,9 +53,28 @@ Each session is a 24 hour window. If a visitor returns after this window, a new 
 This is useful for debugging and identifying problems on your site. 
 For example, if visitors are not completing transactions, you can see which pages were visited and what events were triggered to identify a common problem on your site that is preventing visitors from completing.
 
-### Average Session Time
+### Session Duration
 
-How long a user spends on your site or dapp.
+Session duration measures how long a visitor stays on your website or app during a single visit (session).
+
+##### How It's Calculated
+
+1. Starting Point: When a visitor first lands on your site, the system records a timestamp.
+
+2. Ending Point: When the visitor performs their last action before leaving, another timestamp is recorded.
+
+3. The Calculation: The system simply subtracts the first timestamp from the last one to determine how long the visitor stayed.
+
+4. Averaging: To get the average session duration shown in your reports, the system adds up all individual session durations and divides by the number of sessions.
+
+##### What This Means For You
+
+- The reported average session duration gives you a reliable measure of how long people typically engage with your site.
+- Longer average sessions generally indicate more engaging content.
+- This metric helps you understand if changes to your site are improving user engagement over time.
+- Note: The system can only measure activity it can see - when someone views a page or clicks something. If a visitor reads a long article without interacting further, the system can't detect this "passive" time. This is a standard limitation in all web analytics platforms.
+
+For most purposes, this calculation method provides an accurate and useful measure of how long visitors are engaging with your content.
 
 ### Bounce Rate
 
