@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "aspen",
   "name": "Formo Docs",
   "colors": {
     "primary": "#0D9373",
@@ -11,10 +11,10 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Get Started",
+        "tab": "Guides",
         "groups": [
           {
-            "group": "Quickstart",
+            "group": "Getting started",
             "pages": [
               "intro",
               "install"
@@ -191,14 +191,14 @@
           "icon": "map"
         },
         {
-          "anchor": "Support",
-          "href": "https://formo.so/support",
-          "icon": "headset"
-        },
-        {
           "anchor": "Community",
           "href": "https://formo.so/slack",
           "icon": "slack"
+        },
+        {
+          "anchor": "Support",
+          "href": "https://formo.so/support",
+          "icon": "headset"
         },
         {
           "anchor": "Status",
