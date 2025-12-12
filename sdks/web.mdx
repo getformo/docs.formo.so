@@ -86,11 +86,9 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
 ## Track events
 
-The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
+The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.) 
 
-You do not need to configure anything to track wallet events.
-
-To track custom events (in-app actions, key conversions) use the [`track`](/data/events/track) function with send details about the action:
+To track custom events (in-app actions, key conversions) use the [`track`](/data/events/track) function:
 
 
 ```ts
@@ -101,8 +99,9 @@ const analytics = useFormo();
 analytics.track("Position Opened",  // custom event name
   {
     pool_id: "LINK/ETH", // custom event property
-    amount: "1200", // custom event property
-    revenue: 99.99,     // revenue (reserved property)
+    amount: "1200",      // custom event property
+    volume: -59.99,      // volume (reserved property, can be positive or negative to track outflows)
+    revenue: 99.99,      // revenue (reserved property, must be a non-negative number)
   }
 )
 
@@ -110,6 +109,8 @@ OR
 
 window.formo.track(...)
 ```
+
+You can [track volume, revenue, and points](/data/events/track#tracking-volume,-revenue,-points) in custom events.
 
 ## Code examples
 

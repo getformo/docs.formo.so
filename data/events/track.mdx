@@ -50,8 +50,8 @@ Include these optional properties in a custom event to track values associated w
 
 | Property | Type | Description |
 |:---------|:-----|:------------|
-| `volume` | Number | The volume amount as a result of an event. For e.g., a token swap worth $20.00 would result in a volume of 20.00. |
-| `revenue` | Number | The revenue amount as a result of an event. For e.g., a transaction with a protocol fee of $5.00 would result in a revenue of 5.00. |
+| `volume` | Number | The volume amount as a result of an event. For e.g., a token swap worth $20.00 would result in a volume of 20.00. Can be positive or negative e.g. send -100 to track outflows. |
+| `revenue` | Number | The revenue amount as a result of an event. For e.g., a transaction with a protocol fee of $5.00 would result in a revenue of 5.00. Must be a non-negative number.|
 | `currency` | String | The currency of the revenue as a result of the event, set in ISO 4127 format. If this is not set, Formo assumes the revenue is in USD. |
 | `points` | String | An abstract value such as points or XP associated with an event, to be used by various teams. |
 
