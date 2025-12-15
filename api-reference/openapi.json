@@ -85,70 +85,163 @@
 					}
 				}
 			},
+			"EventContext": {
+				"type": "object",
+				"description": "Contextual information about the event",
+				"properties": {
+					"user_agent": {
+						"type": "string",
+						"description": "The user agent of the device"
+					},
+					"locale": {
+						"type": "string",
+						"description": "Language of the device (e.g., en-US, en-GB)"
+					},
+					"timezone": {
+						"type": "string",
+						"description": "Timezone of the user (e.g., America/New_York)"
+					},
+					"location": {
+						"type": "string",
+						"description": "Geographic location country code (e.g., US, NG)"
+					},
+					"ref": {
+						"type": "string",
+						"description": "Referral code or identifier"
+					},
+					"referrer": {
+						"type": "string",
+						"description": "The referrer URL where the user came from"
+					},
+					"utm_campaign": {
+						"type": "string",
+						"description": "UTM campaign parameter"
+					},
+					"utm_content": {
+						"type": "string",
+						"description": "UTM content parameter"
+					},
+					"utm_medium": {
+						"type": "string",
+						"description": "UTM medium parameter"
+					},
+					"utm_source": {
+						"type": "string",
+						"description": "UTM source parameter"
+					},
+					"utm_term": {
+						"type": "string",
+						"description": "UTM term parameter"
+					},
+					"page_title": {
+						"type": "string",
+						"description": "Title of the current page"
+					},
+					"page_url": {
+						"type": "string",
+						"description": "Full URL of the current page"
+					},
+					"library_name": {
+						"type": "string",
+						"description": "Name of the SDK used (e.g., Formo Web SDK)"
+					},
+					"library_version": {
+						"type": "string",
+						"description": "Version of the SDK used"
+					},
+					"browser": {
+						"type": "string",
+						"description": "Name of the browser (e.g., chrome, firefox, safari)"
+					},
+					"screen_width": {
+						"type": "integer",
+						"description": "Width of the device screen in pixels"
+					},
+					"screen_height": {
+						"type": "integer",
+						"description": "Height of the device screen in pixels"
+					},
+					"screen_density": {
+						"type": "number",
+						"description": "Pixel density of the device screen (devicePixelRatio)"
+					},
+					"viewport_width": {
+						"type": "integer",
+						"description": "Width of the browser viewport in pixels"
+					},
+					"viewport_height": {
+						"type": "integer",
+						"description": "Height of the browser viewport in pixels"
+					}
+				}
+			},
+			"EventProperties": {
+				"type": "object",
+				"description": "Event-specific properties. Can contain any key-value pairs relevant to the event.",
+				"additionalProperties": true
+			},
 			"Event": {
 				"type": "object",
 				"properties": {
-					"channel": {
-						"type": "string",
-						"description": "Channel of the event"
-					},
 					"type": {
 						"type": "string",
+						"enum": ["identify", "track", "page", "connect", "disconnect", "detect", "chain", "signature", "transaction"],
 						"description": "Type of the event"
+					},
+					"channel": {
+						"type": "string",
+						"enum": ["web", "mobile", "server"],
+						"description": "Channel/source of the event"
+					},
+					"version": {
+						"type": "string",
+						"description": "Event spec version"
 					},
 					"anonymous_id": {
 						"type": "string",
-						"description": "Anonymous user identifier"
+						"description": "Pseudo-identifier for the user (device ID)"
 					},
 					"user_id": {
 						"type": "string",
-						"description": "User identifier"
+						"nullable": true,
+						"description": "Unique user identifier"
 					},
 					"address": {
 						"type": "string",
+						"nullable": true,
 						"description": "Wallet address"
 					},
 					"event": {
 						"type": "string",
-						"description": "Name of the event"
+						"description": "Name of the event (for track events)"
 					},
 					"context": {
-						"type": "string",
-						"description": "Event context as JSON string"
+						"$ref": "#/components/schemas/EventContext"
 					},
 					"properties": {
-						"type": "string",
-						"description": "Event properties as JSON string"
-					},
-					"version": {
-						"type": "string",
-						"description": "Event version"
+						"$ref": "#/components/schemas/EventProperties"
 					},
 					"original_timestamp": {
 						"type": "string",
 						"format": "date-time",
-						"description": "Original timestamp of the event"
+						"description": "Time when the event occurred on the client"
 					},
 					"sent_at": {
 						"type": "string",
 						"format": "date-time",
-						"description": "Timestamp when the event was sent"
+						"description": "Time when the event was sent from the client"
 					},
 					"message_id": {
 						"type": "string",
-						"description": "Unique message identifier"
+						"description": "Unique identifier for the event"
 					}
 				},
 				"required": [
 					"type",
 					"channel",
-					"anonymous_id",
-					"user_id",
-					"address",
-					"event",
-					"context",
-					"properties",
 					"version",
+					"anonymous_id",
+					"context",
 					"original_timestamp",
 					"sent_at",
 					"message_id"
@@ -475,10 +568,10 @@
 				}
 			}
 		},
-		"/v0/events": {
+		"/v0/raw_events": {
 			"post": {
 				"summary": "Track Event",
-				"description": "Sends an event to the Formo Events API",
+				"description": "Sends an event to the Formo Events API. Use the SDK Write Key from your project settings as the Bearer token for authentication.",
 				"operationId": "trackEvent",
 				"tags": ["Events API"],
 				"servers": [
@@ -492,18 +585,6 @@
 						"BearerAuth": []
 					}
 				],
-				"parameters": [
-					{
-						"name": "name",
-						"in": "query",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"default": "raw_events"
-						},
-						"description": "Name of the event pipeline"
-					}
-				],
 				"requestBody": {
 					"required": true,
 					"content": {
@@ -512,15 +593,42 @@
 								"$ref": "#/components/schemas/Event"
 							},
 							"example": {
-								"channel": "web",
 								"type": "page",
+								"channel": "web",
+								"version": "0",
 								"anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
 								"user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
 								"address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
 								"event": "",
-								"context": "{\"user_agent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36\",\"locale\":\"en-US\",\"location\":\"ID\",\"timezone\":\"Asia/Saigon\",\"referrer\":\"https://chatgpt.com/\",\"utm_source\":\"chatgpt.com\",\"utm_medium\":\"linkedin\",\"utm_campaign\":\"early-access\",\"utm_term\":null,\"utm_content\":null,\"ref\":\"vitalik.eth\",\"page_url\":\"https://www.estore.com/best-seller/1\",\"page_path\":\"/best-seller/1\",\"page_title\":\"The best sellers offered by EStore\",\"library_name\":\"Formo Web SDK\",\"library_version\":\"1.16.2\"}",
-								"properties": "{\"name\":\"Best Seller\",\"category\":\"Docs\",\"url\":\"https://formo.so/faucets?utm_source=chatgpt.com\",\"path\":\"/best-seller/1\",\"hash\":\"#submit\",\"title\":\"The best sellers offered by EStore\"}",
-								"version": "0",
+								"context": {
+									"user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+									"locale": "en-GB",
+									"timezone": "Africa/Lagos",
+									"location": "NG",
+									"ref": "",
+									"referrer": "",
+									"utm_campaign": "",
+									"utm_content": "",
+									"utm_medium": "",
+									"utm_source": "",
+									"utm_term": "",
+									"page_title": "WalletConnect Content Cabal",
+									"page_url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+									"library_name": "Formo Web SDK",
+									"library_version": "1.25.0",
+									"browser": "chrome",
+									"screen_width": 393,
+									"screen_height": 873,
+									"screen_density": 2.75,
+									"viewport_width": 392,
+									"viewport_height": 735
+								},
+								"properties": {
+									"url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+									"path": "/lByfTbeUSL_mxy_TN2m3d",
+									"hash": "",
+									"query": ""
+								},
 								"original_timestamp": "2025-04-23T13:15:17.000Z",
 								"sent_at": "2025-04-23T13:15:18.000Z",
 								"message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
@@ -536,44 +644,33 @@
 								"schema": {
 									"type": "object",
 									"properties": {
-										"success": {
-											"type": "boolean",
-											"example": true
+										"successful_rows": {
+											"type": "integer",
+											"description": "Number of events successfully ingested",
+											"example": 1
+										},
+										"quarantined_rows": {
+											"type": "integer",
+											"description": "Number of events that failed validation and were quarantined",
+											"example": 0
 										}
 									}
+								},
+								"example": {
+									"successful_rows": 1,
+									"quarantined_rows": 0
 								}
 							}
 						}
 					},
 					"400": {
-						"description": "Bad Request - Invalid event data",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
+						"description": "Bad Request - Invalid event data"
 					},
 					"401": {
-						"description": "Unauthorized - Missing or invalid Bearer token",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
+						"description": "Unauthorized - Missing or invalid Bearer token"
 					},
 					"500": {
-						"description": "Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
+						"description": "Server Error"
 					}
 				}
 			}

@@ -51,6 +51,12 @@ Contextual fields give additional information about a particular event. The foll
 | `page_title` | String |  | Title of the page. |
 | `library_name` | String |  | Name of the SDK used to capture the event. |
 | `library_version` | String |  | Version of the SDK used to capture the event. |
+| `browser` | String |  | Name of the browser (e.g., chrome, firefox, safari). |
+| `screen_width` | Number |  | Width of the device screen in pixels. |
+| `screen_height` | Number |  | Height of the device screen in pixels. |
+| `screen_density` | Number |  | Pixel density of the device screen (devicePixelRatio). |
+| `viewport_width` | Number |  | Width of the browser viewport in pixels. |
+| `viewport_height` | Number |  | Height of the browser viewport in pixels. |
 
 ## Timestamps
 
@@ -113,17 +119,23 @@ Here's an example event with common and contextual fields included:
         "location": "ID",
         "timezone": "Asia/Saigon",
         "referrer": "https://chatgpt.com/",
+        "ref": "vitalik.eth",
         "utm_source": "chatgpt.com",
         "utm_medium": "linkedin",
         "utm_campaign": "early-access",
-        "utm_term": null,
-        "utm_content": null,
-        "ref": "vitalik.eth",
+        "utm_term": "",
+        "utm_content": "",
         "page_url": "https://www.estore.com/best-seller/1",
         "page_path": "/best-seller/1",
         "page_title": "The best sellers offered by EStore",
         "library_name": "Formo Web SDK",
-        "library_version": "1.16.2"
+        "library_version": "1.25.0",
+        "browser": "chrome",
+        "screen_width": 1920,
+        "screen_height": 1080,
+        "screen_density": 1,
+        "viewport_width": 1920,
+        "viewport_height": 969
     },
     "properties": {
         "name": "Best Seller",
