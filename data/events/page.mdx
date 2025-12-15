@@ -5,20 +5,34 @@ description: 'Get started with the Page view event.'
 
 The `page` event records whenever a user views a page of your website.
 
+## Fields
+
+Apart from the [common fields](/data/events/common), the `page` call accepts the following properties:
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `url` | String | Full URL of the page. |
+| `path` | String | Path component of the URL (without query string or hash). |
+| `hash` | String | Hash fragment of the URL (e.g., `#section`). |
+| `query` | String | Query string of the URL (without the leading `?`). |
+| `name` | String | Name of the page. |
+| `category` | String | Category of the page. |
+| `title` | String | Title of the page. |
+
 ## Sample Payload
 
-Here’s the payload of a typical call with most common fields removed:
-
+Here's the payload of a typical call with most common fields removed:
 
 ```json
 {
-    "type": "page",   
+    "type": "page",
     "properties": {
-        "name": "Faucets",
-        "category": "Docs",
         "url": "https://formo.so/faucets?utm_source=chatgpt.com",
         "path": "/faucets",
-        "hash": "#submit"
+        "hash": "",
+        "query": "utm_source=chatgpt.com",
+        "name": "Faucets",
+        "category": "Docs",
         "title": "Free testnet faucets"
     }
 }
