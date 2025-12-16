@@ -3,7 +3,7 @@ title: 'Spec: Track'
 description: 'Get started with tracking custom events.'
 ---
 
-The Track API call is how you record any [custom actions](/features/product-analytics/custom-events) your users are doing, 
+The Track API call is how you record any [custom events](/features/product-analytics/custom-events) your users are doing, 
 along with properties that describe the action. 
 
 Custom events can capture a broad range of actions, such as clicking a button or completing a purchase.
@@ -63,6 +63,7 @@ Include these optional properties in a custom event to track values associated w
   "type": "track",
   "event": "Product Reviewed",
   "properties": {
+    "volume": "-100.5",
     "revenue": "20.5",
     "currency": "USD",
     "points": "100",
