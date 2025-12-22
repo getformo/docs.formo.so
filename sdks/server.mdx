@@ -1,7 +1,161 @@
 ---
-title: 'Server-Side'
+title: "Server"
 icon: server
-description: 'Track user events server-side with SDKs for Node.js, Python, Go, and other major programming languages and tech stacks.'
+description: "Track user events server-side with SDKs for Node.js, Python, and other major programming languages."
 ---
 
-> 🚧 In development. <a href="https://cal.com/formo/30min">Reach out</a> to get early access. 🚧
+The Formo server-side SDKs allow you to track actions and identify users from your backend applications. Server-side tracking is ideal for sensitive data or ensuring events are captured even when a user is not actively on your website.
+
+The Node.js SDK is [open source](https://github.com/getformo/sdk-node) and implements the standard [Events API](/data/events#events-api).
+
+### How it works
+
+When you call `track` or `identify`, the SDK adds the event to an in-memory queue rather than sending it immediately. This improves performance by reducing network overhead. Events are batched and sent to Formo's servers based on your [configuration](#options). If a request fails, the SDK will automatically retry it with an exponential backoff.
+
+## Installation
+
+Install the `@formo/analytics-node` package:
+
+```bash
+npm install @formo/analytics-node
+```
+
+## Quick Start
+
+Initialize the SDK with your project's write key:
+
+```typescript
+import { FormoAnalytics } from "@formo/analytics-node";
+
+const analytics = new FormoAnalytics("<YOUR_WRITE_KEY>");
+```
+
+## Identify users
+
+Call [`identify()`](/data/events/identify) when a user signs in or connects their wallet to associate them with their actions.
+
+```typescript
+await analytics.identify({
+  userId: "user-123", // your unique user identifier
+  anonymousId: "device-uuid", // device or session identifier
+  properties: {
+    user_id: "0c93652b-a366-4c92-ab87-0c0ab4fba5aa",
+    address: "0x9798d87366bdfc5d70b300abdffc4f9e95369b3d",
+    provider_name: "MetaMask",
+    rdns: "io.metamask",
+  },
+});
+```
+
+## Track events
+
+To track custom events (actions, conversions, or backend states) use the [`track`](/data/events/track) function.
+
+```typescript
+await analytics.track({
+  event: "Purchase Completed",
+  anonymousId: "device-uuid",
+  properties: {
+    order_id: "123",
+    revenue: 99.99,
+    currency: "USD",
+  },
+});
+```
+
+You can [track volume, revenue, and points](/data/events/track#tracking-volume,-revenue,-points) in custom events.
+
+## Configuration
+
+### Manual Flush
+
+To ensure all pending events are sent before a process exits (useful for serverless functions), call `flush()`:
+
+```typescript
+await analytics.flush();
+```
+
+### Options
+
+Customize the SDK behavior during initialization by passing an optional configuration object:
+
+| Option          | Type     | Default        | Description                                           |
+| :-------------- | :------- | :------------- | :---------------------------------------------------- |
+| `flushAt`       | `number` | `20` events    | Flush the queue once it contains N events.            |
+| `flushInterval` | `number` | `30000` ms     | Flush the queue every N milliseconds.                 |
+| `maxQueueSize`  | `number` | `500000` bytes | Flush when the queue exceeds N bytes (approx. 500KB). |
+| `retryCount`    | `number` | `3` retries    | Number of times to retry failed requests.             |
+
+```typescript
+const analytics = new FormoAnalytics("<YOUR_WRITE_KEY>", {
+  flushAt: 20,
+  flushInterval: 30000,
+  maxQueueSize: 500000,
+  retryCount: 3,
+});
+```
+
+## Ethereum addresses
+
+The SDK automatically validates and checksums Ethereum addresses:
+
+```typescript
+await analytics.track({
+  event: "Wallet Connected",
+  anonymousId: "device-uuid",
+  address: "0xab5801a7d398351b8be11c439e05c5b3259aec9b",
+  // Stored as: 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B (checksummed)
+});
+```
+
+## Error handling
+
+The SDK throws a `ValidationError` when required fields are missing or invalid:
+
+```typescript
+import { FormoAnalytics, ValidationError } from "@formo/analytics-node";
+
+try {
+  await analytics.track({
+    anonymousId: "",
+    event: "Test",
+  });
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error(`Validation failed: ${error.field} - ${error.reason}`);
+  }
+}
+```
+
+## Verification
+
+To verify that your integration is working correctly:
+
+1. **Send a test event**: Trigger an action in your application that calls `track()` or `identify()`.
+2. **Check the Dashboard**: Go to the **Activity** page in the Formo dashboard.
+3. **Confirm Ingestion**: Your events should appear in the activity stream within a few seconds after a flush occurs.
+
+If you don't see events, ensure that you are calling `await analytics.flush()` if your script exits immediately, and check for any `ValidationError` in your server logs.
+
+## Graceful shutdown
+
+The SDK automatically attempts to flush pending events before the process closes by listening to the following Node.js process events:
+
+- `beforeExit`: Flushes events when the process is about to exit naturally.
+- `SIGTERM`: Flushes events when the process receives a termination signal (common in Docker/Kubernetes).
+- `SIGINT`: Flushes events when the process is interrupted (e.g., `Ctrl+C`).
+
+### Important Caveats
+
+- **Manual `process.exit()`**: If your code calls `process.exit()` directly, the `beforeExit` event will not fire, and the queue will not be flushed.
+- **Serverless Environments**: In platforms like AWS Lambda or Vercel, the environment may be frozen immediately after your handler returns. **You must call `await analytics.flush()` manually** at the end of your function.
+- **Forceful Shutdowns**: A `SIGKILL` (`kill -9`) or sudden crash will prevent any automatic flushing.
+
+For the most reliable delivery in mission-critical applications or serverless functions, we recommend calling `await analytics.flush()` explicitly:
+
+```typescript
+process.on("SIGTERM", async () => {
+  await analytics.flush();
+  process.exit(0);
+});
+```
