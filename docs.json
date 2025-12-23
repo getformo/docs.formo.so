@@ -230,7 +230,9 @@
     "socials": {
       "x": "https://x.com/getformo",
       "linkedin": "https://linkedin.com/company/getformo",
-      "slack": "https://formo.so/slack"
+      "slack": "https://formo.so/slack",
+      "github": "https://github.com/getformo",
+      "website": "https://formo.so"
     }
   },
   "integrations": {
@@ -240,5 +242,9 @@
     "intercom": {
       "appId": "pggy8kos"
     }
-  }
+  },
+  "appearance": {
+    "default": "light"
+  },
+  "description": "Guides and API documentation for the Formo data platform."
 }
