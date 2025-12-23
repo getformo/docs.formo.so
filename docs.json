@@ -248,6 +248,6 @@
   },
   "description": "Guides and API documentation for the Formo data platform.",
   "background": {
-    "decoration": "grid"
+    "decoration": "windows"
   }
 }
