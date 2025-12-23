@@ -216,7 +216,7 @@
   "navbar": {
     "links": [
       {
-        "label": "Book Demo",
+        "label": "Demo",
         "href": "https://cal.com/formo/demo"
       }
     ],
@@ -246,5 +246,8 @@
   "appearance": {
     "default": "light"
   },
-  "description": "Guides and API documentation for the Formo data platform."
+  "description": "Guides and API documentation for the Formo data platform.",
+  "background": {
+    "decoration": "grid"
+  }
 }
