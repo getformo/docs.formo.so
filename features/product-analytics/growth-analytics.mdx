@@ -1,6 +1,6 @@
 ---
-title: 'Growth analytics'
-description: 'Track key growth metrics like visitors, wallets, transactions, and user acquisition channels to understand your product performance.'
+title: "Growth analytics"
+description: "Track key growth metrics like visitors, wallets, transactions, and user acquisition channels to understand your product performance."
 ---
 
 ## Visitors, wallets, transactions
@@ -8,15 +8,21 @@ description: 'Track key growth metrics like visitors, wallets, transactions, and
 Measure the number of visitors, wallets, and transactions to discover which tactics drive product adoption and growth.
 
 <Frame caption="Key metrics for crypto teams.">
-    <img src="/images/screenshots/overview.png" alt="Product Analytics Overview" />
+  <img
+    src="/images/screenshots/overview.png"
+    alt="Product Analytics Overview"
+  />
 </Frame>
 
 ## Referrers, UTM, referrals
 
-See where your users are coming from by referrer, UTM parameters, and referrals. 
+See where your users are coming from by referrer, UTM parameters, and referrals.
 
 <Frame caption="Understand where your users are coming from.">
-    <img src="/images/dapp-analytics-referrers.png" alt="Product Analytics Referrers" />
+  <img
+    src="/images/dapp-analytics-referrers.png"
+    alt="Product Analytics Referrers"
+  />
 </Frame>
 
 The Formo SDK automatically add the following UTM parameters present on the page to events fired from that page load:
@@ -28,18 +34,153 @@ The Formo SDK automatically add the following UTM parameters present on the page
 - utm_content
 - ref
 
+### How to enable full referer URL tracking (via Referer-Policy header)
+
+To enable full referer URLs, you need to make sure your site has the correct Referer-Policy header set.
+
+<div className="mt-4 flex flex-col items-start space-y-3 rounded-2xl border p-4 pr-8 text-[0.95rem] border-green-200 bg-green-50">
+We recommend setting the `no-referrer-when-downgrade` <a target="_blank" rel="noopener noreferrer" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#no-referrer-when-downgrade">policy</a>, which will only send the domain, path, and query parameters to the destination URL as long as the protocol security level stays the same (i.e. `HTTP` → `HTTP`, or `HTTPS` → `HTTPS`).
+
+If the protocol security level is downgraded (i.e. `HTTPS` → `HTTP`), the referer will not be sent. This is a good compromise to make sure your users' privacy is respected while still getting a good amount of data.
+
+</div>
+
+There are a few ways to configure this, depending on your application framework:
+
+<Tabs>
+  <Tab icon="rectangle-terminal" title="Next.js">
+    If you are using Next.js, you can use the headers property in your `next.config.js` file to configure the referer policy:
+
+    ```javascript
+    module.exports = {
+      async headers() {
+        return [
+          {
+            source: "/:path*",
+            headers: [
+              {
+                key: "Referrer-Policy",
+                value: "no-referrer-when-downgrade",
+              },
+            ],
+          },
+        ];
+      },
+    };
+    ```
+
+  </Tab>
+  <Tab icon="rectangle-terminal" title="Nuxt">
+    If you are using Nuxt, you can use the `routeRules` property in your `nuxt.config.ts` file to configure the referer policy:
+
+    ```typescript
+    export default defineNuxtConfig({
+      routeRules: {
+        "/**": {
+          security: {
+            headers: {
+              "referrer-policy": "no-referrer-when-downgrade",
+            },
+          },
+        },
+      },
+    });
+    ```
+
+  </Tab>
+  <Tab icon="rectangle-terminal" title="Laravel">
+    If you are using Laravel, you can use the Laravel Security Middleware to configure the referer policy:
+
+    ```php
+    final class SetReferrerPolicy
+    {
+        public function handle(Request $request, Closure $next): Response
+        {
+            /**
+            * @var Response $response
+            */
+            $response = $next($request);
+
+            $response->headers->set(
+                key: 'Referrer-Policy',
+                values: 'no-referrer-when-downgrade',
+            );
+
+            return $response;
+        }
+    }
+    ```
+
+  </Tab>
+  <Tab icon="rectangle-terminal" title="Flask">
+    If you are using Flask, you can set the `Referrer-Policy` header for all requests like this:
+
+    ```python
+    from flask import Flask
+
+    app = Flask(__name__)
+
+    @app.after_request
+    def set_headers(response):
+        response.headers["Referrer-Policy"] = 'no-referrer-when-downgrade'
+        return response
+
+    @app.route('/')
+    def index():
+        return 'Hello world!'
+
+    if __name__ == '__main__':
+        app.run()
+    ```
+
+    Alternatively, you can set the header for specific endpoint:
+
+    ```python
+    from flask import Flask, make_response
+
+    app = Flask(__name__)
+
+    @app.route('/')
+    def index():
+        response = make_response('Hello world!')
+        response.headers["Referrer-Policy"] = 'no-referrer-when-downgrade'
+        return response
+
+    if __name__ == '__main__':
+        app.run()
+    ```
+
+  </Tab>
+  <Tab icon="code" title="Meta Tag">
+    Alternatively, you can also set the referer policy using a meta tag in the `<head>` section of your HTML:
+
+    ```html
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    ```
+
+    This is useful if you are using a website builder like Webflow or Framer, where you don't have access to the server-side configuration.
+
+  </Tab>
+</Tabs>
+
 ## Devices, browsers, OS
 
 <Frame caption="Understand what devices, browers, and operating system users are on.">
-	<img src="/images/dapp-analytics-devices.png" alt="Product Analytics Devices" />
+  <img
+    src="/images/dapp-analytics-devices.png"
+    alt="Product Analytics Devices"
+  />
 </Frame>
 
 ## Countries
 
-See where your users are coming from by country. 
+See where your users are coming from by country.
 
 <Frame caption="Understand where your users are coming from.">
-	<img src="/images/dapp-analytics-countries.png" alt="Product Analytics Countries" />
+  <img
+    src="/images/dapp-analytics-countries.png"
+    alt="Product Analytics Countries"
+  />
 </Frame>
 
 ## Pages
@@ -47,7 +188,7 @@ See where your users are coming from by country.
 See the top pages that your users are visiting. See which pages are driving the most traffic and conversions.
 
 <Frame caption="Understand what users are seeing on your site or dapp.">
-	<img src="/images/pages.png" alt="Product Analytics Pages" />
+  <img src="/images/pages.png" alt="Product Analytics Pages" />
 </Frame>
 
 ### Entry and Exit Pages
@@ -61,7 +202,7 @@ Understanding both gives you a clear window into how people interact with your s
 
 ## Session Frequency
 
-See the average session frequency of visitors and users on your app. Easily understand how sticky and engaged your users are across cohorts. 
+See the average session frequency of visitors and users on your app. Easily understand how sticky and engaged your users are across cohorts.
 
 See [Retention](/features/product-analytics/retention) for week-on-week retention analysis.
 
@@ -70,13 +211,19 @@ See [Retention](/features/product-analytics/retention) for week-on-week retentio
 See the top wallets of your visitors and users.
 
 <Frame caption="Understand what wallets are being used on your dapp.">
-	<img src="/images/dapp-analytics-wallets.png" alt="Product Analytics Wallets" />
+  <img
+    src="/images/dapp-analytics-wallets.png"
+    alt="Product Analytics Wallets"
+  />
 </Frame>
 
 ## Breakdown by Referrer
 
 <Frame caption="See a breakdown of your visitors, wallets, transactions, volume, and revenue by top referrers.">
-	<img src="/images/referrer-breakdown.png" alt="Product Analytics Referrer Breakdown" />
+  <img
+    src="/images/referrer-breakdown.png"
+    alt="Product Analytics Referrer Breakdown"
+  />
 </Frame>
 
 See what's moving the needle with a breakdown of your metrics by referrers. Easily understand where your onchain users come from and how they find you.
