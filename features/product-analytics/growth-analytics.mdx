@@ -34,9 +34,9 @@ The Formo SDK automatically add the following UTM parameters present on the page
 - utm_content
 - ref
 
-### How to enable full referer URL tracking (via Referer-Policy header)
+### Referer URL tracking
 
-To enable full referer URLs, you need to make sure your site has the correct Referer-Policy header set.
+To track full referer URLs (instead of just the domain), you need to make sure your site has the correct `Referer-Policy` header set.
 
 <div className="mt-4 flex flex-col items-start space-y-3 rounded-2xl border p-4 pr-8 text-[0.95rem] border-green-200 bg-green-50">
 We recommend setting the `no-referrer-when-downgrade` <a target="_blank" rel="noopener noreferrer" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#no-referrer-when-downgrade">policy</a>, which will only send the domain, path, and query parameters to the destination URL as long as the protocol security level stays the same (i.e. `HTTP` → `HTTP`, or `HTTPS` → `HTTPS`).
@@ -70,96 +70,12 @@ There are a few ways to configure this, depending on your application framework:
     ```
 
   </Tab>
-  <Tab icon="rectangle-terminal" title="Nuxt">
-    If you are using Nuxt, you can use the `routeRules` property in your `nuxt.config.ts` file to configure the referer policy:
-
-    ```typescript
-    export default defineNuxtConfig({
-      routeRules: {
-        "/**": {
-          security: {
-            headers: {
-              "referrer-policy": "no-referrer-when-downgrade",
-            },
-          },
-        },
-      },
-    });
-    ```
-
-  </Tab>
-  <Tab icon="rectangle-terminal" title="Laravel">
-    If you are using Laravel, you can use the Laravel Security Middleware to configure the referer policy:
-
-    ```php
-    final class SetReferrerPolicy
-    {
-        public function handle(Request $request, Closure $next): Response
-        {
-            /**
-            * @var Response $response
-            */
-            $response = $next($request);
-
-            $response->headers->set(
-                key: 'Referrer-Policy',
-                values: 'no-referrer-when-downgrade',
-            );
-
-            return $response;
-        }
-    }
-    ```
-
-  </Tab>
-  <Tab icon="rectangle-terminal" title="Flask">
-    If you are using Flask, you can set the `Referrer-Policy` header for all requests like this:
-
-    ```python
-    from flask import Flask
-
-    app = Flask(__name__)
-
-    @app.after_request
-    def set_headers(response):
-        response.headers["Referrer-Policy"] = 'no-referrer-when-downgrade'
-        return response
-
-    @app.route('/')
-    def index():
-        return 'Hello world!'
-
-    if __name__ == '__main__':
-        app.run()
-    ```
-
-    Alternatively, you can set the header for specific endpoint:
-
-    ```python
-    from flask import Flask, make_response
-
-    app = Flask(__name__)
-
-    @app.route('/')
-    def index():
-        response = make_response('Hello world!')
-        response.headers["Referrer-Policy"] = 'no-referrer-when-downgrade'
-        return response
-
-    if __name__ == '__main__':
-        app.run()
-    ```
-
-  </Tab>
-  <Tab icon="code" title="Meta Tag">
-    Alternatively, you can also set the referer policy using a meta tag in the `<head>` section of your HTML:
+  <Tab icon="code" title="HTML">
+    You can set the referer policy using a meta tag in the `<head>` section of your HTML:
 
     ```html
     <meta name="referrer" content="no-referrer-when-downgrade" />
     ```
-
-    This is useful if you are using a website builder like Webflow or Framer, where you don't have access to the server-side configuration.
-
   </Tab>
 </Tabs>
 
