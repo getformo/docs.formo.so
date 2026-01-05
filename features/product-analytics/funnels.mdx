@@ -1,10 +1,10 @@
 ---
-title: 'Funnels'
-description: 'Track user journeys and conversion rates with offchain to onchain funnel analytics.'
+title: "Funnels"
+description: "Track user journeys and conversion rates with offchain to onchain funnel analytics."
 ---
 
 <Frame caption="Create a funnel by adding steps to your dapp and measuring the conversion rate at each step.">
-	<img src="/images/funnels.png" alt="Funnels" />
+  <img src="/images/funnels.png" alt="Funnels" />
 </Frame>
 
 Visualize how users progress through a series of steps with Funnel Analysis.
@@ -20,7 +20,7 @@ Visualize how users progress through a series of steps with Funnel Analysis.
 Specify a conversion window for your funnels to control the time period during which funnel steps must be completed.
 
 The default conversion window is 2 weeks, meaning all steps must be completed within that time. Longer windows will include more event completions.
- 
+
 ## Funnel Breakdowns
 
 Break down funnel steps by key dimensions to understand how different user segments convert:
@@ -29,3 +29,43 @@ Break down funnel steps by key dimensions to understand how different user segme
 - **Country**: Understand geographic differences in conversion rates
 - **Device**: Compare mobile vs desktop conversion performance
 - **OS**: Analyze conversion rates across operating systems
+
+## Conversion Insights
+
+Discover which events or user properties are most strongly associated with conversion. We prioritize two key metrics to help you identify meaningful drivers:
+
+- **Lift**: Measures the impact of an event. A lift > 1 means users who perform the event are more likely to convert.
+- **Odds Ratio**: Measures the strength of the association. Useful for verifying that an observed lift is not just due to random chance, especially for rare events.
+
+<Accordion title="Deep Dive: How is this calculated?">
+  **2×2 Contingency Table**
+
+All insights are derived from a standard binary exposure vs. conversion table:
+
+|                   | Converted | Did Not Convert | Total |
+| ----------------- | --------- | --------------- | ----- |
+| **Did Event**     | a         | b               | a+b   |
+| **Did NOT Event** | c         | d               | c+d   |
+| **Total**         | a+c       | b+d             | N     |
+
+**Key Metrics**
+
+1.  **Lift**
+    $$
+    Lift = \frac{a / (a+b)}{(a+c) / N}
+    $$
+    - _Interpretation_: Lift > 1 indicates a positive effect.
+2.  **Odds Ratio**
+    $$
+    \text{Odds Ratio} = \frac{a \times d}{b \times c}
+    $$
+    - _Interpretation_: An Odds Ratio > 1 confirms a positive correlation.
+
+**Noise Reduction**
+
+To prevent false positives, we automatically filter out events with:
+
+- Low volume (fewer than 10 users).
+- Negligible impact (less than 0.2% - 1.5% absolute difference depending on baseline conversion).
+
+</Accordion>
