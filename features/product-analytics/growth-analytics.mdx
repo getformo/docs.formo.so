@@ -34,22 +34,19 @@ The Formo SDK automatically add the following UTM parameters present on the page
 - utm_content
 - ref
 
-### Referer URL tracking
+### Referrer URL tracking
 
-To track full referer URLs (instead of just the domain), you need to make sure your site has the correct `Referer-Policy` header set.
+Referrer URL tracking lets you understand the specific URL where your users are coming from – as long as the site has the correct `Referer-Policy` header set.
 
-<div className="mt-4 flex flex-col items-start space-y-3 rounded-2xl border p-4 pr-8 text-[0.95rem] border-green-200 bg-green-50">
 We recommend setting the `no-referrer-when-downgrade` <a target="_blank" rel="noopener noreferrer" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#no-referrer-when-downgrade">policy</a>, which will only send the domain, path, and query parameters to the destination URL as long as the protocol security level stays the same (i.e. `HTTP` → `HTTP`, or `HTTPS` → `HTTPS`).
 
-If the protocol security level is downgraded (i.e. `HTTPS` → `HTTP`), the referer will not be sent. This is a good compromise to make sure your users' privacy is respected while still getting a good amount of data.
+If the protocol security level is downgraded (i.e. `HTTPS` → `HTTP`), the referrer will not be sent. This is a good compromise to make sure your users' privacy is respected while still getting a good amount of data.
 
-</div>
-
-There are a few ways to configure this, depending on your application framework:
+Here's how to configure this:
 
 <Tabs>
   <Tab icon="rectangle-terminal" title="Next.js">
-    If you are using Next.js, you can use the headers property in your `next.config.js` file to configure the referer policy:
+    If you are using Next.js, you can use the headers property in your `next.config.js` file to configure the referrer policy:
 
     ```javascript
     module.exports = {
@@ -71,7 +68,7 @@ There are a few ways to configure this, depending on your application framework:
 
   </Tab>
   <Tab icon="code" title="HTML">
-    You can set the referer policy using a meta tag in the `<head>` section of your HTML:
+    You can set the referrer policy using a meta tag in the `<head>` section of your HTML:
 
     ```html
     <meta name="referrer" content="no-referrer-when-downgrade" />
