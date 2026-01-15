@@ -27,50 +27,7 @@ Install this snippet at the `<head>` of your website:
 
 Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
 
-### React & Next.js
-
-[Install](/install) the JavaScript SDK via CDN or NPM.
-
-```bash
-npm install @formo/analytics --save
-```
-
-```tsx
-// App.tsx (or App.js)
-
-import { FormoAnalyticsProvider } from '@formo/analytics';
-
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-
-root.render(
-  <React.StrictMode>
-    <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>">
-      <App />
-    </FormoAnalyticsProvider>
-  </React.StrictMode>
-);
-```
-
-```tsx
-// Usage on a page component
-
-import { useFormo } from '@formo/analytics';
-
-const HomePage = () => {
-  const analytics = useFormo();
-
-  useEffect(() => {
-    // Track a custom event
-    analytics.track('Swap Completed', { points: 100 });
-  }, [analytics]);
-
-  return <div>Welcome to the Home Page!</div>;
-};
-
-export default HomePage;
-```
-
-### React with Wagmi
+### React with Wagmi (Recommended)
 
 If your app uses [Wagmi](https://wagmi.sh), the Formo SDK can integrate directly with Wagmi's event system for better reliability and performance.
 
@@ -128,6 +85,53 @@ function App() {
 <Warning>
 **Important:** Always provide the `queryClient` to enable full event tracking. Without it, signature and transaction events will not be captured.
 </Warning>
+
+### React & Next.js (without Wagmi)
+
+<Note>
+**Using Wagmi?** Use the [Wagmi integration](#react-with-wagmi-recommended) above instead for better event tracking and compatibility.
+</Note>
+
+[Install](/install) the JavaScript SDK via CDN or NPM.
+
+```bash
+npm install @formo/analytics --save
+```
+
+```tsx
+// App.tsx (or App.js)
+
+import { FormoAnalyticsProvider } from '@formo/analytics';
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+
+root.render(
+  <React.StrictMode>
+    <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>">
+      <App />
+    </FormoAnalyticsProvider>
+  </React.StrictMode>
+);
+```
+
+```tsx
+// Usage on a page component
+
+import { useFormo } from '@formo/analytics';
+
+const HomePage = () => {
+  const analytics = useFormo();
+
+  useEffect(() => {
+    // Track a custom event
+    analytics.track('Swap Completed', { points: 100 });
+  }, [analytics]);
+
+  return <div>Welcome to the Home Page!</div>;
+};
+
+export default HomePage;
+```
 
 ## Identify users
 
