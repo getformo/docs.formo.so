@@ -330,7 +330,111 @@ Pick your stack and add the code below to your codebase.
       export default HomePage;
     ```
 
-  </Tab> 
+  </Tab>
+  <Tab icon="w" title="Wagmi">
+    #### 1. Install the Formo SDK
+
+    ```bash
+      npm install @formo/analytics --save
+    ```
+
+    #### 2. Configure Formo with Wagmi
+
+    Pass your Wagmi config and QueryClient to enable native Wagmi integration.
+
+    ```tsx
+      // App.tsx
+
+      import { WagmiProvider, createConfig, http } from 'wagmi';
+      import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+      import { FormoAnalyticsProvider } from '@formo/analytics';
+      import { mainnet, polygon } from 'wagmi/chains';
+
+      const wagmiConfig = createConfig({
+        chains: [mainnet, polygon],
+        transports: {
+          [mainnet.id]: http(),
+          [polygon.id]: http(),
+        },
+      });
+
+      const queryClient = new QueryClient();
+
+      function App() {
+        return (
+          <WagmiProvider config={wagmiConfig}>
+            <QueryClientProvider client={queryClient}>
+              <FormoAnalyticsProvider
+                writeKey="<YOUR_WRITE_KEY>"
+                options={{
+                  wagmi: {
+                    config: wagmiConfig,
+                    queryClient: queryClient,
+                  },
+                }}
+              >
+                <YourApp />
+              </FormoAnalyticsProvider>
+            </QueryClientProvider>
+          </WagmiProvider>
+        );
+      }
+    ```
+
+    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
+
+    <Tip>
+    **Why Wagmi integration?** When enabled, the SDK hooks directly into Wagmi's state management and TanStack Query's mutation cache. This provides better compatibility with wallet libraries like RainbowKit, ConnectKit, and Web3Modal.
+    </Tip>
+
+    #### 3. Identify users
+
+    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session.
+
+    ```tsx
+    import { useFormo } from "@formo/analytics";
+    import { useAccount } from "wagmi";
+
+    const HomePage = () => {
+      const { address } = useAccount();
+      const analytics = useFormo();
+
+      useEffect(() => {
+        if (address && analytics) {
+          analytics.identify({ address });
+        }
+      }, [address, analytics]);
+    }
+    ```
+
+    #### 4. Track events (optional)
+
+    Formo autocaptures wallet events (connect, disconnect, signature, transaction, chain changes) automatically via Wagmi.
+
+    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+
+    ```tsx
+      import { useFormo } from '@formo/analytics';
+
+      const HomePage = () => {
+        const analytics = useFormo();
+
+        useEffect(() => {
+          // Track a custom event
+          analytics.track('Swap Completed', { points: 100 });
+        }, [analytics]);
+
+        return <div>Welcome to the Home Page!</div>;
+      };
+
+      export default HomePage;
+    ```
+
+    <Warning>
+    **Important:** Always provide the `queryClient` to enable full event tracking. Without it, signature and transaction events will not be captured—only connect, disconnect, and chain change events.
+    </Warning>
+
+  </Tab>
 </Tabs>
 
 ## Autocapture

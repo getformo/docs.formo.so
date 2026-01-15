@@ -46,7 +46,7 @@ root.render(
   <React.StrictMode>
     <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>">
       <App />
-    </FormoAnalyticsProvider> 
+    </FormoAnalyticsProvider>
   </React.StrictMode>
 );
 ```
@@ -69,6 +69,65 @@ const HomePage = () => {
 
 export default HomePage;
 ```
+
+### React with Wagmi
+
+If your app uses [Wagmi](https://wagmi.sh), the Formo SDK can integrate directly with Wagmi's event system for better reliability and performance.
+
+```bash
+npm install @formo/analytics --save
+```
+
+```tsx
+// App.tsx
+
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { FormoAnalyticsProvider } from '@formo/analytics';
+import { mainnet, polygon } from 'wagmi/chains';
+import { http } from 'wagmi';
+
+const wagmiConfig = createConfig({
+  chains: [mainnet, polygon],
+  transports: {
+    [mainnet.id]: http(),
+    [polygon.id]: http(),
+  },
+});
+
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <FormoAnalyticsProvider
+          writeKey="<YOUR_WRITE_KEY>"
+          options={{
+            wagmi: {
+              config: wagmiConfig,
+              queryClient: queryClient,
+            },
+          }}
+        >
+          <YourApp />
+        </FormoAnalyticsProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
+```
+
+<Tip>
+**Why use Wagmi integration?** When `wagmi` options are provided, the SDK hooks directly into Wagmi's state management instead of wrapping EIP-1193 providers. This provides:
+- Native event handling via Wagmi's built-in state system
+- Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
+- Full tracking of signatures and transactions via TanStack Query's mutation cache
+</Tip>
+
+<Warning>
+**Important:** Always provide the `queryClient` to enable full event tracking. Without it, signature and transaction events will not be captured.
+</Warning>
 
 ## Identify users
 
@@ -135,6 +194,13 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
     href="https://github.com/getformo/formo-example-next-page-router"
   >
     formo-example-next-page-router
+  </Card>
+  <Card
+    title="Wagmi + RainbowKit example"
+    icon="file-code"
+    href="https://github.com/getformo/formo-example-wagmi"
+  >
+    formo-example-wagmi
   </Card>
   <Card
     title="Blocknative / Web3 Onboard example"
@@ -354,6 +420,39 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
   autocapture: false
 });
 ```
+
+### Wagmi integration
+
+For apps using [Wagmi v2](https://wagmi.sh), enable native integration by providing the Wagmi config and QueryClient:
+
+```tsx
+<FormoAnalyticsProvider
+  writeKey="<YOUR_WRITE_KEY>"
+  options={{
+    wagmi: {
+      config: wagmiConfig,      // Required: Wagmi config from createConfig()
+      queryClient: queryClient, // Recommended: For signature/transaction tracking
+    },
+  }}
+>
+```
+
+When Wagmi mode is enabled, the SDK:
+- Hooks directly into Wagmi's state management for connection events
+- Uses TanStack Query's mutation cache for signature and transaction tracking
+- Skips EIP-1193 provider wrapping (no proxy behavior)
+
+| Event Type | Without QueryClient | With QueryClient |
+|-----------|-------------------|------------------|
+| Connect | ✅ Tracked | ✅ Tracked |
+| Disconnect | ✅ Tracked | ✅ Tracked |
+| Chain Change | ✅ Tracked | ✅ Tracked |
+| Signatures | ❌ Not tracked | ✅ Tracked |
+| Transactions | ❌ Not tracked | ✅ Tracked |
+
+<Tip>
+Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating multiple cache instances.
+</Tip>
 
 ### Referrals
 
