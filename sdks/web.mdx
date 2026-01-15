@@ -14,22 +14,18 @@ The Formo Web SDK is [open source](https://github.com/getformo/sdk) and implemen
 
 <Warning>IMPORTANT: To enable accurate attribution, install Formo on both your website (example.com) and your app (app.example.com) using the same project/SDK write key.</Warning>
 
-### Websites
+Formo offers a few ways to install the SDK:
+- [Wagmi](#wagmi) (recommended for apps)
+- [HTML Snippet](#html-snippet) for websites
+- [React & Next.js (without Wagmi)](#react-nextjs-without-wagmi)
 
-Install this snippet at the `<head>` of your website:
+### Wagmi
 
-```html
-<script
-  src="https://cdn.formo.so/analytics@latest"
-  defer onload="window.formofy('<YOUR_WRITE_KEY>');"
-></script>
-```
+<Note>
+If your app uses [Wagmi](https://wagmi.sh), the Formo SDK can integrate directly for better reliability and security.
+</Note>
 
-Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
-
-### Wagmi (Recommended)
-
-If your app uses [Wagmi](https://wagmi.sh), the Formo SDK can integrate directly with Wagmi's event system for better reliability and performance.
+Install the Web SDK via NPM.
 
 ```bash
 npm install @formo/analytics --save
@@ -84,13 +80,26 @@ function App() {
 **Important:** Always provide the `queryClient` to enable full event tracking. Without it, signature and transaction events will not be captured.
 </Warning>
 
+### HTML Snippet
+
+Install this snippet at the `<head>` of your website:
+
+```html
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer onload="window.formofy('<YOUR_WRITE_KEY>');"
+></script>
+```
+
+Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
+
 ### React & Next.js (without Wagmi)
 
 <Note>
-Use the [Wagmi integration](#react-with-wagmi-recommended) instead for better event tracking and compatibility.
+Use [Wagmi](#wagmi) instead for better event tracking and compatibility.
 </Note>
 
-[Install](/install) the JavaScript SDK via CDN or NPM.
+Install the Web SDK via NPM.
 
 ```bash
 npm install @formo/analytics --save

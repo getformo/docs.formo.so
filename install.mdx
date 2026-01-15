@@ -6,49 +6,12 @@ icon: rocket-launch
 
 ## Instructions
 
-<Warning>IMPORTANT: To enable accurate attribution, install Formo on both your website (**example.com**) and your app (**app.example.com**) using the same project/SDK write key.</Warning>
+<Warning>IMPORTANT: To enable accurate attribution, install Formo on both your website (example.com) and your app (app.example.com) using the same project/SDK write key.</Warning>
 
 Pick your stack and add the code below to your codebase.
 
 <Tabs>
-  <Tab icon="code" title="Website">
-
-    #### 1. Install the Formo SDK
-
-    Install this script in the `<head>` tag of your website. Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings:
-
-    ```tsx
-    <script
-      src="https://cdn.formo.so/analytics@latest"
-      defer
-      onload="
-        window.formofy('<YOUR_WRITE_KEY>', {
-          ready: function(formo) {
-            formo.identify();
-          }
-        });
-      "
-    ></script>
-    ```
-
-    Calling [`identify`](/data/events/identify) at the start of every session or page load links wallets to user sessions.
-
-    To improve security, enable [Subresource Integrity (SRI)](/security/sri).
-
-    #### 2. Track events (optional)
-
-    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
-
-    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
-
-    ```html
-    <button type="button" onclick="window.formo.track('Swap Completed', { foo: 'bar' })">
-      Track event
-    </button>
-    ```
-
-  </Tab>
-  <Tab icon="star" title="Wagmi (Recommended)">
+  <Tab icon="star" title="Wagmi">
     #### 1. Install the Formo SDK
 
     ```bash
@@ -99,10 +62,6 @@ Pick your stack and add the code below to your codebase.
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
-    <Tip>
-    **Why Wagmi integration?** When enabled, the SDK hooks directly into Wagmi's state management and TanStack Query's mutation cache. This provides better compatibility with wallet libraries like RainbowKit, ConnectKit, and Web3Modal.
-    </Tip>
-
     #### 3. Identify users
 
     Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session.
@@ -151,10 +110,47 @@ Pick your stack and add the code below to your codebase.
     </Warning>
 
   </Tab>
+  <Tab icon="code" title="HTML Snippet">
+
+    #### 1. Install the Formo SDK
+
+    Install this script in the `<head>` tag of your website. Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings:
+
+    ```tsx
+    <script
+      src="https://cdn.formo.so/analytics@latest"
+      defer
+      onload="
+        window.formofy('<YOUR_WRITE_KEY>', {
+          ready: function(formo) {
+            formo.identify();
+          }
+        });
+      "
+    ></script>
+    ```
+
+    Calling [`identify`](/data/events/identify) at the start of every session or page load links wallets to user sessions.
+
+    To improve security, enable [Subresource Integrity (SRI)](/security/sri).
+
+    #### 2. Track events (optional)
+
+    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
+
+    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+
+    ```html
+    <button type="button" onclick="window.formo.track('Swap Completed', { foo: 'bar' })">
+      Track event
+    </button>
+    ```
+
+  </Tab>
   <Tab icon="react" title="React">
 
     <Note>
-    **Using Wagmi?** Use the [Wagmi (Recommended)](#wagmi-recommended) tab instead for better event tracking.
+    **Using Wagmi?** Install with [Wagmi](#wagmi) instead for better event tracking.
     </Note>
 
     #### 1. Install the Formo SDK
@@ -234,7 +230,7 @@ Pick your stack and add the code below to your codebase.
   <Tab icon="rectangle-terminal" title="Next.js app router">
 
     <Note>
-    **Using Wagmi?** Use the [Wagmi (Recommended)](#wagmi-recommended) tab instead for better event tracking.
+    **Using Wagmi?** Install with [Wagmi](#wagmi) instead for better event tracking.
     </Note>
 
     #### 1. Install the Formo SDK
@@ -347,7 +343,7 @@ Pick your stack and add the code below to your codebase.
   <Tab icon="rectangle-terminal" title="Next.js pages router">
 
     <Note>
-    **Using Wagmi?** Use the [Wagmi (Recommended)](#wagmi-recommended) tab instead for better event tracking.
+    **Using Wagmi?** Install with [Wagmi](#wagmi) instead for better event tracking.
     </Note>
 
     #### 1. Install the Formo SDK
