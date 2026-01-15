@@ -227,7 +227,7 @@ Pick your stack and add the code below to your codebase.
     ```
 
   </Tab>
-  <Tab icon="rectangle-terminal" title="Next.js app router">
+  <Tab icon="rectangle-terminal" title="Next.js">
 
     <Note>
     **Using Wagmi?** Install with [Wagmi](#wagmi) instead for better event tracking.
@@ -243,56 +243,103 @@ Pick your stack and add the code below to your codebase.
 
     Create a new `AnalyticsProvider.tsx` client component.
 
-    ```tsx
-      // AnalyticsProvider.tsx
+    <AccordionGroup>
+      <Accordion title="App Router">
+        ```tsx
+          // AnalyticsProvider.tsx
 
-      'use client';
+          'use client';
 
-      import { FormoAnalyticsProvider } from '@formo/analytics';
+          import { FormoAnalyticsProvider } from '@formo/analytics';
 
-      type FormoAnalyticsProviderProps = {
-        writeKey: string,
-        children: React.ReactNode,
-      };
+          type FormoAnalyticsProviderProps = {
+            writeKey: string,
+            children: React.ReactNode,
+          };
 
-      // The provider component
-      export const AnalyticsProvider: FC<FormoAnalyticsProviderProps> = ({
-        writeKey,
-        children,
-      }) => {
-        return (
-          <FormoAnalyticsProvider writeKey={writeKey}>
-            {children}
-          </FormoAnalyticsProvider>
-        );
-      };
+          // The provider component
+          export const AnalyticsProvider: FC<FormoAnalyticsProviderProps> = ({
+            writeKey,
+            children,
+          }) => {
+            return (
+              <FormoAnalyticsProvider writeKey={writeKey}>
+                {children}
+              </FormoAnalyticsProvider>
+            );
+          };
 
-      export default AnalyticsProvider;
-    ```
+          export default AnalyticsProvider;
+        ```
 
-    Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component:
+        Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component:
 
-    ```tsx
-      // app/layout.tsx
+        ```tsx
+          // app/layout.tsx
 
-      import { AnalyticsProvider } from './AnalyticsProvider';
+          import { AnalyticsProvider } from './AnalyticsProvider';
 
-      export default function RootLayout({
-        children,
-      }: {
-        children: React.ReactNode,
-      }) {
-        return (
-          <html lang='en'>
-            <body>
+          export default function RootLayout({
+            children,
+          }: {
+            children: React.ReactNode,
+          }) {
+            return (
+              <html lang='en'>
+                <body>
+                  <AnalyticsProvider writeKey='YOUR_WRITE_KEY'>
+                    Your Page Content
+                  </AnalyticsProvider>
+                </body>
+              </html>
+            );
+          }
+        ```
+      </Accordion>
+      <Accordion title="Pages Router">
+        ```tsx
+          // AnalyticsProvider.tsx
+
+          import { FormoAnalyticsProvider } from "@formo/analytics";
+
+          type FormoAnalyticsProviderProps = {
+            writeKey: string;
+            children: React.ReactNode;
+          };
+
+          // The provider component
+          export const AnalyticsProvider: FC<FormoAnalyticsProviderProps> = ({
+            writeKey,
+            children,
+          }) => {
+            return (
+              <FormoAnalyticsProvider writeKey={writeKey}>
+                {children}
+              </FormoAnalyticsProvider>
+            );
+          };
+
+          export default AnalyticsProvider;
+        ```
+
+        Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component:
+
+        ```tsx
+          // pages/_app.tsx
+
+          import AnalyticsProvider from "@/AnalyticsProvider";
+          import type { AppProps } from "next/app";
+
+          export default function App({ Component, pageProps }: AppProps) {
+            return (
               <AnalyticsProvider writeKey='YOUR_WRITE_KEY'>
-                Your Page Content
+                <Component {...pageProps} />
               </AnalyticsProvider>
-            </body>
-          </html>
-        );
-      }
-    ```
+            );
+          }
+        ```
+      </Accordion>
+    </AccordionGroup>
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
@@ -321,111 +368,6 @@ Pick your stack and add the code below to your codebase.
     Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
 
     For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
-
-    ```tsx
-      import { useFormo } from '@formo/analytics';
-
-      const HomePage = () => {
-        const analytics = useFormo();
-
-        useEffect(() => {
-          // Track a custom event
-          analytics.track('Swap Completed', { points: 100 });
-        }, [analytics]);
-
-        return <div>Welcome to the Home Page!</div>;
-      };
-
-      export default HomePage;
-    ```
-
-  </Tab> 
-  <Tab icon="rectangle-terminal" title="Next.js pages router">
-
-    <Note>
-    **Using Wagmi?** Install with [Wagmi](#wagmi) instead for better event tracking.
-    </Note>
-
-    #### 1. Install the Formo SDK
-
-    ```bash
-      npm install @formo/analytics --save
-    ```
-
-    #### 2. Use `FormoAnalyticsProvider` in your app
-
-    Create a new `AnalyticsProvider.tsx` client component.
-
-    ```tsx
-      // AnalyticsProvider.tsx
-
-      import { FormoAnalyticsProvider } from "@formo/analytics";
-
-      type FormoAnalyticsProviderProps = {
-        writeKey: string;
-        children: React.ReactNode;
-      };
-
-      // The provider component
-      export const AnalyticsProvider: FC<FormoAnalyticsProviderProps> = ({
-        writeKey,
-        children,
-      }) => {
-        return (
-          <FormoAnalyticsProvider writeKey={writeKey}>
-            {children}
-          </FormoAnalyticsProvider>
-        );
-      };
-
-      export default AnalyticsProvider;
-    ```
-
-    Wrap your Next.js app in your main layout file with the newly created `AnalyticsProvider` component:
-
-    ```tsx
-      // pages/_app.tsx
-
-      import AnalyticsProvider from "@/AnalyticsProvider";
-      import type { AppProps } from "next/app";
-
-      export default function App({ Component, pageProps }: AppProps) {
-        return (
-          <AnalyticsProvider writeKey='YOUR_WRITE_KEY'>
-            <Component {...pageProps} />
-          </AnalyticsProvider>
-        );
-      }
-
-    ```
-
-    Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
-
-    #### 3. Identify users
-
-    Call [`identify`](/data/events/identify) at the start of every session or page load to link a wallet address to a session..
-
-    ```tsx
-    import { useFormo } from "@formo/analytics";
-    import { useAccount } from "wagmi";
-
-    const HomePage = () => {
-      const { address } = useAccount();
-      const analytics = useFormo();
-
-      useEffect(() => {
-        if (address && analytics) {
-          analytics.identify({ address });
-        }
-      }, [address, analytics]);
-    }
-    ```
-
-    #### 4. Track events (optional)
-
-    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
-
-    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
