@@ -65,13 +65,12 @@ Pick your stack and add the code below to your codebase.
       import { WagmiProvider, createConfig, http } from 'wagmi';
       import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
       import { FormoAnalyticsProvider } from '@formo/analytics';
-      import { mainnet, polygon } from 'wagmi/chains';
+      import { mainnet } from 'wagmi/chains';
 
       const wagmiConfig = createConfig({
-        chains: [mainnet, polygon],
+        chains: [mainnet],
         transports: {
           [mainnet.id]: http(),
-          [polygon.id]: http(),
         },
       });
 

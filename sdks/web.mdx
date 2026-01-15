@@ -27,7 +27,7 @@ Install this snippet at the `<head>` of your website:
 
 Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
 
-### React with Wagmi (Recommended)
+### Wagmi (Recommended)
 
 If your app uses [Wagmi](https://wagmi.sh), the Formo SDK can integrate directly with Wagmi's event system for better reliability and performance.
 
@@ -38,17 +38,15 @@ npm install @formo/analytics --save
 ```tsx
 // App.tsx
 
-import { WagmiProvider, createConfig } from 'wagmi';
+import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { FormoAnalyticsProvider } from '@formo/analytics';
-import { mainnet, polygon } from 'wagmi/chains';
-import { http } from 'wagmi';
+import { mainnet } from 'wagmi/chains';
 
 const wagmiConfig = createConfig({
-  chains: [mainnet, polygon],
+  chains: [mainnet],
   transports: {
     [mainnet.id]: http(),
-    [polygon.id]: http(),
   },
 });
 
@@ -89,7 +87,7 @@ function App() {
 ### React & Next.js (without Wagmi)
 
 <Note>
-**Using Wagmi?** Use the [Wagmi integration](#react-with-wagmi-recommended) above instead for better event tracking and compatibility.
+Use the [Wagmi integration](#react-with-wagmi-recommended) instead for better event tracking and compatibility.
 </Note>
 
 [Install](/install) the JavaScript SDK via CDN or NPM.
