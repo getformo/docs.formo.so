@@ -8,7 +8,12 @@ icon: rocket-launch
 
 ## Instructions
 
-Pick your stack and add the code below to your codebase.
+Set up Formo for both your website and your app on the same project.
+
+- For static websites (example.com), we recommend using the HTML snippet.
+- For apps (app.example.com) with wallet connection, we recommend using the Wagmi integration.
+
+On the same project, make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find the write key in your Formo project settings.
 
 <Tabs>
   <Tab icon="star" title="Wagmi">
@@ -44,7 +49,7 @@ Pick your stack and add the code below to your codebase.
           <WagmiProvider config={wagmiConfig}>
             <QueryClientProvider client={queryClient}>
               <FormoAnalyticsProvider
-                writeKey="<YOUR_WRITE_KEY>"
+                writeKey="<SDK_WRITE_KEY>"
                 options={{
                   wagmi: {
                     config: wagmiConfig,

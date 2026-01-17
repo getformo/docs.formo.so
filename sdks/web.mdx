@@ -12,17 +12,19 @@ The Formo Web SDK is [open source](https://github.com/getformo/sdk) and implemen
 
 ## Installation
 
-<Info>For best results, install Formo on both your website (example.com) and your app (app.example.com) using the same project/SDK write key.</Info>
+There are several ways to install the Formo SDK:
+- [Wagmi](#wagmi) is recommended for apps with wallet connection
+- [HTML Snippet](#html-snippet) is recommended for static websites
+- [React & Next.js (without Wagmi)](#react-&-next-js-without-wagmi)
 
-Formo offers a few ways to install the SDK:
-- [Wagmi](#wagmi) (recommended for apps)
-- [HTML Snippet](#html-snippet) for websites
-- [React & Next.js (without Wagmi)](#react-nextjs-without-wagmi)
+> For best results, install Formo on both your website (example.com) and your app (app.example.com) using the same project/SDK write key. 
+> 
+> The standard setup is to use the HTML snippet on your website and Wagmi on your app.
 
 ### Wagmi
 
 <Note>
-If your app uses [Wagmi](https://wagmi.sh), the Formo SDK can integrate directly for better reliability and security.
+If you're already using [Wagmi](https://wagmi.sh), the Formo SDK can connect directly. This is the recommended way to install Formo for apps.
 </Note>
 
 Install the Web SDK via NPM.
