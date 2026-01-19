@@ -13,6 +13,10 @@
 		{
 			"url": "https://events.formo.so",
 			"description": "Events API"
+		},
+		{
+			"url": "https://api.formo.so",
+			"description": "Profile API"
 		}
 	],
 	"components": {
@@ -246,6 +250,449 @@
 					"sent_at",
 					"message_id"
 				]
+			},
+			"WalletLabel": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Label ID"
+					},
+					"value": {
+						"type": "string",
+						"description": "Label value"
+					},
+					"chain_id": {
+						"type": "string",
+						"description": "Chain ID where label applies"
+					},
+					"source": {
+						"type": "string",
+						"description": "Label source (e.g., manual, automated)"
+					}
+				},
+				"required": ["id", "value", "chain_id", "source"]
+			},
+			"WalletApp": {
+				"type": "object",
+				"properties": {
+					"chain_id": {
+						"type": "string",
+						"description": "Chain ID"
+					},
+					"id": {
+						"type": "string",
+						"description": "App ID"
+					},
+					"name": {
+						"type": "string",
+						"description": "App name"
+					},
+					"img": {
+						"type": "string",
+						"nullable": true,
+						"description": "App image URL"
+					},
+					"url": {
+						"type": "string",
+						"nullable": true,
+						"description": "App URL"
+					},
+					"balance_usd": {
+						"type": "number",
+						"description": "Balance in USD for this app"
+					}
+				},
+				"required": ["chain_id", "id", "name", "balance_usd"]
+			},
+			"WalletToken": {
+				"type": "object",
+				"properties": {
+					"chain_id": {
+						"type": "string",
+						"description": "Chain ID"
+					},
+					"token_address": {
+						"type": "string",
+						"description": "Token contract address"
+					},
+					"app_id": {
+						"type": "string",
+						"description": "App ID"
+					},
+					"name": {
+						"type": "string",
+						"description": "Token name"
+					},
+					"symbol": {
+						"type": "string",
+						"description": "Token symbol"
+					},
+					"img": {
+						"type": "string",
+						"nullable": true,
+						"description": "Token image URL"
+					},
+					"decimals": {
+						"type": "integer",
+						"description": "Token decimals"
+					},
+					"price": {
+						"type": "number",
+						"description": "Token price in USD"
+					},
+					"balance": {
+						"type": "string",
+						"description": "Token balance (as string to preserve precision)"
+					},
+					"balance_usd": {
+						"type": "number",
+						"description": "Token balance value in USD"
+					}
+				},
+				"required": ["chain_id", "token_address", "app_id", "name", "symbol", "decimals", "price", "balance", "balance_usd"]
+			},
+			"WalletProfile": {
+				"type": "object",
+				"properties": {
+					"address": {
+						"type": "string",
+						"description": "The wallet address"
+					},
+					"net_worth_usd": {
+						"type": "number",
+						"description": "Total net worth in USD"
+					},
+					"ens": {
+						"type": "string",
+						"nullable": true,
+						"description": "ENS name"
+					},
+					"farcaster": {
+						"type": "string",
+						"nullable": true,
+						"description": "Farcaster username"
+					},
+					"lens": {
+						"type": "string",
+						"nullable": true,
+						"description": "Lens handle"
+					},
+					"basenames": {
+						"type": "string",
+						"nullable": true,
+						"description": "Base names"
+					},
+					"linea": {
+						"type": "string",
+						"nullable": true,
+						"description": "Linea identifier"
+					},
+					"discord": {
+						"type": "string",
+						"nullable": true,
+						"description": "Discord username"
+					},
+					"telegram": {
+						"type": "string",
+						"nullable": true,
+						"description": "Telegram username"
+					},
+					"website": {
+						"type": "string",
+						"nullable": true,
+						"description": "Website URL"
+					},
+					"github": {
+						"type": "string",
+						"nullable": true,
+						"description": "GitHub username"
+					},
+					"twitter": {
+						"type": "string",
+						"nullable": true,
+						"description": "Twitter/X handle"
+					},
+					"linkedin": {
+						"type": "string",
+						"nullable": true,
+						"description": "LinkedIn profile"
+					},
+					"email": {
+						"type": "string",
+						"nullable": true,
+						"description": "Email address"
+					},
+					"instagram": {
+						"type": "string",
+						"nullable": true,
+						"description": "Instagram handle"
+					},
+					"facebook": {
+						"type": "string",
+						"nullable": true,
+						"description": "Facebook profile"
+					},
+					"tiktok": {
+						"type": "string",
+						"nullable": true,
+						"description": "TikTok handle"
+					},
+					"youtube": {
+						"type": "string",
+						"nullable": true,
+						"description": "YouTube channel"
+					},
+					"reddit": {
+						"type": "string",
+						"nullable": true,
+						"description": "Reddit username"
+					},
+					"avatar": {
+						"type": "string",
+						"nullable": true,
+						"description": "Avatar image URL"
+					},
+					"description": {
+						"type": "string",
+						"nullable": true,
+						"description": "Profile description"
+					},
+					"display_name": {
+						"type": "string",
+						"nullable": true,
+						"description": "Display name"
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Last update timestamp (ISO 8601)"
+					},
+					"tx_count": {
+						"type": "integer",
+						"description": "Total transaction count"
+					},
+					"first_onchain": {
+						"type": "string",
+						"format": "date-time",
+						"description": "First on-chain activity timestamp (ISO 8601)"
+					},
+					"last_onchain": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Last on-chain activity timestamp (ISO 8601)"
+					},
+					"first_seen": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true,
+						"description": "First seen timestamp (ISO 8601)"
+					},
+					"last_seen": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true,
+						"description": "Last seen timestamp (ISO 8601)"
+					},
+					"first_utm_source": {
+						"type": "string",
+						"nullable": true,
+						"description": "First UTM source"
+					},
+					"last_utm_source": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last UTM source"
+					},
+					"first_utm_medium": {
+						"type": "string",
+						"nullable": true,
+						"description": "First UTM medium"
+					},
+					"last_utm_medium": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last UTM medium"
+					},
+					"first_utm_campaign": {
+						"type": "string",
+						"nullable": true,
+						"description": "First UTM campaign"
+					},
+					"last_utm_campaign": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last UTM campaign"
+					},
+					"first_utm_content": {
+						"type": "string",
+						"nullable": true,
+						"description": "First UTM content"
+					},
+					"last_utm_content": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last UTM content"
+					},
+					"first_utm_term": {
+						"type": "string",
+						"nullable": true,
+						"description": "First UTM term"
+					},
+					"last_utm_term": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last UTM term"
+					},
+					"first_referrer": {
+						"type": "string",
+						"nullable": true,
+						"description": "First referrer domain"
+					},
+					"last_referrer": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last referrer domain"
+					},
+					"first_referrer_url": {
+						"type": "string",
+						"nullable": true,
+						"description": "First referrer full URL"
+					},
+					"last_referrer_url": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last referrer full URL"
+					},
+					"first_ref": {
+						"type": "string",
+						"nullable": true,
+						"description": "First referral code"
+					},
+					"last_ref": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last referral code"
+					},
+					"location": {
+						"type": "string",
+						"nullable": true,
+						"description": "User location"
+					},
+					"device": {
+						"type": "string",
+						"nullable": true,
+						"description": "Device type"
+					},
+					"browser": {
+						"type": "string",
+						"nullable": true,
+						"description": "Browser name"
+					},
+					"os": {
+						"type": "string",
+						"nullable": true,
+						"description": "Operating system"
+					},
+					"last_type": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last event type"
+					},
+					"last_event": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last event name"
+					},
+					"last_properties": {
+						"type": "string",
+						"nullable": true,
+						"description": "Last event properties (JSON string)"
+					},
+					"num_sessions": {
+						"type": "integer",
+						"nullable": true,
+						"description": "Total number of sessions"
+					},
+					"revenue": {
+						"type": "number",
+						"nullable": true,
+						"description": "Total revenue"
+					},
+					"volume": {
+						"type": "number",
+						"nullable": true,
+						"description": "Total volume"
+					},
+					"points": {
+						"type": "number",
+						"nullable": true,
+						"description": "Total points"
+					},
+					"activity_dates": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"format": "date"
+						},
+						"nullable": true,
+						"description": "Array of activity dates (YYYY-MM-DD format)"
+					},
+					"labels": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/WalletLabel"
+						},
+						"description": "Array of wallet labels"
+					},
+					"apps": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/WalletApp"
+						},
+						"nullable": true,
+						"description": "Array of wallet apps (only included if wallet has associated apps)"
+					},
+					"tokens": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/WalletToken"
+						},
+						"nullable": true,
+						"description": "Array of wallet tokens (only included if wallet has associated tokens)"
+					}
+				},
+				"required": ["address", "net_worth_usd", "updated_at", "tx_count", "first_onchain", "last_onchain", "labels"]
+			},
+			"ProfileResponse": {
+				"type": "object",
+				"properties": {
+					"isSuccess": {
+						"type": "boolean",
+						"example": true
+					},
+					"data": {
+						"$ref": "#/components/schemas/WalletProfile"
+					}
+				},
+				"required": ["isSuccess", "data"]
+			},
+			"ErrorWithCode": {
+				"type": "object",
+				"properties": {
+					"isSuccess": {
+						"type": "boolean",
+						"example": false
+					},
+					"message": {
+						"type": "string"
+					},
+					"code": {
+						"type": "string",
+						"enum": ["BAD_REQUEST", "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "INTERNAL_SERVER_ERROR"]
+					}
+				},
+				"required": ["isSuccess", "message", "code"]
 			}
 		}
 	},
@@ -671,6 +1118,241 @@
 					},
 					"500": {
 						"description": "Server Error"
+					}
+				}
+			}
+		},
+		"/v0/profiles/{id}": {
+			"get": {
+				"summary": "Get Wallet Profile",
+				"description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, on-chain activity, tokens, apps, and user engagement metrics. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
+				"operationId": "getWalletProfile",
+				"tags": ["Profile API"],
+				"servers": [
+					{
+						"url": "https://api.formo.so",
+						"description": "Profile API"
+					}
+				],
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "The wallet address to retrieve profile information for (must be a valid Ethereum address)"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved wallet profile",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProfileResponse"
+								},
+								"example": {
+									"isSuccess": true,
+									"data": {
+										"address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+										"net_worth_usd": 125000.50,
+										"ens": "vitalik.eth",
+										"farcaster": null,
+										"lens": null,
+										"basenames": null,
+										"linea": null,
+										"discord": null,
+										"telegram": null,
+										"website": "https://example.com",
+										"github": "github.com/username",
+										"twitter": "@username",
+										"linkedin": null,
+										"email": null,
+										"instagram": null,
+										"facebook": null,
+										"tiktok": null,
+										"youtube": null,
+										"reddit": null,
+										"avatar": "https://example.com/avatar.png",
+										"description": "Wallet description",
+										"display_name": "Display Name",
+										"updated_at": "2025-01-20T14:22:00Z",
+										"tx_count": 1234,
+										"first_onchain": "2024-01-15T10:30:00Z",
+										"last_onchain": "2025-01-20T14:22:00Z",
+										"first_seen": "2024-01-15T10:30:00Z",
+										"last_seen": "2025-01-20T14:22:00Z",
+										"first_utm_source": "google",
+										"last_utm_source": "direct",
+										"first_utm_medium": "cpc",
+										"last_utm_medium": null,
+										"first_utm_campaign": "summer_sale",
+										"last_utm_campaign": null,
+										"first_utm_content": null,
+										"last_utm_content": null,
+										"first_utm_term": null,
+										"last_utm_term": null,
+										"first_referrer": "example.com",
+										"last_referrer": null,
+										"first_referrer_url": "https://example.com/page",
+										"last_referrer_url": null,
+										"first_ref": "ref123",
+										"last_ref": null,
+										"location": "US",
+										"device": "Desktop",
+										"browser": "Chrome",
+										"os": "macOS",
+										"last_type": "track",
+										"last_event": "Page Viewed",
+										"last_properties": "{\"page\":\"/home\"}",
+										"num_sessions": 45,
+										"revenue": 1500.75,
+										"volume": 50000.00,
+										"points": 2500,
+										"activity_dates": [
+											"2024-01-15",
+											"2024-01-16",
+											"2024-01-20"
+										],
+										"labels": [
+											{
+												"id": "label_123",
+												"value": "Whale",
+												"chain_id": "1",
+												"source": "manual"
+											}
+										],
+										"apps": [
+											{
+												"chain_id": "1",
+												"id": "uniswap",
+												"name": "Uniswap",
+												"img": "https://example.com/uniswap.png",
+												"url": "https://uniswap.org",
+												"balance_usd": 50000.00
+											}
+										],
+										"tokens": [
+											{
+												"chain_id": "1",
+												"token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+												"app_id": "usdc",
+												"name": "USD Coin",
+												"symbol": "USDC",
+												"img": "https://example.com/usdc.png",
+												"decimals": 6,
+												"price": 1.00,
+												"balance": "1000000000",
+												"balance_usd": 1000.00
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Invalid wallet address format",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorWithCode"
+								},
+								"example": {
+									"isSuccess": false,
+									"message": "Invalid wallet address format",
+									"code": "BAD_REQUEST"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing authorization header, invalid header format, or invalid API key",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorWithCode"
+								},
+								"examples": {
+									"missingHeader": {
+										"summary": "Missing authorization header",
+										"value": {
+											"isSuccess": false,
+											"message": "Missing authorization header",
+											"code": "UNAUTHORIZED"
+										}
+									},
+									"invalidFormat": {
+										"summary": "Invalid header format",
+										"value": {
+											"isSuccess": false,
+											"message": "Invalid authorization header format",
+											"code": "UNAUTHORIZED"
+										}
+									},
+									"invalidKey": {
+										"summary": "Invalid API key",
+										"value": {
+											"isSuccess": false,
+											"message": "Invalid workspace API key",
+											"code": "UNAUTHORIZED"
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - API key does not have profiles:read permission",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorWithCode"
+								},
+								"example": {
+									"isSuccess": false,
+									"message": "API key does not have profiles:read permission",
+									"code": "FORBIDDEN"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found - Wallet profile not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorWithCode"
+								},
+								"example": {
+									"isSuccess": false,
+									"message": "Wallet profile not found",
+									"code": "NOT_FOUND"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error - Failed to fetch wallet profile data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorWithCode"
+								},
+								"example": {
+									"isSuccess": false,
+									"message": "Failed to fetch wallet profile data",
+									"code": "INTERNAL_SERVER_ERROR"
+								}
+							}
+						}
 					}
 				}
 			}

@@ -1,0 +1,23 @@
+---
+title: 'Profile API'
+description: 'Get wallet profile information from an address'
+openapi: 'GET /v0/profiles/{id}'
+---
+
+Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, on-chain activity, tokens, apps, and user engagement metrics.
+
+<Frame>
+	<img src="/images/profile-api-diagram.png" alt="Profile API architecture diagram showing user device, Profiles API, and Wallet Profiles interaction" />
+</Frame>
+
+## Authentication
+
+This endpoint requires authentication using a **Workspace API Key** with `profiles:read` permission. Include the API key in your request headers:
+
+```bash
+Authorization: Bearer <your_workspace_api_key>
+```
+
+<Note>
+The API key needs to have the **read permission for profiles** in the API settings. You can configure this in your workspace API key settings.
+</Note>

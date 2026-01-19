@@ -158,6 +158,12 @@
               "api-reference/forms/subscribe",
               "api-reference/forms/unsubscribe"
             ]
+          },
+          {
+            "group": "Profile API",
+            "pages": [
+              "api-reference/profile"
+            ]
           }
         ]
       },
@@ -249,5 +255,8 @@
   "description": "Guides and API documentation for the Formo data platform.",
   "background": {
     "decoration": "gradient"
+  },
+  "apiReference": {
+    "spec": "api-reference/openapi.json"
   }
 }
