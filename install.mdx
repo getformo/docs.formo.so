@@ -109,11 +109,6 @@ On the same project, make sure you use the same `<SDK_WRITE_KEY>` for both your 
 
       export default HomePage;
     ```
-
-    <Warning>
-    **Important:** Always provide the `queryClient` to enable full event tracking. Without it, signature and transaction events will not be captured—only connect, disconnect, and chain change events.
-    </Warning>
-
   </Tab>
   <Tab icon="code" title="HTML Snippet">
 
@@ -394,6 +389,14 @@ On the same project, make sure you use the same `<SDK_WRITE_KEY>` for both your 
   </Tab>
 </Tabs>
 
+## Code Examples
+
+<CardGroup>
+  <Card title="Example Apps" icon="globe" iconType="solid" href="/sdks/web#code-examples">
+    Working examples for Privy, Dynamic, React, and Next.js
+  </Card>
+</CardGroup>
+
 ## Autocapture
 
 The Formo SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
@@ -413,14 +416,6 @@ Events that are tracked correctly should also show up in the Activity page of yo
 <CardGroup>
   <Card title="Web SDK" icon="globe" iconType="solid" href="/sdks/web">
     Web SDK (HTML, React, Next.js)
-  </Card>
-</CardGroup>
-
-## Code Examples
-
-<CardGroup>
-  <Card title="Example Apps" icon="globe" iconType="solid" href="/sdks/web#code-examples">
-    React, Next.js, Farcaster
   </Card>
 </CardGroup>
 

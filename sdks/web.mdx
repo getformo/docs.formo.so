@@ -24,7 +24,12 @@ There are several ways to install the Formo SDK:
 ### Wagmi
 
 <Note>
-If you're already using [Wagmi](https://wagmi.sh), the Formo SDK can connect directly. This is the recommended way to install Formo for apps.
+If you're already using [Wagmi](https://wagmi.sh), this is the recommended way to install Formo for apps.
+
+When `wagmi` options are provided, the SDK hooks directly into Wagmi's state management instead of wrapping EIP-1193 providers. This provides:
+- Native event handling via Wagmi's built-in state system
+- Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
+- Full tracking of signatures and transactions via TanStack Query's mutation cache
 </Note>
 
 Install the Web SDK via NPM.
@@ -71,17 +76,6 @@ function App() {
 }
 ```
 
-<Tip>
-**Why use Wagmi integration?** When `wagmi` options are provided, the SDK hooks directly into Wagmi's state management instead of wrapping EIP-1193 providers. This provides:
-- Native event handling via Wagmi's built-in state system
-- Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
-- Full tracking of signatures and transactions via TanStack Query's mutation cache
-</Tip>
-
-<Warning>
-**Important:** Always provide the `queryClient` to enable full event tracking. Without it, signature and transaction events will not be captured.
-</Warning>
-
 ### HTML Snippet
 
 Install this snippet at the `<head>` of your website:
@@ -98,7 +92,7 @@ Enable [Subresource Integrity (SRI)](/security/sri) to improve site security.
 ### React & Next.js (without Wagmi)
 
 <Note>
-Use [Wagmi](#wagmi) instead for better event tracking and compatibility.
+Use [Wagmi](#wagmi) for more reliable and secure event tracking.
 </Note>
 
 Install the Web SDK via NPM.
@@ -188,6 +182,20 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
 
 <CardGroup>
   <Card
+    title="Privy"
+    icon="file-code"
+    href="https://github.com/getformo/formo-example-privy"
+  >
+    formo-example-privy
+  </Card>
+  <Card
+    title="Dynamic"
+    icon="file-code"
+    href="https://github.com/getformo/formo-example-dynamic"
+  >
+    formo-example-dynamic
+  </Card>
+  <Card
     title="React"
     icon="file-code"
     href="https://github.com/getformo/formo-example-react"
@@ -214,20 +222,6 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
     href="https://github.com/getformo/formo-example-metamask"
   >
     formo-example-metamask
-  </Card>
-  <Card
-    title="Privy"
-    icon="file-code"
-    href="https://github.com/getformo/formo-example-privy"
-  >
-    formo-example-privy
-  </Card>
-  <Card
-    title="Dynamic"
-    icon="file-code"
-    href="https://github.com/getformo/formo-example-dynamic"
-  >
-    formo-example-dynamic
   </Card>
   <Card
     title="Blocknative"
