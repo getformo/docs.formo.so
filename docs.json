@@ -160,6 +160,12 @@
             ]
           },
           {
+            "group": "Query API",
+            "pages": [
+              "api-reference/query"
+            ]
+          },
+          {
             "group": "Profile API",
             "pages": [
               "api-reference/profile"

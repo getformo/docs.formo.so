@@ -1,0 +1,62 @@
+---
+title: 'Query API'
+description: 'Execute SQL queries against your project data'
+openapi: 'POST /v0/query'
+---
+
+Run read-only SQL queries for your project via Tinybird. Enforces safety checks (read-only, no comments/DDL/DML) and requires an explicit `LIMIT` no greater than `1000`.
+
+## Authentication
+
+Use a **Workspace API Key** with `query:read` permission. Send it in the `Authorization` header:
+
+```bash
+Authorization: Bearer <your_workspace_api_key>
+```
+
+## Request
+
+- Method: `POST`
+- Path: `/v0/query`
+- Body:
+
+```json
+{
+  "query": "SELECT * FROM events WHERE project_id = 'proj_123' LIMIT 100"
+}
+```
+
+Rules:
+- Query must be a single `SELECT`/`WITH` statement (read-only).
+- No comments or multiple statements.
+- `LIMIT` is required and must be `<= 1000`.
+
+## Response
+
+`200 OK` returns rows plus pagination metadata inferred from the query:
+
+```json
+{
+  "data": [
+    {
+      "event": "page",
+      "address": "0x123...",
+      "timestamp": "2025-01-20T10:00:00Z"
+    }
+  ],
+  "meta": {
+    "total": 120,
+    "limit": 100,
+    "offset": 0
+  }
+}
+```
+
+## Errors
+
+- `400`: missing query, invalid SQL, LIMIT over 1000, or missing project id.
+- `401`: missing/invalid authorization header or API key.
+- `403`: API key lacks `query:read` permission.
+- `404`: project or read token not found.
+- `500`: failure executing the query.
+
