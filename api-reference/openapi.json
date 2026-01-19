@@ -665,17 +665,27 @@
 				"required": ["address", "net_worth_usd", "updated_at", "tx_count", "first_onchain", "last_onchain", "labels"]
 			},
 			"ProfileResponse": {
+				"$ref": "#/components/schemas/WalletProfile"
+			},
+			"RestApiErrorResponse": {
 				"type": "object",
 				"properties": {
-					"isSuccess": {
-						"type": "boolean",
-						"example": true
-					},
-					"data": {
-						"$ref": "#/components/schemas/WalletProfile"
+					"error": {
+						"type": "object",
+						"properties": {
+							"code": {
+								"type": "string",
+								"description": "Error code"
+							},
+							"message": {
+								"type": "string",
+								"description": "Error message"
+							}
+						},
+						"required": ["code", "message"]
 					}
 				},
-				"required": ["isSuccess", "data"]
+				"required": ["error"]
 			},
 			"ErrorWithCode": {
 				"type": "object",
@@ -1159,101 +1169,98 @@
 									"$ref": "#/components/schemas/ProfileResponse"
 								},
 								"example": {
-									"isSuccess": true,
-									"data": {
-										"address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
-										"net_worth_usd": 125000.50,
-										"ens": "vitalik.eth",
-										"farcaster": null,
-										"lens": null,
-										"basenames": null,
-										"linea": null,
-										"discord": null,
-										"telegram": null,
-										"website": "https://example.com",
-										"github": "github.com/username",
-										"twitter": "@username",
-										"linkedin": null,
-										"email": null,
-										"instagram": null,
-										"facebook": null,
-										"tiktok": null,
-										"youtube": null,
-										"reddit": null,
-										"avatar": "https://example.com/avatar.png",
-										"description": "Wallet description",
-										"display_name": "Display Name",
-										"updated_at": "2025-01-20T14:22:00Z",
-										"tx_count": 1234,
-										"first_onchain": "2024-01-15T10:30:00Z",
-										"last_onchain": "2025-01-20T14:22:00Z",
-										"first_seen": "2024-01-15T10:30:00Z",
-										"last_seen": "2025-01-20T14:22:00Z",
-										"first_utm_source": "google",
-										"last_utm_source": "direct",
-										"first_utm_medium": "cpc",
-										"last_utm_medium": null,
-										"first_utm_campaign": "summer_sale",
-										"last_utm_campaign": null,
-										"first_utm_content": null,
-										"last_utm_content": null,
-										"first_utm_term": null,
-										"last_utm_term": null,
-										"first_referrer": "example.com",
-										"last_referrer": null,
-										"first_referrer_url": "https://example.com/page",
-										"last_referrer_url": null,
-										"first_ref": "ref123",
-										"last_ref": null,
-										"location": "US",
-										"device": "Desktop",
-										"browser": "Chrome",
-										"os": "macOS",
-										"last_type": "track",
-										"last_event": "Page Viewed",
-										"last_properties": "{\"page\":\"/home\"}",
-										"num_sessions": 45,
-										"revenue": 1500.75,
-										"volume": 50000.00,
-										"points": 2500,
-										"activity_dates": [
-											"2024-01-15",
-											"2024-01-16",
-											"2024-01-20"
-										],
-										"labels": [
-											{
-												"id": "label_123",
-												"value": "Whale",
-												"chain_id": "1",
-												"source": "manual"
-											}
-										],
-										"apps": [
-											{
-												"chain_id": "1",
-												"id": "uniswap",
-												"name": "Uniswap",
-												"img": "https://example.com/uniswap.png",
-												"url": "https://uniswap.org",
-												"balance_usd": 50000.00
-											}
-										],
-										"tokens": [
-											{
-												"chain_id": "1",
-												"token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-												"app_id": "usdc",
-												"name": "USD Coin",
-												"symbol": "USDC",
-												"img": "https://example.com/usdc.png",
-												"decimals": 6,
-												"price": 1.00,
-												"balance": "1000000000",
-												"balance_usd": 1000.00
-											}
-										]
-									}
+									"address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+									"net_worth_usd": 125000.50,
+									"ens": "vitalik.eth",
+									"farcaster": null,
+									"lens": null,
+									"basenames": null,
+									"linea": null,
+									"discord": null,
+									"telegram": null,
+									"website": "https://example.com",
+									"github": "github.com/username",
+									"twitter": "@username",
+									"linkedin": null,
+									"email": null,
+									"instagram": null,
+									"facebook": null,
+									"tiktok": null,
+									"youtube": null,
+									"reddit": null,
+									"avatar": "https://example.com/avatar.png",
+									"description": "Wallet description",
+									"display_name": "Display Name",
+									"updated_at": "2025-01-20T14:22:00Z",
+									"tx_count": 1234,
+									"first_onchain": "2024-01-15T10:30:00Z",
+									"last_onchain": "2025-01-20T14:22:00Z",
+									"first_seen": "2024-01-15T10:30:00Z",
+									"last_seen": "2025-01-20T14:22:00Z",
+									"first_utm_source": "google",
+									"last_utm_source": "direct",
+									"first_utm_medium": "cpc",
+									"last_utm_medium": null,
+									"first_utm_campaign": "summer_sale",
+									"last_utm_campaign": null,
+									"first_utm_content": null,
+									"last_utm_content": null,
+									"first_utm_term": null,
+									"last_utm_term": null,
+									"first_referrer": "example.com",
+									"last_referrer": null,
+									"first_referrer_url": "https://example.com/page",
+									"last_referrer_url": null,
+									"first_ref": "ref123",
+									"last_ref": null,
+									"location": "US",
+									"device": "Desktop",
+									"browser": "Chrome",
+									"os": "macOS",
+									"last_type": "track",
+									"last_event": "Page Viewed",
+									"last_properties": "{\"page\":\"/home\"}",
+									"num_sessions": 45,
+									"revenue": 1500.75,
+									"volume": 50000.00,
+									"points": 2500,
+									"activity_dates": [
+										"2024-01-15",
+										"2024-01-16",
+										"2024-01-20"
+									],
+									"labels": [
+										{
+											"id": "label_123",
+											"value": "Whale",
+											"chain_id": "1",
+											"source": "manual"
+										}
+									],
+									"apps": [
+										{
+											"chain_id": "1",
+											"id": "uniswap",
+											"name": "Uniswap",
+											"img": "https://example.com/uniswap.png",
+											"url": "https://uniswap.org",
+											"balance_usd": 50000.00
+										}
+									],
+									"tokens": [
+										{
+											"chain_id": "1",
+											"token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+											"app_id": "usdc",
+											"name": "USD Coin",
+											"symbol": "USDC",
+											"img": "https://example.com/usdc.png",
+											"decimals": 6,
+											"price": 1.00,
+											"balance": "1000000000",
+											"balance_usd": 1000.00
+										}
+									]
 								}
 							}
 						}
@@ -1263,12 +1270,13 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorWithCode"
+									"$ref": "#/components/schemas/RestApiErrorResponse"
 								},
 								"example": {
-									"isSuccess": false,
-									"message": "Invalid wallet address format",
-									"code": "BAD_REQUEST"
+									"error": {
+										"code": "BAD_REQUEST",
+										"message": "Invalid wallet address format"
+									}
 								}
 							}
 						}
@@ -1278,31 +1286,34 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorWithCode"
+									"$ref": "#/components/schemas/RestApiErrorResponse"
 								},
 								"examples": {
 									"missingHeader": {
 										"summary": "Missing authorization header",
 										"value": {
-											"isSuccess": false,
-											"message": "Missing authorization header",
-											"code": "UNAUTHORIZED"
+											"error": {
+												"code": "UNAUTHORIZED",
+												"message": "Missing authorization header"
+											}
 										}
 									},
 									"invalidFormat": {
 										"summary": "Invalid header format",
 										"value": {
-											"isSuccess": false,
-											"message": "Invalid authorization header format",
-											"code": "UNAUTHORIZED"
+											"error": {
+												"code": "UNAUTHORIZED",
+												"message": "Invalid authorization header format"
+											}
 										}
 									},
 									"invalidKey": {
 										"summary": "Invalid API key",
 										"value": {
-											"isSuccess": false,
-											"message": "Invalid workspace API key",
-											"code": "UNAUTHORIZED"
+											"error": {
+												"code": "UNAUTHORIZED",
+												"message": "Invalid workspace API key"
+											}
 										}
 									}
 								}
@@ -1314,12 +1325,13 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorWithCode"
+									"$ref": "#/components/schemas/RestApiErrorResponse"
 								},
 								"example": {
-									"isSuccess": false,
-									"message": "API key does not have profiles:read permission",
-									"code": "FORBIDDEN"
+									"error": {
+										"code": "FORBIDDEN",
+										"message": "API key does not have profiles:read permission"
+									}
 								}
 							}
 						}
@@ -1329,12 +1341,13 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorWithCode"
+									"$ref": "#/components/schemas/RestApiErrorResponse"
 								},
 								"example": {
-									"isSuccess": false,
-									"message": "Wallet profile not found",
-									"code": "NOT_FOUND"
+									"error": {
+										"code": "PROFILE_NOT_FOUND",
+										"message": "Profile does not exist"
+									}
 								}
 							}
 						}
@@ -1344,12 +1357,13 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorWithCode"
+									"$ref": "#/components/schemas/RestApiErrorResponse"
 								},
 								"example": {
-									"isSuccess": false,
-									"message": "Failed to fetch wallet profile data",
-									"code": "INTERNAL_SERVER_ERROR"
+									"error": {
+										"code": "INTERNAL_SERVER_ERROR",
+										"message": "Failed to fetch wallet profile data"
+									}
 								}
 							}
 						}
