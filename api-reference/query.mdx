@@ -4,7 +4,7 @@ description: 'Execute SQL queries against your project data'
 openapi: 'POST /v0/query'
 ---
 
-Run read-only SQL queries for your project via Tinybird. Enforces safety checks (read-only, no comments/DDL/DML) and requires an explicit `LIMIT` no greater than `1000`.
+Run read-only SQL queries for your project. Enforces safety checks (read-only, no comments/DDL/DML) and requires an explicit `LIMIT` no greater than `1000`.
 
 ## Authentication
 
@@ -22,7 +22,7 @@ Authorization: Bearer <your_workspace_api_key>
 
 ```json
 {
-  "query": "SELECT * FROM events WHERE project_id = 'proj_123' LIMIT 100"
+  "query": "SELECT * FROM events LIMIT 100"
 }
 ```
 

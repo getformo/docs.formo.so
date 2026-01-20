@@ -683,7 +683,7 @@
 						"properties": {
 							"total": {
 								"type": "integer",
-								"description": "Total rows available (from Tinybird rows_before_limit_at_least or rows)"
+								"description": "Total rows available"
 							},
 							"limit": {
 								"type": "integer",
