@@ -4,6 +4,8 @@ description: 'Get wallet profile information from an address'
 openapi: 'GET /v0/profiles/{id}'
 ---
 
+Retrieves wallet profile information for a given address.
+
 Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, onchain activity, tokens, apps, user demographics, lifecycle, volume, and revenue.
 
 <Frame>
@@ -20,4 +22,33 @@ Authorization: Bearer <your_workspace_api_key>
 
 <Note>
 The API key needs to have the **read permission for profiles** in the API settings. You can configure this in your workspace API key settings.
+</Note>
+
+## Path parameters
+
+- `id` (string): Wallet address (EVM / `0x…`).
+
+## Query parameters
+
+### `expand`
+
+Comma-separated list of optional sections to include in the response.
+
+Supported values:
+
+- `apps`
+- `chains`
+- `tokens`
+- `labels`
+
+Examples:
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  "https://api.formo.so/v0/profiles/0x0000000000000000000000000000000000000000?expand=apps,chains,tokens"
+```
+
+<Note>
+The `apps`, `chains`, and `tokens` collections are capped at **50 items** each.
 </Note>

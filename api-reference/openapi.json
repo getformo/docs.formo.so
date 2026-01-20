@@ -239,17 +239,7 @@
 						"type": "string",
 						"description": "Unique identifier for the event"
 					}
-				},
-				"required": [
-					"type",
-					"channel",
-					"version",
-					"anonymous_id",
-					"context",
-					"original_timestamp",
-					"sent_at",
-					"message_id"
-				]
+				}
 			},
 			"WalletLabel": {
 				"type": "object",
@@ -302,8 +292,7 @@
 						"type": "number",
 						"description": "Balance in USD for this app"
 					}
-				},
-				"required": ["chain_id", "id", "name", "balance_usd"]
+				}
 			},
 			"WalletToken": {
 				"type": "object",
@@ -349,8 +338,7 @@
 						"type": "number",
 						"description": "Token balance value in USD"
 					}
-				},
-				"required": ["chain_id", "token_address", "app_id", "name", "symbol", "decimals", "price", "balance", "balance_usd"]
+				}
 			},
 			"WalletProfile": {
 				"type": "object",
@@ -661,8 +649,7 @@
 						"nullable": true,
 						"description": "Array of wallet tokens (only included if wallet has associated tokens)"
 					}
-				},
-				"required": ["address", "net_worth_usd", "updated_at", "tx_count", "first_onchain", "last_onchain", "labels"]
+				}
 			},
 			"ProfileResponse": {
 				"$ref": "#/components/schemas/WalletProfile"
