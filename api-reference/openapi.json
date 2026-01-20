@@ -667,6 +667,38 @@
 			"ProfileResponse": {
 				"$ref": "#/components/schemas/WalletProfile"
 			},
+			"PerformSqlQueryPublicResponse": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": true
+						},
+						"description": "Rows returned by the SQL query"
+					},
+					"meta": {
+						"type": "object",
+						"properties": {
+							"total": {
+								"type": "integer",
+								"description": "Total rows available"
+							},
+							"limit": {
+								"type": "integer",
+								"description": "Limit inferred from the query"
+							},
+							"offset": {
+								"type": "integer",
+								"description": "Offset inferred from the query"
+							}
+						},
+						"required": ["total", "limit", "offset"]
+					}
+				},
+				"required": ["data", "meta"]
+			},
 			"RestApiErrorResponse": {
 				"type": "object",
 				"properties": {
@@ -1128,6 +1160,151 @@
 					},
 					"500": {
 						"description": "Server Error"
+					}
+				}
+			}
+		},
+		"/v0/query": {
+			"post": {
+				"summary": "Run SQL query",
+				"description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements, and must include a LIMIT that is less than or equal to 1000.",
+				"operationId": "performSqlQueryPublic",
+				"tags": ["Query API"],
+				"servers": [
+					{
+						"url": "https://api.formo.so",
+						"description": "Query API"
+					}
+				],
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"query": {
+										"type": "string",
+										"description": "SQL query to execute. Must be read-only (SELECT/WITH), single statement, no comments, and include LIMIT <= 1000."
+									}
+								},
+								"required": ["query"]
+							},
+							"example": {
+								"query": "SELECT * FROM events LIMIT 100"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successfully executed SQL query",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PerformSqlQueryPublicResponse"
+								},
+								"example": {
+									"data": [
+										{
+											"event": "page",
+											"address": "0x123...",
+											"timestamp": "2025-01-20T10:00:00Z"
+										}
+									],
+									"meta": {
+										"total": 120,
+										"limit": 100,
+										"offset": 0
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Query missing/invalid or limit over 1000",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RestApiErrorResponse"
+								},
+								"example": {
+									"error": {
+										"code": "BAD_REQUEST",
+										"message": "Query is required"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized - Missing or invalid API key",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RestApiErrorResponse"
+								},
+								"example": {
+									"error": {
+										"code": "UNAUTHORIZED",
+										"message": "Missing authorization header"
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - API key does not have query:read permission",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RestApiErrorResponse"
+								},
+								"example": {
+									"error": {
+										"code": "FORBIDDEN",
+										"message": "API key does not have query:read permission"
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found - Project ID or read token not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RestApiErrorResponse"
+								},
+								"example": {
+									"error": {
+										"code": "NOT_FOUND",
+										"message": "Project id or read token not found"
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Server Error - Failed to perform SQL query",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RestApiErrorResponse"
+								},
+								"example": {
+									"error": {
+										"code": "INTERNAL_SERVER_ERROR",
+										"message": "Failed to perform SQL query"
+									}
+								}
+							}
+						}
 					}
 				}
 			}
