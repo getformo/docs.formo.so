@@ -1,0 +1,259 @@
+---
+title: 'User Onboarding Analysis'
+description: 'Analyze how new users navigate your crypto app, identify drop-off points, and optimize the first-time user experience with flows and funnels.'
+---
+
+Understand how new users experience your crypto app for the first time. This guide shows you how to use Flows, Funnels, and Retention to identify friction points and improve onboarding.
+
+## What you'll learn
+
+- Map the actual paths new users take through your app
+- Identify where users get confused or drop off
+- Measure onboarding completion rates
+- Compare successful vs. unsuccessful user journeys
+- Track improvements over time
+
+## Prerequisites
+
+- Formo SDK installed ([Installation Guide](/install))
+- At least 100 new users for meaningful analysis
+- Key pages and actions identified (connect wallet, first transaction, etc.)
+
+---
+
+## Part 1: Map user journeys with Flows
+
+### What Flows reveal about onboarding
+
+[Flows](/features/product-analytics/flows) show you the actual paths users take—not the paths you designed. This is critical for onboarding because users rarely follow the "happy path."
+
+### Step 1: Create an onboarding flow
+
+1. Go to **Flows** in the Formo Dashboard
+2. Set the **Starting event** to your landing page (e.g., `page = /`)
+3. Set **Steps after** to 5-7 steps
+4. Filter by **New Users** to focus on first-time visitors
+
+You'll see a Sankey diagram showing where users actually go after landing.
+
+### Step 2: Identify common paths
+
+Look for patterns in the flow:
+
+| Pattern | What it means | Action |
+|---------|---------------|--------|
+| **Wide first branch** | Users exploring, unsure where to go | Simplify navigation, add clearer CTAs |
+| **Many paths to same destination** | Multiple entry points working | Keep these paths optimized |
+| **Dead ends** | Users hitting pages with no next action | Add CTAs, fix broken flows |
+| **Loops** | Users going back and forth | Unclear instructions, missing information |
+
+### Step 3: Compare entry points
+
+Create separate flows for different entry points:
+
+- Users landing on homepage vs. direct to app
+- Users from different referrers (Twitter, Discord, Google)
+- Mobile vs. desktop users
+
+This reveals which entry points lead to successful onboarding.
+
+---
+
+## Part 2: Measure onboarding with Funnels
+
+### Define your onboarding funnel
+
+Create a [Funnel](/features/product-analytics/funnels) that captures the key onboarding steps:
+
+**Example: DeFi app onboarding funnel**
+
+| Step | Event | Description |
+|------|-------|-------------|
+| 1 | `page = /` | Landed on site |
+| 2 | `page = /app` | Visited app |
+| 3 | `type = connect` | Connected wallet |
+| 4 | `type = transaction` | Completed first transaction |
+
+### Step 1: Create the funnel
+
+1. Go to **Funnels** in the dashboard
+2. Click **Create Funnel**
+3. Add your onboarding steps in order
+4. Set the conversion window (7 days recommended for onboarding)
+
+### Step 2: Analyze drop-off points
+
+The funnel shows where users abandon the onboarding:
+
+| Drop-off point | Likely cause | Solution |
+|----------------|--------------|----------|
+| **Landing → App** | Unclear value proposition | Improve landing page messaging |
+| **App → Connect** | Wallet friction, trust issues | Add social proof, simplify connect flow |
+| **Connect → Transaction** | Complexity, gas concerns | Add tutorials, gas estimation |
+
+### Step 3: Break down by segments
+
+Use funnel breakdowns to identify which users struggle most:
+
+- **By Referrer**: Which traffic sources have best onboarding rates?
+- **By Device**: Is mobile onboarding broken?
+- **By Country**: Are there regional issues (language, regulations)?
+- **By Wallet**: Do specific wallet users have problems?
+
+---
+
+## Part 3: Track onboarding retention
+
+### Why retention matters for onboarding
+
+A user who completes onboarding but never returns isn't truly onboarded. Use [Retention](/features/product-analytics/retention) to measure if new users stick.
+
+### Step 1: Set up retention by cohort
+
+1. Go to **Retention** in the dashboard
+2. Set the **Starting event** to `connect` (wallet connection)
+3. Set the **Returning event** to `connect` (any subsequent connection)
+4. View by weekly cohorts
+
+### Step 2: Identify the "aha moment"
+
+Compare retention for users who completed different actions in their first session:
+
+| First session action | Week 1 retention | Insight |
+|---------------------|------------------|---------|
+| Only connected wallet | 15% | Need to drive deeper engagement |
+| Viewed 3+ pages | 25% | Exploration helps |
+| Completed transaction | 45% | Transaction is the "aha moment" |
+
+Use this to optimize your onboarding to drive users toward high-retention actions.
+
+---
+
+## Part 4: Segment new users
+
+### Create onboarding segments
+
+Use [Segments](/features/wallet-intelligence/segments) to track users at different onboarding stages:
+
+**Segment 1: Landed but didn't connect**
+- Visited page in last 7 days
+- Did NOT connect wallet
+
+**Segment 2: Connected but didn't transact**
+- Connected wallet in last 7 days
+- Did NOT complete transaction
+
+**Segment 3: Completed onboarding**
+- Completed transaction in last 7 days
+- Is a New User (lifecycle)
+
+### Track segment sizes over time
+
+Monitor these segments to measure onboarding health:
+
+```
+Onboarding rate = (Completed onboarding) / (Landed) × 100
+```
+
+Create a [Dashboard](/features/product-analytics/charts) to track this metric over time.
+
+---
+
+## Part 5: Build an onboarding dashboard
+
+### Recommended charts
+
+Create a dashboard with these visualizations:
+
+| Chart | Type | Purpose |
+|-------|------|---------|
+| **Onboarding funnel** | Funnel | Overall conversion rates |
+| **Daily new users** | Line | Volume trends |
+| **Onboarding rate** | Number | Key metric |
+| **Drop-off by step** | Bar | Where users abandon |
+| **Retention by cohort** | Retention | Long-term success |
+| **Top entry pages** | Table | Traffic patterns |
+
+### Example SQL: Onboarding rate
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(CASE WHEN type = 'page' THEN visitor_id END) AS landed,
+  countDistinct(CASE WHEN type = 'connect' THEN address END) AS connected,
+  countDistinct(CASE WHEN type = 'transaction' THEN address END) AS transacted,
+  round(connected / landed * 100, 1) AS connect_rate,
+  round(transacted / connected * 100, 1) AS transaction_rate
+FROM events
+WHERE timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+---
+
+## Part 6: Optimize and iterate
+
+### A/B test onboarding changes
+
+When you make changes to improve onboarding:
+
+1. Note the date of the change
+2. Compare funnel metrics before/after
+3. Check if retention improved for post-change cohorts
+
+### Common onboarding improvements
+
+| Issue | Solution | How to measure |
+|-------|----------|----------------|
+| Low landing → app conversion | Clearer CTA, better messaging | Funnel step 1→2 rate |
+| Wallet connect drop-off | Simplify options, add trust signals | Funnel step 2→3 rate |
+| High bounce on app page | Improve loading speed, add guidance | Flows showing exits |
+| Users don't return | Email/notification follow-up | Week 1 retention |
+
+### Set up alerts
+
+Create [Alerts](/features/product-analytics/alerts) for onboarding anomalies:
+
+- Alert when daily connect rate drops below threshold
+- Alert when a whale connects but doesn't transact
+- Alert when onboarding funnel conversion drops significantly
+
+---
+
+## Summary
+
+You've learned how to:
+
+1. **Map user journeys** with Flows to see actual behavior
+2. **Measure onboarding** with Funnels to find drop-off points
+3. **Track retention** to ensure users stick after onboarding
+4. **Segment users** by onboarding stage for targeted actions
+5. **Build dashboards** to monitor onboarding health
+6. **Iterate** based on data to continuously improve
+
+## Onboarding analysis checklist
+
+- [ ] Created onboarding flow from landing page
+- [ ] Built funnel with key onboarding steps
+- [ ] Set up retention tracking for new users
+- [ ] Created segments for each onboarding stage
+- [ ] Built dashboard with key onboarding metrics
+- [ ] Set up alerts for onboarding anomalies
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="User Flows" icon="route" href="/features/product-analytics/flows">
+    Deep dive on flow analysis
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Advanced funnel techniques
+  </Card>
+  <Card title="Retention" icon="calendar" href="/features/product-analytics/retention">
+    Cohort retention analysis
+  </Card>
+  <Card title="Churn Prevention" icon="user-minus" href="/guides/use-cases/churn-prevention">
+    Keep users after onboarding
+  </Card>
+</CardGroup>

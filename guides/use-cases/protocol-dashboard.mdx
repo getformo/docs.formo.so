@@ -1,0 +1,421 @@
+---
+title: 'Protocol Health Dashboard'
+description: 'Build a comprehensive dashboard to monitor your protocol metrics including users, transactions, volume, and retention in real-time.'
+---
+
+Build a single dashboard that gives you complete visibility into your protocol's health. This guide shows you how to create a metrics dashboard that tracks users, transactions, volume, and trends.
+
+## What you'll learn
+
+- Design an effective protocol health dashboard
+- Create key metric charts with SQL and Ask AI
+- Set up real-time monitoring for critical metrics
+- Build executive-ready visualizations
+- Automate reporting with saved dashboards
+
+## Prerequisites
+
+- Formo SDK installed ([Installation Guide](/install))
+- At least 14 days of data
+- Contract events configured for transaction tracking ([Contract Events](/features/product-analytics/contract-events))
+
+---
+
+## Part 1: Plan your dashboard
+
+### Key metrics for protocol health
+
+Every protocol should track these core metrics:
+
+| Category | Metrics | Why it matters |
+|----------|---------|----------------|
+| **Users** | DAU, WAU, MAU, new users | Growth and engagement |
+| **Transactions** | Daily txns, success rate, avg value | Protocol usage |
+| **Volume** | Daily volume, cumulative volume | Economic activity |
+| **Retention** | Week 1, Week 4 retention | User stickiness |
+| **Acquisition** | Top referrers, conversion rate | Growth efficiency |
+
+### Dashboard layout best practices
+
+Organize your dashboard for quick scanning:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  DAU    │  WAU    │  Daily Volume  │  Success Rate     │  ← Key numbers
+├─────────────────────────────────────────────────────────┤
+│                Daily Active Users (Line)                │  ← Primary trend
+├─────────────────────────────────────────────────────────┤
+│     Transactions (Line)      │   Volume (Line)         │  ← Secondary trends
+├─────────────────────────────────────────────────────────┤
+│  Top Referrers  │  Countries  │  Retention Cohort      │  ← Breakdowns
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Part 2: Create the dashboard
+
+### Step 1: Set up your board
+
+1. Go to **Dashboards** in the Formo Dashboard
+2. Click **Add board**
+3. Name it "Protocol Health" or similar
+
+### Step 2: Add key number cards
+
+Start with the most important metrics as single-number cards.
+
+**Daily Active Users (DAU)**
+
+Click **Ask AI** and type:
+> "Show me the number of unique wallets that connected today"
+
+Or use SQL in [Explore](/features/product-analytics/explore):
+
+```sql
+SELECT countDistinct(address) AS dau
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= today()
+```
+
+**Weekly Active Users (WAU)**
+
+```sql
+SELECT countDistinct(address) AS wau
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 7 DAY
+```
+
+**Daily Transaction Volume**
+
+```sql
+SELECT
+  sum(value) AS daily_volume
+FROM events
+WHERE type = 'transaction'
+  AND timestamp >= today()
+```
+
+**Transaction Success Rate**
+
+```sql
+SELECT
+  round(
+    countIf(status = 'success') / count(*) * 100, 1
+  ) AS success_rate
+FROM events
+WHERE type = 'transaction'
+  AND timestamp >= today()
+```
+
+### Step 3: Add trend charts
+
+**Daily Active Users Over Time**
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(address) AS dau
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+Choose **Line chart** visualization.
+
+**Daily Transactions and Volume**
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  count(*) AS transactions,
+  sum(value) AS volume
+FROM events
+WHERE type = 'transaction'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+Use a **dual-axis line chart** to show both metrics.
+
+**New vs. Returning Users**
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(CASE WHEN is_new = true THEN address END) AS new_users,
+  countDistinct(CASE WHEN is_new = false THEN address END) AS returning_users
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+Choose **Stacked area chart** to show composition.
+
+---
+
+## Part 3: Add breakdown charts
+
+### Top referrers
+
+```sql
+SELECT
+  referrer,
+  countDistinct(address) AS wallets,
+  count(*) AS transactions,
+  sum(value) AS volume
+FROM events
+WHERE timestamp >= now() - INTERVAL 30 DAY
+  AND referrer != ''
+GROUP BY referrer
+ORDER BY wallets DESC
+LIMIT 10
+```
+
+Choose **Bar chart** or **Table** visualization.
+
+### Geographic distribution
+
+```sql
+SELECT
+  location AS country,
+  countDistinct(address) AS users,
+  count(*) AS transactions
+FROM events
+WHERE timestamp >= now() - INTERVAL 30 DAY
+  AND location != ''
+GROUP BY country
+ORDER BY users DESC
+LIMIT 10
+```
+
+Choose **Pie chart** or **Bar chart**.
+
+### Wallet breakdown
+
+```sql
+SELECT
+  properties.wallet AS wallet_type,
+  countDistinct(address) AS users,
+  round(countDistinct(address) * 100.0 / sum(countDistinct(address)) OVER (), 1) AS percentage
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY wallet_type
+ORDER BY users DESC
+```
+
+---
+
+## Part 4: Add retention view
+
+### Cohort retention table
+
+Add a Retention chart to your dashboard:
+
+1. Click **Add Chart**
+2. Select **Retention** chart type
+3. Set starting event to `connect`
+4. Set returning event to `connect`
+
+This shows week-over-week retention for each cohort.
+
+### Retention trend
+
+Track how retention changes over time:
+
+```sql
+SELECT
+  toStartOfWeek(first_seen) AS cohort_week,
+  countDistinct(address) AS cohort_size,
+  countDistinct(CASE
+    WHEN dateDiff('day', first_seen, last_seen) >= 7
+    THEN address
+  END) AS returned_week_1,
+  round(returned_week_1 / cohort_size * 100, 1) AS week_1_retention
+FROM (
+  SELECT
+    address,
+    min(timestamp) AS first_seen,
+    max(timestamp) AS last_seen
+  FROM events
+  WHERE type = 'connect'
+  GROUP BY address
+)
+WHERE first_seen >= now() - INTERVAL 8 WEEK
+GROUP BY cohort_week
+ORDER BY cohort_week
+```
+
+---
+
+## Part 5: Add funnel metrics
+
+### Conversion funnel
+
+Add a Funnel chart showing your key conversion:
+
+1. Click **Add Chart**
+2. Select **Funnel** chart type
+3. Add steps:
+   - Step 1: Page view (`type = page`)
+   - Step 2: Wallet connect (`type = connect`)
+   - Step 3: Transaction (`type = transaction`)
+
+### Funnel conversion rate over time
+
+Track how conversion changes:
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(visitor_id) AS visitors,
+  countDistinct(CASE WHEN type = 'connect' THEN address END) AS connected,
+  countDistinct(CASE WHEN type = 'transaction' THEN address END) AS transacted,
+  round(connected / visitors * 100, 1) AS connect_rate,
+  round(transacted / connected * 100, 1) AS transaction_rate
+FROM events
+WHERE timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+---
+
+## Part 6: Add advanced metrics
+
+### User segments breakdown
+
+```sql
+SELECT
+  CASE
+    WHEN session_count = 1 THEN 'New'
+    WHEN session_count <= 5 THEN 'Returning'
+    ELSE 'Power User'
+  END AS segment,
+  count(*) AS users,
+  round(count(*) * 100.0 / sum(count(*)) OVER (), 1) AS percentage
+FROM users
+WHERE last_seen >= now() - INTERVAL 30 DAY
+GROUP BY segment
+ORDER BY users DESC
+```
+
+### Revenue per user (if applicable)
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  sum(value) AS total_volume,
+  countDistinct(address) AS active_users,
+  round(total_volume / active_users, 2) AS volume_per_user
+FROM events
+WHERE type = 'transaction'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+### Week-over-week growth
+
+```sql
+SELECT
+  toStartOfWeek(timestamp) AS week,
+  countDistinct(address) AS wau,
+  lagInFrame(wau) OVER (ORDER BY week) AS prev_wau,
+  round((wau - prev_wau) / prev_wau * 100, 1) AS wow_growth
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 8 WEEK
+GROUP BY week
+ORDER BY week
+```
+
+---
+
+## Part 7: Set up monitoring
+
+### Create alerts
+
+Set up [Alerts](/features/product-analytics/alerts) for critical metrics:
+
+**Alert: DAU drop**
+- Condition: DAU drops 20% vs. 7-day average
+- Notify: Team Slack channel
+
+**Alert: Transaction failures spike**
+- Condition: Failure rate > 10%
+- Notify: Engineering team
+
+**Alert: Whale activity**
+- Condition: User with net worth > $1M connects
+- Notify: BD team
+
+### Schedule reviews
+
+- **Daily**: Check key numbers (DAU, volume, success rate)
+- **Weekly**: Review retention, acquisition sources, user segments
+- **Monthly**: Deep dive on trends, cohort analysis, growth rates
+
+---
+
+## Example: Complete dashboard
+
+Here's a complete dashboard configuration:
+
+| Row | Charts | Purpose |
+|-----|--------|---------|
+| 1 | DAU, WAU, MAU, Daily Volume | Key metrics at a glance |
+| 2 | Daily Active Users (30d line) | Primary growth trend |
+| 3 | Transactions (line), Volume (line) | Activity metrics |
+| 4 | Top Referrers (bar), Countries (pie) | Acquisition breakdown |
+| 5 | Retention cohort table | User stickiness |
+| 6 | Conversion funnel | Health of user journey |
+
+---
+
+## Summary
+
+You've learned how to:
+
+1. **Plan an effective dashboard** with the right metrics
+2. **Create key number cards** for at-a-glance metrics
+3. **Build trend charts** to track growth over time
+4. **Add breakdown charts** to understand user composition
+5. **Include retention** to measure stickiness
+6. **Set up monitoring** with alerts and reviews
+
+## Dashboard checklist
+
+- [ ] Added key number cards (DAU, WAU, Volume)
+- [ ] Created daily active users trend chart
+- [ ] Added transaction and volume trends
+- [ ] Included top referrers breakdown
+- [ ] Added retention cohort view
+- [ ] Created conversion funnel
+- [ ] Set up critical alerts
+- [ ] Shared with team
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Dashboards" icon="chart-line" href="/features/product-analytics/charts">
+    Advanced dashboard features
+  </Card>
+  <Card title="Explore" icon="compass" href="/features/product-analytics/explore">
+    Custom SQL queries
+  </Card>
+  <Card title="Ask AI" icon="sparkles" href="/features/product-analytics/ai">
+    Generate charts with AI
+  </Card>
+  <Card title="Alerts" icon="bell" href="/features/product-analytics/alerts">
+    Set up monitoring
+  </Card>
+</CardGroup>

@@ -1,0 +1,164 @@
+---
+title: 'Explore'
+description: 'Run custom SQL queries against your analytics data to uncover deep insights and build advanced visualizations.'
+---
+
+Explore gives you direct SQL access to your analytics data. Run custom queries, build complex analyses, and answer questions that go beyond pre-built dashboards.
+
+<Frame caption="The Explore query editor lets you run SQL against your analytics data.">
+  <img src="/images/explore.png" alt="Explore SQL Editor" />
+</Frame>
+
+## When to use Explore
+
+Use Explore when you need:
+
+- **Custom calculations** that aren't available in standard dashboards
+- **Complex joins** across multiple data types
+- **Ad-hoc analysis** for specific questions
+- **Data validation** to verify metrics
+
+## Running queries
+
+### Step 1: Open Explore
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Explore** in the left navigation
+
+### Step 2: Write your query
+
+Enter your SQL query in the editor. Formo uses ClickHouse SQL syntax.
+
+**Example: Daily active wallets**
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(address) AS daily_active_wallets
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+### Step 3: Run and visualize
+
+1. Click **Run** to execute your query
+2. View results in the table below
+3. Optionally, switch to chart view to visualize the data
+
+## Common queries
+
+### DAU/WAU/MAU
+
+```sql
+-- Daily Active Users (DAU)
+SELECT countDistinct(address) AS dau
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= today()
+
+-- Weekly Active Users (WAU)
+SELECT countDistinct(address) AS wau
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 7 DAY
+
+-- Monthly Active Users (MAU)
+SELECT countDistinct(address) AS mau
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 30 DAY
+```
+
+### Conversion by referrer
+
+```sql
+SELECT
+  referrer,
+  countDistinct(CASE WHEN type = 'page' THEN visitor_id END) AS visitors,
+  countDistinct(CASE WHEN type = 'connect' THEN address END) AS wallets,
+  countDistinct(CASE WHEN type = 'transaction' THEN address END) AS transactors
+FROM events
+WHERE timestamp >= now() - INTERVAL 30 DAY
+GROUP BY referrer
+ORDER BY visitors DESC
+LIMIT 20
+```
+
+### User retention
+
+```sql
+SELECT
+  toDate(first_seen) AS cohort_date,
+  countDistinct(address) AS users,
+  countDistinct(CASE WHEN last_seen >= first_seen + INTERVAL 7 DAY THEN address END) AS retained_7d
+FROM (
+  SELECT
+    address,
+    min(timestamp) AS first_seen,
+    max(timestamp) AS last_seen
+  FROM events
+  WHERE type = 'connect'
+  GROUP BY address
+)
+GROUP BY cohort_date
+ORDER BY cohort_date DESC
+```
+
+### Transaction volume by day
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  count(*) AS transactions,
+  sum(value) AS total_volume
+FROM events
+WHERE type = 'transaction'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+## Available tables
+
+| Table | Description |
+|-------|-------------|
+| `events` | All tracked events (page views, connects, transactions, custom events) |
+| `users` | User profiles with wallet labels and metadata |
+
+## Tips
+
+- Use `LIMIT` to avoid returning too much data
+- Use date filters to improve query performance
+- Reference the [Event Spec](/data/events/overview) for available event properties
+- Use **Ask AI** to help generate queries - click Ask AI in the sidebar or press `Cmd+K`
+
+## Saving queries
+
+After running a useful query:
+
+1. Click **Save to Dashboard** to add it as a chart
+2. Select an existing board or create a new one
+3. Choose a visualization type (line, bar, table, etc.)
+
+Your query becomes a reusable chart on your dashboard.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Dashboards" icon="chart-line" href="/features/product-analytics/charts">
+    Save queries as dashboard charts
+  </Card>
+  <Card title="Event Spec" icon="cube" href="/data/events/overview">
+    Understand available event properties
+  </Card>
+  <Card title="AI Assistant" icon="sparkles" href="/features/product-analytics/ai">
+    Let AI help write queries
+  </Card>
+  <Card title="Data Schema" icon="database" href="/data/schema">
+    Full data warehouse schema
+  </Card>
+</CardGroup>
