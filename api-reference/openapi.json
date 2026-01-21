@@ -260,8 +260,7 @@
 						"type": "string",
 						"description": "Label source (e.g., manual, automated)"
 					}
-				},
-				"required": ["id", "value", "chain_id", "source"]
+				}
 			},
 			"WalletApp": {
 				"type": "object",

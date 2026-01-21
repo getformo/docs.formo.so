@@ -1,0 +1,34 @@
+name: Docs CI
+
+on:
+  pull_request:
+    paths:
+      - '**/*.mdx'
+      - '**/*.json'
+      - '.github/workflows/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.mdx'
+      - '**/*.json'
+      - '.github/workflows/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Mintlify CLI
+        run: npm install -g mintlify@latest
+
+      - name: Lint docs
+        run: mintlify validate
