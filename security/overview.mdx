@@ -9,10 +9,21 @@ description: "Security is one of our biggest priorities. Learn how we keep your 
   Built with privacy in mind with no third-party cookies, fingerprinting, or invasive tracking.
 </Card>
 
+Our SDK explicitly does **not** collect:
+- IP addresses (country is derived from timezone, not IP geolocation)
+- Device fingerprints (no Canvas, WebGL, or storage-based fingerprinting)
+- Full user-agent strings (only browser type for analytics classification)
+- Social profiles (no Twitter, Discord, or email collection)
+- Third-party cookies
+
+<Tip>
+Learn more about what data we collect in our [Data Collection](/data/what-we-collect) documentation.
+</Tip>
+
 ## Transparency
 
 <Card title="Open Source" icon="github" href="https://github.com/getformo/sdk">
-  Formo SDKs are open source with a fully permissive MIT license. 
+  Formo SDKs are 100% open source with a fully permissive MIT license. 
 </Card>
 
 ## Compliance
@@ -33,13 +44,28 @@ description: "Security is one of our biggest priorities. Learn how we keep your 
   <Card title="Content Security Policy" icon="shield" href="/security/csp">
     Formo supports CSP, which helps prevent attacks like cross-site scripting (XSS) and data injection.
   </Card>
+  <Card title="Minimal Dependencies" icon="cube">
+    Having fewer runtime dependencies significantly reduces the supply chain attack surface.
+  </Card>
 </CardGroup>
+
+### SDK Dependencies List
+
+The [@formo/analytics](https://github.com/getformo/sdk) SDK maintains a minimal dependency footprint to minimize attack surface:
+
+| Package | Purpose | Risk Level |
+| :--- | :--- | :--- |
+| [ethereum-cryptography](https://github.com/ethereum/js-ethereum-cryptography) | Cryptographic operations (Keccak256, SHA256) | Low - Audited pure JS library containing all Ethereum-related cryptographic primitives by the Ethereum Foundation |
+| [mipd](https://github.com/wevm/mipd) | EIP-6963 wallet discovery | Low - standard EIP-6963 implementation by the [wevm](https://wevm.dev/) team, authors of wagmi |
+| [fetch-retry](https://github.com/jonbern/fetch-retry) | HTTP retry with exponential backoff | Low - simple utility |
+
+All releases include cryptographic [provenance attestations](https://www.npmjs.com/package/@formo/analytics#provenance) linking each npm package to its GitHub source code.
 
 ## Infrastructure Security
 
 <CardGroup cols={2}>
   <Card title="Encryption in Transit" icon="lock">
-    Formo secures all connections with industry-standard TLS 1.2+ encryption.
+    All connections secured with industry-standard TLS 1.2+ encryption.
   </Card>
   <Card title="Encryption at Rest" icon="database">
     All data volumes, including backups, are encrypted at rest with unique AES-256 keys.
@@ -72,7 +98,7 @@ description: "Security is one of our biggest priorities. Learn how we keep your 
 ## Partner Security
 
 <CardGroup cols={2}>
-  <Card title="Payments and PCI" icon="credit-card">
+  <Card title="Payments and PCI" icon="credit-card" href="https://security.paddle.com/">
     Formo uses Paddle to process payments and does not store credit card information.
   </Card>
   <Card title="Subprocessors" icon="list-check">

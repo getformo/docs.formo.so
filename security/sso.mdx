@@ -3,27 +3,23 @@ title: "Single Sign-On (SSO)"
 description: "Configure SAML-based Single Sign-On for your organization to manage team access securely."
 ---
 
-Single Sign-On (SSO) allows your team members to log into Formo using your organization's identity provider. This provides centralized access management, enhanced security, and a seamless login experience.
+Single Sign-On (SSO) allows your team members to sign in to Formo using your organization's identity provider. This provides centralized access management, enhanced security, and a seamless sign-in experience.
 
 <Info>SSO is available on Enterprise plans. [Contact us](https://formo.so/support) to enable SSO for your organization.</Info>
 
 ## Supported providers
 
-Formo supports SAML 2.0 SSO with any compliant identity provider, including:
+Formo supports SAML 2.0 SSO with the following identity providers:
 
-- **Okta**
+- **Google Workspace** (formerly G Suite)
 - **Azure Active Directory**
-- **Google Workspace**
-- **OneLogin**
-- **JumpCloud**
-- **Auth0**
-- Any other SAML 2.0 compliant provider
+- **Okta**
 
 ## How SSO works
 
 When SSO is enabled for your organization:
 
-1. Team members visit the Formo login page
+1. Team members visit the Formo sign-in page
 2. They enter their work email address
 3. Formo detects the SSO-enabled domain and redirects to your identity provider
 4. Users authenticate with your identity provider
@@ -69,7 +65,7 @@ Send the following to Formo:
 
 Once configured, Formo will confirm the setup is complete. Test the SSO flow by:
 
-1. Logging out of Formo
+1. Signing out of Formo
 2. Going to [app.formo.so](https://app.formo.so)
 3. Entering an email with your SSO-enabled domain
 4. Verifying you're redirected to your identity provider
@@ -119,7 +115,7 @@ Enter the values provided by Formo:
 Once SSO is configured, you can optionally enforce SSO for all users on your domain. When enforced:
 
 - Users with matching email domains must authenticate via SSO
-- Password-based login is disabled for those users
+- Password-based sign-in is disabled for those users
 - New team members are automatically required to use SSO
 
 <Warning>Before enforcing SSO, ensure all team members can successfully authenticate through your identity provider.</Warning>
@@ -133,8 +129,8 @@ To enable SSO enforcement, contact [support@formo.so](mailto:support@formo.so).
 When SSO is enabled:
 
 1. Add users to your SAML application in your identity provider
-2. Users can then log into Formo using SSO
-3. New users are automatically provisioned on first login
+2. Users can then sign in to Formo using SSO
+3. New users are automatically provisioned on first sign-in
 
 ### Removing users
 
@@ -145,7 +141,7 @@ To remove a user's access:
 
 ## Troubleshooting
 
-### User can't log in via SSO
+### User can't sign in via SSO
 
 1. Verify the user is assigned to the SAML application in your identity provider
 2. Check that the user's email domain matches the configured SSO domain

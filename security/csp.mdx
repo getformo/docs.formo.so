@@ -1,6 +1,6 @@
 ---
 title: "Content Security Policy (CSP)"
-description: "Learn how you can use CSP to protect your users and your data. CSP helps prevent attacks like cross-site scripting (XSS) and data injection attacks."
+description: "Learn how you can use CSP to protect your users and your data. CSP helps prevent attacks like cross-site scripting (XSS), data injection, and man-in-the-middle (MITM) attacks."
 ---
 
 ### Overview
@@ -8,6 +8,16 @@ description: "Learn how you can use CSP to protect your users and your data. CSP
 As [described on MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP): Content Security Policy (CSP) is a feature that helps to prevent or minimize the risk of certain types of security threats. It consists of a series of instructions from a website to a browser, which instruct the browser to place restrictions on the things that the code comprising the site is allowed to do.
 
 The primary use case for CSP is to control which resources, in particular JavaScript resources, a document is allowed to load. This is mainly used as a defense against cross-site scripting (XSS) attacks, in which an attacker is able to inject malicious code into the victim's site.
+
+### How CSP Prevents MITM Attacks
+
+CSP provides a critical layer of protection against man-in-the-middle (MITM) attacks by:
+
+1. **Restricting script sources** - Only scripts from whitelisted domains can execute
+2. **Blocking data exfiltration** - `connect-src` limits where data can be sent
+3. **Preventing code injection** - Even if an attacker injects malicious code, CSP blocks it from communicating with unauthorized servers
+
+When combined with [SRI](/security/sri) and TLS 1.2+ encryption, CSP makes MITM attacks on the Formo SDK effectively impossible.
 
 If you choose to use a CSP it is important to ensure that Formo domains are permitted.
 
@@ -31,4 +41,34 @@ Add the script above within the `<head>` tag of your site to enable CSP.
 | :--- | :--- |
 | `events.formo.so` | Ingestion endpoint for SDK API calls |
 | `cdn.formo.so` | CDN for SDK assets |
+
+### Complete Secure Installation
+
+For maximum security, combine CSP with [SRI](/security/sri):
+
+```html
+<head>
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://*.formo.so;
+    connect-src 'self' https://*.formo.so;
+  ">
+
+  <!-- Formo SDK with SRI -->
+  <script
+    src="https://cdn.formo.so/analytics@1.24.0"
+    integrity="sha384-I84ELjt74eiqNbn2rc8XPfM1ujYclMAMfbFz1Q17Gohaax62TVy49hx/SRNC2MdV"
+    crossorigin="anonymous"
+    defer
+    onload="window.formofy('<YOUR_WRITE_KEY>');"
+  ></script>
+</head>
+```
+
+This configuration ensures:
+- Scripts can only load from your domain and Formo's CDN
+- API calls can only be made to your domain and Formo's ingestion endpoint
+- The SDK integrity is cryptographically verified before execution
+- All traffic is encrypted with TLS 1.2+
 
