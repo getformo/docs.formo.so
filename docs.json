@@ -29,11 +29,13 @@
                 "icon": "compass",
                 "pages": [
                   "features/product-analytics/overview",
-                  "features/product-analytics/growth-analytics",
+                  "features/product-analytics/key-metrics",
                   "features/product-analytics/activity",
+                  "features/product-analytics/live-view",
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
                   "features/product-analytics/charts",
+                  "features/product-analytics/explore",
                   "features/product-analytics/funnels",
                   "features/product-analytics/flows",
                   "features/product-analytics/retention",
@@ -69,11 +71,24 @@
                 "icon": "shield-check",
                 "pages": [
                   "security/overview",
+                  "security/sso",
                   "security/roles",
                   "security/sri",
                   "security/csp"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Use Cases",
+            "pages": [
+              "guides/use-cases/dau-tracking",
+              "guides/use-cases/defi-conversions",
+              "guides/use-cases/wallet-targeting",
+              "guides/use-cases/attribution-guide",
+              "guides/use-cases/onboarding-analysis",
+              "guides/use-cases/churn-prevention",
+              "guides/use-cases/protocol-dashboard"
             ]
           }
         ]

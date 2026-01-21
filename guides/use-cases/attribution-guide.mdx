@@ -1,0 +1,375 @@
+---
+title: 'Attribution for Crypto Marketing'
+description: 'Track the complete user journey from first touch to onchain conversion with multi-touch attribution for crypto marketing campaigns.'
+---
+
+Understand which marketing channels actually drive onchain conversions, not just clicks. This guide shows you how to set up attribution tracking, compare models, and optimize your marketing spend.
+
+## What you'll learn
+
+- Set up UTM tracking for all marketing channels
+- Understand first-touch vs. last-touch attribution
+- Measure true ROI by channel (to the transaction level)
+- Optimize budget allocation based on conversion data
+
+## Prerequisites
+
+- Formo SDK installed ([Installation Guide](/install))
+- Active marketing campaigns to track
+
+---
+
+## Part 1: The Attribution Challenge in Crypto
+
+### Why traditional attribution fails
+
+Traditional analytics measure clicks and visits. For crypto apps, this misses what matters:
+
+| What traditional tools measure | What actually matters |
+|-------------------------------|----------------------|
+| Page views | Wallet connects |
+| Time on site | Transactions completed |
+| Form submissions | Volume/revenue generated |
+| Bounce rate | User quality (net worth, labels) |
+
+### The crypto user journey
+
+A typical onchain user touches multiple channels:
+
+1. **Discovery**: Sees your tweet, ad, or mention
+2. **Research**: Reads about you on Discord, docs, or DeFiLlama
+3. **First visit**: Lands on your site (often without converting)
+4. **Return visit**: Comes back from a different source
+5. **Conversion**: Connects wallet and transacts
+
+Each touchpoint matters. The question is: which one gets credit?
+
+---
+
+## Part 2: How to Set Up UTM Tracking
+
+### UTM parameter basics
+
+UTM parameters let you track where users come from:
+
+```
+https://yourapp.xyz/?utm_source=twitter&utm_medium=social&utm_campaign=launch_2024
+```
+
+| Parameter | Purpose | Examples |
+|-----------|---------|----------|
+| `utm_source` | The platform | twitter, discord, newsletter, defillama |
+| `utm_medium` | The channel type | social, email, paid, referral |
+| `utm_campaign` | The campaign name | launch_2024, airdrop_promo, partnership_xyz |
+| `utm_content` | The creative variant | banner_a, thread_1, video_ad |
+| `utm_term` | Keywords (for paid) | defi, swap, yield |
+
+### Where to add UTMs
+
+Add UTM parameters to every link you control:
+
+**Social media:**
+```
+https://yourapp.xyz/?utm_source=twitter&utm_medium=social&utm_campaign=daily_content
+```
+
+**Email campaigns:**
+```
+https://yourapp.xyz/?utm_source=newsletter&utm_medium=email&utm_campaign=weekly_update
+```
+
+**Partner/referral links:**
+```
+https://yourapp.xyz/?utm_source=partner_name&utm_medium=referral&utm_campaign=collab_jan
+```
+
+**Paid ads:**
+```
+https://yourapp.xyz/?utm_source=twitter_ads&utm_medium=paid&utm_campaign=retargeting&utm_content=banner_v2
+```
+
+### UTM naming conventions
+
+Use consistent naming to make analysis easier:
+
+| Bad | Good |
+|-----|------|
+| `twitter`, `Twitter`, `tw` | Always `twitter` |
+| `paid ad`, `paid_ad`, `paidAd` | Always `paid` |
+| `Launch`, `launch2024`, `jan-launch` | `launch_2024_jan` |
+
+**Recommended format:**
+- Lowercase only
+- Underscores for spaces
+- Include date/month for campaigns: `campaign_name_mmyy`
+
+---
+
+## Part 3: Understand Attribution Models
+
+Formo supports multiple attribution models. Each gives credit differently.
+
+### First-touch attribution
+
+**How it works:** 100% credit to the first channel that introduced the user.
+
+**Best for:** Understanding discovery channels.
+
+**Example:**
+1. User finds you via Twitter (first touch)
+2. Returns via Discord link
+3. Converts via direct visit
+
+→ Twitter gets 100% credit
+
+### Last-touch attribution
+
+**How it works:** 100% credit to the last channel before conversion.
+
+**Best for:** Understanding what drives final conversions.
+
+**Example:**
+1. User finds you via Twitter
+2. Returns via Discord link
+3. Converts via direct visit (last touch)
+
+→ Direct gets 100% credit
+
+### Linear attribution
+
+**How it works:** Credit split equally across all touchpoints.
+
+**Best for:** Valuing the entire journey.
+
+**Example:**
+1. User finds you via Twitter
+2. Returns via Discord link
+3. Converts via direct visit
+
+→ Each gets 33% credit
+
+### Which model to use?
+
+| Goal | Model | Why |
+|------|-------|-----|
+| Grow awareness | First-touch | Shows which channels introduce new users |
+| Optimize conversions | Last-touch | Shows what pushes users to convert |
+| Balanced view | Linear | Values the full journey |
+
+---
+
+## Part 4: How to Analyze Attribution in Formo
+
+### View attribution in Overview
+
+<Steps>
+  <Step title="Go to Overview in the Formo Dashboard" />
+  <Step title="See the Referrers chart in the tabs" />
+  <Step title="Select different units (users, volume, revenue)" />
+</Steps>
+
+<Tip>You can apply filters on the overview page to see attribution by different segments.</Tip>
+
+### Key metrics by source
+
+For each traffic source, track:
+
+| Metric | What it tells you |
+|--------|-------------------|
+| **Visitors** | Reach/awareness |
+| **Wallet connects** | Engagement quality |
+| **Transactions** | Conversion performance |
+| **Volume** | Revenue contribution |
+| **Connect rate** | Visitor → Wallet conversion |
+| **Transaction rate** | Wallet → Transaction conversion |
+
+### Calculate true ROI
+
+For paid campaigns, calculate cost per conversion:
+
+```
+Cost per Transaction = Campaign Spend / Transactions from Campaign
+```
+
+**Example:**
+
+| Channel | Spend | Transactions | Cost/Transaction |
+|---------|-------|--------------|------------------|
+| Influencer | $5,000 | 100 | $50 |
+| Discord Ads | $2,000 | 80 | $25 |
+| Twitter Ads | $3,000 | 150 | $20 |
+
+In this example, Twitter Ads has the best ROI.
+
+---
+
+## Part 5: How to Create Attribution Reports
+
+### Using Ask AI for attribution analysis
+
+Get quick attribution insights with Ask AI (click **Ask AI** in the sidebar):
+
+**Channel comparison:**
+> "Compare wallet connects by utm_source for the last 30 days"
+
+**Campaign performance:**
+> "Show me transactions and volume by utm_campaign this month"
+
+**First vs last touch:**
+> "What are the top 5 first-touch sources for users who transacted?"
+
+**ROI analysis:**
+> "Which utm_source has the highest transaction volume per visitor?"
+
+### Build an attribution dashboard
+
+Create a dedicated attribution dashboard:
+
+| Chart | Query |
+|-------|-------|
+| **Visitors by Source** | Daily visitors grouped by utm_source |
+| **Conversion by Source** | Transaction rate by first-touch source |
+| **Revenue by Campaign** | Volume grouped by utm_campaign |
+| **Source Trend** | Weekly wallet connects by top 5 sources |
+
+### Attribution funnel
+
+Create funnels filtered by source:
+
+<Steps>
+  <Step title="Go to Funnels > Create Funnel" />
+  <Step title="Add steps: Visit → Connect → Transaction" />
+  <Step title="Add breakdown by UTM Source" />
+  <Step title="Compare conversion rates across channels" />
+</Steps>
+
+---
+
+## Part 6: How to Optimize Your Marketing
+
+### Identify your best channels
+
+From your attribution data, categorize channels:
+
+**High-volume, high-conversion:**
+- Scale these immediately
+- Allocate more budget
+- Test similar channels
+
+**High-volume, low-conversion:**
+- Improve landing pages
+- Refine targeting
+- Test different messaging
+
+**Low-volume, high-conversion:**
+- Increase investment
+- Find ways to scale
+- Understand what makes them work
+
+**Low-volume, low-conversion:**
+- Reduce or cut spend
+- Test improvements before continuing
+- Consider audience mismatch
+
+### Optimize by user quality
+
+Don't just measure conversions. Measure user quality:
+
+- Filter users by UTM source
+- Compare average net worth by source
+- Compare retention by source
+- Compare volume per user by source
+
+**Example insight:**
+> Twitter drives more users, but Discord users have 3x higher average net worth and 2x better retention.
+
+### Multi-touch optimization
+
+If using linear attribution:
+
+- Identify common multi-touch paths
+- Ensure each touchpoint is optimized
+- Don't cut channels that assist conversions
+
+**Example path:**
+Twitter (awareness) → DeFiLlama (research) → Direct (conversion)
+
+All three channels contributed. Cutting Twitter would reduce DeFiLlama traffic.
+
+---
+
+## Part 7: Advanced Attribution Tactics
+
+### Cross-channel attribution
+
+Track users across marketing channels:
+
+- Use consistent UTM naming
+- Track first-touch and last-touch separately
+- Analyze common paths with Flows
+
+### Referral program tracking
+
+For referral programs:
+
+```
+?ref=referrer_username
+```
+
+The `ref` parameter is automatically captured by Formo alongside UTM parameters.
+
+### Cohort-based attribution
+
+Compare user quality by acquisition cohort:
+
+- Create segments by first-touch source
+- Measure retention for each segment
+- Calculate LTV by acquisition source
+
+**Example:**
+| Source | 30-day Retention | Avg LTV |
+|--------|-----------------|---------|
+| Twitter | 15% | $50 |
+| Discord | 25% | $120 |
+| DeFiLlama | 35% | $200 |
+
+---
+
+## Summary
+
+You've learned how to:
+
+1. **Set up UTM tracking** across all marketing channels
+2. **Understand attribution models** and when to use each
+3. **Analyze attribution** in Formo with Overview
+4. **Calculate true ROI** including conversion and user quality
+5. **Optimize budget allocation** based on data
+
+## Attribution checklist
+
+<Checklist>
+  <ChecklistItem>UTM parameters on all social links</ChecklistItem>
+  <ChecklistItem>UTM parameters on all email links</ChecklistItem>
+  <ChecklistItem>UTM parameters on all partner links</ChecklistItem>
+  <ChecklistItem>UTM parameters on all paid ads</ChecklistItem>
+  <ChecklistItem>Consistent naming conventions</ChecklistItem>
+  <ChecklistItem>Attribution dashboard created</ChecklistItem>
+  <ChecklistItem>Weekly review of channel performance</ChecklistItem>
+</Checklist>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Key Metrics" icon="chart-simple" href="/features/product-analytics/key-metrics">
+    Deep dive on traffic analysis
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Build conversion funnels by source
+  </Card>
+  <Card title="Wallet Targeting" icon="bullseye" href="/guides/use-cases/wallet-targeting">
+    Target high-value user segments
+  </Card>
+  <Card title="Attribution Methodology" icon="route" href="/data/attribution">
+    Technical attribution details
+  </Card>
+</CardGroup>

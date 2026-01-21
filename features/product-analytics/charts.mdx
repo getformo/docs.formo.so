@@ -1,5 +1,5 @@
 ---
-title: 'Charts'
+title: 'Dashboards'
 description: 'Create and share your own charts and dashboards for reporting, with support for multiple chart types and visualizations.'
 ---
 
@@ -10,6 +10,14 @@ description: 'Create and share your own charts and dashboards for reporting, wit
 Create custom charts and reports. Turn your data into decisions with powerful visualizations and real-time insights.
 
 Easily share insights with your team. Export and distribute reports with a single click.
+
+## Understanding dashboards
+
+- **Dashboards** is the section in the sidebar where you manage your visualizations
+- **Boards** are individual dashboard pages that contain multiple charts
+- **Charts** are the visualizations within each board
+
+Click **Dashboards** in the sidebar to see your boards, or click **Add board** to create a new one.
 
 ## SQL Editor Autocomplete
 
@@ -65,3 +73,137 @@ Add beautiful, interactive visualizations that make your data easy to understand
 ## Export CSV
 
 Export data into a CSV file for use elsewhere in your stack.
+
+---
+
+## How to build your first dashboard
+
+Create a custom dashboard with charts to track your key metrics. This guide walks you through creating charts using both SQL and the AI assistant.
+
+### Step 1: Create a board
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Dashboards** in the left navigation
+4. Click **Add board** to create a new dashboard
+5. Click **Add Chart** to add your first visualization
+
+### Step 2: Create a chart with Ask AI (Recommended)
+
+The easiest way to create charts is using natural language:
+
+1. Click **Ask AI** in the sidebar
+2. Describe what you want to see:
+   - "Show me daily active users over the last 30 days"
+   - "What are my top 10 referrers by transaction count?"
+   - "Chart wallet connects by country this month"
+3. AI generates the SQL query and chart
+4. Click **Save to Dashboard**
+
+<Frame caption="Ask AI to generate charts from natural language.">
+	<img src="/images/ai.png" alt="Ask AI" />
+</Frame>
+
+**Example prompts:**
+| Prompt | What you get |
+|--------|--------------|
+| "Daily unique wallets last 7 days" | Line chart of wallet connects |
+| "Top pages by views" | Bar chart of page rankings |
+| "Conversion funnel from visit to transaction" | Funnel visualization |
+| "Week-over-week retention" | Retention cohort table |
+
+### Step 3: Create a chart with SQL
+
+For more control, write SQL directly:
+
+1. Click **New Chart** > **SQL Editor**
+2. Write your query using Formo's schema
+3. Click **Run** to preview results
+4. Choose your visualization type
+5. Click **Save**
+
+**Example: Daily active wallets**
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(address) AS unique_wallets
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+<Frame caption="The SQL editor with autocomplete for table and column names.">
+	<img src="/images/autocomplete.png" alt="SQL Editor" />
+</Frame>
+
+<Tip>Use autocomplete (`Ctrl+Space`) to see available tables and columns. See the [Data Schema](/data/schema) for full documentation.</Tip>
+
+### Step 4: Choose a visualization
+
+After running your query, select the chart type that best represents your data:
+
+| Chart Type | Best for |
+|------------|----------|
+| **Line** | Trends over time |
+| **Bar** | Comparing categories |
+| **Pie** | Showing proportions |
+| **Number** | Single KPI metric |
+| **Table** | Detailed data exploration |
+| **Funnel** | Conversion analysis |
+| **Retention** | Cohort retention |
+
+### Step 5: Organize your board
+
+Arrange charts into a dashboard layout:
+
+1. Open your board from **Dashboards** in the sidebar
+2. Drag charts to rearrange
+3. Resize charts by dragging corners
+4. Group related metrics together
+
+**Recommended dashboard layout:**
+- **Top row**: Key numbers (DAU, revenue, transactions)
+- **Middle**: Time-series trends
+- **Bottom**: Breakdowns and tables
+
+### Step 6: Share your dashboard
+
+Share insights with your team:
+
+- **Export** - Download individual charts as CSV
+- **Share link** - Generate a view-only dashboard link
+- **BI tools** - Connect Metabase, Tableau, or other tools via [direct database access](/data/bi)
+
+### Example: Weekly metrics dashboard
+
+Here's a starter dashboard with common metrics:
+
+| Chart | Query description | Type |
+|-------|-------------------|------|
+| WAU | Unique wallets last 7 days | Number |
+| Daily trend | Visitors per day last 30 days | Line |
+| Top referrers | Referrers ranked by visitors | Bar |
+| Conversion rate | Visitors who transacted | Number |
+| Country breakdown | Users by country | Pie |
+
+Use Ask AI to generate each chart, then arrange them on your dashboard.
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Ask AI" icon="sparkles" href="/features/product-analytics/ai">
+    Learn more about AI-powered analytics
+  </Card>
+  <Card title="Data Schema" icon="database" href="/data/schema">
+    Explore available tables and columns
+  </Card>
+  <Card title="BI Tools" icon="chart-mixed" href="/data/bi">
+    Connect external visualization tools
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Build conversion funnels
+  </Card>
+</CardGroup>

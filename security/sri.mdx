@@ -1,6 +1,6 @@
 ---
 title: "Subresource Integrity (SRI)"
-description: "Learn how Formo uses SRI to protect your users and your data. SRI helps prevent attacks like cross-site scripting (XSS) and NPM hijacking."
+description: "Learn how Formo uses SRI to protect your users and your data. SRI helps prevent attacks like cross-site scripting (XSS), NPM hijacking, and man-in-the-middle (MITM) attacks."
 ---
 
 ### Overview
@@ -11,6 +11,18 @@ SRI matters because it offers **protection against malicious tampering**.
 If an attacker exploited a content delivery network (CDN) and modified the contents of JavaScript libraries hosted on that CDN, it would create vulnerabilities in all websites that use those libraries.
 
 SRI helps prevent attacks like cross-site scripting (XSS) by ensuring that the resources delivered to your site are exactly what they should be.
+
+### How SRI Prevents MITM Attacks
+
+SRI provides cryptographic protection against man-in-the-middle attacks:
+
+1. **Hash verification** - The browser computes a SHA384 hash of the downloaded script
+2. **Integrity check** - If the hash doesn't match the `integrity` attribute, the browser **refuses to execute the script**
+3. **Tamper detection** - Any modification in transit (MITM) or at rest (CDN compromise) is detected
+
+<Warning>
+If someone intercepts the script during transit and modifies it, the hash will not match and the browser will block execution entirely. This is the same protection mechanism used by major CDNs like cdnjs and unpkg.
+</Warning>
 
 ### How to Enable SRI
 
@@ -31,4 +43,37 @@ Enable SRI on the browser [install](/install) snippet by updating the `src` and 
 
 The hash in the integrity attribute within the Formo install script works with SRI to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
 
-If the file is modified after this point, the hash won't match, and supporting web browsers will refuse to load it. This ensures that the script you’re running is exactly the one provided by Formo, without any hidden changes or malicious code.
+If the file is modified after this point, the hash won't match, and supporting web browsers will refuse to load it. This ensures that the script you're running is exactly the one provided by Formo, without any hidden changes or malicious code.
+
+### Verifying the Integrity Hash
+
+You can independently verify the SRI hash using the following methods:
+
+**Using OpenSSL (macOS/Linux):**
+```bash
+curl -s https://cdn.formo.so/analytics@1.24.0 | openssl dgst -sha384 -binary | openssl base64 -A
+```
+
+**Using Node.js:**
+```javascript
+const crypto = require('crypto');
+const https = require('https');
+
+https.get('https://cdn.formo.so/analytics@1.24.0', (res) => {
+  const hash = crypto.createHash('sha384');
+  res.on('data', (chunk) => hash.update(chunk));
+  res.on('end', () => console.log('sha384-' + hash.digest('base64')));
+});
+```
+
+The output should match the integrity hash published in our [GitHub releases](https://github.com/getformo/sdk/releases).
+
+### Combined Protection with CSP
+
+For maximum security, combine SRI with [Content Security Policy](/security/csp). When both are enabled:
+
+- **CSP** restricts where scripts can load from and where data can be sent
+- **SRI** ensures the loaded script hasn't been tampered with
+- **TLS 1.2+** encrypts all traffic in transit
+
+This defense-in-depth approach makes it effectively impossible for an attacker to compromise the Formo SDK through MITM attacks.

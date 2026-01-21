@@ -46,3 +46,145 @@ Here's an example of the JSON payload that will be sent to your webhook:
   "webhook_version": "1.0"
 }
 ```
+
+---
+
+## How to set up your first alert
+
+Get real-time notifications when high-value users interact with your app. This guide walks you through creating alerts for whale detection and key events.
+
+### Step 1: Navigate to Alerts
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Settings** in the left navigation (gear icon)
+4. Select the **Alerts** tab
+
+### Step 2: Create a new alert
+
+1. Click **Create Alert**
+2. Configure your alert:
+
+| Setting | Description |
+|---------|-------------|
+| **Name** | Descriptive name (e.g., "Whale Alert") |
+| **Event Type** | Which event triggers the alert |
+| **Conditions** | Filter conditions (optional) |
+| **Notification** | Email or Webhook |
+
+### Step 3: Choose an event type
+
+Select which events should trigger notifications:
+
+| Event Type | When it fires |
+|------------|--------------|
+| **connect** | User connects their wallet |
+| **transaction** | User submits a transaction |
+| **page** | User visits a specific page |
+| **custom** | Your custom tracked events |
+
+### Step 4: Add filter conditions (optional)
+
+Make alerts more targeted by adding conditions:
+
+**Example: Alert only for whales**
+- Event type: `connect`
+- Condition: `net_worth > 100000`
+
+**Example: Alert for specific contract interaction**
+- Event type: `transaction`
+- Condition: `contract_address = 0x...`
+
+### Step 5: Configure notifications
+
+<Tabs>
+  <Tab title="Email">
+    1. Select **Email** as the notification type
+    2. Enter the email addresses to notify
+    3. Alerts arrive in real-time as events occur
+  </Tab>
+  <Tab title="Webhook">
+    1. Select **Webhook** as the notification type
+    2. Enter your webhook URL
+    3. Formo sends a POST request with event data
+
+    **Webhook payload fields:**
+    - `alert_id` - Unique alert identifier
+    - `alert_name` - Your alert name
+    - `event` - Full event data including address, type, and properties
+    - `timestamp` - When the alert fired
+  </Tab>
+  <Tab title="Slack (via Webhook)">
+    1. Create a [Slack incoming webhook](https://api.slack.com/messaging/webhooks)
+    2. Use the Slack webhook URL as your Formo webhook URL
+    3. Messages post to your configured Slack channel
+  </Tab>
+</Tabs>
+
+### Step 6: Test your alert
+
+1. Save your alert configuration
+2. Trigger a test event:
+   - Visit your app in a browser
+   - Connect a wallet
+   - Perform the action that matches your alert
+3. Check your email or webhook endpoint for the notification
+
+### Example: Whale detection alert
+
+Here's a practical alert configuration to notify you when high-value users visit:
+
+| Setting | Value |
+|---------|-------|
+| Name | Whale Alert |
+| Event type | connect |
+| Condition | net_worth > 100000 |
+| Notification | Slack webhook |
+
+Every time a wallet with over $100k net worth connects, you'll get a Slack message with their details.
+
+### Example: Failed transaction alert
+
+Track when users encounter issues:
+
+| Setting | Value |
+|---------|-------|
+| Name | Failed TX Alert |
+| Event type | transaction |
+| Condition | status = failed |
+| Notification | Email |
+
+Get notified when transactions fail so you can investigate UX issues.
+
+### Webhook integration examples
+
+**Send to Slack:**
+```bash
+# Your Slack webhook URL
+https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+```
+
+**Send to Zapier:**
+```bash
+# Your Zapier webhook URL
+https://hooks.zapier.com/hooks/catch/123456/abcdef/
+```
+
+Then use Zapier to route alerts to any destination: Notion, Airtable, Discord, SMS, etc.
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Wallet Profiles" icon="user" href="/features/wallet-intelligence/wallet-profiles">
+    Learn more about user data available in alerts
+  </Card>
+  <Card title="Custom Events" icon="bolt" href="/features/product-analytics/custom-events">
+    Track custom events to alert on
+  </Card>
+  <Card title="Webhooks API" icon="webhook" href="/api-reference/webhooks">
+    Full webhook documentation
+  </Card>
+  <Card title="Wallet Messaging" icon="message" href="/features/wallet-intelligence/wallet-messaging">
+    Reach out to high-value users directly
+  </Card>
+</CardGroup>

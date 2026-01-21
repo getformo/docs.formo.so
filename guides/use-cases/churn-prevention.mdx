@@ -1,0 +1,314 @@
+---
+title: 'Churn Prevention'
+description: 'Identify at-risk users before they leave, create re-engagement segments, and reduce churn with data-driven retention strategies.'
+---
+
+Stop losing users before it happens. This guide shows you how to identify at-risk users, understand why they're leaving, and take action to bring them back.
+
+## What you'll learn
+
+- Define and measure churn for onchain apps
+- Identify at-risk users before they churn
+- Understand why users leave using behavioral analysis
+- Create re-engagement segments and campaigns
+- Track the effectiveness of retention efforts
+
+## Prerequisites
+
+- Formo SDK installed ([Installation Guide](/install))
+- At least 30 days of data for meaningful churn analysis
+- Defined what "active" means for your app
+
+---
+
+## Part 1: How to Define Churn for Your App
+
+### What is churn?
+
+Churn is when a user stops engaging with your app. For onchain apps, this typically means:
+
+| App Type | Churn Definition |
+|----------|------------------|
+| **DeFi protocol** | No transactions for 30+ days |
+| **Gaming** | No gameplay sessions for 14+ days |
+| **Bridge** | No bridge transactions for 60+ days |
+
+### Step 1: Check your retention baseline
+
+<Steps>
+  <Step title="Go to Retention in the Formo Dashboard" />
+  <Step title="Set the starting event to connect (wallet connection)" />
+  <Step title="View the cohort table" />
+</Steps>
+
+A typical retention pattern looks like:
+
+| Cohort | Week 0 | Week 1 | Week 2 | Week 4 | Week 8 |
+|--------|--------|--------|--------|--------|--------|
+| Week 1 | 100% | 25% | 18% | 12% | 8% |
+| Week 2 | 100% | 28% | 20% | 14% | - |
+
+If Week 4 retention is 12%, then ~88% of users have churned by Week 4.
+
+### Step 2: Calculate your churn rate
+
+```
+Monthly churn rate = (Users at start - Users at end) / Users at start × 100
+```
+
+Or use the [Explorer](/features/product-analytics/explore) with this query:
+
+```sql
+WITH monthly_active AS (
+  SELECT
+    toStartOfMonth(timestamp) AS month,
+    countDistinct(address) AS active_users
+  FROM events
+  WHERE type = 'connect'
+  GROUP BY month
+)
+SELECT
+  month,
+  active_users,
+  lagInFrame(active_users) OVER (ORDER BY month) AS prev_month,
+  round((lagInFrame(active_users) OVER (ORDER BY month) - active_users)
+    / lagInFrame(active_users) OVER (ORDER BY month) * 100, 1) AS churn_rate
+FROM monthly_active
+ORDER BY month
+```
+
+---
+
+## Part 2: How to Identify At-Risk Users
+
+### User lifecycle stages
+
+Formo automatically assigns [lifecycle stages](/features/wallet-intelligence/wallet-profiles#user-lifecycle) to users:
+
+| Stage | Description | Churn Risk |
+|-------|-------------|------------|
+| **New** | First session | Medium - haven't proven value yet |
+| **Returning** | Multiple sessions | Low - showing engagement |
+| **Power User** | 5+ active days in 30 days | Very Low - highly engaged |
+| **Churned** | 30+ days inactive | Already churned |
+| **Resurrected** | Returned after churning | Medium - may churn again |
+
+### Step 1: Create at-risk segments
+
+Go to **Users** and create these [Segments](/features/wallet-intelligence/segments):
+
+**Segment: At-Risk Power Users**
+- Lifecycle = Power User
+- Last seen between 14 and 30 days ago
+
+These are your most valuable users who are showing signs of disengagement.
+
+**Segment: New Users Not Returning**
+- Lifecycle = New
+- First seen more than 7 days ago
+- Last seen = First seen (only one session)
+
+These users tried your app once and never came back.
+
+**Segment: Declining Activity**
+- Was active 3+ times in previous 30 days
+- Active only 1 time in last 30 days
+
+These users are reducing their engagement.
+
+### Step 2: Monitor segment sizes
+
+Track how many users are in each at-risk segment over time.
+
+Use [Ask AI](/features/product-analytics/ai) to generate monitoring charts:
+
+> "Show me the count of users who were last seen between 14 and 30 days ago and have more than 5 sessions"
+
+> "How many users have only had 1 session and haven't been seen in 7 days?"
+
+Save these charts to a [Dashboard](/features/product-analytics/charts) to monitor segment sizes over time.
+
+---
+
+## Part 3: How to Understand Why Users Churn
+
+### Analyze churned user behavior
+
+Use [Flows](/features/product-analytics/flows) to see what churned users did in their last session:
+
+<Steps>
+  <Step title="Go to Flows" />
+  <Step title="Filter by users who are now Churned" />
+  <Step title="Set the starting event to their last session" />
+  <Step title="Look for patterns in exit behavior" />
+</Steps>
+
+### Common churn signals
+
+| Signal | What it means | How to detect |
+|--------|---------------|---------------|
+| **Failed transaction** | User hit an error | Filter Activity by `status = failed` |
+| **Abandoned flow** | Confusion or friction | Flows showing exits before completion |
+| **Only viewed prices** | Window shopping, no intent | Funnel drop-off at connect step |
+| **Single feature use** | Didn't discover value | Flows showing limited exploration |
+
+### Compare churned vs. retained users
+
+Create two cohorts and compare their behavior:
+
+**Churned cohort:**
+- Users who were active 60+ days ago
+- Have not returned in 30+ days
+
+**Retained cohort:**
+- Users who were active 60+ days ago
+- Have returned in the last 30 days
+
+Compare:
+- Number of sessions in first week
+- Features used
+- Transaction volume
+- Entry referrer
+
+This reveals what retained users do differently.
+
+---
+
+## Part 4: How to Set Up Churn Alerts
+
+### Real-time monitoring
+
+Create [Alerts](/features/product-analytics/alerts) to catch churn risks early:
+
+**Alert 1: Whale going inactive**
+- Trigger: User with net worth > $100k
+- Condition: No activity for 7 days
+- Action: Notify sales/BD team
+
+**Alert 2: Power user declining**
+- Trigger: User was power user
+- Condition: Activity dropped 50% week-over-week
+- Action: Add to re-engagement campaign
+
+**Alert 3: Failed transaction spike**
+- Trigger: Failed transactions
+- Condition: Count > 2× daily average
+- Action: Notify engineering (may be a bug causing churn)
+
+### Weekly churn review
+
+Set up a weekly dashboard review:
+
+- Check at-risk segment sizes
+- Review failed transactions
+- Analyze retention by cohort
+- Identify any anomalies
+
+---
+
+## Part 5: How to Run Re-Engagement Campaigns
+
+### Export at-risk segments
+
+<Steps>
+  <Step title="Go to Users > select your at-risk segment" />
+  <Step title="Click Export CSV" />
+  <Step title="Download wallet addresses" />
+</Steps>
+
+Use these for targeted campaigns on:
+- **Twitter/X**: Target ads to wallet owners
+- **Farcaster**: Direct outreach
+- **Email**: If you have email addresses linked
+- **In-app**: Show personalized messages on return
+
+### Re-engagement strategies by segment
+
+| Segment | Strategy | Message |
+|---------|----------|---------|
+| **Power users going quiet** | VIP outreach | "We miss you! Here's what's new..." |
+| **One-and-done users** | Education | "Complete your first transaction. Here's how" |
+| **Failed transaction users** | Support | "We noticed an issue. Let us help" |
+| **Feature-limited users** | Discovery | "Have you tried [feature]?" |
+
+### Track re-engagement success
+
+After running campaigns:
+
+<Steps>
+  <Step title="Create a segment of users targeted" />
+  <Step title="Track how many returned (Resurrected lifecycle)" />
+  <Step title="Measure their subsequent retention" />
+</Steps>
+
+To measure reactivation rate, filter your Users list by the Resurrected lifecycle and compare to the number of users you targeted in your campaign.
+
+---
+
+## Part 6: How to Build a Churn Prevention Dashboard
+
+### Recommended metrics
+
+| Metric | Chart Type | Purpose |
+|--------|------------|---------|
+| **Monthly churn rate** | Line | Trend over time |
+| **At-risk user count** | Number | Current risk level |
+| **Retention by cohort** | Retention | Long-term patterns |
+| **Days since last seen distribution** | Bar | Inactivity spread |
+| **Churned users by referrer** | Table | Which sources have worst retention |
+| **Reactivation rate** | Number | Campaign effectiveness |
+
+### Key metrics to track
+
+**Leading indicators** (predict future churn):
+- At-risk segment size
+- Week 1 retention rate
+- Failed transaction rate
+- Average sessions per user
+
+**Lagging indicators** (measure past churn):
+- Monthly churn rate
+- Churned user count
+- Lifetime value of churned users
+
+---
+
+## Summary
+
+You've learned how to:
+
+1. **Define churn** appropriately for your app type
+2. **Identify at-risk users** before they leave
+3. **Understand why users churn** through behavioral analysis
+4. **Set up alerts** for early warning signals
+5. **Run re-engagement campaigns** with exported segments
+6. **Track effectiveness** of retention efforts
+
+## Churn prevention checklist
+
+<Checklist>
+  <ChecklistItem>Defined what "churned" means for your app</ChecklistItem>
+  <ChecklistItem>Calculated baseline churn rate</ChecklistItem>
+  <ChecklistItem>Created at-risk user segments</ChecklistItem>
+  <ChecklistItem>Set up alerts for high-value user inactivity</ChecklistItem>
+  <ChecklistItem>Analyzed churned vs. retained user behavior</ChecklistItem>
+  <ChecklistItem>Built churn prevention dashboard</ChecklistItem>
+  <ChecklistItem>Established re-engagement workflow</ChecklistItem>
+</Checklist>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Retention Analysis" icon="calendar" href="/features/product-analytics/retention">
+    Deep dive on retention metrics
+  </Card>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Advanced segmentation techniques
+  </Card>
+  <Card title="Alerts" icon="bell" href="/features/product-analytics/alerts">
+    Set up automated monitoring
+  </Card>
+  <Card title="Wallet Targeting" icon="bullseye" href="/guides/use-cases/wallet-targeting">
+    Run targeted campaigns
+  </Card>
+</CardGroup>

@@ -1,0 +1,179 @@
+---
+title: "Single Sign-On (SSO)"
+description: "Configure SAML-based Single Sign-On for your organization to manage team access securely."
+---
+
+Single Sign-On (SSO) allows your team members to sign in to Formo using your organization's identity provider. This provides centralized access management, enhanced security, and a seamless sign-in experience.
+
+<Info>SSO is available on Enterprise plans. [Contact us](https://formo.so/support) to enable SSO for your organization.</Info>
+
+## Supported providers
+
+Formo supports SAML 2.0 SSO with the following identity providers:
+
+- **Google Workspace** (formerly G Suite)
+- **Azure Active Directory**
+- **Okta**
+
+## How SSO works
+
+When SSO is enabled for your organization:
+
+1. Team members visit the Formo sign-in page
+2. They enter their work email address
+3. Formo detects the SSO-enabled domain and redirects to your identity provider
+4. Users authenticate with your identity provider
+5. Upon successful authentication, users are redirected back to Formo
+
+## Setting up SSO
+
+SSO configuration is handled by the Formo team. Here's what you'll need to provide:
+
+### Step 1: Contact Formo
+
+Reach out to [support@formo.so](mailto:support@formo.so) or your account manager to request SSO setup.
+
+### Step 2: Create a SAML application
+
+In your identity provider (e.g., Okta), create a new SAML 2.0 application with the following settings:
+
+| Setting | Value |
+|---------|-------|
+| **Single sign-on URL (ACS URL)** | Provided by Formo |
+| **Audience URI (SP Entity ID)** | Provided by Formo |
+| **Name ID format** | EmailAddress |
+| **Application username** | Email |
+
+### Step 3: Configure attribute mappings
+
+Ensure the following attributes are mapped:
+
+| SAML Attribute | Value |
+|----------------|-------|
+| `email` | User's email address |
+| `firstName` (optional) | User's first name |
+| `lastName` (optional) | User's last name |
+
+### Step 4: Provide Formo with your metadata
+
+Send the following to Formo:
+
+1. **Metadata URL** - Your identity provider's SAML metadata URL
+2. **Email domains** - The email domains to enable for SSO (e.g., `yourcompany.com`)
+
+### Step 5: Test and verify
+
+Once configured, Formo will confirm the setup is complete. Test the SSO flow by:
+
+1. Signing out of Formo
+2. Going to [app.formo.so](https://app.formo.so)
+3. Entering an email with your SSO-enabled domain
+4. Verifying you're redirected to your identity provider
+5. Authenticating and being redirected back to Formo
+
+## Okta setup guide
+
+Here's a detailed guide for setting up SSO with Okta:
+
+### 1. Create a new application
+
+1. In the Okta Admin Console, go to **Applications** > **Applications**
+2. Click **Create App Integration**
+3. Select **SAML 2.0** and click **Next**
+
+### 2. Configure general settings
+
+1. Enter an **App name** (e.g., "Formo")
+2. Optionally upload the Formo logo
+3. Click **Next**
+
+### 3. Configure SAML settings
+
+Enter the values provided by Formo:
+
+| Field | Value |
+|-------|-------|
+| **Single sign on URL** | `https://[provided].supabase.co/auth/v1/sso/saml/acs` |
+| **Audience URI (SP Entity ID)** | `https://[provided].supabase.co/auth/v1/sso/saml/metadata` |
+| **Name ID format** | EmailAddress |
+| **Application username** | Email |
+| **Update application username on** | Create and update |
+
+### 4. Get the metadata URL
+
+1. After creating the application, go to the **Sign On** tab
+2. Copy the **Metadata URL**
+3. Send this URL to Formo along with your email domain(s)
+
+### 5. Assign users
+
+1. Go to the **Assignments** tab
+2. Assign the application to users or groups who should have access to Formo
+
+## Enforcing SSO
+
+Once SSO is configured, you can optionally enforce SSO for all users on your domain. When enforced:
+
+- Users with matching email domains must authenticate via SSO
+- Password-based sign-in is disabled for those users
+- New team members are automatically required to use SSO
+
+<Warning>Before enforcing SSO, ensure all team members can successfully authenticate through your identity provider.</Warning>
+
+To enable SSO enforcement, contact [support@formo.so](mailto:support@formo.so).
+
+## Managing users
+
+### Adding users
+
+When SSO is enabled:
+
+1. Add users to your SAML application in your identity provider
+2. Users can then sign in to Formo using SSO
+3. New users are automatically provisioned on first sign-in
+
+### Removing users
+
+To remove a user's access:
+
+1. Remove them from the SAML application in your identity provider
+2. Optionally, remove them from the Formo team in **Team Settings** > **Members**
+
+## Troubleshooting
+
+### User can't sign in via SSO
+
+1. Verify the user is assigned to the SAML application in your identity provider
+2. Check that the user's email domain matches the configured SSO domain
+3. Ensure the Name ID format is set to "EmailAddress"
+
+### SSO redirect not working
+
+1. Verify the Single sign-on URL (ACS URL) is correct
+2. Check that the Audience URI matches exactly
+3. Ensure there are no trailing slashes or whitespace in the URLs
+
+### Need help?
+
+Contact [support@formo.so](mailto:support@formo.so) for assistance with SSO configuration.
+
+## Security benefits
+
+SSO provides several security advantages:
+
+- **Centralized access control** - Manage all user access from your identity provider
+- **Automatic deprovisioning** - Remove access instantly when employees leave
+- **Stronger authentication** - Leverage your organization's MFA policies
+- **Audit trail** - Track authentication events in your identity provider logs
+- **Reduced password fatigue** - Users don't need another password to remember
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Role-Based Access Control" icon="users" href="/security/roles">
+    Configure team member permissions
+  </Card>
+  <Card title="Security Overview" icon="shield-check" href="/security/overview">
+    Learn about Formo's security practices
+  </Card>
+</CardGroup>

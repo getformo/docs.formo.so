@@ -3,29 +3,16 @@ title: 'Activity feed'
 description: 'Get insights into user behaviour, including drop-off and retention drivers. From pageviews to conversions, get complete visibility into how users actually use your product.'
 ---
 
-Track every user interaction with powerful real-time event analytics. 
-
-Formo automatically captures page views, wallet connects, signatures, and transactions on your onchain app.
+Track every user interaction with powerful real-time event analytics.  Formo automatically captures page views, wallet connects, signatures, and transactions on your app.
 You can also track [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
 
 <Frame caption="The activity feed shows you what users are doing in real-time.">
 	<img src="/images/dapp-analytics-activity-1.png" alt="Product Analytics Activity" />
 </Frame>
 
-You can see all event properties, user actions, and conversion data in one place, without any sampling.
-The activity feed lets you measure key touchpoints in the user lifecycle, identify drop-off points, and boost retention.
+Get full visibility on key touchpoints in the user lifecycle to identify drop-off points and boost retention. You can see what users do, full event properties, and other data without sampling.
 
-## Live View
-
-See a realtime activity feed of your current visitors on a rotating globe. Perfect for a mission control dashboard.
-
-<Frame caption="Live view of your current visitors.">
-	<img src="/images/live.png" alt="Product Analytics Activity" />
-</Frame>
-
-Click on any user or activity in the live feed to see where they are on the map. Click again to open their [wallet profile](/features/wallet-intelligence/wallet-profiles).
-
-## Filter by Event Properties
+## Filter by event properties
 
 Filter the activity feed by event properties to focus on specific user actions or behaviors.
 
@@ -33,4 +20,184 @@ Filter the activity feed by event properties to focus on specific user actions o
 	<img src="/images/filter-properties.png" alt="Product Analytics Activity" />
 </Frame>
 
-Use filters to narrow down events by any property, making it easy to investigate specific user journeys or debug issues.
+Use filters to narrow down events by any property, making it easy to investigate specific user journeys or troubleshoot issues.
+
+---
+
+## How to use the activity feed
+
+The Activity Feed is your real-time view into what users are doing on your app. This guide shows you how to use it for investigation and user research.
+
+### Step 1: Open the Activity Feed
+
+<Steps>
+  <Step title="Go to the Formo Dashboard">
+    Open [app.formo.so](https://app.formo.so).
+  </Step>
+  <Step title="Select your project" />
+  <Step title="Click Activity in the left navigation" />
+</Steps>
+
+You'll see a chronological stream of all events on your app.
+
+### Step 2: Understand event types
+
+Each event has a structured schema and type based on the [event specs](/data/events/overview):
+
+| Event Type | What it captures |
+|------------|------------------|
+| `page` | Page view with URL path |
+| `connect` | Wallet connection |
+| `disconnect` | Wallet disconnection |
+| `signature` | Message signing |
+| `transaction` | Onchain transaction |
+| `track` | Custom events |
+| `decoded_log` | Smart contract events |
+
+Click any event to expand and see all properties.
+
+<Frame caption="Each event has full properties and metadata available for deeper analysis.">
+	<img src="/images/activity-expand.png" alt="Product Analytics Event Properties" />
+</Frame>
+
+### Step 3: Filter to find specific events
+
+Use filters to narrow down the feed:
+
+<Steps>
+  <Step title="Click Filter" />
+  <Step title="Choose a property to filter by" />
+  <Step title="Set the condition and value" />
+</Steps>
+
+**Common filter combinations:**
+
+| Goal | Filters |
+|------|---------|
+| Connects from Twitter | type = connect, referrer contains twitter |
+| Visitors from marketing campaign | utm_source = newsletter |
+| Events from mobile devices | device = mobile |
+| Failed transactions | type = transaction, status = failed |
+| Wallet connects from Twitter | type = connect, referrer contains twitter |
+| Specific user's activity | address = 0x... |
+| Events on a specific page | path = /swap |
+| High-value transactions | type = transaction, value > 1000 |
+
+<Frame caption="Filter by any property to focus your investigation.">
+	<img src="/images/filter-properties.png" alt="Activity Filters" />
+</Frame>
+
+### Step 4: Investigate a user's journey
+
+To see everything a specific user did:
+
+<Steps>
+  <Step title="Find any event from that user" />
+  <Step title="Click the wallet address" />
+  <Step title="View their complete Wallet Profile">
+    See [Wallet Profiles](/features/wallet-intelligence/wallet-profiles) for more details.
+  </Step>
+</Steps>
+
+<Frame caption="View a user's activity feed.">
+	<img src="/images/screenshots/wallet-profile-activity.png" alt="Wallet Profile Activity Feed" />
+</Frame>
+
+Or filter the Activity Feed:
+
+<Steps>
+  <Step title="Add filter: address = [wallet address]" />
+  <Step title="See all events from this user in chronological order" />
+</Steps>
+
+
+### Step 5: Investigate issues
+
+When users report problems, use the Activity Feed to investigate:
+
+**Investigating a failed transaction:**
+
+<Steps>
+  <Step title="Filter by type = transaction and status = failed" />
+  <Step title="Find the user's transaction" />
+  <Step title="Click to expand and see error details" />
+  <Step title="Check the preceding events for context" />
+</Steps>
+
+**Investigating a drop-off:**
+
+<Steps>
+  <Step title="Filter by the user's address" />
+  <Step title="Look at their event sequence" />
+  <Step title="Identify where they stopped (last event before leaving)" />
+  <Step title="Check for errors or unusual patterns" />
+  <Step title="Use Funnels to measure drop-off rates at each step">
+    See [Funnels](/features/product-analytics/funnels) for more details.
+  </Step>
+</Steps>
+
+**Investigating a flow issue:**
+
+<Steps>
+  <Step title="Filter by a specific page path" />
+  <Step title="Look at what users do after visiting that page" />
+  <Step title="Identify unexpected patterns" />
+  <Step title="Use Flows to visualize common paths users take">
+    See [Flows](/features/product-analytics/flows) for more details.
+  </Step>
+</Steps>
+
+### Common investigation patterns
+
+**"Why are users bouncing from our swap page?"**
+
+<Steps>
+  <Step title="Filter: path = /swap" />
+  <Step title="Look at events that follow page views" />
+  <Step title="Count how many lead to connect vs. leaving" />
+  <Step title="Check for errors or unusual device/browser patterns" />
+</Steps>
+
+**"Which transactions are failing?"**
+
+<Steps>
+  <Step title="Filter: type = transaction, status = failed" />
+  <Step title="Group by error message or contract" />
+  <Step title="Identify the most common failure reasons" />
+  <Step title="Check if failures correlate with specific flows" />
+</Steps>
+
+**"What do our best users do differently?"**
+
+<Steps>
+  <Step title="Identify a power user from the Users list" />
+  <Step title="Filter Activity by their address" />
+  <Step title="Study their event sequence" />
+  <Step title="Compare to average user patterns" />
+</Steps>
+
+**"Is our new feature being used?"**
+
+<Steps>
+  <Step title="Filter by your custom event or page path" />
+  <Step title="See adoption over time" />
+  <Step title="Check which user segments are using it" />
+  <Step title="Look at the referrer to see how users find it" />
+</Steps>
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Live View" icon="globe" href="/features/product-analytics/live-view">
+    Real-time activity on a globe
+  </Card>
+  <Card title="Wallet Profiles" icon="user" href="/features/wallet-intelligence/wallet-profiles">
+    Drill into individual users
+  </Card>
+  <Card title="Custom Events" icon="bolt" href="/features/product-analytics/custom-events">
+    Track more actions in the feed
+  </Card>
+  <Card title="Alerts" icon="bell" href="/features/product-analytics/alerts">
+    Get notified of important events
+  </Card>
+</CardGroup>

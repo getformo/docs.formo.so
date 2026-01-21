@@ -1,0 +1,288 @@
+---
+title: "Key metrics"
+description: "Track key growth metrics like visitors, wallets, transactions, and user acquisition channels to understand your product performance."
+---
+
+<Note>This corresponds to the **Overview** page in the Formo dashboard.</Note>
+
+## Visitors, wallets, transactions
+
+Measure the number of visitors, wallets, and transactions to discover which tactics drive product adoption and growth.
+
+<Frame caption="Key metrics for crypto teams.">
+  <img
+    src="/images/screenshots/overview.png"
+    alt="Product Analytics Overview"
+  />
+</Frame>
+
+### Breakdown by referrer
+
+<Frame caption="See a breakdown of your visitors, wallets, transactions, volume, and revenue by top referrers.">
+  <img
+    src="/images/referrer-breakdown.png"
+    alt="Product Analytics Referrer Breakdown"
+  />
+</Frame>
+
+See what's moving the needle with a breakdown of your metrics by referrers. Easily understand where your onchain users come from and how they find you.
+
+## Session duration
+
+See the average session duration of visitors and users on your app. Understand how long users spend engaging with your product.
+
+## Bounce rate
+
+Track your bounce rate to understand how many visitors leave after viewing only one page. A high bounce rate may indicate issues with your landing page or user experience.
+
+## Pages
+
+See the top pages that your users are visiting. See which pages are driving the most traffic and conversions.
+
+<Frame caption="Understand what users are seeing on your site or app.">
+  <img src="/images/pages.png" alt="Product Analytics Pages" />
+</Frame>
+
+### Entry and exit pages
+
+View Entry and Exit page analytics for your site and app.
+
+- **Entry pages** are the first pages visitors land on when they come to your website. Think of them as digital front doors where your user's journey begins.
+- **Exit pages** are the last pages users view before leaving your site. They represent the end of a visitor's session, whether it's after completing a goal or bouncing before engaging further.
+
+Understanding both gives you a clear window into how people interact with your site and where you might be losing them.
+
+## Referrers, UTM, referrals
+
+See where your users are coming from by referrer, UTM parameters, and referrals.
+
+<Frame caption="Understand where your users are coming from.">
+  <img
+    src="/images/dapp-analytics-referrers.png"
+    alt="Product Analytics Referrers"
+  />
+</Frame>
+
+The Formo SDK automatically add the following UTM parameters present on the page to events fired from that page load:
+
+- utm_source
+- utm_campaign
+- utm_medium
+- utm_term
+- utm_content
+- ref
+
+### Referrer URL tracking
+
+Referrer URL tracking lets you understand the specific URL where your users are coming from – as long as the site has the correct `Referer-Policy` header set.
+
+We recommend setting the `no-referrer-when-downgrade` <a target="_blank" rel="noopener noreferrer" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#no-referrer-when-downgrade">policy</a>, which will only send the domain, path, and query parameters to the destination URL as long as the protocol security level stays the same (i.e. `HTTP` → `HTTP`, or `HTTPS` → `HTTPS`).
+
+If the protocol security level is downgraded (i.e. `HTTPS` → `HTTP`), the referrer will not be sent. This is a good compromise to make sure your users' privacy is respected while still getting a good amount of data.
+
+Here's how to configure this:
+
+<Tabs>
+  <Tab icon="rectangle-terminal" title="Next.js">
+    If you are using Next.js, you can use the headers property in your `next.config.js` file to configure the referrer policy:
+
+    ```javascript
+    module.exports = {
+      async headers() {
+        return [
+          {
+            source: "/:path*",
+            headers: [
+              {
+                key: "Referrer-Policy",
+                value: "no-referrer-when-downgrade",
+              },
+            ],
+          },
+        ];
+      },
+    };
+    ```
+
+  </Tab>
+  <Tab icon="code" title="HTML">
+    You can set the referrer policy using a meta tag in the `<head>` section of your HTML:
+
+    ```html
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    ```
+  </Tab>
+</Tabs>
+
+## Countries
+
+See where your users are coming from by country.
+
+<Frame caption="Understand where your users are coming from.">
+  <img
+    src="/images/dapp-analytics-countries.png"
+    alt="Product Analytics Countries"
+  />
+</Frame>
+
+## Devices, browsers, OS
+
+<Frame caption="Understand what devices, browsers, and operating system users are on.">
+  <img
+    src="/images/dapp-analytics-devices.png"
+    alt="Product Analytics Devices"
+  />
+</Frame>
+
+## Wallets
+
+See the top wallets of your visitors and users.
+
+<Frame caption="Understand what wallets are being used on your crypto app.">
+  <img
+    src="/images/dapp-analytics-wallets.png"
+    alt="Product Analytics Wallets"
+  />
+</Frame>
+
+---
+
+## How to analyze traffic sources
+
+Understand where your users come from and which channels drive the most value. This guide walks you through analyzing traffic sources and optimizing user acquisition.
+
+### Step 1: Open Formo
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Overview** in the left navigation
+
+You'll see the overview with visitors, wallets, and transactions over time.
+
+### Step 2: Review the referrer breakdown
+
+View your core metrics by referrer to see where traffic originates:
+
+<Frame caption="Breakdown by referrer shows which sources drive real conversions.">
+  <img src="/images/referrer-breakdown.png" alt="Referrer Breakdown" />
+</Frame>
+
+| Data | What it shows |
+|--------|---------------|
+| **Referrer** | The source domain (twitter.com, google.com, direct) |
+| **Visitors** | Page views from this source |
+| **Wallets** | Wallet connects from this source |
+| **Transactions** | Completed transactions from this source |
+| **Volume** | Total transaction volume (USD) |
+
+You get full attribution for users, volume, and revenue by referrer, referral, and UTM parameters in the Referrers chart.
+
+<Frame caption="The Referrers chart shows you where users come from.">
+  <img
+    src="/images/dapp-analytics-referrers.png"
+    alt="Product Analytics Referrers"
+  />
+</Frame>
+
+You can click on any item to drill down into the data, showing you the list of [users](/features/wallet-intelligence/overview) that came from that source.
+
+
+### Step 3: Measure conversion rates by source
+
+The overview page shows your **conversion rates by source**:
+
+```
+Conversion Rate = Transactions / Visitors × 100
+```
+
+**Example analysis:**
+
+| Referrer | Visitors | Transactions | Conversion |
+|----------|----------|--------------|------------|
+| twitter.com | 1,000 | 50 | 5% |
+| discord.com | 500 | 75 | 15% |
+| defillama.com | 200 | 60 | 30% |
+
+In this example, DefiLlama drives 6x better conversion than Twitter despite lower volume.
+
+### Step 4: Analyze UTM campaigns
+
+If you use UTM parameters in your marketing links, you can drill deeper:
+
+1. See your breakdown by UTM campaign, source, medium
+2. Identify which specific campaigns perform best on user acquisition and volume
+
+**UTM parameter guide:**
+
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| `utm_source` | Platform | twitter, discord, newsletter |
+| `utm_medium` | Channel type | social, email, paid |
+| `utm_campaign` | Campaign name | launch_promo, airdrop_2024 |
+| `utm_content` | Ad variation | banner_a, banner_b |
+| `utm_term` | Keywords (for paid) | defi, swap |
+
+You can use Formo's [UTM Generator](https://formo.so/utm-generator) to generate your marketing links.
+
+**Example URL:**
+```
+https://yourapp.xyz/?utm_source=twitter&utm_medium=social&utm_campaign=launch_promo
+```
+
+Once Formo is installed, any incoming clicks with UTM parameters leading to wallet connects or transactions in your app will be attributed automatically.
+
+### Step 5: Analyze by device and geography
+
+Check the **Devices** and **Countries** sections:
+
+**Device insights:**
+- High mobile traffic but low mobile conversion? Mobile UX issue.
+- Desktop dominates? Your users are power users.
+
+**Geographic insights:**
+- Unexpected traffic from certain countries? Potential new markets.
+- Low conversion from specific regions? Localization opportunities.
+
+### Optimizing based on data
+
+**Double down on high-converting sources:**
+- Identify your top 3 converting referrers
+- Allocate more budget/effort to these channels
+- Create content tailored to these audiences
+
+**Investigate low-converting sources:**
+- High traffic but low conversion = landing page issue
+- Check if these visitors bounce or explore but don't convert
+- Consider if this traffic is actually relevant
+
+**UTM best practices:**
+- Use consistent naming conventions
+- Track all paid campaigns with unique UTMs
+- Add UTMs to social media links, emails, and partner links
+
+### Attribution models
+
+Formo supports multiple attribution models. Learn more in the [Attribution guide](/data/attribution).
+
+| Model | Best for |
+|-------|----------|
+| **First Touch** | Understanding discovery channels |
+| **Last Touch** | Understanding conversion drivers |
+| **Custom** | Use the [Explorer](/features/product-analytics/explore) to build your own attribution model |
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Activity" icon="bolt" href="/features/product-analytics/activity">
+    View real-time events and Live View
+  </Card>
+  <Card title="Explorer" icon="compass" href="/features/product-analytics/explore">
+    Run custom SQL queries
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Track conversion by source through funnels
+  </Card>
+  <Card title="Attribution Guide" icon="bullseye" href="/guides/use-cases/attribution-guide">
+    Complete attribution workflow
+  </Card>
+</CardGroup>
