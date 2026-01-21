@@ -21,7 +21,7 @@ Build a single dashboard that gives you complete visibility into your protocol's
 
 ---
 
-## Part 1: Plan your dashboard
+## Part 1: How to Plan Your Dashboard
 
 ### Key metrics for protocol health
 
@@ -53,13 +53,15 @@ Organize your dashboard for quick scanning:
 
 ---
 
-## Part 2: Create the dashboard
+## Part 2: How to Create the Dashboard
 
 ### Step 1: Set up your board
 
-1. Go to **Dashboards** in the Formo Dashboard
-2. Click **Add board**
-3. Name it "Protocol Health" or similar
+<Steps>
+  <Step title="Go to Dashboards in the Formo Dashboard" />
+  <Step title="Click Add board" />
+  <Step title='Name it "Protocol Health" or similar' />
+</Steps>
 
 ### Step 2: Add key number cards
 
@@ -90,25 +92,15 @@ WHERE type = 'connect'
 
 **Daily Transaction Volume**
 
-```sql
-SELECT
-  sum(value) AS daily_volume
-FROM events
-WHERE type = 'transaction'
-  AND timestamp >= today()
-```
+Use [Ask AI](/features/product-analytics/ai):
+> "Show me total transaction volume for today"
+
+Or query the `revenue` table which contains volume data with full attribution context.
 
 **Transaction Success Rate**
 
-```sql
-SELECT
-  round(
-    countIf(status = 'success') / count(*) * 100, 1
-  ) AS success_rate
-FROM events
-WHERE type = 'transaction'
-  AND timestamp >= today()
-```
+Use [Ask AI](/features/product-analytics/ai):
+> "What is the transaction success rate for today?"
 
 ### Step 3: Add trend charts
 
@@ -129,39 +121,21 @@ Choose **Line chart** visualization.
 
 **Daily Transactions and Volume**
 
-```sql
-SELECT
-  toDate(timestamp) AS date,
-  count(*) AS transactions,
-  sum(value) AS volume
-FROM events
-WHERE type = 'transaction'
-  AND timestamp >= now() - INTERVAL 30 DAY
-GROUP BY date
-ORDER BY date
-```
+Use [Ask AI](/features/product-analytics/ai):
+> "Show me daily transactions and volume for the last 30 days"
 
 Use a **dual-axis line chart** to show both metrics.
 
 **New vs. Returning Users**
 
-```sql
-SELECT
-  toDate(timestamp) AS date,
-  countDistinct(CASE WHEN is_new = true THEN address END) AS new_users,
-  countDistinct(CASE WHEN is_new = false THEN address END) AS returning_users
-FROM events
-WHERE type = 'connect'
-  AND timestamp >= now() - INTERVAL 30 DAY
-GROUP BY date
-ORDER BY date
-```
+Use [Ask AI](/features/product-analytics/ai):
+> "Show me new vs returning users by day for the last 30 days"
 
 Choose **Stacked area chart** to show composition.
 
 ---
 
-## Part 3: Add breakdown charts
+## Part 3: How to Add Breakdown Charts
 
 ### Top referrers
 
@@ -169,8 +143,7 @@ Choose **Stacked area chart** to show composition.
 SELECT
   referrer,
   countDistinct(address) AS wallets,
-  count(*) AS transactions,
-  sum(value) AS volume
+  count(*) AS events
 FROM events
 WHERE timestamp >= now() - INTERVAL 30 DAY
   AND referrer != ''
@@ -200,30 +173,25 @@ Choose **Pie chart** or **Bar chart**.
 
 ### Wallet breakdown
 
-```sql
-SELECT
-  properties.wallet AS wallet_type,
-  countDistinct(address) AS users,
-  round(countDistinct(address) * 100.0 / sum(countDistinct(address)) OVER (), 1) AS percentage
-FROM events
-WHERE type = 'connect'
-  AND timestamp >= now() - INTERVAL 30 DAY
-GROUP BY wallet_type
-ORDER BY users DESC
-```
+Use [Ask AI](/features/product-analytics/ai):
+> "Show me wallet connects broken down by wallet type for the last 30 days"
+
+Or use the [Key Metrics](/features/product-analytics/key-metrics) page which shows wallet breakdown automatically.
 
 ---
 
-## Part 4: Add retention view
+## Part 4: How to Add Retention View
 
 ### Cohort retention table
 
 Add a Retention chart to your dashboard:
 
-1. Click **Add Chart**
-2. Select **Retention** chart type
-3. Set starting event to `connect`
-4. Set returning event to `connect`
+<Steps>
+  <Step title="Click Add Chart" />
+  <Step title="Select Retention chart type" />
+  <Step title="Set starting event to connect" />
+  <Step title="Set returning event to connect" />
+</Steps>
 
 This shows week-over-week retention for each cohort.
 
@@ -256,18 +224,21 @@ ORDER BY cohort_week
 
 ---
 
-## Part 5: Add funnel metrics
+## Part 5: How to Add Funnel Metrics
 
 ### Conversion funnel
 
 Add a Funnel chart showing your key conversion:
 
-1. Click **Add Chart**
-2. Select **Funnel** chart type
-3. Add steps:
-   - Step 1: Page view (`type = page`)
-   - Step 2: Wallet connect (`type = connect`)
-   - Step 3: Transaction (`type = transaction`)
+<Steps>
+  <Step title="Click Add Chart" />
+  <Step title="Select Funnel chart type" />
+  <Step title="Add steps">
+    - Step 1: Page view (`type = page`)
+    - Step 2: Wallet connect (`type = connect`)
+    - Step 3: Transaction (`type = transaction`)
+  </Step>
+</Steps>
 
 ### Funnel conversion rate over time
 
@@ -276,7 +247,7 @@ Track how conversion changes:
 ```sql
 SELECT
   toDate(timestamp) AS date,
-  countDistinct(visitor_id) AS visitors,
+  countDistinct(anonymous_id) AS visitors,
   countDistinct(CASE WHEN type = 'connect' THEN address END) AS connected,
   countDistinct(CASE WHEN type = 'transaction' THEN address END) AS transacted,
   round(connected / visitors * 100, 1) AS connect_rate,
@@ -289,39 +260,21 @@ ORDER BY date
 
 ---
 
-## Part 6: Add advanced metrics
+## Part 6: How to Add Advanced Metrics
 
 ### User segments breakdown
 
-```sql
-SELECT
-  CASE
-    WHEN session_count = 1 THEN 'New'
-    WHEN session_count <= 5 THEN 'Returning'
-    ELSE 'Power User'
-  END AS segment,
-  count(*) AS users,
-  round(count(*) * 100.0 / sum(count(*)) OVER (), 1) AS percentage
-FROM users
-WHERE last_seen >= now() - INTERVAL 30 DAY
-GROUP BY segment
-ORDER BY users DESC
-```
+Use [Ask AI](/features/product-analytics/ai):
+> "Show me user count by lifecycle segment for the last 30 days"
 
-### Revenue per user (if applicable)
+Or view the **Users** page and filter by Lifecycle to see the breakdown of New, Returning, Power User, Churned, and Resurrected users.
 
-```sql
-SELECT
-  toDate(timestamp) AS date,
-  sum(value) AS total_volume,
-  countDistinct(address) AS active_users,
-  round(total_volume / active_users, 2) AS volume_per_user
-FROM events
-WHERE type = 'transaction'
-  AND timestamp >= now() - INTERVAL 30 DAY
-GROUP BY date
-ORDER BY date
-```
+### Volume per user (if applicable)
+
+Use [Ask AI](/features/product-analytics/ai):
+> "Show me daily volume per active user for the last 30 days"
+
+This calculates total volume divided by active users for each day.
 
 ### Week-over-week growth
 
@@ -340,7 +293,7 @@ ORDER BY week
 
 ---
 
-## Part 7: Set up monitoring
+## Part 7: How to Set Up Monitoring
 
 ### Create alerts
 
@@ -394,14 +347,16 @@ You've learned how to:
 
 ## Dashboard checklist
 
-- [ ] Added key number cards (DAU, WAU, Volume)
-- [ ] Created daily active users trend chart
-- [ ] Added transaction and volume trends
-- [ ] Included top referrers breakdown
-- [ ] Added retention cohort view
-- [ ] Created conversion funnel
-- [ ] Set up critical alerts
-- [ ] Shared with team
+<Checklist>
+  <ChecklistItem>Added key number cards (DAU, WAU, Volume)</ChecklistItem>
+  <ChecklistItem>Created daily active users trend chart</ChecklistItem>
+  <ChecklistItem>Added transaction and volume trends</ChecklistItem>
+  <ChecklistItem>Included top referrers breakdown</ChecklistItem>
+  <ChecklistItem>Added retention cohort view</ChecklistItem>
+  <ChecklistItem>Created conversion funnel</ChecklistItem>
+  <ChecklistItem>Set up critical alerts</ChecklistItem>
+  <ChecklistItem>Shared with team</ChecklistItem>
+</Checklist>
 
 ## Next steps
 

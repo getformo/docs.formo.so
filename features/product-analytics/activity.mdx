@@ -30,9 +30,13 @@ The Activity Feed is your real-time view into what users are doing on your app. 
 
 ### Step 1: Open the Activity Feed
 
-1. Go to the [Formo Dashboard](https://app.formo.so)
-2. Select your project
-3. Click **Activity** in the left navigation
+<Steps>
+  <Step title="Go to the Formo Dashboard">
+    Open [app.formo.so](https://app.formo.so).
+  </Step>
+  <Step title="Select your project" />
+  <Step title="Click Activity in the left navigation" />
+</Steps>
 
 You'll see a chronological stream of all events on your app.
 
@@ -60,9 +64,11 @@ Click any event to expand and see all properties.
 
 Use filters to narrow down the feed:
 
-1. Click **Filter**
-2. Choose a property to filter by
-3. Set the condition and value
+<Steps>
+  <Step title="Click Filter" />
+  <Step title="Choose a property to filter by" />
+  <Step title="Set the condition and value" />
+</Steps>
 
 **Common filter combinations:**
 
@@ -85,17 +91,24 @@ Use filters to narrow down the feed:
 
 To see everything a specific user did:
 
-1. Find any event from that user
-2. Click the wallet address
-3. View their complete [Wallet Profile](/features/wallet-intelligence/wallet-profiles)
+<Steps>
+  <Step title="Find any event from that user" />
+  <Step title="Click the wallet address" />
+  <Step title="View their complete Wallet Profile">
+    See [Wallet Profiles](/features/wallet-intelligence/wallet-profiles) for more details.
+  </Step>
+</Steps>
 
 <Frame caption="View a user's activity feed.">
 	<img src="/images/screenshots/wallet-profile-activity.png" alt="Wallet Profile Activity Feed" />
 </Frame>
 
 Or filter the Activity Feed:
-1. Add filter: `address = [wallet address]`
-2. See all events from this user in chronological order
+
+<Steps>
+  <Step title="Add filter: address = [wallet address]" />
+  <Step title="See all events from this user in chronological order" />
+</Steps>
 
 
 ### Step 5: Investigate issues
@@ -103,49 +116,74 @@ Or filter the Activity Feed:
 When users report problems, use the Activity Feed to investigate:
 
 **Investigating a failed transaction:**
-1. Filter by `type = transaction` and `status = failed`
-2. Find the user's transaction
-3. Click to expand and see error details
-4. Check the preceding events for context
+
+<Steps>
+  <Step title="Filter by type = transaction and status = failed" />
+  <Step title="Find the user's transaction" />
+  <Step title="Click to expand and see error details" />
+  <Step title="Check the preceding events for context" />
+</Steps>
 
 **Investigating a drop-off:**
-1. Filter by the user's address
-2. Look at their event sequence
-3. Identify where they stopped (last event before leaving)
-4. Check for errors or unusual patterns
-5. Use [Funnels](/features/product-analytics/funnels) to measure drop-off rates at each step
+
+<Steps>
+  <Step title="Filter by the user's address" />
+  <Step title="Look at their event sequence" />
+  <Step title="Identify where they stopped (last event before leaving)" />
+  <Step title="Check for errors or unusual patterns" />
+  <Step title="Use Funnels to measure drop-off rates at each step">
+    See [Funnels](/features/product-analytics/funnels) for more details.
+  </Step>
+</Steps>
 
 **Investigating a flow issue:**
-1. Filter by a specific page path
-2. Look at what users do after visiting that page
-3. Identify unexpected patterns
-4. Use [Flows](/features/product-analytics/flows) to visualize common paths users take
+
+<Steps>
+  <Step title="Filter by a specific page path" />
+  <Step title="Look at what users do after visiting that page" />
+  <Step title="Identify unexpected patterns" />
+  <Step title="Use Flows to visualize common paths users take">
+    See [Flows](/features/product-analytics/flows) for more details.
+  </Step>
+</Steps>
 
 ### Common investigation patterns
 
 **"Why are users bouncing from our swap page?"**
-1. Filter: `path = /swap`
-2. Look at events that follow page views
-3. Count how many lead to `connect` vs. leaving
-4. Check for errors or unusual device/browser patterns
+
+<Steps>
+  <Step title="Filter: path = /swap" />
+  <Step title="Look at events that follow page views" />
+  <Step title="Count how many lead to connect vs. leaving" />
+  <Step title="Check for errors or unusual device/browser patterns" />
+</Steps>
 
 **"Which transactions are failing?"**
-1. Filter: `type = transaction`, `status = failed`
-2. Group by error message or contract
-3. Identify the most common failure reasons
-4. Check if failures correlate with specific flows
+
+<Steps>
+  <Step title="Filter: type = transaction, status = failed" />
+  <Step title="Group by error message or contract" />
+  <Step title="Identify the most common failure reasons" />
+  <Step title="Check if failures correlate with specific flows" />
+</Steps>
 
 **"What do our best users do differently?"**
-1. Identify a power user from the Users list
-2. Filter Activity by their address
-3. Study their event sequence
-4. Compare to average user patterns
+
+<Steps>
+  <Step title="Identify a power user from the Users list" />
+  <Step title="Filter Activity by their address" />
+  <Step title="Study their event sequence" />
+  <Step title="Compare to average user patterns" />
+</Steps>
 
 **"Is our new feature being used?"**
-1. Filter by your custom event or page path
-2. See adoption over time
-3. Check which user segments are using it
-4. Look at the referrer to see how users find it
+
+<Steps>
+  <Step title="Filter by your custom event or page path" />
+  <Step title="See adoption over time" />
+  <Step title="Check which user segments are using it" />
+  <Step title="Look at the referrer to see how users find it" />
+</Steps>
 
 ### Next Steps
 

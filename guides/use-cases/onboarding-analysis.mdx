@@ -21,7 +21,7 @@ Understand how new users experience your crypto app for the first time. This gui
 
 ---
 
-## Part 1: Map user journeys with Flows
+## Part 1: How to Map User Journeys with Flows
 
 ### What Flows reveal about onboarding
 
@@ -29,10 +29,12 @@ Understand how new users experience your crypto app for the first time. This gui
 
 ### Step 1: Create an onboarding flow
 
-1. Go to **Flows** in the Formo Dashboard
-2. Set the **Starting event** to your landing page (e.g., `page = /`)
-3. Set **Steps after** to 5-7 steps
-4. Filter by **New Users** to focus on first-time visitors
+<Steps>
+  <Step title="Go to Flows in the Formo Dashboard" />
+  <Step title='Set the Starting event to your landing page (e.g., page = /)' />
+  <Step title="Set Steps after to 5-7 steps" />
+  <Step title="Filter by New Users to focus on first-time visitors" />
+</Steps>
 
 You'll see a Sankey diagram showing where users actually go after landing.
 
@@ -59,7 +61,7 @@ This reveals which entry points lead to successful onboarding.
 
 ---
 
-## Part 2: Measure onboarding with Funnels
+## Part 2: How to Measure Onboarding with Funnels
 
 ### Define your onboarding funnel
 
@@ -76,10 +78,12 @@ Create a [Funnel](/features/product-analytics/funnels) that captures the key onb
 
 ### Step 1: Create the funnel
 
-1. Go to **Funnels** in the dashboard
-2. Click **Create Funnel**
-3. Add your onboarding steps in order
-4. Set the conversion window (7 days recommended for onboarding)
+<Steps>
+  <Step title="Go to Funnels in the dashboard" />
+  <Step title="Click Create Funnel" />
+  <Step title="Add your onboarding steps in order" />
+  <Step title="Set the conversion window (7 days recommended for onboarding)" />
+</Steps>
 
 ### Step 2: Analyze drop-off points
 
@@ -102,7 +106,7 @@ Use funnel breakdowns to identify which users struggle most:
 
 ---
 
-## Part 3: Track onboarding retention
+## Part 3: How to Track Onboarding Retention
 
 ### Why retention matters for onboarding
 
@@ -110,10 +114,12 @@ A user who completes onboarding but never returns isn't truly onboarded. Use [Re
 
 ### Step 1: Set up retention by cohort
 
-1. Go to **Retention** in the dashboard
-2. Set the **Starting event** to `connect` (wallet connection)
-3. Set the **Returning event** to `connect` (any subsequent connection)
-4. View by weekly cohorts
+<Steps>
+  <Step title="Go to Retention in the dashboard" />
+  <Step title="Set the Starting event to connect (wallet connection)" />
+  <Step title="Set the Returning event to connect (any subsequent connection)" />
+  <Step title="View by weekly cohorts" />
+</Steps>
 
 ### Step 2: Identify the "aha moment"
 
@@ -129,7 +135,7 @@ Use this to optimize your onboarding to drive users toward high-retention action
 
 ---
 
-## Part 4: Segment new users
+## Part 4: How to Segment New Users
 
 ### Create onboarding segments
 
@@ -159,7 +165,7 @@ Create a [Dashboard](/features/product-analytics/charts) to track this metric ov
 
 ---
 
-## Part 5: Build an onboarding dashboard
+## Part 5: How to Build an Onboarding Dashboard
 
 ### Recommended charts
 
@@ -179,7 +185,7 @@ Create a dashboard with these visualizations:
 ```sql
 SELECT
   toDate(timestamp) AS date,
-  countDistinct(CASE WHEN type = 'page' THEN visitor_id END) AS landed,
+  countDistinct(CASE WHEN type = 'page' THEN anonymous_id END) AS landed,
   countDistinct(CASE WHEN type = 'connect' THEN address END) AS connected,
   countDistinct(CASE WHEN type = 'transaction' THEN address END) AS transacted,
   round(connected / landed * 100, 1) AS connect_rate,
@@ -192,15 +198,17 @@ ORDER BY date
 
 ---
 
-## Part 6: Optimize and iterate
+## Part 6: How to Optimize and Iterate
 
 ### A/B test onboarding changes
 
 When you make changes to improve onboarding:
 
-1. Note the date of the change
-2. Compare funnel metrics before/after
-3. Check if retention improved for post-change cohorts
+<Steps>
+  <Step title="Note the date of the change" />
+  <Step title="Compare funnel metrics before/after" />
+  <Step title="Check if retention improved for post-change cohorts" />
+</Steps>
 
 ### Common onboarding improvements
 
@@ -210,14 +218,6 @@ When you make changes to improve onboarding:
 | Wallet connect drop-off | Simplify options, add trust signals | Funnel step 2→3 rate |
 | High bounce on app page | Improve loading speed, add guidance | Flows showing exits |
 | Users don't return | Email/notification follow-up | Week 1 retention |
-
-### Set up alerts
-
-Create [Alerts](/features/product-analytics/alerts) for onboarding anomalies:
-
-- Alert when daily connect rate drops below threshold
-- Alert when a whale connects but doesn't transact
-- Alert when onboarding funnel conversion drops significantly
 
 ---
 
@@ -234,12 +234,14 @@ You've learned how to:
 
 ## Onboarding analysis checklist
 
-- [ ] Created onboarding flow from landing page
-- [ ] Built funnel with key onboarding steps
-- [ ] Set up retention tracking for new users
-- [ ] Created segments for each onboarding stage
-- [ ] Built dashboard with key onboarding metrics
-- [ ] Set up alerts for onboarding anomalies
+<Checklist>
+  <ChecklistItem>Created onboarding flow from landing page</ChecklistItem>
+  <ChecklistItem>Built funnel with key onboarding steps</ChecklistItem>
+  <ChecklistItem>Set up retention tracking for new users</ChecklistItem>
+  <ChecklistItem>Created segments for each onboarding stage</ChecklistItem>
+  <ChecklistItem>Built dashboard with key onboarding metrics</ChecklistItem>
+  <ChecklistItem>Set up alerts for onboarding anomalies</ChecklistItem>
+</Checklist>
 
 ## Next steps
 

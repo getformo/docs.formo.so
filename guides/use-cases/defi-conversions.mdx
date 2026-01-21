@@ -38,27 +38,32 @@ Formo captures steps 1-3 automatically. Step 4 requires [contract event tracking
 
 ### Why this matters
 
-Traditional analytics tools only see steps 1-2. They can't tell you:
+Traditional analytics tools only see steps 1-2. Onchain analytics tools only see the final step, but not everything that matters is onchain. They can't tell you:
 - How many users who connected a wallet actually completed a transaction
 - Which traffic sources drive the most completed swaps (not just wallet connects)
+- When users drop off before connecting their wallet
 - Where users drop off between approval and execution
+- How many users leave before completing a transaction
 
 Formo gives you the complete picture.
 
 ---
 
-## Part 2: Set Up Contract Event Tracking
+## Part 2: How to Set Up Contract Event Tracking
 
 Before creating funnels, configure Formo to track your smart contract events.
 
 ### Step 1: Add your contract
 
-1. Go to **Project Settings** > **Contracts** in the Formo Dashboard
-2. Click **Add Contract**
-3. Enter your contract details:
-   - **Chain**: Select your deployment chain (Ethereum, Base, Arbitrum, etc.)
-   - **Address**: Your contract address
-   - **Name**: A friendly name (e.g., "Swap Router")
+<Steps>
+  <Step title="Go to Project Settings > Contracts in the Formo Dashboard" />
+  <Step title="Click Add Contract" />
+  <Step title="Enter your contract details">
+    - **Chain**: Select your deployment chain (Ethereum, Base, Arbitrum, etc.)
+    - **Address**: Your contract address
+    - **Name**: A friendly name (e.g., "Swap Router")
+  </Step>
+</Steps>
 
 ### Step 2: Select events to track
 
@@ -79,21 +84,25 @@ After adding the contract, select the relevant events:
 
 ### Step 3: Verify events are flowing
 
-1. Perform a test transaction on your app
-2. Go to **Activity** in the Formo Dashboard
-3. Confirm you see the contract event with decoded parameters
+<Steps>
+  <Step title="Perform a test transaction on your app" />
+  <Step title="Go to Activity in the Formo Dashboard" />
+  <Step title="Confirm you see the contract event with decoded parameters" />
+</Steps>
 
 ---
 
-## Part 3: Create a Swap Conversion Funnel
+## Part 3: How to Create a Swap Conversion Funnel
 
 Now let's build a funnel to track swap conversions.
 
 ### Step 1: Navigate to Funnels
 
-1. Go to **Funnels** in the left navigation
-2. Click **Create Funnel**
-3. Name it "Swap Conversion Funnel"
+<Steps>
+  <Step title="Go to Funnels in the left navigation" />
+  <Step title="Click Create Funnel" />
+  <Step title='Name it "Swap Conversion Funnel"' />
+</Steps>
 
 ### Step 2: Define funnel steps
 
@@ -125,15 +134,17 @@ Click **Save** to create your funnel. You'll see:
 
 ---
 
-## Part 4: Analyze by Traffic Source
+## Part 4: How to Analyze by Traffic Source
 
 Understanding which channels drive actual conversions (not just visits) is critical for DeFi growth.
 
 ### Add a breakdown by referrer
 
-1. Open your Swap Conversion Funnel
-2. Click **Add Breakdown**
-3. Select **Referrer** (or **UTM Source** for campaign tracking)
+<Steps>
+  <Step title="Open your Swap Conversion Funnel" />
+  <Step title="Click Add Breakdown" />
+  <Step title="Select Referrer (or UTM Source for campaign tracking)" />
+</Steps>
 
 Now you can compare conversion rates across sources:
 
@@ -157,7 +168,7 @@ In this example, DefiLlama traffic converts 4x better than Twitter despite lower
 
 ---
 
-## Part 5: Identify Drop-off Points
+## Part 5: How to Identify Drop-off Points
 
 ### Common DeFi drop-off patterns
 
@@ -180,9 +191,11 @@ In this example, DefiLlama traffic converts 4x better than Twitter despite lower
 
 Formo's Conversion Insights automatically identifies behaviors correlated with conversion:
 
-1. Open your funnel
-2. Click the **Insights** tab
-3. Look for high-lift events
+<Steps>
+  <Step title="Open your funnel" />
+  <Step title="Click the Insights tab" />
+  <Step title="Look for high-lift events" />
+</Steps>
 
 **Example insight:**
 > Users who viewed the "How it works" page are 2.3x more likely to complete a swap.
@@ -229,18 +242,21 @@ For complex protocols with multiple transactions:
 
 ---
 
-## Part 7: Set Up Alerts
+## Part 7: How to Set Up Alerts
 
 Get notified when high-value conversions happen.
 
 ### Whale swap alert
 
-1. Go to **Settings** > **Alerts**
-2. Click **Create Alert**
-3. Configure:
-   - **Event**: Your `Swap` contract event
-   - **Condition**: `net_worth > 100000`
-   - **Notification**: Email or Slack webhook
+<Steps>
+  <Step title="Go to Settings > Alerts" />
+  <Step title="Click Create Alert" />
+  <Step title="Configure the alert">
+    - **Event**: Your `Swap` contract event
+    - **Condition**: `net_worth > 100000`
+    - **Notification**: Email or Slack webhook
+  </Step>
+</Steps>
 
 Now you'll know instantly when whales use your protocol.
 
@@ -248,11 +264,14 @@ Now you'll know instantly when whales use your protocol.
 
 Track when swaps fail to identify UX issues:
 
-1. Create a new alert
-2. Configure:
-   - **Event**: `transaction`
-   - **Condition**: `status = failed`
-   - **Notification**: Slack webhook
+<Steps>
+  <Step title="Create a new alert" />
+  <Step title="Configure the alert">
+    - **Event**: `transaction`
+    - **Condition**: `status = failed`
+    - **Notification**: Slack webhook
+  </Step>
+</Steps>
 
 ---
 

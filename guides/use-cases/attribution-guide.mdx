@@ -46,7 +46,7 @@ Each touchpoint matters. The question is: which one gets credit?
 
 ---
 
-## Part 2: Set Up UTM Tracking
+## Part 2: How to Set Up UTM Tracking
 
 ### UTM parameter basics
 
@@ -158,15 +158,17 @@ Formo supports multiple attribution models. Each gives credit differently.
 
 ---
 
-## Part 4: Analyze Attribution in Formo
+## Part 4: How to Analyze Attribution in Formo
 
 ### View attribution in Overview
 
-1. Go to **Overview** in the Formo Dashboard
-2. See the **Referrers** breakdown in the tabs
-3. Toggle between First-touch and Last-touch views
+<Steps>
+  <Step title="Go to Overview in the Formo Dashboard" />
+  <Step title="See the Referrers chart in the tabs" />
+  <Step title="Select different units (users, volume, revenue)" />
+</Steps>
 
-<Tip>Compare first-touch and last-touch side by side to understand your funnel.</Tip>
+<Tip>You can apply filters on the overview page to see attribution by different segments.</Tip>
 
 ### Key metrics by source
 
@@ -193,19 +195,19 @@ Cost per Transaction = Campaign Spend / Transactions from Campaign
 
 | Channel | Spend | Transactions | Cost/Transaction |
 |---------|-------|--------------|------------------|
-| Twitter Ads | $5,000 | 100 | $50 |
+| Influencer | $5,000 | 100 | $50 |
 | Discord Ads | $2,000 | 80 | $25 |
-| Influencer | $3,000 | 150 | $20 |
+| Twitter Ads | $3,000 | 150 | $20 |
 
-In this example, influencer marketing has the best ROI.
+In this example, Twitter Ads has the best ROI.
 
 ---
 
-## Part 5: Create Attribution Reports
+## Part 5: How to Create Attribution Reports
 
 ### Using Ask AI for attribution analysis
 
-Get quick attribution insights with Ask AI (click **Ask AI** in the sidebar or press `Cmd+K`):
+Get quick attribution insights with Ask AI (click **Ask AI** in the sidebar):
 
 **Channel comparison:**
 > "Compare wallet connects by utm_source for the last 30 days"
@@ -234,14 +236,16 @@ Create a dedicated attribution dashboard:
 
 Create funnels filtered by source:
 
-1. Go to **Funnels** > **Create Funnel**
-2. Add steps: Visit → Connect → Transaction
-3. Add breakdown by **UTM Source**
-4. Compare conversion rates across channels
+<Steps>
+  <Step title="Go to Funnels > Create Funnel" />
+  <Step title="Add steps: Visit → Connect → Transaction" />
+  <Step title="Add breakdown by UTM Source" />
+  <Step title="Compare conversion rates across channels" />
+</Steps>
 
 ---
 
-## Part 6: Optimize Your Marketing
+## Part 6: How to Optimize Your Marketing
 
 ### Identify your best channels
 
@@ -271,10 +275,10 @@ From your attribution data, categorize channels:
 
 Don't just measure conversions. Measure user quality:
 
-1. Filter users by UTM source
-2. Compare average net worth by source
-3. Compare retention by source
-4. Compare volume per user by source
+- Filter users by UTM source
+- Compare average net worth by source
+- Compare retention by source
+- Compare volume per user by source
 
 **Example insight:**
 > Twitter drives more users, but Discord users have 3x higher average net worth and 2x better retention.
@@ -283,9 +287,9 @@ Don't just measure conversions. Measure user quality:
 
 If using linear attribution:
 
-1. Identify common multi-touch paths
-2. Ensure each touchpoint is optimized
-3. Don't cut channels that assist conversions
+- Identify common multi-touch paths
+- Ensure each touchpoint is optimized
+- Don't cut channels that assist conversions
 
 **Example path:**
 Twitter (awareness) → DeFiLlama (research) → Direct (conversion)
@@ -300,9 +304,9 @@ All three channels contributed. Cutting Twitter would reduce DeFiLlama traffic.
 
 Track users across marketing channels:
 
-1. Use consistent UTM naming
-2. Track first-touch and last-touch separately
-3. Analyze common paths with Flows
+- Use consistent UTM naming
+- Track first-touch and last-touch separately
+- Analyze common paths with Flows
 
 ### Referral program tracking
 
@@ -318,9 +322,9 @@ The `ref` parameter is automatically captured by Formo alongside UTM parameters.
 
 Compare user quality by acquisition cohort:
 
-1. Create segments by first-touch source
-2. Measure retention for each segment
-3. Calculate LTV by acquisition source
+- Create segments by first-touch source
+- Measure retention for each segment
+- Calculate LTV by acquisition source
 
 **Example:**
 | Source | 30-day Retention | Avg LTV |
@@ -343,13 +347,15 @@ You've learned how to:
 
 ## Attribution checklist
 
-- [ ] UTM parameters on all social links
-- [ ] UTM parameters on all email links
-- [ ] UTM parameters on all partner links
-- [ ] UTM parameters on all paid ads
-- [ ] Consistent naming conventions
-- [ ] Attribution dashboard created
-- [ ] Weekly review of channel performance
+<Checklist>
+  <ChecklistItem>UTM parameters on all social links</ChecklistItem>
+  <ChecklistItem>UTM parameters on all email links</ChecklistItem>
+  <ChecklistItem>UTM parameters on all partner links</ChecklistItem>
+  <ChecklistItem>UTM parameters on all paid ads</ChecklistItem>
+  <ChecklistItem>Consistent naming conventions</ChecklistItem>
+  <ChecklistItem>Attribution dashboard created</ChecklistItem>
+  <ChecklistItem>Weekly review of channel performance</ChecklistItem>
+</Checklist>
 
 ## Next steps
 

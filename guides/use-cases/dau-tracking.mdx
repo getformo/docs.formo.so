@@ -43,18 +43,25 @@ Traditional web analytics count "active users" by sessions or page views. For cr
 | **DAU/MAU ratio** | DAU divided by MAU | Stickiness (higher = more engaged) |
 | **New users** | First-time wallet connects | Growth rate |
 | **Returning users** | Wallets with multiple sessions | Retention quality |
+| **Power users** | Active 5+ days in last 30 days | Core engaged users |
+| **Volume/Revenue** | Total transaction value | Economic activity |
+| **Retention** | % of users returning over time | Long-term engagement |
 
 ---
 
-## Part 2: View Core Metrics
+## Part 2: How to View Core Metrics
 
 Formo provides core metrics for tracking user engagement out of the box.
 
 ### Step 1: Open the Overview dashboard
 
-1. Go to the [Formo Dashboard](https://app.formo.so)
-2. Select your project
-3. Click **Overview** in the left navigation
+<Steps>
+  <Step title="Go to the Formo Dashboard">
+    Open [app.formo.so](https://app.formo.so).
+  </Step>
+  <Step title="Select your project" />
+  <Step title="Click Overview in the left navigation" />
+</Steps>
 
 You'll see top-line metrics including:
 - **Visitors** (page views)
@@ -81,24 +88,27 @@ The overview chart shows daily unique wallets over time. Look for:
 
 ---
 
-## Part 3: Create a Custom DAU Dashboard
+## Part 3: How to Create a Custom DAU Dashboard
 
 Build a dedicated dashboard to monitor active user metrics.
 
 ### Step 1: Navigate to Dashboards
 
-1. Click **Dashboards** in the left navigation
-2. Click **Add board** to create a new dashboard
-3. Click **Add Chart** to add a visualization
+<Steps>
+  <Step title="Click Dashboards in the left navigation" />
+  <Step title="Click Add board to create a new dashboard" />
+</Steps>
 
 ### Step 2: Create a DAU chart
 
 **Using Ask AI (Recommended):**
 
-1. Click **Ask AI** in the sidebar (or press `Cmd+K`)
-2. Type: "Show me daily unique connected wallets for the last 30 days"
-3. AI generates the query and chart
-4. Save it to your dashboard
+<Steps>
+  <Step title="Click Ask AI in the sidebar" />
+  <Step title='Type: "Show me daily unique connected wallets for the last 30 days"' />
+  <Step title="Save the generated chart to your dashboard" />
+  <Step title="Or, click Add Chart to add a visualization yourself with SQL" />
+</Steps>
 
 **Using SQL (via the [Explorer](/features/product-analytics/explore)):**
 
@@ -162,7 +172,7 @@ Arrange your charts into a useful layout:
 
 ---
 
-## Part 4: Segment Active Users
+## Part 4: How to Segment Active Users
 
 Not all active users are equal. Segment by behavior and value.
 
@@ -189,42 +199,48 @@ Create segments for different activity levels:
 - Completed transaction in last 7 days AND
 - Net worth > $10,000
 
-**At-risk users:**
-- Last seen 14-30 days ago AND
-- Was previously a power user
+**Churned users who were previously active:**
+- Volume > $10,000 AND
+- Lifecycle = Churned
 
 ### By traffic source
 
 Track which channels drive the most engaged users:
 
-1. Go to **Overview**
-2. View **Wallets by Referrer** in the breakdown tabs
-3. Compare conversion rates across sources
+<Steps>
+  <Step title="Go to Overview" />
+  <Step title="View Wallets by Referrer in the breakdown tabs" />
+  <Step title="Compare conversion rates across sources" />
+</Steps>
 
 ---
 
-## Part 5: Track Active Users Over Time
+## Part 5: How to Track Active Users Over Time
 
 ### Week-over-week comparison
 
 Compare this week's DAU to last week:
 
-1. Open your DAU chart
-2. Select **Last 7 days** date range
-3. Enable **Compare to previous period**
+<Steps>
+  <Step title="Open your DAU chart" />
+  <Step title="Select Last 7 days date range" />
+  <Step title="Compare to the previous week's data" />
+</Steps>
 
 Look for:
 - **Growth**: This week > last week = positive trend
 - **Decline**: Investigate causes (seasonal, product issues, competition)
 - **Stability**: Consistent DAU week-over-week
 
-### Monthly cohort analysis
+### Weekly cohort analysis
 
-Track how each month's users retain over time:
+Track how each week's users retain over time:
 
-1. Go to **Retention** in the left navigation
-2. View the cohort retention chart
-3. Compare retention rates across monthly cohorts
+<Steps>
+  <Step title="Go to Retention in the left navigation" />
+  <Step title="View the cohort retention chart" />
+  <Step title="Compare retention rates across weekly cohorts" />
+</Steps>
 
 A healthy pattern:
 - Initial drop-off in week 1 (normal)
@@ -233,26 +249,7 @@ A healthy pattern:
 
 ---
 
-## Part 6: Set Up Alerts for Active Users
-
-Get notified of significant changes in your user metrics.
-
-### Alert: DAU drops below threshold
-
-1. Go to **Settings** > **Alerts**
-2. Create a custom SQL alert (or use webhooks with scheduled queries)
-3. Set threshold: Alert when DAU < 80% of 7-day average
-
-### Alert: New user spike
-
-Detect when acquisition suddenly increases:
-
-1. Create an alert on `connect` events
-2. Set threshold: Alert when hourly connects > 2x normal
-
----
-
-## Part 7: Example DAU Dashboard
+## Part 6: Example DAU Dashboard
 
 Here's a complete dashboard setup for tracking active users:
 
@@ -286,7 +283,6 @@ You've learned how to:
 |-----------|-----------------|-------|
 | DEX | 15-25% | High-frequency usage |
 | Lending | 5-10% | Less frequent interactions |
-| NFT Marketplace | 10-15% | Varies by drops/events |
 | Gaming | 20-40% | Daily engagement loops |
 | Bridge | 3-5% | Infrequent, high-value |
 

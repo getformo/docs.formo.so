@@ -21,7 +21,7 @@ Stop losing users before it happens. This guide shows you how to identify at-ris
 
 ---
 
-## Part 1: Define churn for your app
+## Part 1: How to Define Churn for Your App
 
 ### What is churn?
 
@@ -30,15 +30,16 @@ Churn is when a user stops engaging with your app. For onchain apps, this typica
 | App Type | Churn Definition |
 |----------|------------------|
 | **DeFi protocol** | No transactions for 30+ days |
-| **NFT marketplace** | No listings/purchases for 30+ days |
 | **Gaming** | No gameplay sessions for 14+ days |
 | **Bridge** | No bridge transactions for 60+ days |
 
 ### Step 1: Check your retention baseline
 
-1. Go to **Retention** in the Formo Dashboard
-2. Set the starting event to `connect` (wallet connection)
-3. View the cohort table
+<Steps>
+  <Step title="Go to Retention in the Formo Dashboard" />
+  <Step title="Set the starting event to connect (wallet connection)" />
+  <Step title="View the cohort table" />
+</Steps>
 
 A typical retention pattern looks like:
 
@@ -78,7 +79,7 @@ ORDER BY month
 
 ---
 
-## Part 2: Identify at-risk users
+## Part 2: How to Identify At-Risk Users
 
 ### User lifecycle stages
 
@@ -117,37 +118,30 @@ These users are reducing their engagement.
 
 ### Step 2: Monitor segment sizes
 
-Track how many users are in each at-risk segment over time. Create a [Dashboard](/features/product-analytics/charts) with:
+Track how many users are in each at-risk segment over time.
 
-```sql
-SELECT
-  toDate(now()) AS date,
-  countDistinct(CASE
-    WHEN last_seen < now() - INTERVAL 14 DAY
-    AND last_seen > now() - INTERVAL 30 DAY
-    AND session_count > 5
-    THEN address
-  END) AS at_risk_power_users,
-  countDistinct(CASE
-    WHEN session_count = 1
-    AND first_seen < now() - INTERVAL 7 DAY
-    THEN address
-  END) AS one_and_done
-FROM users
-```
+Use [Ask AI](/features/product-analytics/ai) to generate monitoring charts:
+
+> "Show me the count of users who were last seen between 14 and 30 days ago and have more than 5 sessions"
+
+> "How many users have only had 1 session and haven't been seen in 7 days?"
+
+Save these charts to a [Dashboard](/features/product-analytics/charts) to monitor segment sizes over time.
 
 ---
 
-## Part 3: Understand why users churn
+## Part 3: How to Understand Why Users Churn
 
 ### Analyze churned user behavior
 
 Use [Flows](/features/product-analytics/flows) to see what churned users did in their last session:
 
-1. Go to **Flows**
-2. Filter by users who are now **Churned**
-3. Set the starting event to their last session
-4. Look for patterns in exit behavior
+<Steps>
+  <Step title="Go to Flows" />
+  <Step title="Filter by users who are now Churned" />
+  <Step title="Set the starting event to their last session" />
+  <Step title="Look for patterns in exit behavior" />
+</Steps>
 
 ### Common churn signals
 
@@ -180,7 +174,7 @@ This reveals what retained users do differently.
 
 ---
 
-## Part 4: Set up churn alerts
+## Part 4: How to Set Up Churn Alerts
 
 ### Real-time monitoring
 
@@ -205,20 +199,22 @@ Create [Alerts](/features/product-analytics/alerts) to catch churn risks early:
 
 Set up a weekly dashboard review:
 
-1. Check at-risk segment sizes
-2. Review failed transactions
-3. Analyze retention by cohort
-4. Identify any anomalies
+- Check at-risk segment sizes
+- Review failed transactions
+- Analyze retention by cohort
+- Identify any anomalies
 
 ---
 
-## Part 5: Re-engagement campaigns
+## Part 5: How to Run Re-Engagement Campaigns
 
 ### Export at-risk segments
 
-1. Go to **Users** > select your at-risk segment
-2. Click **Export CSV**
-3. Download wallet addresses
+<Steps>
+  <Step title="Go to Users > select your at-risk segment" />
+  <Step title="Click Export CSV" />
+  <Step title="Download wallet addresses" />
+</Steps>
 
 Use these for targeted campaigns on:
 - **Twitter/X**: Target ads to wallet owners
@@ -239,21 +235,17 @@ Use these for targeted campaigns on:
 
 After running campaigns:
 
-1. Create a segment of users targeted
-2. Track how many returned (Resurrected lifecycle)
-3. Measure their subsequent retention
+<Steps>
+  <Step title="Create a segment of users targeted" />
+  <Step title="Track how many returned (Resurrected lifecycle)" />
+  <Step title="Measure their subsequent retention" />
+</Steps>
 
-```sql
-SELECT
-  countDistinct(address) AS targeted_users,
-  countDistinct(CASE WHEN returned = true THEN address END) AS returned,
-  round(returned / targeted_users * 100, 1) AS reactivation_rate
-FROM campaign_users
-```
+To measure reactivation rate, filter your Users list by the Resurrected lifecycle and compare to the number of users you targeted in your campaign.
 
 ---
 
-## Part 6: Build a churn prevention dashboard
+## Part 6: How to Build a Churn Prevention Dashboard
 
 ### Recommended metrics
 
@@ -294,13 +286,15 @@ You've learned how to:
 
 ## Churn prevention checklist
 
-- [ ] Defined what "churned" means for your app
-- [ ] Calculated baseline churn rate
-- [ ] Created at-risk user segments
-- [ ] Set up alerts for high-value user inactivity
-- [ ] Analyzed churned vs. retained user behavior
-- [ ] Built churn prevention dashboard
-- [ ] Established re-engagement workflow
+<Checklist>
+  <ChecklistItem>Defined what "churned" means for your app</ChecklistItem>
+  <ChecklistItem>Calculated baseline churn rate</ChecklistItem>
+  <ChecklistItem>Created at-risk user segments</ChecklistItem>
+  <ChecklistItem>Set up alerts for high-value user inactivity</ChecklistItem>
+  <ChecklistItem>Analyzed churned vs. retained user behavior</ChecklistItem>
+  <ChecklistItem>Built churn prevention dashboard</ChecklistItem>
+  <ChecklistItem>Established re-engagement workflow</ChecklistItem>
+</Checklist>
 
 ## Next steps
 
