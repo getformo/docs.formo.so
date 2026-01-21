@@ -10,7 +10,7 @@ You can also track [custom events](/features/product-analytics/custom-events) an
 	<img src="/images/dapp-analytics-activity-1.png" alt="Product Analytics Activity" />
 </Frame>
 
-Get full visibility on key touchpoints in the user lifecycle to identify drop-off points and boost retention. You can see all user actions, event properties, and conversion data without any sampling.
+Get full visibility on key touchpoints in the user lifecycle to identify drop-off points and boost retention. You can see what users do, full event properties, and other data without sampling.
 
 ## Filter by event properties
 
@@ -20,13 +20,13 @@ Filter the activity feed by event properties to focus on specific user actions o
 	<img src="/images/filter-properties.png" alt="Product Analytics Activity" />
 </Frame>
 
-Use filters to narrow down events by any property, making it easy to investigate specific user journeys or debug issues.
+Use filters to narrow down events by any property, making it easy to investigate specific user journeys or troubleshoot issues.
 
 ---
 
-## How to debug and investigate with the activity feed
+## How to use the activity feed
 
-The Activity Feed is your real-time view into what users are doing on your app. This guide shows you how to use it for debugging, investigation, and user research.
+The Activity Feed is your real-time view into what users are doing on your app. This guide shows you how to use it for investigation and user research.
 
 ### Step 1: Open the Activity Feed
 
@@ -38,7 +38,7 @@ You'll see a chronological stream of all events on your app.
 
 ### Step 2: Understand event types
 
-Each event in the feed has a type:
+Each event has a structured schema and type based on the [event specs](/data/events/overview):
 
 | Event Type | What it captures |
 |------------|------------------|
@@ -47,16 +47,20 @@ Each event in the feed has a type:
 | `disconnect` | Wallet disconnection |
 | `signature` | Message signing |
 | `transaction` | Onchain transaction |
-| `custom` | Your custom events |
-| `contract` | Smart contract events |
+| `track` | Custom events |
+| `decoded_log` | Smart contract events |
 
 Click any event to expand and see all properties.
+
+<Frame caption="Each event has full properties and metadata available for deeper analysis.">
+	<img src="/images/activity-expand.png" alt="Product Analytics Event Properties" />
+</Frame>
 
 ### Step 3: Filter to find specific events
 
 Use filters to narrow down the feed:
 
-1. Click **Add Filter**
+1. Click **Filter**
 2. Choose a property to filter by
 3. Set the condition and value
 
@@ -64,6 +68,9 @@ Use filters to narrow down the feed:
 
 | Goal | Filters |
 |------|---------|
+| Connects from Twitter | type = connect, referrer contains twitter |
+| Visitors from marketing campaign | utm_source = newsletter |
+| Events from mobile devices | device = mobile |
 | Failed transactions | type = transaction, status = failed |
 | Wallet connects from Twitter | type = connect, referrer contains twitter |
 | Specific user's activity | address = 0x... |
@@ -82,30 +89,37 @@ To see everything a specific user did:
 2. Click the wallet address
 3. View their complete [Wallet Profile](/features/wallet-intelligence/wallet-profiles)
 
+<Frame caption="View a user's activity feed.">
+	<img src="/images/screenshots/wallet-profile-activity.png" alt="Wallet Profile Activity Feed" />
+</Frame>
+
 Or filter the Activity Feed:
 1. Add filter: `address = [wallet address]`
 2. See all events from this user in chronological order
 
-### Step 5: Debug issues
+
+### Step 5: Investigate issues
 
 When users report problems, use the Activity Feed to investigate:
 
-**Debugging a failed transaction:**
+**Investigating a failed transaction:**
 1. Filter by `type = transaction` and `status = failed`
 2. Find the user's transaction
 3. Click to expand and see error details
 4. Check the preceding events for context
 
-**Debugging a drop-off:**
+**Investigating a drop-off:**
 1. Filter by the user's address
 2. Look at their event sequence
 3. Identify where they stopped (last event before leaving)
 4. Check for errors or unusual patterns
+5. Use [Funnels](/features/product-analytics/funnels) to measure drop-off rates at each step
 
-**Debugging a flow issue:**
+**Investigating a flow issue:**
 1. Filter by a specific page path
 2. Look at what users do after visiting that page
 3. Identify unexpected patterns
+4. Use [Flows](/features/product-analytics/flows) to visualize common paths users take
 
 ### Common investigation patterns
 
