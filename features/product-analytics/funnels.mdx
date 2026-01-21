@@ -69,3 +69,144 @@ To prevent false positives, we automatically filter out events with:
 - Negligible impact (less than 0.2% - 1.5% absolute difference depending on baseline conversion).
 
 </Accordion>
+
+---
+
+## Quick Start: Create Your First Funnel
+
+Build a conversion funnel to track how users progress from first visit to onchain action. This guide walks you through creating, analyzing, and optimizing funnels.
+
+### What is a funnel?
+
+Think of a funnel like a kitchen funnel: wide at the top, narrow at the bottom. Users enter at the top (e.g., visiting your site) and progress through steps until some complete the final action (e.g., making a transaction). At each step, some users drop off.
+
+Funnels help you:
+- **Measure conversion rates** between steps
+- **Identify bottlenecks** where users drop off
+- **Compare performance** across segments (referrers, devices, countries)
+
+### Step 1: Navigate to Funnels
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Funnels** in the left navigation
+4. Click **Create Funnel**
+
+### Step 2: Add funnel steps
+
+Define the user journey you want to track. Click **Add Step** for each action:
+
+| Step | Event Type | Example |
+|------|------------|---------|
+| 1 | Page view | Visit `/swap` |
+| 2 | Wallet connect | User connects wallet |
+| 3 | Transaction | User submits transaction |
+
+<Tip>Steps must happen in order. Formo tracks users who complete step 1, then step 2, then step 3 (in sequence).</Tip>
+
+### Step 3: Configure each step
+
+For each step, specify:
+
+**Page view steps:**
+- Event type: `page`
+- Filter: `path = /swap` (or any URL path)
+
+**Wallet connection steps:**
+- Event type: `connect`
+- Optional: filter by chain
+
+**Transaction steps:**
+- Event type: `transaction`
+- Optional: filter by contract address or status
+
+**Contract event steps:**
+- Event type: Your contract event (e.g., `Swap`, `Transfer`)
+- Requires [contract events](/features/product-analytics/contract-events) to be configured
+
+### Step 4: Set the conversion window
+
+Choose how long users have to complete all steps:
+
+| Window | Best for |
+|--------|----------|
+| 1 day | Immediate actions (mints, swaps) |
+| 7 days | Considered purchases |
+| 14 days (default) | Complex user journeys |
+| 30 days | Long sales cycles |
+
+Users must complete all steps within this window to count as converted.
+
+### Step 5: Analyze your funnel
+
+After creating your funnel, you'll see:
+
+1. **Conversion rate** - Percentage who completed all steps
+2. **Drop-off by step** - Where users abandon the journey
+3. **Absolute numbers** - User count at each step
+
+<Frame caption="Funnel visualization showing conversion rates and drop-off at each step.">
+  <img src="/images/funnels.png" alt="Funnel Analysis" />
+</Frame>
+
+### Step 6: Add breakdowns
+
+Click **Add Breakdown** to compare conversion across segments:
+
+| Breakdown | What you learn |
+|-----------|---------------|
+| **Referrer** | Which traffic sources convert best |
+| **Country** | Geographic conversion differences |
+| **Device** | Mobile vs desktop performance |
+| **UTM Source** | Campaign performance |
+
+### Example: DEX swap funnel
+
+Track users from landing to completed swap:
+
+| Step | Event | Typical conversion |
+|------|-------|-------------------|
+| 1 | Visit `/swap` | 100% (baseline) |
+| 2 | Connect wallet | 40-60% |
+| 3 | Approve token | 70-80% |
+| 4 | Complete swap | 85-95% |
+
+If you see a big drop between steps 1 and 2, focus on improving wallet connection UX.
+
+### Example: NFT mint funnel
+
+Track minting journey:
+
+| Step | Event | Typical conversion |
+|------|-------|-------------------|
+| 1 | Visit mint page | 100% (baseline) |
+| 2 | Connect wallet | 50-70% |
+| 3 | Mint NFT | 30-50% |
+
+### Using Conversion Insights
+
+After running your funnel, check the **Insights** tab to see which user behaviors correlate with conversion:
+
+- **High lift events**: Users who did X are 2x more likely to convert
+- **Negative indicators**: Users who did Y are 50% less likely to convert
+
+Use these insights to:
+- Encourage high-lift behaviors in your UX
+- Reduce friction that causes negative behaviors
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Contract Events" icon="file-contract" href="/features/product-analytics/contract-events">
+    Add onchain events to your funnels
+  </Card>
+  <Card title="Custom Events" icon="bolt" href="/features/product-analytics/custom-events">
+    Track custom conversion points
+  </Card>
+  <Card title="User Flows" icon="route" href="/features/product-analytics/flows">
+    Visualize all user paths
+  </Card>
+  <Card title="Retention" icon="calendar" href="/features/product-analytics/retention">
+    Measure user return rates
+  </Card>
+</CardGroup>

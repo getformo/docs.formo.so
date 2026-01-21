@@ -3,7 +3,7 @@ title: 'Flows'
 description: 'Analyze sequences of steps taken by users and understand why they convert.'
 ---
 
-User flow analysis (the Sankey diagram) identifies the most frequent paths taken by users to or from any event. 
+User flow analysis (the Sankey diagram) identifies the most frequent paths taken by users to or from any event.
 
 <Frame caption="Follow users along their journey with user path analysis. ">
 	<img src="/images/flows.png" alt="User Flows Chart" />
@@ -11,9 +11,134 @@ User flow analysis (the Sankey diagram) identifies the most frequent paths taken
 
 You can learn the following from paths:
 - What did users do immediately after signing up?
-- Where are users are getting confused or stuck?
+- Where are users getting confused or stuck?
 - Which parts of your app people are actually using?
-- Why are users aren't discovering new features?
-- Where are new users are landing into your website?
+- Why users aren't discovering new features?
+- Where new users are landing on your website?
 
 Understand how your users sequentially perform events in your product and analyze drop-offs or unsuccessful behavior.
+
+---
+
+## Quick Start: Analyze User Paths
+
+User flows show you the actual paths users take through your app—not just the paths you designed. This guide walks you through creating and analyzing flow charts.
+
+### What is a Sankey diagram?
+
+A Sankey diagram visualizes user journeys as flowing paths. The width of each path represents the number of users taking that route. Wider paths = more common behavior.
+
+Unlike funnels (which track a specific sequence), flows reveal **all paths** users take—including unexpected ones.
+
+### Step 1: Navigate to Flows
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Flows** in the left navigation
+
+### Step 2: Choose your starting point
+
+Flows can start from any event. Select what you want to analyze:
+
+| Starting point | What you'll learn |
+|----------------|-------------------|
+| **First visit** | Where users go after landing |
+| **Wallet connect** | What users do after connecting |
+| **Specific page** | Paths from a key page |
+| **Custom event** | Behavior after a conversion point |
+
+### Step 3: Configure the flow
+
+1. Select **Starting event** (e.g., `connect`)
+2. Choose **Direction**:
+   - **Forward**: What happens after this event
+   - **Backward**: What led to this event
+3. Set **Number of steps** (typically 3-5)
+4. Click **Generate**
+
+### Step 4: Read the flow chart
+
+The Sankey diagram shows:
+
+- **Nodes**: Events (pages, actions, conversions)
+- **Paths**: User journeys between events
+- **Width**: Number of users (wider = more common)
+- **Drop-off**: Users who left the flow
+
+<Frame caption="Follow users along their journey with user path analysis.">
+	<img src="/images/flows.png" alt="User Flows Chart" />
+</Frame>
+
+### Step 5: Identify patterns
+
+Look for these insights:
+
+**Common paths:**
+- Wide paths show your most frequent user journeys
+- Do they match your intended UX flow?
+
+**Unexpected paths:**
+- Narrow paths to unexpected destinations
+- Users skipping steps or taking detours
+
+**Dead ends:**
+- Where do users leave the flow?
+- High drop-off at certain pages = friction points
+
+### Example: Post-connect analysis
+
+Analyze what users do after connecting their wallet:
+
+| Starting event | `connect` |
+| Direction | Forward |
+| Steps | 4 |
+
+**Typical findings:**
+- 60% go to `/swap` (expected)
+- 20% go to `/portfolio` (checking balances)
+- 10% disconnect immediately (issue with UX?)
+- 10% navigate to `/docs` (need help?)
+
+### Example: Path to conversion
+
+See how users reach a conversion event:
+
+| Starting event | Your conversion event (e.g., `Swap`) |
+| Direction | Backward |
+| Steps | 3 |
+
+**Questions to answer:**
+- What pages do converters visit first?
+- Do they explore multiple features before converting?
+- Is there a common path to conversion?
+
+### Use flows with funnels
+
+Flows and funnels complement each other:
+
+| Tool | Best for |
+|------|----------|
+| **Funnels** | Measuring specific conversion paths |
+| **Flows** | Discovering all paths (expected and unexpected) |
+
+**Workflow:**
+1. Use Flows to discover common paths
+2. Create Funnels to measure conversion on those paths
+3. Use Flows again to investigate drop-off points
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Measure conversion on specific paths
+  </Card>
+  <Card title="Activity Feed" icon="list" href="/features/product-analytics/activity">
+    Investigate individual user journeys
+  </Card>
+  <Card title="Custom Events" icon="bolt" href="/features/product-analytics/custom-events">
+    Track more touchpoints for flow analysis
+  </Card>
+  <Card title="Wallet Profiles" icon="user" href="/features/wallet-intelligence/wallet-profiles">
+    Drill into specific user journeys
+  </Card>
+</CardGroup>

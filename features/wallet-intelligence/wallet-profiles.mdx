@@ -40,3 +40,128 @@ View users' active days at a glance with the activity chart. Activity charts are
 
 > Let us know what you'd like to know about your onchain users. Message us on [Slack](https://formo.so/slack) or [email](mailto:yos@formo.so).
 
+---
+
+## Quick Start: Investigate Individual Users
+
+Wallet profiles let you drill into specific users to understand their behavior, investigate issues, or identify opportunities. This guide shows you how.
+
+### Step 1: Find a user
+
+There are several ways to access wallet profiles:
+
+**From the Users list:**
+1. Go to **Users** in the left navigation
+2. Click any wallet address to open their profile
+
+**From the Activity feed:**
+1. Go to **Activity**
+2. Click on any event
+3. Click the wallet address to open their profile
+
+**Direct search:**
+1. Use the search bar at the top of the dashboard
+2. Enter a wallet address or ENS name
+3. Click to open the profile
+
+### Step 2: Understand the profile overview
+
+The profile header shows key information at a glance:
+
+| Field | What it shows |
+|-------|---------------|
+| **Address** | Wallet address with copy button |
+| **ENS/Identity** | ENS name, Farcaster, Lens, or other identity |
+| **Net Worth** | Total value across all chains |
+| **Lifecycle** | New, Returning, Power User, Churned, or Resurrected |
+| **First Seen** | When they first visited your app |
+| **Last Seen** | Most recent activity |
+
+### Step 3: Review the activity timeline
+
+The **Activity** tab shows everything this user has done on your app:
+
+- Page views with URLs
+- Wallet connects/disconnects
+- Transactions with status
+- Custom events you've tracked
+
+Each event shows:
+- Timestamp
+- Event type and details
+- Referrer/UTM attribution (how they arrived)
+- Device and location
+
+<Tip>Use the activity timeline to debug user issues. If a user reports a problem, find their profile and review their recent activity to understand what happened.</Tip>
+
+### Step 4: Explore onchain data
+
+The **Holdings** tab shows the user's onchain footprint:
+
+**Token Balances:**
+- All tokens held across supported chains
+- USD values and percentages
+
+**DeFi Positions:**
+- Active positions in protocols (Aave, Uniswap, etc.)
+- Supplied/borrowed amounts
+
+**Apps Used:**
+- Other dApps this wallet interacts with
+- Useful for understanding user preferences
+
+### Step 5: Check labels and attributes
+
+The **Labels** section shows auto-generated tags:
+
+| Label Type | Examples |
+|------------|----------|
+| **Activity** | DeFi Trader, NFT Collector, DAO Voter |
+| **Holdings** | Whale, Stablecoin Holder, ETH Maximalist |
+| **Behavior** | Early Adopter, Power User, Dormant |
+
+Use labels to understand user personas without manual research.
+
+### Common use cases
+
+**Customer support:**
+1. User reports an issue
+2. Find their profile by wallet address
+3. Review activity timeline to see what happened
+4. Check transaction status and error details
+
+**Sales/BD outreach:**
+1. Identify high-value users (filter by net worth)
+2. Review their onchain activity
+3. Find social profiles for outreach
+4. Understand their other app usage
+
+**Product research:**
+1. Find power users in your segments
+2. Study their activity patterns
+3. Identify features they use most
+4. Discover unmet needs from their other app usage
+
+**Fraud investigation:**
+1. Flag suspicious activity in alerts
+2. Open the user's profile
+3. Check wallet age, transaction patterns
+4. Review linked wallets and labels
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Group users by shared characteristics
+  </Card>
+  <Card title="Audience Insights" icon="chart-pie" href="/features/wallet-intelligence/audience-insights">
+    Aggregate view of your user base
+  </Card>
+  <Card title="Wallet Labels" icon="tags" href="/features/wallet-intelligence/wallet-labels">
+    Understand auto-generated labels
+  </Card>
+  <Card title="Profiles API" icon="code" href="/api-reference/profile">
+    Query profiles programmatically
+  </Card>
+</CardGroup>
+

@@ -10,7 +10,7 @@ description: 'Understand and target onchain users with comprehensive wallet inte
 
 ## Features
 
-Wallet intelligence helps you **understand and target users onchain with crypto-native segmentation**: 
+Wallet intelligence helps you **understand and target users onchain with crypto-native segmentation**:
 
 - 🕵️‍♀️ <a href="/features/wallet-intelligence/wallet-profiles">**Wallet profiles.**</a> Turn pseudonymous wallets into actionable onchain personas.
 - 👥 <a href="/features/wallet-intelligence/audience-insights">**Audience insights.**</a> Get comprehensive insights into your audience, including user lifecycle, apps, tokens, chains, revenue, and retention.
@@ -22,3 +22,98 @@ Wallet intelligence helps you **understand and target users onchain with crypto-
 Unify offchain and onchain data to build a complete picture of your users with Formo's wallet-native web3 CRM.
 
 Profile data is available for querying and export in the [Profiles API](/api-reference/overview#wallet-profile-api).
+
+---
+
+## Quick Start: Explore Your Users
+
+This guide walks you through viewing wallet profiles, understanding your audience, and creating your first user segment.
+
+<Note>Wallet Intelligence requires the Formo SDK to be installed. Complete the [Product Analytics setup](/features/product-analytics/overview#quick-start-set-up-product-analytics) first if you haven't already.</Note>
+
+### Step 1: View the Users page
+
+1. Open the [Formo Dashboard](https://app.formo.so)
+2. Select your project from the sidebar
+3. Click **Users** in the left navigation
+
+You'll see a table of all users who have connected a wallet to your app, along with key metrics like net worth, lifecycle stage, and last seen.
+
+<Frame caption="The Users page shows all wallets that have connected to your app.">
+	<img src="/images/wallet-intelligence-users.png" alt="Users list" />
+</Frame>
+
+### Step 2: Explore a wallet profile
+
+Click on any wallet address to open its full profile. The wallet profile shows:
+
+| Section | What you'll see |
+|---------|-----------------|
+| **Overview** | ENS name, net worth, wallet score, and lifecycle stage |
+| **Activity** | Real-time feed of actions on your app with UTM attribution |
+| **Holdings** | Token balances and DeFi positions across chains |
+| **Labels** | Auto-generated labels like "DeFi Trader" or "NFT Collector" |
+
+<Frame caption="View a user's DeFi positions and token balances across chains.">
+	<img src="/images/screenshots/wallet-profile-activity.png" alt="Wallet Profile" />
+</Frame>
+
+### Step 3: Understand lifecycle stages
+
+Formo automatically categorizes users by lifecycle stage based on their activity:
+
+| Stage | Definition | What it means |
+|-------|------------|---------------|
+| **New** | First interaction with your app | Recent acquisition |
+| **Returning** | Came back after first visit | Engaged user |
+| **Power User** | Active 5+ days in last 30 days | Highly engaged |
+| **Churned** | No activity for 30+ days | Needs re-engagement |
+| **Resurrected** | Returned after being churned | Re-engaged user |
+
+Use the lifecycle filter on the Users page to focus on specific user groups.
+
+### Step 4: Create your first segment
+
+Segments let you group users by shared characteristics. Here's how to create one:
+
+1. Go to **Users** > **Segments** in the sidebar
+2. Click **Create Segment**
+3. Add filter conditions. For example:
+   - Lifecycle = "Power User"
+   - Net worth > $10,000
+   - Label contains "DeFi Trader"
+4. Name your segment (e.g., "High-Value DeFi Users")
+5. Click **Save**
+
+<Frame caption="Create segments by combining wallet properties, lifecycle, and behavior.">
+	<img src="/images/wallet-intelligence-segments.png" alt="Segment builder" />
+</Frame>
+
+### Example: Find whales who churned
+
+Here's a practical segment to identify high-value users at risk:
+
+| Filter | Value |
+|--------|-------|
+| Lifecycle | Churned |
+| Net worth | > $100,000 |
+| Last transaction | > 30 days ago |
+
+Export this segment as CSV to run targeted re-engagement campaigns on social channels.
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Audience Insights" icon="users" href="/features/wallet-intelligence/audience-insights">
+    Get aggregate analytics on your entire user base
+  </Card>
+  <Card title="Wallet Labels" icon="tags" href="/features/wallet-intelligence/wallet-labels">
+    Understand auto-generated behavioral labels
+  </Card>
+  <Card title="Wallet Messaging" icon="message" href="/features/wallet-intelligence/wallet-messaging">
+    Send personalized messages to user segments
+  </Card>
+  <Card title="Profiles API" icon="code" href="/api-reference/profile">
+    Query wallet profiles programmatically
+  </Card>
+</CardGroup>

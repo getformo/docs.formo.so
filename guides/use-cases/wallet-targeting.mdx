@@ -1,0 +1,294 @@
+---
+title: 'Wallet Targeting for Campaigns'
+description: 'Build targeted user segments based on onchain behavior and export them for marketing campaigns on social channels.'
+---
+
+Build precise user segments combining onchain data, wallet labels, and app behavior—then export them for marketing campaigns on X, Farcaster, Discord, and more.
+
+This guide shows you how to identify your ideal customers, create targetable segments, and run effective wallet-based campaigns.
+
+## What you'll learn
+
+- Define your Ideal Customer Profile (ICP) using wallet data
+- Create segments combining labels, net worth, and behavior
+- Export segments for use in marketing campaigns
+- Track campaign performance back to conversions
+
+## Prerequisites
+
+- Formo SDK installed with wallet tracking ([Installation Guide](/install))
+- At least 100 connected wallets for meaningful segmentation
+
+---
+
+## Part 1: Define Your Ideal Customer Profile
+
+### Understanding your best users
+
+Before targeting new users, understand who your best current users are:
+
+1. Go to **Users** in the Formo Dashboard
+2. Sort by **Volume** (highest first) or **Sessions** (most active)
+3. Click on your top 10-20 users to study their profiles
+
+**Look for patterns:**
+- What wallet labels do they share?
+- What's their typical net worth range?
+- What other apps do they use?
+- How did they find you (referrer/UTM)?
+
+### Common ICP definitions for dApps
+
+| dApp Type | ICP Characteristics |
+|-----------|---------------------|
+| **DEX** | DeFi Active, Net worth > $10k, Uses 2+ DEXes |
+| **Lending** | Yield Asset Holder, Net worth > $50k, ETH Staker |
+| **NFT Marketplace** | NFT Collector, Has traded NFTs, Active on OpenSea |
+| **Gaming** | Power User, High session count, Multiple chains |
+| **Bridge** | Multi-chain active, High transaction frequency |
+
+---
+
+## Part 2: Create Targeted Segments
+
+### Step 1: Navigate to Segments
+
+1. Go to **Users** > **Segments** in the sidebar
+2. Click **Create Segment**
+
+### Step 2: Build your segment with filters
+
+Combine multiple filter types for precision targeting:
+
+**Filter categories:**
+
+| Category | Examples |
+|----------|----------|
+| **Wallet Labels** | DeFi Active, NFT Collector, Whale |
+| **Net Worth** | > $10,000, $1k-$100k, < $1,000 |
+| **Lifecycle** | Power User, New, Churned |
+| **Behavior** | Sessions > 5, Transactions > 3 |
+| **Attribution** | UTM Source = twitter, Referrer = discord.com |
+| **Apps Used** | Uses Uniswap, Uses Aave |
+| **Tokens Held** | Holds USDC, Holds specific token |
+
+### Step 3: Example high-value segments
+
+**Segment: High-Value DeFi Users**
+
+| Filter | Value |
+|--------|-------|
+| Label | DeFi Active |
+| Net Worth | > $50,000 |
+| Lifecycle | Power User OR Returning |
+
+**Segment: Churned Whales (Re-engagement)**
+
+| Filter | Value |
+|--------|-------|
+| Net Worth | > $100,000 |
+| Lifecycle | Churned |
+| Last Seen | > 30 days ago |
+
+**Segment: Competitor Users**
+
+| Filter | Value |
+|--------|-------|
+| Apps | Contains "Competitor Name" |
+| Net Worth | > $10,000 |
+| Has NOT | Completed transaction on your app |
+
+**Segment: Campaign Responders**
+
+| Filter | Value |
+|--------|-------|
+| UTM Source | twitter |
+| UTM Campaign | your_campaign_name |
+| Connected Wallet | Yes |
+
+### Step 4: Save and validate
+
+1. Review the user count (is it meaningful?)
+2. Spot-check a few profiles to validate quality
+3. Name your segment descriptively
+4. Click **Save**
+
+---
+
+## Part 3: Export for Campaigns
+
+### Export options
+
+Once you have a segment, export it for use in campaigns:
+
+1. Open your saved segment
+2. Click **Export CSV**
+3. Choose fields to include:
+   - Wallet address (required)
+   - ENS name
+   - Twitter handle (if available)
+   - Farcaster ID (if available)
+   - Net worth
+   - Labels
+
+### Using exports for targeting
+
+**X (Twitter) Campaigns:**
+1. Export users with Twitter handles
+2. Create a custom audience in X Ads
+3. Target your segment with promoted content
+
+**Farcaster Outreach:**
+1. Export users with Farcaster IDs
+2. Use Farcaster messaging for direct outreach
+3. Or create targeted casts mentioning relevant users
+
+**Discord Campaigns:**
+1. Export users with Discord handles
+2. Send targeted DMs or role-based announcements
+3. Create exclusive channels for segment members
+
+**Airdrop/Rewards:**
+1. Export wallet addresses
+2. Use for allowlist or airdrop eligibility
+3. Reward your most valuable users
+
+---
+
+## Part 4: Run Targeted Campaigns
+
+### Setting up tracking
+
+Before launching campaigns, set up tracking:
+
+1. Create unique UTM parameters for each campaign:
+   ```
+   ?utm_source=twitter&utm_medium=social&utm_campaign=whale_outreach_jan
+   ```
+
+2. Use different UTMs for different segments:
+   - `utm_campaign=defi_users_jan`
+   - `utm_campaign=churned_whales_jan`
+
+### Campaign types by segment
+
+**For High-Value Users (Retention):**
+- Exclusive feature previews
+- VIP support access
+- Governance participation
+
+**For Churned Users (Re-engagement):**
+- "We miss you" messaging
+- New feature announcements
+- Incentives to return
+
+**For Competitor Users (Acquisition):**
+- Differentiation messaging
+- Migration incentives
+- Comparison content
+
+**For New Users (Activation):**
+- Onboarding content
+- First-transaction rewards
+- Educational materials
+
+---
+
+## Part 5: Measure Campaign Performance
+
+### Track segment conversions
+
+After launching campaigns:
+
+1. Go to **Growth Analytics**
+2. Filter by your campaign UTM
+3. Compare conversion rates to baseline
+
+**Key metrics to track:**
+
+| Metric | What it tells you |
+|--------|-------------------|
+| **Wallet connects from UTM** | Campaign reach |
+| **Transactions from UTM** | Campaign conversions |
+| **Volume from UTM** | Campaign value |
+| **Retention of UTM cohort** | Campaign quality |
+
+### Create a campaign funnel
+
+Build a funnel specific to your campaign:
+
+1. Go to **Funnels** > **Create Funnel**
+2. Add steps:
+   - Step 1: Page view with `utm_campaign = your_campaign`
+   - Step 2: Wallet connect
+   - Step 3: Transaction
+3. Measure conversion rate for this specific campaign
+
+### Compare segment performance
+
+Create charts to compare segment performance:
+
+**Using Ask AI:**
+> "Compare conversion rates for users from twitter vs discord utm_source"
+
+> "What's the average transaction volume for users in the 'High-Value DeFi' segment?"
+
+---
+
+## Part 6: Iterate and Optimize
+
+### Refine your segments
+
+Based on campaign performance:
+
+1. **Expand successful segments**: Loosen filters to reach more similar users
+2. **Narrow underperforming segments**: Add filters to improve quality
+3. **Create lookalike segments**: Find users similar to your best converters
+
+### Build a targeting playbook
+
+Document what works:
+
+| Segment | Channel | Message Type | Conversion Rate |
+|---------|---------|--------------|-----------------|
+| DeFi Whales | Farcaster | Feature announcement | 12% |
+| Churned Users | Email | Incentive offer | 8% |
+| Competitor Users | Twitter Ads | Comparison | 5% |
+
+### Automate with alerts
+
+Set up alerts for high-value segment activity:
+
+1. Go to **Settings** > **Alerts**
+2. Create alert for your target segment
+3. Get notified when target users connect
+4. Enable real-time outreach opportunities
+
+---
+
+## Summary
+
+You've learned how to:
+
+1. **Define your ICP** by analyzing your best users
+2. **Create precise segments** with labels, net worth, and behavior
+3. **Export segments** for use in marketing campaigns
+4. **Track performance** with UTMs and funnels
+5. **Iterate** based on results
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Deep dive on segment creation
+  </Card>
+  <Card title="Wallet Labels" icon="tags" href="/features/wallet-intelligence/wallet-labels">
+    Understand available labels
+  </Card>
+  <Card title="Growth Analytics" icon="chart-simple" href="/features/product-analytics/growth-analytics">
+    Analyze campaign traffic
+  </Card>
+  <Card title="Attribution Guide" icon="route" href="/guides/use-cases/attribution-guide">
+    Track multi-touch attribution
+  </Card>
+</CardGroup>

@@ -140,3 +140,143 @@ See the top wallets of your visitors and users.
 </Frame>
 
 See what's moving the needle with a breakdown of your metrics by referrers. Easily understand where your onchain users come from and how they find you.
+
+---
+
+## Quick Start: Analyze Traffic Sources
+
+Growth Analytics helps you understand where your users come from and which channels drive the most value. This guide walks you through analyzing traffic sources and optimizing acquisition.
+
+### Step 1: Open Growth Analytics
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Growth** in the left navigation
+
+You'll see the overview with visitors, wallets, and transactions over time.
+
+### Step 2: Review the referrer breakdown
+
+Scroll to the **Referrers** section to see where traffic originates:
+
+| Column | What it shows |
+|--------|---------------|
+| **Referrer** | The source domain (twitter.com, google.com, direct) |
+| **Visitors** | Page views from this source |
+| **Wallets** | Wallet connects from this source |
+| **Transactions** | Completed transactions from this source |
+| **Volume** | Total transaction volume (USD) |
+
+<Frame caption="Breakdown by referrer shows which sources drive real conversions.">
+  <img src="/images/referrer-breakdown.png" alt="Referrer Breakdown" />
+</Frame>
+
+### Step 3: Calculate conversion by source
+
+The most valuable metric is **conversion rate by source**:
+
+```
+Conversion Rate = Transactions / Visitors × 100
+```
+
+**Example analysis:**
+
+| Referrer | Visitors | Transactions | Conversion |
+|----------|----------|--------------|------------|
+| twitter.com | 1,000 | 50 | 5% |
+| discord.com | 500 | 75 | 15% |
+| defillama.com | 200 | 60 | 30% |
+
+In this example, DefiLlama drives 6x better conversion than Twitter despite lower volume.
+
+### Step 4: Analyze UTM campaigns
+
+If you use UTM parameters in your marketing links, you can drill deeper:
+
+1. Click on a referrer to expand
+2. See breakdown by UTM campaign, source, medium
+3. Identify which specific campaigns perform best
+
+**UTM parameter guide:**
+
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| `utm_source` | Platform | twitter, discord, newsletter |
+| `utm_medium` | Channel type | social, email, paid |
+| `utm_campaign` | Campaign name | launch_promo, airdrop_2024 |
+| `utm_content` | Ad variation | banner_a, banner_b |
+| `utm_term` | Keywords (for paid) | defi, swap |
+
+**Example URL:**
+```
+https://yourapp.xyz/?utm_source=twitter&utm_medium=social&utm_campaign=launch_promo
+```
+
+### Step 5: Compare time periods
+
+Use the date picker to compare performance:
+
+1. Select a date range (e.g., "Last 7 days")
+2. Enable "Compare to previous period"
+3. See growth/decline by source
+
+**Questions to answer:**
+- Which sources are growing fastest?
+- Did a recent campaign spike traffic?
+- Are any sources declining?
+
+### Step 6: Analyze by device and geography
+
+Check the **Devices** and **Countries** sections:
+
+**Device insights:**
+- High mobile traffic but low mobile conversion? Mobile UX issue.
+- Desktop dominates? Your users are power users.
+
+**Geographic insights:**
+- Unexpected traffic from certain countries? Potential new markets.
+- Low conversion from specific regions? Localization opportunities.
+
+### Optimizing based on data
+
+**Double down on high-converting sources:**
+- Identify your top 3 converting referrers
+- Allocate more budget/effort to these channels
+- Create content tailored to these audiences
+
+**Investigate low-converting sources:**
+- High traffic but low conversion = landing page issue
+- Check if these visitors bounce or explore but don't convert
+- Consider if this traffic is actually relevant
+
+**UTM best practices:**
+- Use consistent naming conventions
+- Track all paid campaigns with unique UTMs
+- Add UTMs to social media links, emails, and partner links
+
+### Attribution models
+
+Formo supports multiple attribution models. Learn more in the [Attribution guide](/data/attribution).
+
+| Model | Best for |
+|-------|----------|
+| **First Touch** | Understanding discovery channels |
+| **Last Touch** | Understanding conversion drivers |
+| **Linear** | Giving credit across the journey |
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Attribution Deep Dive" icon="route" href="/data/attribution">
+    Understand attribution models
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Track conversion by source through funnels
+  </Card>
+  <Card title="Retention" icon="calendar" href="/features/product-analytics/retention">
+    Measure retention by acquisition source
+  </Card>
+  <Card title="Attribution Guide" icon="bullseye" href="/guides/use-cases/attribution-guide">
+    Complete attribution workflow
+  </Card>
+</CardGroup>

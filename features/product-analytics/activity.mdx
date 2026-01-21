@@ -3,7 +3,7 @@ title: 'Activity feed'
 description: 'Get insights into user behaviour, including drop-off and retention drivers. From pageviews to conversions, get complete visibility into how users actually use your product.'
 ---
 
-Track every user interaction with powerful real-time event analytics. 
+Track every user interaction with powerful real-time event analytics.
 
 Formo automatically captures page views, wallet connects, signatures, and transactions on your onchain app.
 You can also track [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
@@ -34,3 +34,150 @@ Filter the activity feed by event properties to focus on specific user actions o
 </Frame>
 
 Use filters to narrow down events by any property, making it easy to investigate specific user journeys or debug issues.
+
+---
+
+## Quick Start: Debug and Investigate with the Activity Feed
+
+The Activity Feed is your real-time view into what users are doing on your app. This guide shows you how to use it for debugging, investigation, and user research.
+
+### Step 1: Open the Activity Feed
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Activity** in the left navigation
+
+You'll see a chronological stream of all events on your app.
+
+### Step 2: Understand event types
+
+Each event in the feed has a type:
+
+| Event Type | What it captures |
+|------------|------------------|
+| `page` | Page view with URL path |
+| `connect` | Wallet connection |
+| `disconnect` | Wallet disconnection |
+| `signature` | Message signing |
+| `transaction` | Onchain transaction |
+| `custom` | Your custom events |
+| `contract` | Smart contract events |
+
+Click any event to expand and see all properties.
+
+### Step 3: Filter to find specific events
+
+Use filters to narrow down the feed:
+
+1. Click **Add Filter**
+2. Choose a property to filter by
+3. Set the condition and value
+
+**Common filter combinations:**
+
+| Goal | Filters |
+|------|---------|
+| Failed transactions | type = transaction, status = failed |
+| Wallet connects from Twitter | type = connect, referrer contains twitter |
+| Specific user's activity | address = 0x... |
+| Events on a specific page | path = /swap |
+| High-value transactions | type = transaction, value > 1000 |
+
+<Frame caption="Filter by any property to focus your investigation.">
+	<img src="/images/filter-properties.png" alt="Activity Filters" />
+</Frame>
+
+### Step 4: Investigate a user's journey
+
+To see everything a specific user did:
+
+1. Find any event from that user
+2. Click the wallet address
+3. View their complete [Wallet Profile](/features/wallet-intelligence/wallet-profiles)
+
+Or filter the Activity Feed:
+1. Add filter: `address = [wallet address]`
+2. See all events from this user in chronological order
+
+### Step 5: Debug issues
+
+When users report problems, use the Activity Feed to investigate:
+
+**Debugging a failed transaction:**
+1. Filter by `type = transaction` and `status = failed`
+2. Find the user's transaction
+3. Click to expand and see error details
+4. Check the preceding events for context
+
+**Debugging a drop-off:**
+1. Filter by the user's address
+2. Look at their event sequence
+3. Identify where they stopped (last event before leaving)
+4. Check for errors or unusual patterns
+
+**Debugging a flow issue:**
+1. Filter by a specific page path
+2. Look at what users do after visiting that page
+3. Identify unexpected patterns
+
+### Step 6: Use Live View for real-time monitoring
+
+For real-time visibility:
+
+1. Click **Live View** in the Activity tab
+2. See events streaming in real-time on a globe
+3. Click any event to see details
+4. Click the user to open their profile
+
+<Frame caption="Monitor your app in real-time with Live View.">
+	<img src="/images/live.png" alt="Live View" />
+</Frame>
+
+**Use cases for Live View:**
+- Launch day monitoring
+- Campaign monitoring
+- Demo dashboards
+- Incident response
+
+### Common investigation patterns
+
+**"Why are users bouncing from our swap page?"**
+1. Filter: `path = /swap`
+2. Look at events that follow page views
+3. Count how many lead to `connect` vs. leaving
+4. Check for errors or unusual device/browser patterns
+
+**"Which transactions are failing?"**
+1. Filter: `type = transaction`, `status = failed`
+2. Group by error message or contract
+3. Identify the most common failure reasons
+4. Check if failures correlate with specific flows
+
+**"What do our best users do differently?"**
+1. Identify a power user from the Users list
+2. Filter Activity by their address
+3. Study their event sequence
+4. Compare to average user patterns
+
+**"Is our new feature being used?"**
+1. Filter by your custom event or page path
+2. See adoption over time
+3. Check which user segments are using it
+4. Look at the referrer to see how users find it
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Wallet Profiles" icon="user" href="/features/wallet-intelligence/wallet-profiles">
+    Drill into individual users
+  </Card>
+  <Card title="Custom Events" icon="bolt" href="/features/product-analytics/custom-events">
+    Track more actions in the feed
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Measure conversion from Activity patterns
+  </Card>
+  <Card title="Alerts" icon="bell" href="/features/product-analytics/alerts">
+    Get notified of important events
+  </Card>
+</CardGroup>

@@ -24,3 +24,144 @@ Launch forms, waitlists, and surveys for your community with the best form build
 <Frame caption="View all of your form responses.">
 	<img src="/images/token-gated-forms-form-builder-2.png" alt="Token Gated Form Builder" />
 </Frame>
+
+---
+
+## Quick Start: Create Your First Token-Gated Form
+
+Build and launch a token-gated form in under 10 minutes. This guide walks you through creating a form, adding token requirements, customizing branding, and viewing responses.
+
+### Step 1: Create a new form
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Click **Forms** in the left navigation
+3. Click **Create Form**
+4. Choose a template or start from scratch:
+   - **Waitlist** - Collect emails and wallet addresses
+   - **Survey** - Gather feedback from your community
+   - **Application** - Accept applications for grants, allowlists, etc.
+   - **Blank** - Start with an empty form
+
+<Tip>Templates come with pre-built questions you can customize. Starting from a template saves time.</Tip>
+
+### Step 2: Add form fields
+
+The form builder uses a drag-and-drop interface. Add fields by clicking the **+** button or dragging from the sidebar.
+
+**Available field types:**
+
+| Field | Use case |
+|-------|----------|
+| **Wallet** | Capture connected wallet address (required for token gating) |
+| **Email** | Collect email addresses |
+| **Short Text** | Single-line responses |
+| **Long Text** | Multi-line responses |
+| **Multiple Choice** | Select one option from a list |
+| **Checkboxes** | Select multiple options |
+| **Twitter** | Verify and capture Twitter handle |
+| **Discord** | Verify and capture Discord username |
+| **Farcaster** | Verify and capture Farcaster ID |
+
+### Step 3: Enable token gating (optional)
+
+To restrict form access based on token ownership:
+
+1. Click **Settings** in the form builder toolbar
+2. Toggle **Token Gating** to enable
+3. Click **Add Requirement**
+4. Configure your requirement:
+
+<Tabs>
+  <Tab title="ERC-20 Token">
+    - Select **ERC-20** as the type
+    - Choose the chain (Ethereum, Base, Arbitrum, etc.)
+    - Paste the token contract address
+    - Set minimum balance (e.g., 100 tokens)
+  </Tab>
+  <Tab title="NFT Collection">
+    - Select **NFT** as the type
+    - Choose the chain
+    - Paste the NFT contract address
+    - Optionally set minimum quantity
+  </Tab>
+  <Tab title="World ID">
+    - Select **World ID** as the type
+    - Users must verify with World ID before submitting
+    - See [World ID integration](/features/token-gated-forms/world-id)
+  </Tab>
+</Tabs>
+
+You can add multiple requirements with AND/OR logic.
+
+### Step 4: Customize branding
+
+Make your form match your brand:
+
+1. Click **Design** in the form builder toolbar
+2. Customize:
+   - **Logo** - Upload your project logo
+   - **Background** - Set a color or upload an image
+   - **Colors** - Match your brand colors
+   - **Font** - Choose from available fonts
+
+### Step 5: Publish and share
+
+1. Click **Publish** in the top right
+2. Copy your form URL (e.g., `forms.formo.so/your-form`)
+3. Share the link with your community
+
+<Frame caption="Share your form via direct link, embed, or social media.">
+	<img src="/images/token-gated-forms-form-builder-1.png" alt="Share form" />
+</Frame>
+
+### Step 6: View responses
+
+As responses come in, view them in the dashboard:
+
+1. Go to **Forms** > select your form
+2. Click the **Responses** tab
+3. You'll see each submission with:
+   - Wallet address
+   - Form answers
+   - Token verification status
+   - Submission timestamp
+
+<Frame caption="All responses are available in the dashboard with export options.">
+	<img src="/images/token-gated-forms-form-builder-2.png" alt="Form responses" />
+</Frame>
+
+**Export options:**
+- **CSV** - Download all responses
+- **Zapier** - Send responses to Slack, Notion, Google Sheets, etc.
+- **Webhooks** - Receive real-time notifications
+
+### Example: NFT holder feedback form
+
+Here's a practical example of a token-gated survey:
+
+| Setting | Value |
+|---------|-------|
+| Template | Survey |
+| Token requirement | NFT: Your collection address |
+| Minimum holdings | 1 NFT |
+| Questions | "How did you hear about us?", "What features would you like?" |
+| Branding | Your logo, brand colors |
+
+Only users holding at least 1 NFT from your collection can submit the form.
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Token Gating Details" icon="lock" href="/features/token-gated-forms/token-gating">
+    Learn about all token gating options
+  </Card>
+  <Card title="World ID Verification" icon="id-card" href="/features/token-gated-forms/world-id">
+    Add proof-of-personhood verification
+  </Card>
+  <Card title="Zapier Integration" icon="plug" href="/features/token-gated-forms/zapier">
+    Automate workflows with form responses
+  </Card>
+  <Card title="Forms API" icon="code" href="/api-reference/forms/list">
+    Manage forms programmatically
+  </Card>
+</CardGroup>

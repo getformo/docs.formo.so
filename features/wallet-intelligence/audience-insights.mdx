@@ -7,8 +7,8 @@ description: 'Get comprehensive insights into your audience including their onch
 	<img src="/images/audience-insights.png" alt="Audience Insights" />
 </Frame>
 
-Track and analyze visitors and users in real-time, with automatic labeling and profile data. 
-Get insights into your audience's onchain activity and other user properties: 
+Track and analyze visitors and users in real-time, with automatic labeling and profile data.
+Get insights into your audience's onchain activity and other user properties:
 - Top dapps
 - Top tokens
 - Top chains
@@ -16,8 +16,8 @@ Get insights into your audience's onchain activity and other user properties:
 - A breakdown of users by revenue / wallet spend
 - <a href="/features/wallet-intelligence/wallet-labels">Wallet labels</a>
 
-Each user is automatically <a href="/features/wallet-intelligence/wallet-labels">labelled</a> and grouped into <a href="/features/wallet-intelligence/segments">segments</a> such as 'New User' or 'Returning User'. 
-Understand the top wallets, devices, OS, and net worth of your users. 
+Each user is automatically <a href="/features/wallet-intelligence/wallet-labels">labelled</a> and grouped into <a href="/features/wallet-intelligence/segments">segments</a> such as 'New User' or 'Returning User'.
+Understand the top wallets, devices, OS, and net worth of your users.
 
 Select a user to view their <a href="/features/wallet-intelligence/wallet-profiles">Wallet Profile</a>.
 
@@ -40,3 +40,115 @@ Filter users by referrer, referral, and UTM properties using first-touch and las
 ### Filter by App and Token Amounts
 
 Filter users' apps and tokens by specific amounts. For example, "Show me users of Ethena with more than $1000 balance."
+
+---
+
+## Quick Start: Analyze Your User Base
+
+Audience Insights gives you a bird's-eye view of who your users are. This guide walks you through exploring your audience composition and finding actionable segments.
+
+### Step 1: Open Audience Insights
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Audience** in the left navigation
+
+You'll see aggregate metrics about your entire user base.
+
+### Step 2: Explore the overview charts
+
+The dashboard shows key breakdowns of your audience:
+
+| Chart | What it shows |
+|-------|---------------|
+| **Net Worth Distribution** | Users grouped by wallet value ($0-1k, $1k-10k, $10k-100k, $100k+) |
+| **Top Apps** | Most common dApps your users interact with |
+| **Top Tokens** | Most held tokens across your user base |
+| **Top Chains** | Which networks your users are active on |
+| **Lifecycle** | New, Returning, Power Users, Churned breakdown |
+
+<Frame caption="See aggregate onchain data for your entire user base.">
+	<img src="/images/audience-insights.png" alt="Audience Insights" />
+</Frame>
+
+### Step 3: Apply filters to segment
+
+Click **Add Filter** to narrow down to specific user groups:
+
+**Example: Find your most valuable DeFi users**
+
+| Filter | Value |
+|--------|-------|
+| Net Worth | > $10,000 |
+| Apps | Contains "Uniswap" |
+| Lifecycle | Power User |
+
+**Example: Find users from a specific campaign**
+
+| Filter | Value |
+|--------|-------|
+| UTM Source | twitter |
+| UTM Campaign | launch_promo |
+
+**Example: Find whales who use competitor apps**
+
+| Filter | Value |
+|--------|-------|
+| Net Worth | > $100,000 |
+| Apps | Contains "Competitor Name" |
+
+### Step 4: Analyze filtered results
+
+After applying filters, the charts update to show only matching users:
+
+- **Compare segments**: How do Twitter users differ from Discord users?
+- **Find opportunities**: Which tokens do your whales hold that you don't support yet?
+- **Identify patterns**: What apps do your power users have in common?
+
+### Step 5: Save as a segment
+
+Turn useful filter combinations into reusable segments:
+
+1. Apply your filters
+2. Click **Save as Segment**
+3. Name your segment (e.g., "High-Value DeFi Users")
+4. Access it anytime from [Segments](/features/wallet-intelligence/segments)
+
+### Common analysis workflows
+
+**Understand your best users:**
+1. Filter by Lifecycle = "Power User"
+2. Look at Top Apps and Top Tokens
+3. Identify common characteristics to target in acquisition
+
+**Evaluate campaign quality:**
+1. Filter by UTM Source = your campaign
+2. Compare net worth distribution to overall average
+3. Check if campaign users have higher/lower value
+
+**Find expansion opportunities:**
+1. Look at Top Chains your users are on
+2. Identify chains you don't fully support yet
+3. Prioritize based on user demand
+
+**Competitive analysis:**
+1. Filter by Apps containing competitor names
+2. See how many of your users also use competitors
+3. Understand what else these users are doing
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Save filters as reusable segments
+  </Card>
+  <Card title="Wallet Profiles" icon="user" href="/features/wallet-intelligence/wallet-profiles">
+    Drill into individual users
+  </Card>
+  <Card title="Wallet Labels" icon="tags" href="/features/wallet-intelligence/wallet-labels">
+    Understand auto-generated labels
+  </Card>
+  <Card title="Wallet Targeting Guide" icon="bullseye" href="/guides/use-cases/wallet-targeting">
+    Export segments for marketing campaigns
+  </Card>
+</CardGroup>

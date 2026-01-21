@@ -58,3 +58,180 @@ Beyond just showing you data, Ask AI provides context and recommendations for wh
 - **Provide context**: Mention time periods, [user segments](/features/wallet-intelligence/segments), or specific metrics you're interested in
 - **Follow up**: Ask follow-up questions to dive deeper into interesting findings
 - **Validate insights**: Always review the AI's findings and validate important insights with your domain knowledge
+
+---
+
+## Quick Start: 10 Questions to Ask Your Data
+
+Ask AI helps you explore your data without writing SQL. This guide provides practical prompts for common analytics tasks.
+
+### How to use Ask AI
+
+1. Click **Ask AI** from anywhere in the dashboard (or press `Cmd+K`)
+2. Type your question in natural language
+3. Review the generated query and results
+4. Save useful charts to your dashboard
+
+<Frame caption="Ask AI generates queries and visualizations from natural language.">
+	<img src="/images/ai.png" alt="Ask AI" />
+</Frame>
+
+### Essential questions for every dApp
+
+Here are 10 questions to ask about your data:
+
+#### 1. User acquisition
+
+**Prompt:** "Where are my users coming from this month?"
+
+**What you'll learn:** Top referrers, UTM sources, and traffic channels.
+
+**Follow-up:** "Which referrer has the best conversion rate?"
+
+---
+
+#### 2. Daily active users
+
+**Prompt:** "Show me daily active wallets for the last 30 days"
+
+**What you'll learn:** DAU trend with day-over-day changes.
+
+**Follow-up:** "Compare this to the previous 30 days"
+
+---
+
+#### 3. Conversion funnel
+
+**Prompt:** "What percentage of visitors connect their wallet?"
+
+**What you'll learn:** Top-of-funnel conversion rate.
+
+**Follow-up:** "Of those who connect, how many complete a transaction?"
+
+---
+
+#### 4. User retention
+
+**Prompt:** "What's my week-1 retention rate?"
+
+**What you'll learn:** How many users return after their first visit.
+
+**Follow-up:** "Show me retention by acquisition source"
+
+---
+
+#### 5. Revenue analysis
+
+**Prompt:** "What's my total transaction volume this month?"
+
+**What you'll learn:** Revenue/volume metrics and trends.
+
+**Follow-up:** "Break this down by day of week"
+
+---
+
+#### 6. User segments
+
+**Prompt:** "How many whales (net worth > $100k) do I have?"
+
+**What you'll learn:** High-value user count.
+
+**Follow-up:** "What's their average transaction volume?"
+
+---
+
+#### 7. Geographic distribution
+
+**Prompt:** "Which countries have the most active users?"
+
+**What you'll learn:** Geographic breakdown of your user base.
+
+**Follow-up:** "Which country has the highest average transaction value?"
+
+---
+
+#### 8. Feature adoption
+
+**Prompt:** "How many users visited the /stake page this week?"
+
+**What you'll learn:** Feature page traffic.
+
+**Follow-up:** "Of those, how many completed a staking transaction?"
+
+---
+
+#### 9. Drop-off analysis
+
+**Prompt:** "Where do users drop off in the transaction flow?"
+
+**What you'll learn:** Conversion bottlenecks.
+
+**Follow-up:** "Is drop-off higher on mobile or desktop?"
+
+---
+
+#### 10. Anomaly detection
+
+**Prompt:** "Are there any unusual patterns in my data this week?"
+
+**What you'll learn:** Spikes, drops, or outliers worth investigating.
+
+**Follow-up:** "What might have caused the spike on Tuesday?"
+
+---
+
+### Power user prompts
+
+Once you're comfortable, try these advanced prompts:
+
+**Cohort analysis:**
+> "Compare retention rates for users acquired from Twitter vs Discord"
+
+**Revenue attribution:**
+> "Which UTM campaign drove the most transaction volume?"
+
+**User behavior:**
+> "What do power users do differently than churned users?"
+
+**Competitive insights:**
+> "How many of my users also use Uniswap?"
+
+**Time patterns:**
+> "What time of day do most transactions happen?"
+
+### Tips for better results
+
+| Tip | Example |
+|-----|---------|
+| **Specify time ranges** | "...in the last 7 days" vs "...recently" |
+| **Name metrics clearly** | "daily active wallets" vs "users" |
+| **Include thresholds** | "net worth > $10,000" vs "wealthy users" |
+| **Ask for comparisons** | "Compare X to Y" vs "Show me X" |
+
+### From question to dashboard
+
+When you find a useful insight:
+
+1. Click **Save to Dashboard**
+2. Name the chart descriptively
+3. Add it to your main dashboard
+4. Set up a recurring refresh
+
+Build a dashboard of your most-asked questions for quick daily monitoring.
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Charts & Dashboards" icon="chart-line" href="/features/product-analytics/charts">
+    Build custom dashboards
+  </Card>
+  <Card title="Data Schema" icon="database" href="/data/schema">
+    Understand available data
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Deep-dive on conversion
+  </Card>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Analyze specific user groups
+  </Card>
+</CardGroup>

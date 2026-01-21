@@ -6,6 +6,215 @@ description: 'Track custom events and user actions such as clicks and conversion
 ## Overview
 
 The Formo SDK offers an easy-to-use event collection library that allows you to track custom events in your dapp.
-Ensure high quality, structured data with Formo. 
+Ensure high quality, structured data with Formo.
 
-Start tracking custom events with the [Web SDK](/sdks/web#custom-events) to get started. Custom events works with [Wallet Intelligence](/features/wallet-intelligence) and [Funnels](/features/product-analytics/funnels) to give you a complete picture of each user's journey.
+Start tracking custom events with the [Web SDK](/sdks/web#custom-events) to get started. Custom events work with [Wallet Intelligence](/features/wallet-intelligence) and [Funnels](/features/product-analytics/funnels) to give you a complete picture of each user's journey.
+
+---
+
+## Quick Start: Track Custom Events
+
+While Formo autocaptures page views, wallet connects, and transactions, custom events let you track specific actions that matter to your app. This guide shows you how.
+
+### When to use custom events
+
+Track actions that aren't captured automatically:
+
+| Action | Why track it |
+|--------|--------------|
+| Button clicks | Measure CTA effectiveness |
+| Form submissions | Track lead generation |
+| Feature usage | Understand adoption |
+| Errors | Debug user issues |
+| Key conversions | Measure business outcomes |
+
+### Step 1: Import the Formo SDK
+
+<Tabs>
+  <Tab title="Wagmi / React">
+    ```tsx
+    import { useFormoAnalytics } from '@formo/analytics';
+
+    function YourComponent() {
+      const analytics = useFormoAnalytics();
+
+      // Now you can track events
+    }
+    ```
+  </Tab>
+  <Tab title="HTML Snippet">
+    The `formo` object is available globally after the snippet loads:
+
+    ```javascript
+    // Track an event
+    window.formo.track('Event Name', { property: 'value' });
+    ```
+  </Tab>
+</Tabs>
+
+### Step 2: Track a custom event
+
+Use the `track` function with an event name and optional properties:
+
+```typescript
+analytics.track('Swap Completed', {
+  pool_id: 'ETH/USDC',
+  amount: '1000',
+  slippage: '0.5'
+});
+```
+
+**Event parameters:**
+- **Event name** (required): Descriptive name for the action
+- **Properties** (optional): Key-value pairs with additional context
+
+### Step 3: Track with volume, revenue, or points
+
+For events with monetary value, use special properties:
+
+```typescript
+analytics.track('Trade Executed', {
+  pair: 'ETH/USDC',
+  volume: 5000,    // USD value of the trade
+  revenue: 25,     // Revenue earned (e.g., fees)
+  points: 100      // Loyalty/reward points
+});
+```
+
+These values appear in your dashboard metrics and can be used for:
+- Revenue attribution by traffic source
+- Volume tracking per user
+- Points/rewards leaderboards
+
+### Step 4: View custom events
+
+After tracking events:
+
+1. Go to **Activity** in the Formo Dashboard
+2. Filter by your custom event name
+3. See all event occurrences with properties
+
+Custom events also appear in:
+- **Wallet Profiles** - User's activity history
+- **Funnels** - As conversion steps
+- **Charts** - Query with SQL
+
+### Best practices
+
+**Naming conventions:**
+
+| Good | Bad |
+|------|-----|
+| `Swap Completed` | `swap` |
+| `Position Opened` | `click` |
+| `Referral Shared` | `event1` |
+
+Use descriptive, past-tense names that describe what happened.
+
+**Properties to include:**
+
+```typescript
+// Good: specific, useful properties
+analytics.track('Position Opened', {
+  pool_id: 'LINK/ETH',
+  amount: '1200',
+  leverage: '2x',
+  source: 'dashboard'  // Where the action originated
+});
+
+// Bad: vague or missing properties
+analytics.track('Position Opened', {
+  data: 'some data'
+});
+```
+
+**When to track:**
+- Track at the moment the action completes (not when a button is clicked)
+- For async actions, track on success (and optionally on failure)
+
+### Example: Tracking a swap flow
+
+Track multiple events throughout a user flow:
+
+```typescript
+// User clicks swap button
+analytics.track('Swap Started', {
+  pair: 'ETH/USDC',
+  amount_in: '1',
+  amount_out_estimate: '3000'
+});
+
+// User approves token (if needed)
+analytics.track('Token Approved', {
+  token: 'ETH',
+  spender: '0x...'
+});
+
+// Swap completes successfully
+analytics.track('Swap Completed', {
+  pair: 'ETH/USDC',
+  amount_in: '1',
+  amount_out: '2998',
+  volume: 2998,
+  slippage: '0.07'
+});
+
+// Or if swap fails
+analytics.track('Swap Failed', {
+  pair: 'ETH/USDC',
+  error: 'Insufficient liquidity',
+  error_code: 'INSUFF_LIQ'
+});
+```
+
+### Example: Tracking feature adoption
+
+Measure which features users engage with:
+
+```typescript
+// User opens a feature
+analytics.track('Feature Opened', {
+  feature: 'Portfolio',
+  source: 'sidebar'
+});
+
+// User completes key action in feature
+analytics.track('Portfolio Export', {
+  format: 'csv',
+  date_range: '30d'
+});
+```
+
+### Using custom events in funnels
+
+Custom events can be funnel steps:
+
+1. Go to **Funnels** > **Create Funnel**
+2. Add a step with **Event type**: Custom
+3. Select your custom event name
+4. Optionally add property filters
+
+**Example funnel:**
+| Step | Event |
+|------|-------|
+| 1 | `page` (visit /swap) |
+| 2 | `connect` |
+| 3 | `Swap Started` (custom) |
+| 4 | `Swap Completed` (custom) |
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Events API Reference" icon="code" href="/data/events/track">
+    Full track() API documentation
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Use custom events in conversion funnels
+  </Card>
+  <Card title="Charts" icon="chart-line" href="/features/product-analytics/charts">
+    Query custom events with SQL
+  </Card>
+  <Card title="Web SDK" icon="browser" href="/sdks/web">
+    Complete SDK documentation
+  </Card>
+</CardGroup>

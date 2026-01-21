@@ -3,16 +3,140 @@ title: 'Contract events'
 description: 'Track and analyze smart contract events across chains in real-time.'
 ---
 
-Add your contract address to start ingesting contract events. 
+Add your contract address to start ingesting contract events.
 
 <Frame caption="Formo makes decoding onchain activity easy.">
 	<img src="/images/product-analytics-contract-events.png" alt="Product Analytics Contract Events" />
 </Frame>
 
-You will see your selected events on the [Activity Feed](/features/product-analytics/activity) and [Wallet Profile](/features/wallet-intelligence/wallet-profiles) in real-time. 
+You will see your selected events on the [Activity Feed](/features/product-analytics/activity) and [Wallet Profile](/features/wallet-intelligence/wallet-profiles) in real-time.
 
 Contract events can also be used when creating [Funnels](/features/product-analytics/funnels).
 
 ## Chains
 
 See the list of supported chains [here](/chains/overview).
+
+---
+
+## Quick Start: Track Smart Contract Events
+
+Monitor your smart contract activity in real-time. This guide walks you through adding contracts, selecting events, and using contract data in analytics.
+
+### Step 1: Navigate to Contract Events
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Settings** in the left navigation
+4. Select the **Contracts** tab
+
+### Step 2: Add a contract
+
+1. Click **Add Contract**
+2. Fill in the contract details:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Chain** | The blockchain network | Ethereum, Base, Arbitrum |
+| **Contract Address** | Your contract's address | `0x1234...abcd` |
+| **Name** (optional) | Friendly name for reference | "Swap Router" |
+
+3. Click **Add**
+
+Formo automatically fetches the contract ABI to decode events.
+
+<Tip>For verified contracts, Formo auto-detects the ABI. For unverified contracts, you can paste the ABI manually.</Tip>
+
+### Step 3: Select events to track
+
+After adding a contract, select which events to monitor:
+
+1. Click on your contract in the list
+2. You'll see all available events from the ABI
+3. Toggle on the events you want to track:
+   - `Transfer` - Token transfers
+   - `Swap` - DEX swaps
+   - `Deposit` / `Withdraw` - Vault interactions
+   - Custom events specific to your contract
+
+<Frame caption="Select which contract events to track.">
+	<img src="/images/product-analytics-contract-events.png" alt="Contract Events Selection" />
+</Frame>
+
+### Step 4: View events in Activity Feed
+
+Once configured, contract events appear in your Activity Feed:
+
+1. Go to **Activity** in the left navigation
+2. Filter by event type to see contract events
+3. Click any event to see decoded parameters
+
+Each contract event shows:
+- Transaction hash
+- Block number
+- Decoded event parameters
+- Wallet address that triggered it
+
+### Step 5: Use contract events in funnels
+
+Build funnels that include onchain actions:
+
+1. Go to **Funnels** and click **Create Funnel**
+2. Add steps mixing offchain and onchain events:
+   - Step 1: `page` view (visit homepage)
+   - Step 2: `connect` (connect wallet)
+   - Step 3: `Swap` (contract event)
+   - Step 4: `transaction` (successful tx)
+
+This gives you true end-to-end conversion tracking from first visit to onchain action.
+
+### Example: DEX swap tracking
+
+Track user journey from landing page to completed swap:
+
+| Step | Event Type | Description |
+|------|------------|-------------|
+| 1 | `page` | User lands on /swap |
+| 2 | `connect` | User connects wallet |
+| 3 | Contract: `Approval` | User approves token |
+| 4 | Contract: `Swap` | Swap executed |
+
+### Example: NFT mint tracking
+
+Track minting funnel:
+
+| Step | Event Type | Description |
+|------|------------|-------------|
+| 1 | `page` | User visits mint page |
+| 2 | `connect` | User connects wallet |
+| 3 | Contract: `Transfer` | NFT minted (from zero address) |
+
+### Supported chains
+
+Contract event tracking is available on [40+ chains](/chains/overview) including:
+
+| Chain | Status |
+|-------|--------|
+| Ethereum | Supported |
+| Base | Supported |
+| Arbitrum | Supported |
+| Optimism | Supported |
+| Polygon | Supported |
+| Solana | Coming soon |
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Build Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Create conversion funnels with contract events
+  </Card>
+  <Card title="Activity Feed" icon="list" href="/features/product-analytics/activity">
+    View real-time contract activity
+  </Card>
+  <Card title="Supported Chains" icon="link" href="/chains/overview">
+    Full list of supported networks
+  </Card>
+  <Card title="Custom Events" icon="bolt" href="/features/product-analytics/custom-events">
+    Track additional offchain events
+  </Card>
+</CardGroup>

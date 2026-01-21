@@ -21,6 +21,16 @@
             ]
           },
           {
+            "group": "Use Cases",
+            "icon": "lightbulb",
+            "pages": [
+              "guides/use-cases/dau-tracking",
+              "guides/use-cases/defi-conversions",
+              "guides/use-cases/wallet-targeting",
+              "guides/use-cases/attribution-guide"
+            ]
+          },
+          {
             "group": "Features",
             "pages": [
               "features/concepts",

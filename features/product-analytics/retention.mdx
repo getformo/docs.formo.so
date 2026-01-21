@@ -16,3 +16,130 @@ For example, measure retention based on:
 - Feature usage
 - Wallet connections
 - [Custom events](/features/product-analytics/custom-events) specific to your app
+
+---
+
+## Quick Start: Analyze User Retention
+
+Retention analysis shows how many users come back to your app over time. This guide walks you through reading retention charts and improving user stickiness.
+
+### What is a cohort retention chart?
+
+A cohort is a group of users who started using your app in the same time period (e.g., users who first connected in Week 1). Retention tracks what percentage of each cohort returns in subsequent weeks.
+
+| Week 0 | Week 1 | Week 2 | Week 3 | Week 4 |
+|--------|--------|--------|--------|--------|
+| 100% | 40% | 25% | 20% | 18% |
+
+This example shows: of users who started in Week 0, 40% returned in Week 1, 25% in Week 2, etc.
+
+### Step 1: Navigate to Retention
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Retention** in the left navigation
+
+### Step 2: Choose the retention event
+
+Select which event defines "active" for retention tracking:
+
+| Event | What it measures |
+|-------|------------------|
+| **connect** | Users who connected their wallet again |
+| **transaction** | Users who transacted again |
+| **page** | Users who visited any page |
+| **Custom event** | Users who performed a specific action |
+
+<Tip>For dApps, `transaction` retention is usually the most meaningful metric—it shows who's actually using your protocol.</Tip>
+
+### Step 3: Read the retention matrix
+
+The retention chart displays:
+
+- **Rows**: Cohorts (grouped by start week/month)
+- **Columns**: Time periods after start
+- **Cells**: Percentage of cohort still active
+
+<Frame caption="Cohort retention shows which user groups stick around.">
+  <img src="/images/retention.png" alt="Retention Chart" />
+</Frame>
+
+**Color coding:**
+- 🟢 Green = above average retention
+- 🟡 Yellow = average retention
+- 🔴 Red = below average retention
+
+### Step 4: Identify patterns
+
+**Healthy retention curve:**
+- Sharp drop in Week 1 (normal)
+- Gradual stabilization by Week 3-4
+- Flat line after stabilization (loyal users)
+
+**Concerning patterns:**
+- Continuous decline without stabilization
+- Large drop-offs in later weeks
+- Significant variance between cohorts
+
+### Step 5: Compare cohorts
+
+Look for cohorts with better or worse retention:
+
+**Questions to ask:**
+- Did a product change improve retention for newer cohorts?
+- Do users from certain campaigns retain better?
+- Is there seasonal variation in retention?
+
+### Retention benchmarks for dApps
+
+| dApp Type | Week 1 | Week 4 | Week 8 |
+|-----------|--------|--------|--------|
+| DEX | 30-40% | 15-25% | 10-20% |
+| Lending | 25-35% | 15-20% | 10-15% |
+| NFT Marketplace | 20-30% | 10-15% | 5-10% |
+| Gaming | 35-50% | 20-30% | 15-25% |
+
+### Improving retention
+
+Based on your retention analysis:
+
+**If Week 1 drop-off is too high:**
+- Improve onboarding experience
+- Send follow-up notifications
+- Add incentives for early engagement
+
+**If long-term retention is declining:**
+- Add new features or content
+- Implement re-engagement campaigns
+- Analyze churned users for common patterns
+
+**If certain cohorts retain better:**
+- Identify what made them different
+- Replicate successful acquisition channels
+- Apply learnings to current users
+
+### Using retention with other features
+
+| Feature | How to combine |
+|---------|----------------|
+| **Segments** | Create segments of retained vs. churned users |
+| **Funnels** | Measure conversion for retained users |
+| **Alerts** | Get notified when retention drops |
+| **Wallet Profiles** | Investigate high-retention users |
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Create segments based on retention behavior
+  </Card>
+  <Card title="DAU Tracking" icon="chart-line" href="/guides/use-cases/dau-tracking">
+    Track daily active users
+  </Card>
+  <Card title="Wallet Messaging" icon="message" href="/features/wallet-intelligence/wallet-messaging">
+    Re-engage churned users
+  </Card>
+  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
+    Analyze conversion for retained users
+  </Card>
+</CardGroup>

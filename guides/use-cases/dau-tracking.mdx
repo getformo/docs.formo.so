@@ -1,0 +1,307 @@
+---
+title: 'Track DAU for dApps'
+description: 'Measure daily, weekly, and monthly active users for your onchain application with wallet-based analytics.'
+---
+
+Track daily active users (DAU), weekly active users (WAU), and monthly active users (MAU) for your dApp with Formo's wallet-native analytics.
+
+Unlike traditional analytics that count page views, Formo tracks actual wallet engagement—giving you accurate user metrics for onchain applications.
+
+## What you'll learn
+
+- Understand the difference between visitors and active users for dApps
+- Set up DAU/WAU/MAU tracking with wallet-based metrics
+- Create custom dashboards for user engagement
+- Analyze active user trends over time
+
+## Prerequisites
+
+- Formo SDK installed ([Installation Guide](/install))
+- At least 7 days of data collection (for meaningful WAU metrics)
+
+---
+
+## Part 1: Understanding dApp User Metrics
+
+### Traditional vs. onchain active users
+
+Traditional web analytics count "active users" by sessions or page views. For dApps, this misses the mark:
+
+| Metric | Traditional Analytics | Formo (Onchain) |
+|--------|----------------------|-----------------|
+| **Active user** | Any visitor with a session | Wallet connected OR transaction completed |
+| **Unique users** | Cookie-based (easily duplicated) | Wallet address (unique by design) |
+| **Engagement** | Time on page, clicks | Transactions, signatures, value moved |
+
+### Key metrics for dApps
+
+| Metric | Definition | Why it matters |
+|--------|------------|----------------|
+| **DAU** | Unique wallets active in the last 24 hours | Daily engagement health |
+| **WAU** | Unique wallets active in the last 7 days | Weekly usage patterns |
+| **MAU** | Unique wallets active in the last 30 days | Monthly reach |
+| **DAU/MAU ratio** | DAU divided by MAU | Stickiness (higher = more engaged) |
+| **New users** | First-time wallet connects | Growth rate |
+| **Returning users** | Wallets with multiple sessions | Retention quality |
+
+---
+
+## Part 2: View Built-in DAU Metrics
+
+Formo provides DAU/WAU/MAU metrics out of the box.
+
+### Step 1: Open the Overview dashboard
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Overview** in the left navigation
+
+You'll see top-line metrics including:
+- **Visitors** (page views)
+- **Wallets** (connected wallets)
+- **Transactions** (completed transactions)
+
+### Step 2: Adjust the date range
+
+Use the date picker to view different time periods:
+
+| Date range | What you'll see |
+|------------|-----------------|
+| Today | DAU (daily active wallets) |
+| Last 7 days | WAU breakdown by day |
+| Last 30 days | MAU breakdown by day |
+
+### Step 3: View the trend chart
+
+The overview chart shows daily unique wallets over time. Look for:
+
+- **Growth trends**: Is DAU increasing week-over-week?
+- **Weekly patterns**: Which days have highest engagement?
+- **Anomalies**: Sudden spikes or drops to investigate
+
+---
+
+## Part 3: Create a Custom DAU Dashboard
+
+Build a dedicated dashboard to monitor active user metrics.
+
+### Step 1: Navigate to Charts
+
+1. Click **Charts** in the left navigation
+2. Click **New Chart**
+
+### Step 2: Create a DAU chart
+
+**Using Ask AI (Recommended):**
+
+1. Click **Ask AI** (or press `Cmd+K`)
+2. Type: "Show me daily unique connected wallets for the last 30 days"
+3. AI generates the query and chart
+4. Click **Save to Dashboard**
+
+**Using SQL:**
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(address) AS daily_active_wallets
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date
+```
+
+Choose **Line chart** for visualization.
+
+### Step 3: Create a WAU chart
+
+**Using Ask AI:**
+
+Type: "Show me 7-day rolling unique wallets"
+
+**Using SQL:**
+
+```sql
+SELECT
+  toDate(timestamp) AS date,
+  countDistinct(address) AS wallets
+FROM events
+WHERE type = 'connect'
+  AND timestamp >= now() - INTERVAL 37 DAY
+GROUP BY date
+HAVING date >= now() - INTERVAL 30 DAY
+ORDER BY date
+```
+
+<Note>For a true rolling 7-day WAU, you'll need a window function. The Ask AI feature can help generate this query.</Note>
+
+### Step 4: Create a DAU/MAU stickiness chart
+
+This ratio shows what percentage of monthly users engage daily—a key health metric.
+
+**Using Ask AI:**
+
+Type: "Calculate DAU/MAU ratio for the last 30 days"
+
+A healthy DAU/MAU ratio for dApps:
+- **5-10%**: Normal for most dApps
+- **10-20%**: Strong engagement
+- **20%+**: Exceptional stickiness (common for DEXes, gaming)
+
+### Step 5: Organize your dashboard
+
+Arrange your charts into a useful layout:
+
+| Row | Charts |
+|-----|--------|
+| **Top** | DAU (number), WAU (number), MAU (number) |
+| **Middle** | Daily active wallets trend (line chart) |
+| **Bottom** | DAU/MAU ratio, New vs. Returning users |
+
+---
+
+## Part 4: Segment Active Users
+
+Not all active users are equal. Segment by behavior and value.
+
+### By user lifecycle
+
+Formo automatically categorizes users by lifecycle:
+
+| Segment | Definition |
+|---------|------------|
+| **New** | First activity in last 30 days |
+| **Returning** | Multiple sessions, active recently |
+| **Power User** | Active 5+ days in last 30 days |
+| **Churned** | No activity for 30+ days |
+| **Resurrected** | Returned after being churned |
+
+View these segments in **Users** > filter by **Lifecycle**.
+
+### By engagement level
+
+Create segments for different activity levels:
+
+**High-value active users:**
+- Connected wallet in last 7 days AND
+- Completed transaction in last 7 days AND
+- Net worth > $10,000
+
+**At-risk users:**
+- Last seen 14-30 days ago AND
+- Was previously a power user
+
+### By traffic source
+
+Track which channels drive the most engaged users:
+
+1. Go to **Growth Analytics**
+2. View **Wallets by Referrer**
+3. Compare conversion rates across sources
+
+---
+
+## Part 5: Track Active Users Over Time
+
+### Week-over-week comparison
+
+Compare this week's DAU to last week:
+
+1. Open your DAU chart
+2. Select **Last 7 days** date range
+3. Enable **Compare to previous period**
+
+Look for:
+- **Growth**: This week > last week = positive trend
+- **Decline**: Investigate causes (seasonal, product issues, competition)
+- **Stability**: Consistent DAU week-over-week
+
+### Monthly cohort analysis
+
+Track how each month's users retain over time:
+
+1. Go to **Retention** in the left navigation
+2. View the cohort retention chart
+3. Compare retention rates across monthly cohorts
+
+A healthy pattern:
+- Initial drop-off in week 1 (normal)
+- Stabilization in weeks 2-4
+- Consistent long-term retention
+
+---
+
+## Part 6: Set Up Alerts for Active Users
+
+Get notified of significant changes in your user metrics.
+
+### Alert: DAU drops below threshold
+
+1. Go to **Settings** > **Alerts**
+2. Create a custom SQL alert (or use webhooks with scheduled queries)
+3. Set threshold: Alert when DAU < 80% of 7-day average
+
+### Alert: New user spike
+
+Detect when acquisition suddenly increases:
+
+1. Create an alert on `connect` events
+2. Set threshold: Alert when hourly connects > 2x normal
+
+---
+
+## Part 7: Example DAU Dashboard
+
+Here's a complete dashboard setup for tracking active users:
+
+| Chart | Type | Query |
+|-------|------|-------|
+| **DAU** | Number | Unique wallets today |
+| **WAU** | Number | Unique wallets last 7 days |
+| **MAU** | Number | Unique wallets last 30 days |
+| **DAU Trend** | Line | Daily unique wallets, 30 days |
+| **New vs. Returning** | Stacked bar | New and returning users by day |
+| **DAU/MAU** | Number | Stickiness ratio |
+| **Active by Referrer** | Bar | DAU breakdown by traffic source |
+| **Active by Country** | Pie | Geographic distribution |
+
+---
+
+## Summary
+
+You've learned how to:
+
+1. **Understand dApp user metrics** (DAU/WAU/MAU with wallet addresses)
+2. **View built-in metrics** in the Formo dashboard
+3. **Create custom dashboards** with SQL or Ask AI
+4. **Segment active users** by lifecycle and engagement
+5. **Track trends** with week-over-week comparisons
+6. **Set up alerts** for metric changes
+
+## Benchmarks for dApp DAU
+
+| dApp Type | Typical DAU/MAU | Notes |
+|-----------|-----------------|-------|
+| DEX | 15-25% | High-frequency usage |
+| Lending | 5-10% | Less frequent interactions |
+| NFT Marketplace | 10-15% | Varies by drops/events |
+| Gaming | 20-40% | Daily engagement loops |
+| Bridge | 3-5% | Infrequent, high-value |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Retention Analysis" icon="calendar" href="/features/product-analytics/retention">
+    Measure week-over-week retention
+  </Card>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Create behavioral segments
+  </Card>
+  <Card title="Charts & Dashboards" icon="chart-line" href="/features/product-analytics/charts">
+    Build more custom visualizations
+  </Card>
+  <Card title="Growth Analytics" icon="chart-simple" href="/features/product-analytics/growth-analytics">
+    Analyze traffic sources
+  </Card>
+</CardGroup>

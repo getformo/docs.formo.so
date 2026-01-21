@@ -13,7 +13,7 @@ Labels help you understand your users so you can create granular [segments](/fea
 
 ## List of Labels
 
-Each tracked user on Formo is assigned labels based on their onchain activity and other data. 
+Each tracked user on Formo is assigned labels based on their onchain activity and other data.
 
 ### User lifecycle labels
 
@@ -23,7 +23,7 @@ Each tracked user on Formo is assigned labels based on their onchain activity an
 | **Returning User** | Number of sessions > 1 and < 10 |
 | **Power User** | Number of sessions > 10 |
 
-### Attestations 
+### Attestations
 
 | Label | Description |
 |-------|-------------|
@@ -46,5 +46,128 @@ More wallet labels will be available:
 | **RWA Holder** | Users with high-value RWA holdings |
 | **ETH Staker** | Users who stake ETH in staking protocols |
 
-> 🚧 
-In development. <a href="https://cal.com/formo/30min">Reach out</a> to let us know what you'd like to see. 🚧
+> In development. <a href="https://cal.com/formo/30min">Reach out</a> to let us know what you'd like to see.
+
+---
+
+## Quick Start: Use Labels for Targeting
+
+Wallet labels turn anonymous addresses into actionable user profiles. This guide shows you how to use labels to identify and target specific user types.
+
+### How labels work
+
+Formo automatically analyzes each wallet's onchain activity and assigns relevant labels. Labels update as users' behavior changes.
+
+**Label sources:**
+- **Onchain activity** - Protocols used, tokens held, transaction patterns
+- **Attestations** - Verified credentials from Coinbase, Gitcoin Passport, etc.
+- **App behavior** - Session count, engagement patterns on your app
+
+### Step 1: View labels on a user profile
+
+1. Go to **Users** and click any wallet address
+2. Scroll to the **Labels** section
+3. See all labels assigned to this user
+
+Labels appear as tags you can click to filter by.
+
+### Step 2: Filter users by label
+
+Use labels to find specific user types:
+
+1. Go to **Users** or **Audience Insights**
+2. Click **Add Filter**
+3. Select **Label** as the filter type
+4. Choose the label(s) you want
+
+**Example filters:**
+
+| Goal | Label Filter |
+|------|--------------|
+| Find DeFi power users | Label = "DeFi Active" AND Label = "Power User" |
+| Find verified humans | Human Passport Score > 50 |
+| Exclude sanctioned wallets | Label != "Sanctioned User" |
+| Find Coinbase users | Label = "Coinbase Verified Account" |
+
+### Step 3: Combine labels with other filters
+
+Labels become powerful when combined with other criteria:
+
+**High-value DeFi users:**
+| Filter | Value |
+|--------|-------|
+| Label | DeFi Active |
+| Net Worth | > $50,000 |
+| Lifecycle | Power User |
+
+**Verified users from campaigns:**
+| Filter | Value |
+|--------|-------|
+| Label | Coinbase Verified Account |
+| UTM Source | twitter |
+| First Seen | Last 30 days |
+
+**At-risk whales:**
+| Filter | Value |
+|--------|-------|
+| Label | ETH Staker |
+| Net Worth | > $100,000 |
+| Lifecycle | Churned |
+
+### Step 4: Save as a segment
+
+Turn useful label combinations into reusable segments:
+
+1. Apply your label + other filters
+2. Click **Save as Segment**
+3. Name it descriptively (e.g., "Verified DeFi Whales")
+4. Use the segment for analysis, exports, or alerts
+
+### Common targeting strategies
+
+**Identify your ICP (Ideal Customer Profile):**
+1. Look at your best users (highest volume, most active)
+2. Check which labels they share
+3. Create a segment with those labels
+4. Use it to find similar users
+
+**Compliance filtering:**
+1. Filter by Label != "Sanctioned User"
+2. Add Human Passport Score > 20 for sybil resistance
+3. Export clean lists for marketing or rewards
+
+**Quality scoring:**
+1. Combine multiple positive labels (DeFi Active + Power User + Coinbase Verified)
+2. Users matching more labels = higher quality
+3. Prioritize multi-label users for outreach
+
+**Competitive targeting:**
+1. Use Apps filter to find users of competitor protocols
+2. Combine with labels showing high engagement
+3. Target these users with differentiated messaging
+
+### Label-based alerting
+
+Set up alerts based on labels:
+
+1. Go to **Settings** > **Alerts**
+2. Create an alert for `connect` events
+3. Add condition: Label = "DeFi Active" AND Net Worth > $100,000
+4. Get notified when high-value DeFi users connect
+
+### Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+    Save label filters as segments
+  </Card>
+  <Card title="Audience Insights" icon="chart-pie" href="/features/wallet-intelligence/audience-insights">
+    Aggregate label distribution
+  </Card>
+  <Card title="Wallet Targeting Guide" icon="bullseye" href="/guides/use-cases/wallet-targeting">
+    Complete targeting workflow
+  </Card>
+  <Card title="Alerts" icon="bell" href="/features/product-analytics/alerts">
+    Alert on labeled users
+  </Card>
+</CardGroup>
