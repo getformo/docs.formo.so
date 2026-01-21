@@ -29,7 +29,7 @@
                 "icon": "compass",
                 "pages": [
                   "features/product-analytics/overview",
-                  "features/product-analytics/growth-analytics",
+                  "features/product-analytics/key-metrics",
                   "features/product-analytics/activity",
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
