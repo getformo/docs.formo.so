@@ -166,17 +166,23 @@
             ]
           },
           {
+            "group": "Query API",
+            "pages": [
+              "api-reference/query"
+            ]
+          },
+          {
+            "group": "Profiles API",
+            "pages": [
+              "api-reference/profile"
+            ]
+          },
+          {
             "group": "Forms API",
             "pages": [
               "api-reference/forms/list",
               "api-reference/forms/subscribe",
               "api-reference/forms/unsubscribe"
-            ]
-          },
-          {
-            "group": "Profile API",
-            "pages": [
-              "api-reference/profile"
             ]
           }
         ]
