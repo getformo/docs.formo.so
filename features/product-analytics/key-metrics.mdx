@@ -3,7 +3,7 @@ title: "Key metrics"
 description: "Track key growth metrics like visitors, wallets, transactions, and user acquisition channels to understand your product performance."
 ---
 
-<Note>This corresponds to the **Overview** page in the Formo dashboard sidebar.</Note>
+<Note>This corresponds to the **Overview** page in the Formo dashboard.</Note>
 
 ## Visitors, wallets, transactions
 
@@ -15,6 +15,42 @@ Measure the number of visitors, wallets, and transactions to discover which tact
     alt="Product Analytics Overview"
   />
 </Frame>
+
+### Breakdown by referrer
+
+<Frame caption="See a breakdown of your visitors, wallets, transactions, volume, and revenue by top referrers.">
+  <img
+    src="/images/referrer-breakdown.png"
+    alt="Product Analytics Referrer Breakdown"
+  />
+</Frame>
+
+See what's moving the needle with a breakdown of your metrics by referrers. Easily understand where your onchain users come from and how they find you.
+
+## Session duration
+
+See the average session duration of visitors and users on your app. Understand how long users spend engaging with your product.
+
+## Bounce rate
+
+Track your bounce rate to understand how many visitors leave after viewing only one page. A high bounce rate may indicate issues with your landing page or user experience.
+
+## Pages
+
+See the top pages that your users are visiting. See which pages are driving the most traffic and conversions.
+
+<Frame caption="Understand what users are seeing on your site or app.">
+  <img src="/images/pages.png" alt="Product Analytics Pages" />
+</Frame>
+
+### Entry and exit pages
+
+View Entry and Exit page analytics for your site and app.
+
+- **Entry pages** are the first pages visitors land on when they come to your website. Think of them as digital front doors where your user's journey begins.
+- **Exit pages** are the last pages users view before leaving your site. They represent the end of a visitor's session, whether it's after completing a goal or bouncing before engaging further.
+
+Understanding both gives you a clear window into how people interact with your site and where you might be losing them.
 
 ## Referrers, UTM, referrals
 
@@ -78,15 +114,6 @@ Here's how to configure this:
   </Tab>
 </Tabs>
 
-## Devices, browsers, OS
-
-<Frame caption="Understand what devices, browers, and operating system users are on.">
-  <img
-    src="/images/dapp-analytics-devices.png"
-    alt="Product Analytics Devices"
-  />
-</Frame>
-
 ## Countries
 
 See where your users are coming from by country.
@@ -98,28 +125,14 @@ See where your users are coming from by country.
   />
 </Frame>
 
-## Pages
+## Devices, browsers, OS
 
-See the top pages that your users are visiting. See which pages are driving the most traffic and conversions.
-
-<Frame caption="Understand what users are seeing on your site or app.">
-  <img src="/images/pages.png" alt="Product Analytics Pages" />
+<Frame caption="Understand what devices, browsers, and operating system users are on.">
+  <img
+    src="/images/dapp-analytics-devices.png"
+    alt="Product Analytics Devices"
+  />
 </Frame>
-
-### Entry and Exit Pages
-
-View Entry and Exit page analytics for your site and app.
-
-- **Entry pages** are the first pages visitors land on when they come to your website. Think of them as digital front doors where your user's journey begins.
-- **Exit pages** are the last pages users view before leaving your site. They represent the end of a visitor's session, whether it's after completing a goal or bouncing before engaging further.
-
-Understanding both gives you a clear window into how people interact with your site and where you might be losing them.
-
-## Session Frequency
-
-See the average session frequency of visitors and users on your app. Easily understand how sticky and engaged your users are across cohorts.
-
-See [Retention](/features/product-analytics/retention) for week-on-week retention analysis.
 
 ## Wallets
 
@@ -132,24 +145,13 @@ See the top wallets of your visitors and users.
   />
 </Frame>
 
-## Breakdown by Referrer
-
-<Frame caption="See a breakdown of your visitors, wallets, transactions, volume, and revenue by top referrers.">
-  <img
-    src="/images/referrer-breakdown.png"
-    alt="Product Analytics Referrer Breakdown"
-  />
-</Frame>
-
-See what's moving the needle with a breakdown of your metrics by referrers. Easily understand where your onchain users come from and how they find you.
-
 ---
 
 ## How to analyze traffic sources
 
 Key metrics helps you understand where your users come from and which channels drive the most value. This guide walks you through analyzing traffic sources and optimizing acquisition.
 
-### Step 1: Open Key metrics
+### Step 1: Open Formo
 
 1. Go to the [Formo Dashboard](https://app.formo.so)
 2. Select your project
@@ -175,7 +177,7 @@ Scroll to the **Referrers** section to see where traffic originates:
 
 ### Step 3: Calculate conversion by source
 
-The most valuable metric is **conversion rate by source**:
+See your **conversions rate by source**:
 
 ```
 Conversion Rate = Transactions / Visitors × 100
@@ -195,9 +197,8 @@ In this example, DefiLlama drives 6x better conversion than Twitter despite lowe
 
 If you use UTM parameters in your marketing links, you can drill deeper:
 
-1. Click on a referrer to expand
-2. See breakdown by UTM campaign, source, medium
-3. Identify which specific campaigns perform best
+1. See your breakdown by UTM campaign, source, medium
+2. Identify which specific campaigns perform best on user acquisition and volume
 
 **UTM parameter guide:**
 
@@ -209,25 +210,16 @@ If you use UTM parameters in your marketing links, you can drill deeper:
 | `utm_content` | Ad variation | banner_a, banner_b |
 | `utm_term` | Keywords (for paid) | defi, swap |
 
+You can use Formo's [UTM Generator](https://formo.so/utm-generator) to generate your marketing links.
+
 **Example URL:**
 ```
 https://yourapp.xyz/?utm_source=twitter&utm_medium=social&utm_campaign=launch_promo
 ```
 
-### Step 5: Compare time periods
+Once Formo is installed, any incoming clicks with UTM parameters leading to wallet connects or transactions in your app will be attributed automatically.
 
-Use the date picker to compare performance:
-
-1. Select a date range (e.g., "Last 7 days")
-2. Enable "Compare to previous period"
-3. See growth/decline by source
-
-**Questions to answer:**
-- Which sources are growing fastest?
-- Did a recent campaign spike traffic?
-- Are any sources declining?
-
-### Step 6: Analyze by device and geography
+### Step 5: Analyze by device and geography
 
 Check the **Devices** and **Countries** sections:
 
@@ -264,7 +256,7 @@ Formo supports multiple attribution models. Learn more in the [Attribution guide
 |-------|----------|
 | **First Touch** | Understanding discovery channels |
 | **Last Touch** | Understanding conversion drivers |
-| **Linear** | Giving credit across the journey |
+| **Custom** | Use the [Explorer](/features/product-analytics/explore) to build your own attribution model |
 
 ### Next Steps
 
@@ -272,7 +264,7 @@ Formo supports multiple attribution models. Learn more in the [Attribution guide
   <Card title="Activity" icon="bolt" href="/features/product-analytics/activity">
     View real-time events and Live View
   </Card>
-  <Card title="Explore" icon="compass" href="/features/product-analytics/explore">
+  <Card title="Explorer" icon="compass" href="/features/product-analytics/explore">
     Run custom SQL queries
   </Card>
   <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">

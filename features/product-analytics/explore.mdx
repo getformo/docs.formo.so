@@ -1,26 +1,27 @@
 ---
-title: 'Explore'
+title: 'Explorer'
 description: 'Run custom SQL queries against your analytics data to uncover deep insights and build advanced visualizations.'
 ---
 
-Explore gives you direct SQL access to your analytics data. Run custom queries, build complex analyses, and answer questions that go beyond pre-built dashboards.
+The Explorer gives you direct SQL access to your analytics data. Run custom queries, build complex analyses, and answer questions that go beyond pre-built dashboards.
 
-<Frame caption="The Explore query editor lets you run SQL against your analytics data.">
-  <img src="/images/explore.png" alt="Explore SQL Editor" />
+<Frame caption="The Explorer query editor lets you run SQL against your analytics data.">
+  <img src="/images/explore.png" alt="Explorer SQL Editor" />
 </Frame>
 
-## When to use Explore
+## When to use the Explorer
 
-Use Explore when you need:
+Use the Explorer when you need:
 
+- **Ad-hoc analysis** for specific questions
 - **Custom calculations** that aren't available in standard dashboards
 - **Complex joins** across multiple data types
-- **Ad-hoc analysis** for specific questions
+- **Testing queries** for custom charts and dashboards
 - **Data validation** to verify metrics
 
 ## Running queries
 
-### Step 1: Open Explore
+### Step 1: Open the Explorer
 
 1. Go to the [Formo Dashboard](https://app.formo.so)
 2. Select your project
@@ -49,102 +50,40 @@ ORDER BY date
 2. View results in the table below
 3. Optionally, switch to chart view to visualize the data
 
-## Common queries
-
-### DAU/WAU/MAU
-
-```sql
--- Daily Active Users (DAU)
-SELECT countDistinct(address) AS dau
-FROM events
-WHERE type = 'connect'
-  AND timestamp >= today()
-
--- Weekly Active Users (WAU)
-SELECT countDistinct(address) AS wau
-FROM events
-WHERE type = 'connect'
-  AND timestamp >= now() - INTERVAL 7 DAY
-
--- Monthly Active Users (MAU)
-SELECT countDistinct(address) AS mau
-FROM events
-WHERE type = 'connect'
-  AND timestamp >= now() - INTERVAL 30 DAY
-```
-
-### Conversion by referrer
-
-```sql
-SELECT
-  referrer,
-  countDistinct(CASE WHEN type = 'page' THEN visitor_id END) AS visitors,
-  countDistinct(CASE WHEN type = 'connect' THEN address END) AS wallets,
-  countDistinct(CASE WHEN type = 'transaction' THEN address END) AS transactors
-FROM events
-WHERE timestamp >= now() - INTERVAL 30 DAY
-GROUP BY referrer
-ORDER BY visitors DESC
-LIMIT 20
-```
-
-### User retention
-
-```sql
-SELECT
-  toDate(first_seen) AS cohort_date,
-  countDistinct(address) AS users,
-  countDistinct(CASE WHEN last_seen >= first_seen + INTERVAL 7 DAY THEN address END) AS retained_7d
-FROM (
-  SELECT
-    address,
-    min(timestamp) AS first_seen,
-    max(timestamp) AS last_seen
-  FROM events
-  WHERE type = 'connect'
-  GROUP BY address
-)
-GROUP BY cohort_date
-ORDER BY cohort_date DESC
-```
-
-### Transaction volume by day
-
-```sql
-SELECT
-  toDate(timestamp) AS date,
-  count(*) AS transactions,
-  sum(value) AS total_volume
-FROM events
-WHERE type = 'transaction'
-  AND timestamp >= now() - INTERVAL 30 DAY
-GROUP BY date
-ORDER BY date
-```
-
 ## Available tables
 
 | Table | Description |
 |-------|-------------|
-| `events` | All tracked events (page views, connects, transactions, custom events) |
-| `users` | User profiles with wallet labels and metadata |
+| `events` | All user interaction events (page views, wallet events, custom events, contract events) |
+| `users` | Aggregated wallet user profiles identified by `address`, with attribution and engagement metrics |
+| `anonymous_users` | Profiles for users who haven't connected a wallet yet, identified by `anonymous_id` |
+| `identities` | Identity graph linking anonymous user IDs to wallet addresses and user IDs |
+| `revenue` | Financial metrics and revenue with full attribution context |
+| `sessions` | Aggregated user session data with engagement metrics and attribution |
+| `sources` | Daily aggregated traffic source metrics and attribution data |
+| `wallet_profiles_mv` | Comprehensive global wallet profile data aggregated across all chains |
+| `wallet_profiles_chains_mv` | Wallet profile data broken down by individual blockchain networks |
+| `wallet_profiles_chains_apps_mv` | Wallet DeFi application usage data broken down by blockchain |
+| `wallet_profiles_chains_tokens_mv` | Wallet token holdings data broken down by blockchain |
+| `wallet_profiles_events` | Timestamped wallet profiling events from external offchain and onchain analysis |
 
 ## Tips
 
 - Use `LIMIT` to avoid returning too much data
 - Use date filters to improve query performance
 - Reference the [Event Spec](/data/events/overview) for available event properties
-- Use **Ask AI** to help generate queries - click Ask AI in the sidebar or press `Cmd+K`
+- Use **Ask AI** to help write and fix queries
 
 ## Saving queries
 
-After running a useful query:
+After writing a useful query, save it as a chart on your custom dashboard:
 
-1. Click **Save to Dashboard** to add it as a chart
-2. Select an existing board or create a new one
-3. Choose a visualization type (line, bar, table, etc.)
+1. On the [Dashboards](/features/product-analytics/charts) page, select an existing board or create a new one
+2. Add a new chart by clicking **Add Chart**
+3. Paste your query into the SQL editor and run it
+4. Choose a visualization type (line, bar, table, etc.)
 
-Your query becomes a reusable chart on your dashboard.
+Your query becomes a reusable chart on your dashboard that you can share with your team. 
 
 ## Next steps
 

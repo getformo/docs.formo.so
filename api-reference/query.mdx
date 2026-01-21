@@ -1,10 +1,10 @@
 ---
-title: 'Query API'
+title: 'Send Query'
 description: 'Execute SQL queries against your project data'
 openapi: 'POST /v0/query'
 ---
 
-Run read-only SQL queries for your project. Enforces safety checks (read-only, no comments/DDL/DML) and requires an explicit `LIMIT` no greater than `1000`.
+Run a read-only SQL query to read your data. See examples on the [Explorer page](/features/product-analytics/explore).
 
 ## Authentication
 
@@ -26,7 +26,7 @@ Authorization: Bearer <your_workspace_api_key>
 }
 ```
 
-Rules:
+Limits:
 - Query must be a single `SELECT`/`WITH` statement (read-only).
 - No comments or multiple statements.
 - `LIMIT` is required and must be `<= 1000`.
