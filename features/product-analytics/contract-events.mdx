@@ -40,42 +40,32 @@ Monitor your smart contract activity in real-time. This guide walks you through 
 | **Chain** | The blockchain network | Ethereum, Base, Arbitrum |
 | **Contract Address** | Your contract's address | `0x1234...abcd` |
 | **Name** (optional) | Friendly name for reference | "Swap Router" |
+| **ABI** (optional) | Formo automatically fetches the contract ABI from Etherscan to decode events. |  |
 
-3. Click **Add**
+3. Click **Save**
 
-Formo automatically fetches the contract ABI to decode events.
+<Frame caption="Adding a contract to your project.">
+	<img src="/images/contract-events.png" alt="Adding a Contract and selecting Contract Events" />
+</Frame>
+
 
 <Tip>For verified contracts, Formo auto-detects the ABI. For unverified contracts, you can paste the ABI manually.</Tip>
 
-### Step 3: Select events to track
+### Step 3: Select smart contract events to track
 
-After adding a contract, select which events to monitor:
+After adding a contract, select on or more events to ingest into Formo:
 
 1. Click on your contract in the list
 2. You'll see all available events from the ABI
-3. Toggle on the events you want to track:
-   - `Transfer` - Token transfers
-   - `Swap` - DEX swaps
-   - `Deposit` / `Withdraw` - Vault interactions
-   - Custom events specific to your contract
-
-<Frame caption="Select which contract events to track.">
-	<img src="/images/product-analytics-contract-events.png" alt="Contract Events Selection" />
-</Frame>
+3. Toggle on the events you want to track from the list
 
 ### Step 4: View events in Activity Feed
 
 Once configured, contract events appear in your Activity Feed:
 
 1. Go to **Activity** in the left navigation
-2. Filter by event type to see contract events
-3. Click any event to see decoded parameters
-
-Each contract event shows:
-- Transaction hash
-- Block number
-- Decoded event parameters
-- Wallet address that triggered it
+2. Filter by the **Contract Event** event type to see contract events
+3. Click any event to see decoded parameters including transaction hash, block number, function name and function parameters
 
 ### Step 5: Use contract events in funnels
 
@@ -85,10 +75,10 @@ Build funnels that include onchain actions:
 2. Add steps mixing offchain and onchain events:
    - Step 1: `page` view (visit homepage)
    - Step 2: `connect` (connect wallet)
-   - Step 3: `Swap` (contract event)
-   - Step 4: `transaction` (successful tx)
+   - Step 3: `transaction` (successful tx)   
+   - Step 4: `SwapCompleted` (contract event)
 
-This gives you true end-to-end conversion tracking from first visit to onchain action.
+This gives you true end-to-end conversion tracking from first visit offchain to conversions onchain.
 
 ### Example: DEX swap tracking
 
@@ -113,16 +103,7 @@ Track minting funnel:
 
 ### Supported chains
 
-Contract event tracking is available on [40+ chains](/chains/overview) including:
-
-| Chain | Status |
-|-------|--------|
-| Ethereum | Supported |
-| Base | Supported |
-| Arbitrum | Supported |
-| Optimism | Supported |
-| Polygon | Supported |
-| Solana | Coming soon |
+Contract events is available on [40+ chains](/chains/overview) including all major EVM chains.
 
 ### Next Steps
 

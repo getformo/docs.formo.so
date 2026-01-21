@@ -59,8 +59,8 @@ Use the `track` function with an event name and optional properties:
 ```typescript
 analytics.track('Swap Completed', {
   pool_id: 'ETH/USDC',
-  amount: '1000',
-  slippage: '0.5'
+  amount: 1000,
+  slippage: 0.5
 });
 ```
 
@@ -92,12 +92,12 @@ After tracking events:
 
 1. Go to **Activity** in the Formo Dashboard
 2. Filter by your custom event name
-3. See all event occurrences with properties
+3. See all event occurrences
 
 Custom events also appear in:
-- **Wallet Profiles** - User's activity history
-- **Funnels** - As conversion steps
-- **Charts** - Query with SQL
+- [**Wallet Profiles**](/features/wallet-intelligence/wallet-profiles) – User's activity history
+- [**Funnels**](/features/product-analytics/funnels) – As conversion steps
+- [**Charts**](/features/product-analytics/charts) – Query with SQL
 
 ### Best practices
 
@@ -117,7 +117,7 @@ Use descriptive, past-tense names that describe what happened.
 // Good: specific, useful properties
 analytics.track('Position Opened', {
   pool_id: 'LINK/ETH',
-  amount: '1200',
+  amount: 1200,
   leverage: '2x',
   source: 'dashboard'  // Where the action originated
 });
@@ -140,8 +140,8 @@ Track multiple events throughout a user flow:
 // User clicks swap button
 analytics.track('Swap Started', {
   pair: 'ETH/USDC',
-  amount_in: '1',
-  amount_out_estimate: '3000'
+  amount_in: 1,
+  amount_out_estimate: 3000
 });
 
 // User approves token (if needed)
@@ -153,10 +153,10 @@ analytics.track('Token Approved', {
 // Swap completes successfully
 analytics.track('Swap Completed', {
   pair: 'ETH/USDC',
-  amount_in: '1',
-  amount_out: '2998',
+  amount_in: 1,
+  amount_out: 2998,
   volume: 2998,
-  slippage: '0.07'
+  slippage: 0.07
 });
 
 // Or if swap fails
