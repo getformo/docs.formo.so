@@ -209,6 +209,17 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Security",
+        "groups": [
+          {
+            "group": "Security",
+            "pages": [
+              "security/overview"
+            ]
+          }
+        ]
       }
     ],
     "global": {
