@@ -1,0 +1,89 @@
+---
+title: "Multi-Factor Authentication (MFA)"
+description: "Add an extra layer of security to your Formo account with time-based one-time passwords (TOTP)."
+---
+
+Multi-Factor Authentication (MFA) adds a second verification step when signing in to Formo. After entering your email, you'll be prompted to enter a time-based one-time password (TOTP) from an authenticator app on your device.
+
+<Info>MFA is available to all Formo users and can be enabled in your account settings.</Info>
+
+## How it works
+
+Formo uses **TOTP (Time-based One-Time Passwords)** for MFA. After signing in with your email, you'll be prompted to enter a 6-digit code from your authenticator app before accessing your dashboard.
+
+## Supported authenticator apps
+
+Any TOTP-compatible authenticator app works with Formo, including:
+
+- **Google Authenticator**
+- **Authy**
+- **1Password**
+- **Microsoft Authenticator**
+
+## Enabling MFA
+
+<Steps>
+
+<Step title="Open security settings">
+  Navigate to **Account Settings** > **Security** in the Formo dashboard.
+</Step>
+
+<Step title="Enable two-factor authentication">
+  Toggle the **Enable 2FA** switch. A setup dialog will appear with a QR code.
+</Step>
+
+<Step title="Scan the QR code">
+  Open your authenticator app and scan the QR code. If you can't scan the QR code, click to copy the secret key and enter it manually in your authenticator app.
+
+  <Warning>Save the secret key in a secure location. This is the only time it will be displayed and can be used to recover access if you lose your device.</Warning>
+</Step>
+
+<Step title="Verify with a code">
+  Enter the 6-digit code from your authenticator app to complete the setup.
+</Step>
+
+</Steps>
+
+Once verified, MFA is active on your account. You'll be prompted for a TOTP code on every sign-in.
+
+## Signing in with MFA
+
+1. Enter your email on the Formo sign-in page
+2. Complete email verification
+3. When prompted, enter the 6-digit code from your authenticator app
+4. The code is verified automatically once all 6 digits are entered
+
+## Disabling MFA
+
+<Steps>
+
+<Step title="Open security settings">
+  Navigate to **Account Settings** > **Security** in the Formo dashboard.
+</Step>
+
+<Step title="Disable two-factor authentication">
+  Toggle off the **Enable 2FA** switch. A confirmation dialog will appear.
+</Step>
+
+<Step title="Confirm with a code">
+  Enter a valid 6-digit code from your authenticator app to confirm disabling MFA.
+</Step>
+
+</Steps>
+
+<Warning>Disabling MFA removes the additional security layer from your account. Only disable it if you have an alternative reason, such as switching to a new authenticator device.</Warning>
+
+## Account recovery
+
+If you lose access to your authenticator device, contact your organization administrator or reach out to [support@formo.so](mailto:support@formo.so). An administrator can reset your MFA so you can re-enroll with a new device.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Single Sign-On (SSO)" icon="key" href="/security/sso">
+    Configure SAML-based SSO for your organization
+  </Card>
+  <Card title="Role-Based Access Control" icon="users" href="/security/roles">
+    Configure team member permissions
+  </Card>
+</CardGroup>

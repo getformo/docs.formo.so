@@ -72,6 +72,7 @@
                 "pages": [
                   "security/overview",
                   "security/sso",
+                  "security/mfa",
                   "security/roles",
                   "security/sri",
                   "security/csp"
