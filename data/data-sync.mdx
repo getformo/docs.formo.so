@@ -1,0 +1,42 @@
+---
+title: 'Data Sync'
+icon: upload
+description: 'Set up data pipelines for scheduled exports to external data sources.'
+---
+
+Data Sync lets you set up data pipelines that export events, users, and query results to external destinations on a defined schedule or on-demand.
+
+## Supported destinations
+
+- **Google Cloud Storage (GCS)** — Export directly to a GCS bucket. From there, you can load data into BigQuery for warehousing and analysis.
+- **Amazon S3** — Export directly to an S3 bucket.
+
+## What you can export
+
+Export any data available in the Formo data warehouse, including:
+
+- **Events** — Raw and processed event data.
+- **Users** — User profiles with wallet data, attribution, lifecycle classification, and activity history.
+- **Wallet Profiles** — Net worth, social profiles, onchain activity, token holdings, app interactions, and labels.
+- **Segments** — Filtered user cohorts based on lifecycle, behavior, or custom criteria.
+- **Arbitrary SQL** — If you can run it on the [Explorer](/features/product-analytics/explore), you can export it.
+
+## Scheduling
+
+Exports run on a cron schedule (e.g. `0 * * * *` for hourly) or can be triggered on-demand.
+
+## Export formats
+
+- CSV (default)
+- NDJSON
+- Parquet
+
+Compression options: gzip, brotli, LZMA, zstd, or none.
+
+## How it works
+
+1. Configure a data pipeline with a SQL query defining the data to export.
+2. Set a destination (GCS or S3 bucket) and schedule (cron expression).
+3. Exports run automatically on schedule, writing files to the destination.
+
+> 🚧 In development. <a href="https://cal.com/formo/30min">Reach out</a> to get early access. 🚧

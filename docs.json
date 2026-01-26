@@ -132,7 +132,7 @@
             "pages": [
               "data/schema",
               "data/bi",
-              "data/reverse-etl"
+              "data/data-sync"
             ]
           }
         ]
