@@ -1414,7 +1414,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON array of filter conditions for user engagement data. Each filter object has: field (e.g., 'revenue', 'num_sessions', 'first_seen', 'last_seen'), operator ('=', '!=', '>', '<', '>=', '<=', 'contains', 'not_contains'), and value. Example: [{\"field\":\"revenue\",\"operator\":\">\",\"value\":100}]"
+            "description": "JSON array of filter conditions for user engagement data. Each filter object has: operand (e.g., 'revenue', 'num_sessions', 'first_seen', 'last_seen', 'volume', 'points', 'location', 'device', 'browser', 'os'), operator ('equals', 'greater', 'less', 'greaterOrEqual', 'lessOrEqual', 'in'), and value. Example: [{\"operand\":\"revenue\",\"operator\":\"greater\",\"value\":100}]"
           },
           {
             "name": "profile_filters",
@@ -1423,7 +1423,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON array of filter conditions for on-chain profile data. Each filter object has: field (e.g., 'net_worth_usd', 'tx_count', 'first_onchain', 'last_onchain'), operator, and value. Example: [{\"field\":\"net_worth_usd\",\"operator\":\">\",\"value\":1000}]"
+            "description": "JSON array of filter conditions for on-chain profile data. Each filter object has: operand (e.g., 'net_worth_usd', 'tx_count', 'first_onchain', 'last_onchain'), operator ('equals', 'greater', 'less', 'greaterOrEqual', 'lessOrEqual'), and value. Example: [{\"operand\":\"net_worth_usd\",\"operator\":\"greater\",\"value\":1000}]"
           },
           {
             "name": "socials",
@@ -1432,7 +1432,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON array of social profile filters. Each filter object has: field (e.g., 'ens', 'farcaster', 'twitter', 'discord', 'telegram', 'lens', 'email'), operator ('exists', 'not_exists', '=', 'contains'), and optional value. Example: [{\"field\":\"ens\",\"operator\":\"exists\"}]"
+            "description": "JSON array of social field names to filter by. Only profiles with non-empty values for ALL specified fields will be returned. Supported fields: ens, farcaster, twitter, discord, telegram, lens, email, github, linkedin, basenames, linea, website. Example: [\"ens\",\"twitter\"]"
           },
           {
             "name": "chain_filters",
@@ -1441,7 +1441,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON array of per-chain filter conditions. Each filter object has: chain_id, field (e.g., 'net_worth_usd', 'tx_count'), operator, and value. Example: [{\"chain_id\":\"1\",\"field\":\"tx_count\",\"operator\":\">\",\"value\":10}]"
+            "description": "JSON array of per-chain net worth filter conditions. Each filter is an array [chain_id, operator, value]. Operators: 'greater', 'less', 'greaterOrEqual', 'lessOrEqual', 'equals'. Example: [[\"1\",\"greater\",1000]] filters for >$1000 on Ethereum"
           },
           {
             "name": "expand",

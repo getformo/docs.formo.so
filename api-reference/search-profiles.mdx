@@ -35,66 +35,70 @@ curl -sS \
 ### `filters`
 
 JSON array of filter conditions for user engagement data. Each filter object has:
-- `field`: The field to filter on (e.g., `revenue`, `num_sessions`, `first_seen`, `last_seen`, `volume`, `points`)
-- `operator`: The comparison operator (`=`, `!=`, `>`, `<`, `>=`, `<=`, `contains`, `not_contains`)
+- `operand`: The field to filter on (e.g., `revenue`, `num_sessions`, `first_seen`, `last_seen`, `volume`, `points`, `location`, `device`, `browser`, `os`)
+- `operator`: The comparison operator (`equals`, `greater`, `less`, `greaterOrEqual`, `lessOrEqual`, `in`)
 - `value`: The value to compare against
 
 Example:
 
 ```json
 [
-  {"field": "revenue", "operator": ">", "value": 100},
-  {"field": "num_sessions", "operator": ">=", "value": 5}
+  {"operand": "revenue", "operator": "greater", "value": 100},
+  {"operand": "num_sessions", "operator": "greaterOrEqual", "value": 5}
 ]
 ```
 
 ### `profile_filters`
 
 JSON array of filter conditions for on-chain profile data. Each filter object has:
-- `field`: The field to filter on (e.g., `net_worth_usd`, `tx_count`, `first_onchain`, `last_onchain`)
-- `operator`: The comparison operator
+- `operand`: The field to filter on (e.g., `net_worth_usd`, `tx_count`, `first_onchain`, `last_onchain`)
+- `operator`: The comparison operator (`equals`, `greater`, `less`, `greaterOrEqual`, `lessOrEqual`)
 - `value`: The value to compare against
 
 Example:
 
 ```json
 [
-  {"field": "net_worth_usd", "operator": ">", "value": 1000},
-  {"field": "tx_count", "operator": ">", "value": 10}
+  {"operand": "net_worth_usd", "operator": "greater", "value": 1000},
+  {"operand": "tx_count", "operator": "greater", "value": 10}
 ]
 ```
 
 ### `socials`
 
-JSON array of social profile filters. Each filter object has:
-- `field`: The social field to filter on (e.g., `ens`, `farcaster`, `twitter`, `discord`, `telegram`, `lens`, `email`, `github`, `linkedin`)
-- `operator`: The comparison operator (`exists`, `not_exists`, `=`, `contains`)
-- `value`: Optional value for equality/contains checks
+JSON array of social field names to filter by. Only profiles that have a non-empty value for ALL specified social fields will be returned.
+
+Supported fields: `ens`, `farcaster`, `twitter`, `discord`, `telegram`, `lens`, `email`, `github`, `linkedin`, `basenames`, `linea`, `website`, `instagram`, `facebook`, `tiktok`, `youtube`, `reddit`
 
 Example - Find profiles with ENS names:
 
 ```json
-[{"field": "ens", "operator": "exists"}]
+["ens"]
 ```
 
-Example - Find profiles with specific Twitter handle:
+Example - Find profiles with both ENS and Twitter:
 
 ```json
-[{"field": "twitter", "operator": "=", "value": "@vitalik"}]
+["ens", "twitter"]
 ```
 
 ### `chain_filters`
 
-JSON array of per-chain filter conditions. Each filter object has:
-- `chain_id`: The chain ID to filter on (e.g., `1` for Ethereum, `137` for Polygon)
-- `field`: The field to filter on (e.g., `net_worth_usd`, `tx_count`, `first_onchain`, `last_onchain`)
-- `operator`: The comparison operator
-- `value`: The value to compare against
+JSON array of per-chain filter conditions for net worth. Each filter is an array with three elements:
+- `[0]`: Chain ID (e.g., `"1"` for Ethereum, `"137"` for Polygon)
+- `[1]`: Operator (`greater`, `less`, `greaterOrEqual`, `lessOrEqual`, `equals`)
+- `[2]`: Value (net worth in USD)
 
-Example - Find profiles with >10 transactions on Ethereum:
+Example - Find profiles with >$1000 net worth on Ethereum:
 
 ```json
-[{"chain_id": "1", "field": "tx_count", "operator": ">", "value": 10}]
+[["1", "greater", 1000]]
+```
+
+Example - Find profiles with >$500 on both Ethereum and Polygon:
+
+```json
+[["1", "greater", 500], ["137", "greater", 500]]
 ```
 
 ### `expand`
@@ -225,8 +229,8 @@ curl -sS \
 curl -sS \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   -G "https://api.formo.so/v0/profiles" \
-  --data-urlencode 'profile_filters=[{"field":"net_worth_usd","operator":">","value":10000}]' \
-  --data-urlencode 'filters=[{"field":"num_sessions","operator":">=","value":5}]'
+  --data-urlencode 'profile_filters=[{"operand":"net_worth_usd","operator":"greater","value":10000}]' \
+  --data-urlencode 'filters=[{"operand":"num_sessions","operator":"greaterOrEqual","value":5}]'
 ```
 
 ### Find Users with ENS on Ethereum
@@ -235,19 +239,23 @@ curl -sS \
 curl -sS \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   -G "https://api.formo.so/v0/profiles" \
-  --data-urlencode 'socials=[{"field":"ens","operator":"exists"}]' \
-  --data-urlencode 'chain_filters=[{"chain_id":"1","field":"tx_count","operator":">","value":5}]' \
+  --data-urlencode 'socials=["ens"]' \
+  --data-urlencode 'chain_filters=[["1","greater",0]]' \
   --data-urlencode 'expand=chains,labels'
 ```
 
-### Find Power Users by Lifecycle
+### Find Users by Revenue and Sessions
 
 ```bash
 curl -sS \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   -G "https://api.formo.so/v0/profiles" \
-  --data-urlencode 'filters=[{"field":"lifecycle","operator":"=","value":"Power user"}]'
+  --data-urlencode 'filters=[{"operand":"revenue","operator":"greater","value":1000},{"operand":"num_sessions","operator":"greaterOrEqual","value":10}]'
 ```
+
+<Note>
+The `lifecycle` field is computed dynamically based on user activity patterns and cannot be used as a filter. To find users by lifecycle stage, you can filter by the underlying fields (`first_seen`, `last_seen`, `activity_dates`) or retrieve profiles and filter client-side.
+</Note>
 
 ## Error Responses
 
