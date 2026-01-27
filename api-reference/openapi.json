@@ -1797,7 +1797,6 @@
                   "volume": 50000.0,
                   "points": 2500,
                   "activity_dates": ["2024-01-15", "2024-01-16", "2024-01-20"],
-                  "lifecycle": "Returning",
                   "chains": [
                     {
                       "chain_id": "1",
