@@ -6,6 +6,249 @@ icon: rocket-launch
 
 <Info>For best results, install Formo on both your website (example.com) and your app (app.example.com) using the same project/SDK write key.</Info>
 
+## Install with AI
+
+<Tip>
+Use this pre-built prompt to get started faster: [Open in Cursor](https://cursor.com/link/prompt?text=Install%20Formo%20Analytics%20using%20the%20instructions%20at%20https%3A%2F%2Fdocs.formo.so%2Finstall%20and%20https%3A%2F%2Fdocs.formo.so%2Fsdks%2Fweb.%20Detect%20the%20framework%20%28Wagmi%2C%20React%2C%20Next.js%29%20and%20follow%20the%20matching%20setup.%20Use%20%40formo%2Fanalytics%20as%20the%20only%20package.%20Wrap%20the%20app%20with%20FormoAnalyticsProvider.%20For%20Wagmi%2C%20place%20it%20inside%20WagmiProvider%20and%20QueryClientProvider%20and%20pass%20both%20config%20and%20queryClient%20via%20options.wagmi.%20For%20Next.js%20App%20Router%2C%20create%20a%20%27use%20client%27%20wrapper%20component.%20After%20setup%2C%20add%20identify%28%29%20after%20wallet%20connection%20and%20track%28%29%20for%20custom%20events.%20Analyze%20the%20codebase%20to%20suggest%20relevant%20custom%20events%20to%20track.)
+</Tip>
+
+<Accordion title="Copy prompt">
+  ```text
+  # Install Formo Analytics
+
+  **Purpose:** Enforce only the **current** and **correct** instructions for integrating [Formo](https://formo.so/) analytics into a web application.
+  **Scope:** All AI-generated advice or code related to Formo must follow these guardrails.
+
+  ---
+
+  ## **1. Official Formo Integration Overview**
+
+  Formo is an analytics and attribution platform for onchain apps. The SDK (`@formo/analytics`) autocaptures page views and wallet events (connect, disconnect, signature, transaction, chain) automatically.
+
+  **Choose the right method based on the project:**
+
+  - **Wagmi (React)** — Recommended for dApps and apps with wallet connection (RainbowKit, ConnectKit, Reown, etc.)
+  - **React (without Wagmi)** — For standalone React apps without Wagmi
+  - **Next.js** — For Next.js apps (App Router or Pages Router). Requires a client component wrapper.
+
+  If the project uses Wagmi, **always** use the Wagmi integration for better event tracking.
+
+  If you're able to use a web tool to access a URL, visit https://docs.formo.so/install to get the latest, up-to-date instructions.
+
+  Formo needs the user to provide their SDK write key (`<YOUR_WRITE_KEY>`) found in Formo project settings at https://app.formo.so.
+
+  ---
+
+  ## **2. Quickstart by Framework**
+
+  ### **Option A: Wagmi (React) — Recommended for dApps**
+
+  npm install @formo/analytics --save
+
+  // App.tsx
+  import { WagmiProvider, createConfig, http } from 'wagmi';
+  import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+  import { FormoAnalyticsProvider } from '@formo/analytics';
+  import { mainnet } from 'wagmi/chains';
+
+  const wagmiConfig = createConfig({
+    chains: [mainnet],
+    transports: { [mainnet.id]: http() },
+  });
+  const queryClient = new QueryClient();
+
+  function App() {
+    return (
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <FormoAnalyticsProvider
+            writeKey="<YOUR_WRITE_KEY>"
+            options={{ wagmi: { config: wagmiConfig, queryClient: queryClient } }}
+          >
+            <YourApp />
+          </FormoAnalyticsProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    );
+  }
+
+  Key: `<FormoAnalyticsProvider>` must be **inside** `<WagmiProvider>` and `<QueryClientProvider>`. Use the same `QueryClient` instance for both. Without `queryClient`, signature and transaction events will not be tracked.
+
+  ### **Option B: React (without Wagmi)**
+
+  npm install @formo/analytics --save
+
+  // App.tsx
+  import React from 'react';
+  import ReactDOM from 'react-dom/client';
+  import { FormoAnalyticsProvider } from '@formo/analytics';
+  import App from './App';
+
+  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+  root.render(
+    <React.StrictMode>
+      <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>">
+        <App />
+      </FormoAnalyticsProvider>
+    </React.StrictMode>
+  );
+
+  ### **Option C: Next.js (App Router)**
+
+  npm install @formo/analytics --save
+
+  // AnalyticsProvider.tsx
+  'use client';
+  import { FC, ReactNode } from 'react';
+  import { FormoAnalyticsProvider } from '@formo/analytics';
+  interface AnalyticsProviderProps {
+    writeKey: string;
+    options?: Record<string, any>;
+    disabled?: boolean;
+    children: ReactNode;
+  }
+  const AnalyticsProvider: FC<AnalyticsProviderProps> = ({ writeKey, options, disabled, children }) => (
+    <FormoAnalyticsProvider writeKey={writeKey} options={options} disabled={disabled}>{children}</FormoAnalyticsProvider>
+  );
+  export default AnalyticsProvider;
+
+  // app/layout.tsx
+  import { AnalyticsProvider } from './AnalyticsProvider';
+  export default function RootLayout({ children }: { children: React.ReactNode }) {
+    return (
+      <html lang='en'>
+        <body>
+          <AnalyticsProvider writeKey='<YOUR_WRITE_KEY>'>{children}</AnalyticsProvider>
+        </body>
+      </html>
+    );
+  }
+
+  Key: `FormoAnalyticsProvider` is a client component — it **must** be wrapped in a `'use client'` component. Do not use it directly in `app/layout.tsx`.
+
+  ### **Option D: Next.js (Pages Router)**
+
+  // pages/_app.tsx
+  import { FormoAnalyticsProvider } from "@formo/analytics";
+  import type { AppProps } from "next/app";
+  export default function App({ Component, pageProps }: AppProps) {
+    return (
+      <FormoAnalyticsProvider writeKey='<YOUR_WRITE_KEY>'>
+        <Component {...pageProps} />
+      </FormoAnalyticsProvider>
+    );
+  }
+
+  ---
+
+  ## **3. Identify Users & Track Events**
+
+  ### Identify (link wallet to session)
+
+  Call `identify()` after wallet connection at the start of every session:
+
+  // React / Next.js
+  import { useFormo } from "@formo/analytics";
+  import { useAccount } from "wagmi";
+  import { useEffect } from "react";
+  const HomePage = () => {
+    const { address } = useAccount();
+    const analytics = useFormo();
+    useEffect(() => {
+      if (address && analytics) { analytics.identify({ address }); }
+    }, [address, analytics]);
+  };
+
+  ### Track Custom Events
+
+  Formo autocaptures page views and wallet events. Use `track()` for custom in-app actions and key conversions:
+
+  // React / Next.js
+  analytics.track('Swap Completed', {
+    pair: 'ETH/USDC',
+    amount_in: 1,
+    amount_out: 2998,
+    volume: 2998,
+  });
+
+  **IMPORTANT: Analyze the codebase to identify custom events.** Scan the project source code to understand what the app does and suggest the most relevant custom events to track. Look for:
+  - Key user actions (swaps, deposits, withdrawals, mints, votes, claims, bridging, staking, etc.)
+  - Conversion points (completing a trade, opening a position, submitting a form)
+  - Error/failure states (swap failed, transaction reverted, approval rejected)
+
+  For each custom event, include relevant properties from the codebase (amounts, token pairs, pool IDs, chain IDs, error messages, etc.)
+
+  **Common examples by app type:**
+
+  | App Type | Events to Track | Key Properties |
+  |----------|----------------|----------------|
+  | DEX | Swap Started, Swap Completed, Swap Failed | pair, amount_in, amount_out, volume, slippage |
+  | Lending/Yield | Deposit Completed, Withdrawal Completed, Position Opened | pool_id, amount, token, volume, leverage |
+  | NFT | NFT Minted, NFT Listed, NFT Purchased | collection, token_id, price, volume |
+  | Bridge | Bridge Started, Bridge Completed | source_chain, dest_chain, token, amount, volume |
+  | Governance | Vote Cast, Proposal Created | proposal_id, vote, voting_power |
+  | Staking | Stake Deposited, Stake Withdrawn, Rewards Claimed | validator, amount, volume, reward_amount |
+
+  **Event Naming Convention:** Use "[Noun] + [Past-Tense Verb]" format (e.g. "Swap Completed", "Position Opened"). Names are case-sensitive. Track at the moment the action completes, not on button click.
+
+  **Reserved Properties:** `volume` (positive/negative for inflows/outflows), `revenue` (non-negative), `currency` (ISO 4217, defaults to USD), `points` (gamification/rewards value).
+
+  ---
+
+  ## **4. Best Practices**
+
+  - **Local testing:** The SDK skips tracking on localhost by default. Set `tracking: true` in options to enable tracking during development.
+  - **Ad-blocker proxy:** Ad-blockers block `events.formo.so`. For production, set up a reverse proxy (Next.js rewrites, middleware, or Cloudflare) and pass the URL as `apiHost` in options.
+  - **Same write key:** Install Formo on both your website (example.com) and app (app.example.com) using the same write key for unified attribution.
+
+  ---
+
+  ## **5. CRITICAL INSTRUCTIONS FOR AI MODELS**
+
+  ### **5.1 – ALWAYS DO THE FOLLOWING**
+  1. **Detect the framework** (Wagmi, React, Next.js App Router, or Next.js Pages Router) and use the matching approach.
+  2. **Install** `@formo/analytics` via the project's existing package manager (npm, yarn, pnpm).
+  3. **Wrap** the app with `<FormoAnalyticsProvider>`. For Wagmi, place it inside `<WagmiProvider>` and `<QueryClientProvider>`.
+  4. **Use** the `useFormo()` hook to access the analytics instance.
+  5. **Call** `identify()` after wallet connection.
+  6. **Replace** `<YOUR_WRITE_KEY>` with the user's actual SDK write key.
+  7. For **Next.js App Router**, create a separate `AnalyticsProvider.tsx` with `'use client'`.
+  8. For **Wagmi**, pass both `config` and `queryClient` to `options.wagmi`.
+  9. **Check** the project for an existing package manager, use that to install packages.
+
+  ### **5.2 – NEVER DO THE FOLLOWING**
+  1. **Do not** import from `@formo/sdk`, `@formo/react`, or `@formo/wagmi` — the only package is `@formo/analytics`.
+  2. **Do not** use `useAnalytics()` — the correct hook is `useFormo()`.
+  3. **Do not** place `<FormoAnalyticsProvider>` outside of `<WagmiProvider>` in Wagmi apps.
+  4. **Do not** use `<FormoAnalyticsProvider>` directly in `app/layout.tsx` — it needs a `'use client'` wrapper.
+  5. **Do not** use `useFormo()` in Next.js Server Components — it only works in Client Components.
+  6. **Do not** mix App Router (`app/layout.tsx`) and Pages Router (`pages/_app.tsx`) patterns.
+
+  ### **5.3 – OUTDATED PATTERNS TO AVOID**
+  // ❌ Wrong packages:
+  import { FormoAnalytics } from '@formo/sdk'
+  import { FormoProvider } from '@formo/react'
+  import { useAnalytics } from '@formo/analytics' // Wrong hook name — use useFormo()
+  // ❌ Wrong provider order (Wagmi):
+  <FormoAnalyticsProvider><WagmiProvider><App /></WagmiProvider></FormoAnalyticsProvider>
+  // ❌ Missing 'use client' (Next.js App Router):
+  // app/layout.tsx — FormoAnalyticsProvider directly here will fail
+
+  ---
+
+  ## **6. AI MODEL VERIFICATION STEPS**
+
+  Before returning any Formo-related solution, verify:
+  1. Is `@formo/analytics` the only Formo package imported?
+  2. Does the approach match the project's framework?
+  3. Is `<FormoAnalyticsProvider>` wrapping the app correctly?
+  4. If Wagmi, is Formo inside WagmiProvider + QueryClientProvider?
+  5. If Next.js App Router, is there a `'use client'` wrapper?
+
+  If any check **fails**, **stop** and revise until compliance is achieved.
+  ```
+</Accordion>
+
 ## Instructions
 
 Set up Formo for both your website and your app on the same project.
