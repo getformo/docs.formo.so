@@ -1,0 +1,259 @@
+---
+title: "Search Profiles"
+description: "Search and filter wallet profiles with pagination support"
+openapi: "GET /v0/profiles"
+---
+
+Search and filter wallet profiles across your project with advanced filtering capabilities. Returns a paginated list of wallet profiles matching the specified criteria.
+
+## Authentication
+
+This endpoint requires authentication using a **Workspace API Key** with `profiles:read` permission. Include the API key in your request headers:
+
+```bash
+Authorization: Bearer <your_workspace_api_key>
+```
+
+<Note>
+The API key needs to have the **read permission for profiles** in the API settings. You can configure this in your workspace API key settings.
+</Note>
+
+## Query Parameters
+
+The search endpoint supports rich filtering capabilities through JSON-encoded parameters.
+
+### `address`
+
+Filter by a specific wallet address (exact match).
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  "https://api.formo.so/v0/profiles?address=0x1234..."
+```
+
+### `filters`
+
+JSON array of filter conditions for user engagement data. Each filter object has:
+- `field`: The field to filter on (e.g., `revenue`, `num_sessions`, `first_seen`, `last_seen`, `volume`, `points`)
+- `operator`: The comparison operator (`=`, `!=`, `>`, `<`, `>=`, `<=`, `contains`, `not_contains`)
+- `value`: The value to compare against
+
+Example:
+
+```json
+[
+  {"field": "revenue", "operator": ">", "value": 100},
+  {"field": "num_sessions", "operator": ">=", "value": 5}
+]
+```
+
+### `profile_filters`
+
+JSON array of filter conditions for on-chain profile data. Each filter object has:
+- `field`: The field to filter on (e.g., `net_worth_usd`, `tx_count`, `first_onchain`, `last_onchain`)
+- `operator`: The comparison operator
+- `value`: The value to compare against
+
+Example:
+
+```json
+[
+  {"field": "net_worth_usd", "operator": ">", "value": 1000},
+  {"field": "tx_count", "operator": ">", "value": 10}
+]
+```
+
+### `socials`
+
+JSON array of social profile filters. Each filter object has:
+- `field`: The social field to filter on (e.g., `ens`, `farcaster`, `twitter`, `discord`, `telegram`, `lens`, `email`, `github`, `linkedin`)
+- `operator`: The comparison operator (`exists`, `not_exists`, `=`, `contains`)
+- `value`: Optional value for equality/contains checks
+
+Example - Find profiles with ENS names:
+
+```json
+[{"field": "ens", "operator": "exists"}]
+```
+
+Example - Find profiles with specific Twitter handle:
+
+```json
+[{"field": "twitter", "operator": "=", "value": "@vitalik"}]
+```
+
+### `chain_filters`
+
+JSON array of per-chain filter conditions. Each filter object has:
+- `chain_id`: The chain ID to filter on (e.g., `1` for Ethereum, `137` for Polygon)
+- `field`: The field to filter on (e.g., `net_worth_usd`, `tx_count`, `first_onchain`, `last_onchain`)
+- `operator`: The comparison operator
+- `value`: The value to compare against
+
+Example - Find profiles with >10 transactions on Ethereum:
+
+```json
+[{"chain_id": "1", "field": "tx_count", "operator": ">", "value": 10}]
+```
+
+### `expand`
+
+Comma-separated list of optional sections to include in each profile response.
+
+Supported values:
+- `apps` - DeFi app interactions and balances
+- `chains` - Per-chain activity metrics
+- `tokens` - Token holdings
+- `labels` - Wallet labels
+
+Example:
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  "https://api.formo.so/v0/profiles?expand=apps,chains,labels"
+```
+
+<Note>
+Expanding fields like `chains`, `tokens`, or `apps` increases response size and latency. The collections are capped at **50 items** each.
+</Note>
+
+### `order_by`
+
+Field to sort results by. Supported values:
+- `last_onchain` (default) - Last on-chain activity timestamp
+- `first_onchain` - First on-chain activity timestamp
+- `net_worth_usd` - Total net worth
+- `updated_at` - Last profile update timestamp
+- `tx_count` - Total transaction count
+
+### `order_dir`
+
+Sort direction:
+- `desc` (default) - Descending order
+- `asc` - Ascending order
+
+### `limit`
+
+Maximum number of profiles to return per request.
+- Default: `100`
+- Maximum: `1000`
+
+### `offset`
+
+Number of profiles to skip for pagination.
+- Default: `0`
+
+## Response
+
+The response includes a `data` array of wallet profiles and a `meta` object with pagination information.
+
+```json
+{
+  "data": [
+    {
+      "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+      "net_worth_usd": 125000.5,
+      "ens": "example.eth",
+      "tx_count": 1234,
+      "first_onchain": "2024-01-15T10:30:00Z",
+      "last_onchain": "2025-01-20T14:22:00Z",
+      "lifecycle": "Returning",
+      // ... other profile fields
+    }
+  ],
+  "meta": {
+    "total": 150,
+    "limit": 100,
+    "offset": 0
+  }
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `data` | array | Array of wallet profiles matching the search criteria |
+| `meta.total` | integer | Total number of profiles matching the criteria (before pagination) |
+| `meta.limit` | integer | Maximum number of profiles returned in this response |
+| `meta.offset` | integer | Number of profiles skipped (for pagination) |
+
+### Profile Fields
+
+Each profile in the `data` array includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `address` | string | Wallet address |
+| `net_worth_usd` | number | Total net worth in USD |
+| `tx_count` | integer | Total transaction count |
+| `first_onchain` | string | First on-chain activity timestamp (ISO 8601) |
+| `last_onchain` | string | Last on-chain activity timestamp (ISO 8601) |
+| `lifecycle` | string | User lifecycle stage: `Churned`, `New`, `Power user`, `Resurrected`, `Returning` |
+| `ens` | string \| null | ENS name |
+| `farcaster` | string \| null | Farcaster username |
+| `twitter` | string \| null | Twitter/X handle |
+| `discord` | string \| null | Discord username |
+| `telegram` | string \| null | Telegram username |
+| `email` | string \| null | Email address |
+| `first_seen` | string \| null | First seen timestamp in your app |
+| `last_seen` | string \| null | Last seen timestamp in your app |
+| `num_sessions` | integer \| null | Total number of sessions |
+| `revenue` | number \| null | Total revenue |
+| `volume` | number \| null | Total volume |
+| `points` | number \| null | Total points |
+| `chains` | array \| null | Per-chain data (when expanded) |
+| `apps` | array \| null | DeFi app data (when expanded) |
+| `tokens` | array \| null | Token holdings (when expanded) |
+| `labels` | array \| null | Wallet labels (when expanded) |
+
+## Examples
+
+### Basic Search with Pagination
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  "https://api.formo.so/v0/profiles?limit=50&offset=100&order_by=net_worth_usd&order_dir=desc"
+```
+
+### Find High-Value Users
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -G "https://api.formo.so/v0/profiles" \
+  --data-urlencode 'profile_filters=[{"field":"net_worth_usd","operator":">","value":10000}]' \
+  --data-urlencode 'filters=[{"field":"num_sessions","operator":">=","value":5}]'
+```
+
+### Find Users with ENS on Ethereum
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -G "https://api.formo.so/v0/profiles" \
+  --data-urlencode 'socials=[{"field":"ens","operator":"exists"}]' \
+  --data-urlencode 'chain_filters=[{"chain_id":"1","field":"tx_count","operator":">","value":5}]' \
+  --data-urlencode 'expand=chains,labels'
+```
+
+### Find Power Users by Lifecycle
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -G "https://api.formo.so/v0/profiles" \
+  --data-urlencode 'filters=[{"field":"lifecycle","operator":"=","value":"Power user"}]'
+```
+
+## Error Responses
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `BAD_REQUEST` | Invalid query parameters or malformed JSON in filters |
+| 401 | `UNAUTHORIZED` | Missing or invalid API key |
+| 403 | `FORBIDDEN` | API key does not have `profiles:read` permission |
+| 500 | `INTERNAL_SERVER_ERROR` | Failed to fetch wallet profile data |

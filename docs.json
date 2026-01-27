@@ -15,10 +15,7 @@
         "groups": [
           {
             "group": "Getting started",
-            "pages": [
-              "intro",
-              "install"
-            ]
+            "pages": ["intro", "install"]
           },
           {
             "group": "Features",
@@ -40,7 +37,7 @@
                   "features/product-analytics/flows",
                   "features/product-analytics/retention",
                   "features/product-analytics/alerts",
-                  "features/product-analytics/ai"              
+                  "features/product-analytics/ai"
                 ]
               },
               {
@@ -99,10 +96,7 @@
         "groups": [
           {
             "group": "Methodology",
-            "pages": [
-              "data/attribution",
-              "data/what-we-collect"
-            ]
+            "pages": ["data/attribution", "data/what-we-collect"]
           },
           {
             "group": "Data",
@@ -129,11 +123,7 @@
           },
           {
             "group": "Data Warehouse",
-            "pages": [
-              "data/schema",
-              "data/bi",
-              "data/data-sync"
-            ]
+            "pages": ["data/schema", "data/bi", "data/data-sync"]
           }
         ]
       },
@@ -142,11 +132,7 @@
         "groups": [
           {
             "group": "SDK",
-            "pages": [
-              "sdks/web",
-              "sdks/mobile",
-              "sdks/server"
-            ]
+            "pages": ["sdks/web", "sdks/mobile", "sdks/server"]
           }
         ]
       },
@@ -163,21 +149,15 @@
           },
           {
             "group": "Events API",
-            "pages": [
-              "api-reference/events/track"
-            ]
+            "pages": ["api-reference/events/track"]
           },
           {
             "group": "Query API",
-            "pages": [
-              "api-reference/query"
-            ]
+            "pages": ["api-reference/query"]
           },
           {
             "group": "Profiles API",
-            "pages": [
-              "api-reference/profile"
-            ]
+            "pages": ["api-reference/profile", "api-reference/search-profiles"]
           },
           {
             "group": "Forms API",
@@ -194,9 +174,7 @@
         "groups": [
           {
             "group": "Integrations",
-            "pages": [
-              "integrations/overview"
-            ]
+            "pages": ["integrations/overview"]
           }
         ]
       },
@@ -205,9 +183,7 @@
         "groups": [
           {
             "group": "Chains",
-            "pages": [
-              "chains/overview"
-            ]
+            "pages": ["chains/overview"]
           }
         ]
       },
@@ -216,9 +192,7 @@
         "groups": [
           {
             "group": "Security",
-            "pages": [
-              "security/overview"
-            ]
+            "pages": ["security/overview"]
           }
         ]
       }

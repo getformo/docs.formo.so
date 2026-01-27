@@ -34,10 +34,10 @@ Comma-separated list of optional sections to include in the response.
 
 Supported values:
 
-- `apps`
-- `chains`
-- `tokens`
-- `labels`
+- `apps` - DeFi app interactions and balances
+- `chains` - Per-chain activity metrics (net worth, tx count, first/last activity per chain)
+- `tokens` - Token holdings with balances and prices
+- `labels` - Wallet labels from various sources
 
 Examples:
 
@@ -50,3 +50,248 @@ curl -sS \
 <Note>
 The `apps`, `chains`, and `tokens` collections are capped at **50 items** each.
 </Note>
+
+## Response Fields
+
+### Core Profile Data
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `address` | string | The wallet address |
+| `net_worth_usd` | number | Total net worth in USD across all chains |
+| `tx_count` | integer | Total transaction count across all chains |
+| `first_onchain` | string \| null | First on-chain activity timestamp (ISO 8601) |
+| `last_onchain` | string \| null | Last on-chain activity timestamp (ISO 8601) |
+| `updated_at` | string \| null | Last profile update timestamp (ISO 8601) |
+
+### Lifecycle
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `lifecycle` | string \| null | User lifecycle stage based on activity patterns |
+
+Possible lifecycle values:
+- `New` - Recently acquired user
+- `Returning` - User who has returned after absence
+- `Power user` - Highly active user
+- `Resurrected` - User who returned after long absence
+- `Churned` - User who has stopped engaging
+
+### Social & Identity
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ens` | string \| null | ENS name |
+| `farcaster` | string \| null | Farcaster username |
+| `lens` | string \| null | Lens handle |
+| `basenames` | string \| null | Base names |
+| `linea` | string \| null | Linea identifier |
+| `discord` | string \| null | Discord username |
+| `telegram` | string \| null | Telegram username |
+| `twitter` | string \| null | Twitter/X handle |
+| `github` | string \| null | GitHub username |
+| `linkedin` | string \| null | LinkedIn profile |
+| `email` | string \| null | Email address |
+| `website` | string \| null | Website URL |
+| `instagram` | string \| null | Instagram handle |
+| `facebook` | string \| null | Facebook profile |
+| `tiktok` | string \| null | TikTok handle |
+| `youtube` | string \| null | YouTube channel |
+| `reddit` | string \| null | Reddit username |
+
+### Profile Display
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `avatar` | string \| null | Avatar image URL |
+| `display_name` | string \| null | Display name |
+| `description` | string \| null | Profile description |
+
+### User Engagement Data
+
+These fields are populated based on events tracked in your project:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `first_seen` | string \| null | First seen timestamp in your app (ISO 8601) |
+| `last_seen` | string \| null | Last seen timestamp in your app (ISO 8601) |
+| `num_sessions` | integer \| null | Total number of sessions |
+| `revenue` | number \| null | Total revenue |
+| `volume` | number \| null | Total volume |
+| `points` | number \| null | Total points |
+| `activity_dates` | array \| null | Array of activity dates (YYYY-MM-DD format) |
+
+### Device & Location
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `location` | string \| null | User location (country code) |
+| `device` | string \| null | Device type |
+| `browser` | string \| null | Browser name |
+| `os` | string \| null | Operating system |
+
+### Attribution & UTM
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `first_utm_source` | string \| null | First UTM source |
+| `last_utm_source` | string \| null | Last UTM source |
+| `first_utm_medium` | string \| null | First UTM medium |
+| `last_utm_medium` | string \| null | Last UTM medium |
+| `first_utm_campaign` | string \| null | First UTM campaign |
+| `last_utm_campaign` | string \| null | Last UTM campaign |
+| `first_utm_content` | string \| null | First UTM content |
+| `last_utm_content` | string \| null | Last UTM content |
+| `first_utm_term` | string \| null | First UTM term |
+| `last_utm_term` | string \| null | Last UTM term |
+| `first_referrer` | string \| null | First referrer domain |
+| `last_referrer` | string \| null | Last referrer domain |
+| `first_referrer_url` | string \| null | First referrer full URL |
+| `last_referrer_url` | string \| null | Last referrer full URL |
+| `first_ref` | string \| null | First referral code |
+| `last_ref` | string \| null | Last referral code |
+
+### Last Event
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `last_type` | string \| null | Last event type |
+| `last_event` | string \| null | Last event name |
+| `last_properties` | string \| null | Last event properties (JSON string) |
+
+### Expanded Fields
+
+When using the `expand` parameter, these additional fields are included:
+
+#### `chains` (when `expand=chains`)
+
+Array of per-chain wallet data:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `chain_id` | string | Chain ID |
+| `net_worth_usd` | number | Net worth on this chain |
+| `tx_count` | integer | Transaction count on this chain |
+| `first_onchain` | string | First activity on this chain |
+| `last_onchain` | string | Last activity on this chain |
+
+#### `labels` (when `expand=labels`)
+
+Array of wallet labels:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Label ID |
+| `value` | string | Label value |
+| `chain_id` | string | Chain ID where label applies |
+| `source` | string | Label source (e.g., manual, automated) |
+
+#### `apps` (when `expand=apps`)
+
+Array of DeFi app interactions:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `chain_id` | string | Chain ID |
+| `id` | string | App ID |
+| `name` | string | App name |
+| `img` | string \| null | App image URL |
+| `url` | string \| null | App URL |
+| `balance_usd` | number | Balance in USD for this app |
+
+#### `tokens` (when `expand=tokens`)
+
+Array of token holdings:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `chain_id` | string | Chain ID |
+| `token_address` | string | Token contract address |
+| `app_id` | string | App ID |
+| `name` | string | Token name |
+| `symbol` | string | Token symbol |
+| `img` | string \| null | Token image URL |
+| `decimals` | integer | Token decimals |
+| `price` | number | Token price in USD |
+| `balance` | string | Token balance (as string to preserve precision) |
+| `balance_usd` | number | Token balance value in USD |
+
+## Example Response
+
+```json
+{
+  "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+  "net_worth_usd": 125000.5,
+  "ens": "vitalik.eth",
+  "farcaster": null,
+  "lens": null,
+  "tx_count": 1234,
+  "first_onchain": "2024-01-15T10:30:00Z",
+  "last_onchain": "2025-01-20T14:22:00Z",
+  "lifecycle": "Returning",
+  "first_seen": "2024-01-15T10:30:00Z",
+  "last_seen": "2025-01-20T14:22:00Z",
+  "num_sessions": 45,
+  "revenue": 1500.75,
+  "volume": 50000.0,
+  "points": 2500,
+  "chains": [
+    {
+      "chain_id": "1",
+      "net_worth_usd": 100000.0,
+      "tx_count": 1000,
+      "first_onchain": "2024-01-15T10:30:00Z",
+      "last_onchain": "2025-01-20T14:22:00Z"
+    },
+    {
+      "chain_id": "137",
+      "net_worth_usd": 25000.5,
+      "tx_count": 234,
+      "first_onchain": "2024-03-01T08:00:00Z",
+      "last_onchain": "2025-01-18T12:00:00Z"
+    }
+  ],
+  "labels": [
+    {
+      "id": "label_123",
+      "value": "Whale",
+      "chain_id": "1",
+      "source": "manual"
+    }
+  ],
+  "apps": [
+    {
+      "chain_id": "1",
+      "id": "uniswap",
+      "name": "Uniswap",
+      "img": "https://example.com/uniswap.png",
+      "url": "https://uniswap.org",
+      "balance_usd": 50000.0
+    }
+  ],
+  "tokens": [
+    {
+      "chain_id": "1",
+      "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "app_id": "usdc",
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "img": "https://example.com/usdc.png",
+      "decimals": 6,
+      "price": 1.0,
+      "balance": "1000000000",
+      "balance_usd": 1000.0
+    }
+  ]
+}
+```
+
+## Error Responses
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `BAD_REQUEST` | Invalid wallet address format |
+| 401 | `UNAUTHORIZED` | Missing or invalid API key |
+| 403 | `FORBIDDEN` | API key does not have `profiles:read` permission |
+| 404 | `PROFILE_NOT_FOUND` | Profile does not exist |
+| 500 | `INTERNAL_SERVER_ERROR` | Failed to fetch wallet profile data |

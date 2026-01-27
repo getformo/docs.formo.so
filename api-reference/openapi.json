@@ -1,1538 +1,1932 @@
 {
-	"openapi": "3.0.0",
-	"info": {
-		"title": "Formo API",
-		"version": "1.0.0",
-		"description": "API for managing form webhook subscriptions, form responses, and event tracking"
-	},
-	"servers": [
-		{
-			"url": "https://api.formo.so/api",
-			"description": "Forms API"
-		},
-		{
-			"url": "https://events.formo.so",
-			"description": "Events API"
-		},
-		{
-			"url": "https://api.formo.so",
-			"description": "Profile API"
-		}
-	],
-	"components": {
-		"securitySchemes": {
-			"ApiKeyAuth": {
-				"type": "apiKey",
-				"in": "header",
-				"name": "x-api-key"
-			},
-			"BearerAuth": {
-				"type": "http",
-				"scheme": "bearer",
-				"bearerFormat": "JWT",
-				"description": "JWT Bearer token for authentication. Format: 'Bearer <token>'"
-			}
-		},
-		"schemas": {
-			"FormResponse": {
-				"type": "object",
-				"properties": {
-					"formId": {
-						"type": "string",
-						"description": "Unique identifier of the form"
-					},
-					"formTitle": {
-						"type": "string",
-						"description": "Title of the form"
-					},
-					"submissionId": {
-						"type": "string",
-						"description": "Unique identifier of the submission"
-					},
-					"submittedAt": {
-						"type": "string",
-						"format": "date-time",
-						"description": "Timestamp of form submission"
-					}
-				},
-				"additionalProperties": true
-			},
-			"Error": {
-				"type": "object",
-				"properties": {
-					"isSuccess": {
-						"type": "boolean",
-						"example": false
-					},
-					"message": {
-						"type": "string"
-					}
-				}
-			},
-			"SuccessResponse": {
-				"type": "object",
-				"properties": {
-					"isSuccess": {
-						"type": "boolean",
-						"example": true
-					},
-					"data": {
-						"type": "object",
-						"properties": {
-							"items": {
-								"type": "array",
-								"items": {
-									"$ref": "#/components/schemas/FormResponse"
-								}
-							}
-						}
-					}
-				}
-			},
-			"EventContext": {
-				"type": "object",
-				"description": "Contextual information about the event",
-				"properties": {
-					"user_agent": {
-						"type": "string",
-						"description": "The user agent of the device"
-					},
-					"locale": {
-						"type": "string",
-						"description": "Language of the device (e.g., en-US, en-GB)"
-					},
-					"timezone": {
-						"type": "string",
-						"description": "Timezone of the user (e.g., America/New_York)"
-					},
-					"location": {
-						"type": "string",
-						"description": "Geographic location country code (e.g., US, NG)"
-					},
-					"ref": {
-						"type": "string",
-						"description": "Referral code or identifier"
-					},
-					"referrer": {
-						"type": "string",
-						"description": "The referrer URL where the user came from"
-					},
-					"utm_campaign": {
-						"type": "string",
-						"description": "UTM campaign parameter"
-					},
-					"utm_content": {
-						"type": "string",
-						"description": "UTM content parameter"
-					},
-					"utm_medium": {
-						"type": "string",
-						"description": "UTM medium parameter"
-					},
-					"utm_source": {
-						"type": "string",
-						"description": "UTM source parameter"
-					},
-					"utm_term": {
-						"type": "string",
-						"description": "UTM term parameter"
-					},
-					"page_title": {
-						"type": "string",
-						"description": "Title of the current page"
-					},
-					"page_url": {
-						"type": "string",
-						"description": "Full URL of the current page"
-					},
-					"library_name": {
-						"type": "string",
-						"description": "Name of the SDK used (e.g., Formo Web SDK)"
-					},
-					"library_version": {
-						"type": "string",
-						"description": "Version of the SDK used"
-					},
-					"browser": {
-						"type": "string",
-						"description": "Name of the browser (e.g., chrome, firefox, safari)"
-					},
-					"screen_width": {
-						"type": "integer",
-						"description": "Width of the device screen in pixels"
-					},
-					"screen_height": {
-						"type": "integer",
-						"description": "Height of the device screen in pixels"
-					},
-					"screen_density": {
-						"type": "number",
-						"description": "Pixel density of the device screen (devicePixelRatio)"
-					},
-					"viewport_width": {
-						"type": "integer",
-						"description": "Width of the browser viewport in pixels"
-					},
-					"viewport_height": {
-						"type": "integer",
-						"description": "Height of the browser viewport in pixels"
-					}
-				}
-			},
-			"EventProperties": {
-				"type": "object",
-				"description": "Event-specific properties. Can contain any key-value pairs relevant to the event.",
-				"additionalProperties": true
-			},
-			"Event": {
-				"type": "object",
-				"properties": {
-					"type": {
-						"type": "string",
-						"enum": ["identify", "track", "page", "connect", "disconnect", "detect", "chain", "signature", "transaction"],
-						"description": "Type of the event"
-					},
-					"channel": {
-						"type": "string",
-						"enum": ["web", "mobile", "server"],
-						"description": "Channel/source of the event"
-					},
-					"version": {
-						"type": "string",
-						"description": "Event spec version"
-					},
-					"anonymous_id": {
-						"type": "string",
-						"description": "Pseudo-identifier for the user (device ID)"
-					},
-					"user_id": {
-						"type": "string",
-						"nullable": true,
-						"description": "Unique user identifier"
-					},
-					"address": {
-						"type": "string",
-						"nullable": true,
-						"description": "Wallet address"
-					},
-					"event": {
-						"type": "string",
-						"description": "Name of the event (for track events)"
-					},
-					"context": {
-						"$ref": "#/components/schemas/EventContext"
-					},
-					"properties": {
-						"$ref": "#/components/schemas/EventProperties"
-					},
-					"original_timestamp": {
-						"type": "string",
-						"format": "date-time",
-						"description": "Time when the event occurred on the client"
-					},
-					"sent_at": {
-						"type": "string",
-						"format": "date-time",
-						"description": "Time when the event was sent from the client"
-					},
-					"message_id": {
-						"type": "string",
-						"description": "Unique identifier for the event"
-					}
-				}
-			},
-			"WalletLabel": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "string",
-						"description": "Label ID"
-					},
-					"value": {
-						"type": "string",
-						"description": "Label value"
-					},
-					"chain_id": {
-						"type": "string",
-						"description": "Chain ID where label applies"
-					},
-					"source": {
-						"type": "string",
-						"description": "Label source (e.g., manual, automated)"
-					}
-				}
-			},
-			"WalletApp": {
-				"type": "object",
-				"properties": {
-					"chain_id": {
-						"type": "string",
-						"description": "Chain ID"
-					},
-					"id": {
-						"type": "string",
-						"description": "App ID"
-					},
-					"name": {
-						"type": "string",
-						"description": "App name"
-					},
-					"img": {
-						"type": "string",
-						"nullable": true,
-						"description": "App image URL"
-					},
-					"url": {
-						"type": "string",
-						"nullable": true,
-						"description": "App URL"
-					},
-					"balance_usd": {
-						"type": "number",
-						"description": "Balance in USD for this app"
-					}
-				}
-			},
-			"WalletToken": {
-				"type": "object",
-				"properties": {
-					"chain_id": {
-						"type": "string",
-						"description": "Chain ID"
-					},
-					"token_address": {
-						"type": "string",
-						"description": "Token contract address"
-					},
-					"app_id": {
-						"type": "string",
-						"description": "App ID"
-					},
-					"name": {
-						"type": "string",
-						"description": "Token name"
-					},
-					"symbol": {
-						"type": "string",
-						"description": "Token symbol"
-					},
-					"img": {
-						"type": "string",
-						"nullable": true,
-						"description": "Token image URL"
-					},
-					"decimals": {
-						"type": "integer",
-						"description": "Token decimals"
-					},
-					"price": {
-						"type": "number",
-						"description": "Token price in USD"
-					},
-					"balance": {
-						"type": "string",
-						"description": "Token balance (as string to preserve precision)"
-					},
-					"balance_usd": {
-						"type": "number",
-						"description": "Token balance value in USD"
-					}
-				}
-			},
-			"WalletProfile": {
-				"type": "object",
-				"properties": {
-					"address": {
-						"type": "string",
-						"description": "The wallet address"
-					},
-					"net_worth_usd": {
-						"type": "number",
-						"description": "Total net worth in USD"
-					},
-					"ens": {
-						"type": "string",
-						"nullable": true,
-						"description": "ENS name"
-					},
-					"farcaster": {
-						"type": "string",
-						"nullable": true,
-						"description": "Farcaster username"
-					},
-					"lens": {
-						"type": "string",
-						"nullable": true,
-						"description": "Lens handle"
-					},
-					"basenames": {
-						"type": "string",
-						"nullable": true,
-						"description": "Base names"
-					},
-					"linea": {
-						"type": "string",
-						"nullable": true,
-						"description": "Linea identifier"
-					},
-					"discord": {
-						"type": "string",
-						"nullable": true,
-						"description": "Discord username"
-					},
-					"telegram": {
-						"type": "string",
-						"nullable": true,
-						"description": "Telegram username"
-					},
-					"website": {
-						"type": "string",
-						"nullable": true,
-						"description": "Website URL"
-					},
-					"github": {
-						"type": "string",
-						"nullable": true,
-						"description": "GitHub username"
-					},
-					"twitter": {
-						"type": "string",
-						"nullable": true,
-						"description": "Twitter/X handle"
-					},
-					"linkedin": {
-						"type": "string",
-						"nullable": true,
-						"description": "LinkedIn profile"
-					},
-					"email": {
-						"type": "string",
-						"nullable": true,
-						"description": "Email address"
-					},
-					"instagram": {
-						"type": "string",
-						"nullable": true,
-						"description": "Instagram handle"
-					},
-					"facebook": {
-						"type": "string",
-						"nullable": true,
-						"description": "Facebook profile"
-					},
-					"tiktok": {
-						"type": "string",
-						"nullable": true,
-						"description": "TikTok handle"
-					},
-					"youtube": {
-						"type": "string",
-						"nullable": true,
-						"description": "YouTube channel"
-					},
-					"reddit": {
-						"type": "string",
-						"nullable": true,
-						"description": "Reddit username"
-					},
-					"avatar": {
-						"type": "string",
-						"nullable": true,
-						"description": "Avatar image URL"
-					},
-					"description": {
-						"type": "string",
-						"nullable": true,
-						"description": "Profile description"
-					},
-					"display_name": {
-						"type": "string",
-						"nullable": true,
-						"description": "Display name"
-					},
-					"updated_at": {
-						"type": "string",
-						"format": "date-time",
-						"description": "Last update timestamp (ISO 8601)"
-					},
-					"tx_count": {
-						"type": "integer",
-						"description": "Total transaction count"
-					},
-					"first_onchain": {
-						"type": "string",
-						"format": "date-time",
-						"description": "First on-chain activity timestamp (ISO 8601)"
-					},
-					"last_onchain": {
-						"type": "string",
-						"format": "date-time",
-						"description": "Last on-chain activity timestamp (ISO 8601)"
-					},
-					"first_seen": {
-						"type": "string",
-						"format": "date-time",
-						"nullable": true,
-						"description": "First seen timestamp (ISO 8601)"
-					},
-					"last_seen": {
-						"type": "string",
-						"format": "date-time",
-						"nullable": true,
-						"description": "Last seen timestamp (ISO 8601)"
-					},
-					"first_utm_source": {
-						"type": "string",
-						"nullable": true,
-						"description": "First UTM source"
-					},
-					"last_utm_source": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last UTM source"
-					},
-					"first_utm_medium": {
-						"type": "string",
-						"nullable": true,
-						"description": "First UTM medium"
-					},
-					"last_utm_medium": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last UTM medium"
-					},
-					"first_utm_campaign": {
-						"type": "string",
-						"nullable": true,
-						"description": "First UTM campaign"
-					},
-					"last_utm_campaign": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last UTM campaign"
-					},
-					"first_utm_content": {
-						"type": "string",
-						"nullable": true,
-						"description": "First UTM content"
-					},
-					"last_utm_content": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last UTM content"
-					},
-					"first_utm_term": {
-						"type": "string",
-						"nullable": true,
-						"description": "First UTM term"
-					},
-					"last_utm_term": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last UTM term"
-					},
-					"first_referrer": {
-						"type": "string",
-						"nullable": true,
-						"description": "First referrer domain"
-					},
-					"last_referrer": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last referrer domain"
-					},
-					"first_referrer_url": {
-						"type": "string",
-						"nullable": true,
-						"description": "First referrer full URL"
-					},
-					"last_referrer_url": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last referrer full URL"
-					},
-					"first_ref": {
-						"type": "string",
-						"nullable": true,
-						"description": "First referral code"
-					},
-					"last_ref": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last referral code"
-					},
-					"location": {
-						"type": "string",
-						"nullable": true,
-						"description": "User location"
-					},
-					"device": {
-						"type": "string",
-						"nullable": true,
-						"description": "Device type"
-					},
-					"browser": {
-						"type": "string",
-						"nullable": true,
-						"description": "Browser name"
-					},
-					"os": {
-						"type": "string",
-						"nullable": true,
-						"description": "Operating system"
-					},
-					"last_type": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last event type"
-					},
-					"last_event": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last event name"
-					},
-					"last_properties": {
-						"type": "string",
-						"nullable": true,
-						"description": "Last event properties (JSON string)"
-					},
-					"num_sessions": {
-						"type": "integer",
-						"nullable": true,
-						"description": "Total number of sessions"
-					},
-					"revenue": {
-						"type": "number",
-						"nullable": true,
-						"description": "Total revenue"
-					},
-					"volume": {
-						"type": "number",
-						"nullable": true,
-						"description": "Total volume"
-					},
-					"points": {
-						"type": "number",
-						"nullable": true,
-						"description": "Total points"
-					},
-					"activity_dates": {
-						"type": "array",
-						"items": {
-							"type": "string",
-							"format": "date"
-						},
-						"nullable": true,
-						"description": "Array of activity dates (YYYY-MM-DD format)"
-					},
-					"labels": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/WalletLabel"
-						},
-						"description": "Array of wallet labels"
-					},
-					"apps": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/WalletApp"
-						},
-						"nullable": true,
-						"description": "Array of wallet apps (only included if wallet has associated apps)"
-					},
-					"tokens": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/WalletToken"
-						},
-						"nullable": true,
-						"description": "Array of wallet tokens (only included if wallet has associated tokens)"
-					}
-				}
-			},
-			"ProfileResponse": {
-				"$ref": "#/components/schemas/WalletProfile"
-			},
-			"PerformSqlQueryPublicResponse": {
-				"type": "object",
-				"properties": {
-					"data": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"additionalProperties": true
-						},
-						"description": "Rows returned by the SQL query"
-					},
-					"meta": {
-						"type": "object",
-						"properties": {
-							"total": {
-								"type": "integer",
-								"description": "Total rows available"
-							},
-							"limit": {
-								"type": "integer",
-								"description": "Limit inferred from the query"
-							},
-							"offset": {
-								"type": "integer",
-								"description": "Offset inferred from the query"
-							}
-						},
-						"required": ["total", "limit", "offset"]
-					}
-				},
-				"required": ["data", "meta"]
-			},
-			"RestApiErrorResponse": {
-				"type": "object",
-				"properties": {
-					"error": {
-						"type": "object",
-						"properties": {
-							"code": {
-								"type": "string",
-								"description": "Error code"
-							},
-							"message": {
-								"type": "string",
-								"description": "Error message"
-							}
-						},
-						"required": ["code", "message"]
-					}
-				},
-				"required": ["error"]
-			},
-			"ErrorWithCode": {
-				"type": "object",
-				"properties": {
-					"isSuccess": {
-						"type": "boolean",
-						"example": false
-					},
-					"message": {
-						"type": "string"
-					},
-					"code": {
-						"type": "string",
-						"enum": ["BAD_REQUEST", "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "INTERNAL_SERVER_ERROR"]
-					}
-				},
-				"required": ["isSuccess", "message", "code"]
-			}
-		}
-	},
-	"paths": {
-		"/webhooks/{formId}/poll": {
-			"get": {
-				"summary": "List Form Responses",
-				"description": "Retrieves recent form responses with transformed field data",
-				"operationId": "listFormResponses",
-				"tags": ["Forms API"],
-				"servers": [
-					{
-						"url": "https://api.formo.so/api",
-						"description": "Forms API"
-					}
-				],
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"parameters": [
-					{
-						"name": "formId",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "The unique identifier of the form"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successfully retrieved form responses",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/SuccessResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request - Form ID is required",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized - Missing or invalid API key",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden - Insufficient permissions",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found - Form not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/webhooks": {
-			"post": {
-				"summary": "Subscribe to Form Events",
-				"description": "Creates a new webhook subscription for form events",
-				"operationId": "subscribeFormEvents",
-				"tags": ["Forms API"],
-				"servers": [
-					{
-						"url": "https://api.formo.so/api",
-						"description": "Forms API"
-					}
-				],
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"required": [
-									"formId",
-									"targetUrl",
-									"eventTypes"
-								],
-								"properties": {
-									"formId": {
-										"type": "string",
-										"description": "The unique identifier of the form"
-									},
-									"targetUrl": {
-										"type": "string",
-										"description": "The URL that will receive webhook events"
-									},
-									"eventTypes": {
-										"type": "array",
-										"items": {
-											"type": "string",
-											"enum": [
-												"FORM_SUBMISSION",
-												"FORM_UPDATED"
-											]
-										},
-										"description": "Types of events to subscribe to"
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Successfully subscribed to webhook",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"isSuccess": {
-											"type": "boolean",
-											"example": true
-										},
-										"data": {
-											"type": "object",
-											"properties": {
-												"webhookId": {
-													"type": "string",
-													"description": "Unique identifier of the webhook subscription"
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request - Missing required fields or invalid event types",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized - Missing or invalid API key",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden - Insufficient permissions",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"summary": "Unsubscribe from Form Events",
-				"description": "Removes a webhook subscription",
-				"operationId": "unsubscribeFormEvents",
-				"tags": ["Forms API"],
-				"servers": [
-					{
-						"url": "https://api.formo.so/api",
-						"description": "Forms API"
-					}
-				],
-				"security": [
-					{
-						"ApiKeyAuth": []
-					}
-				],
-				"parameters": [
-					{
-						"name": "webhookId",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						},
-						"description": "The unique identifier of the webhook subscription"
-					},
-					{
-						"name": "targetUrl",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						},
-						"description": "The URL that receives webhook events"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successfully unsubscribed from webhook",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"isSuccess": {
-											"type": "boolean",
-											"example": true
-										},
-										"data": {
-											"type": "object",
-											"properties": {
-												"message": {
-													"type": "string",
-													"example": "Webhook unsubscribed successfully"
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized - Missing or invalid API key",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden - Insufficient permissions",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found - Webhook not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/v0/raw_events": {
-			"post": {
-				"summary": "Track Event",
-				"description": "Sends an event to the Formo Events API. Use the SDK Write Key from your project settings as the Bearer token for authentication.",
-				"operationId": "trackEvent",
-				"tags": ["Events API"],
-				"servers": [
-					{
-						"url": "https://events.formo.so",
-						"description": "Events API"
-					}
-				],
-				"security": [
-					{
-						"BearerAuth": []
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/Event"
-							},
-							"example": {
-								"type": "page",
-								"channel": "web",
-								"version": "0",
-								"anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
-								"user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
-								"address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
-								"event": "",
-								"context": {
-									"user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
-									"locale": "en-GB",
-									"timezone": "Africa/Lagos",
-									"location": "NG",
-									"ref": "",
-									"referrer": "",
-									"utm_campaign": "",
-									"utm_content": "",
-									"utm_medium": "",
-									"utm_source": "",
-									"utm_term": "",
-									"page_title": "WalletConnect Content Cabal",
-									"page_url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
-									"library_name": "Formo Web SDK",
-									"library_version": "1.25.0",
-									"browser": "chrome",
-									"screen_width": 393,
-									"screen_height": 873,
-									"screen_density": 2.75,
-									"viewport_width": 392,
-									"viewport_height": 735
-								},
-								"properties": {
-									"url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
-									"path": "/lByfTbeUSL_mxy_TN2m3d",
-									"hash": "",
-									"query": ""
-								},
-								"original_timestamp": "2025-04-23T13:15:17.000Z",
-								"sent_at": "2025-04-23T13:15:18.000Z",
-								"message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Event successfully tracked",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"successful_rows": {
-											"type": "integer",
-											"description": "Number of events successfully ingested",
-											"example": 1
-										},
-										"quarantined_rows": {
-											"type": "integer",
-											"description": "Number of events that failed validation and were quarantined",
-											"example": 0
-										}
-									}
-								},
-								"example": {
-									"successful_rows": 1,
-									"quarantined_rows": 0
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request - Invalid event data"
-					},
-					"401": {
-						"description": "Unauthorized - Missing or invalid Bearer token"
-					},
-					"500": {
-						"description": "Server Error"
-					}
-				}
-			}
-		},
-		"/v0/query": {
-			"post": {
-				"summary": "Run SQL query",
-				"description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements, and must include a LIMIT that is less than or equal to 1000.",
-				"operationId": "performSqlQueryPublic",
-				"tags": ["Query API"],
-				"servers": [
-					{
-						"url": "https://api.formo.so",
-						"description": "Query API"
-					}
-				],
-				"security": [
-					{
-						"BearerAuth": []
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"query": {
-										"type": "string",
-										"description": "SQL query to execute. Must be read-only (SELECT/WITH), single statement, no comments, and include LIMIT <= 1000."
-									}
-								},
-								"required": ["query"]
-							},
-							"example": {
-								"query": "SELECT * FROM events LIMIT 100"
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Successfully executed SQL query",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/PerformSqlQueryPublicResponse"
-								},
-								"example": {
-									"data": [
-										{
-											"event": "page",
-											"address": "0x123...",
-											"timestamp": "2025-01-20T10:00:00Z"
-										}
-									],
-									"meta": {
-										"total": 120,
-										"limit": 100,
-										"offset": 0
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request - Query missing/invalid or limit over 1000",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "BAD_REQUEST",
-										"message": "Query is required"
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized - Missing or invalid API key",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "UNAUTHORIZED",
-										"message": "Missing authorization header"
-									}
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden - API key does not have query:read permission",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "FORBIDDEN",
-										"message": "API key does not have query:read permission"
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found - Project ID or read token not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "NOT_FOUND",
-										"message": "Project id or read token not found"
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Server Error - Failed to perform SQL query",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "INTERNAL_SERVER_ERROR",
-										"message": "Failed to perform SQL query"
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/v0/profiles/{id}": {
-			"get": {
-				"summary": "Get Wallet Profile",
-				"description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, on-chain activity, tokens, apps, and user engagement metrics. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
-				"operationId": "getWalletProfile",
-				"tags": ["Profile API"],
-				"servers": [
-					{
-						"url": "https://api.formo.so",
-						"description": "Profile API"
-					}
-				],
-				"security": [
-					{
-						"BearerAuth": []
-					}
-				],
-				"parameters": [
-					{
-						"name": "id",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "The wallet address to retrieve profile information for (must be a valid Ethereum address)"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successfully retrieved wallet profile",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ProfileResponse"
-								},
-								"example": {
-									"address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
-									"net_worth_usd": 125000.50,
-									"ens": "vitalik.eth",
-									"farcaster": null,
-									"lens": null,
-									"basenames": null,
-									"linea": null,
-									"discord": null,
-									"telegram": null,
-									"website": "https://example.com",
-									"github": "github.com/username",
-									"twitter": "@username",
-									"linkedin": null,
-									"email": null,
-									"instagram": null,
-									"facebook": null,
-									"tiktok": null,
-									"youtube": null,
-									"reddit": null,
-									"avatar": "https://example.com/avatar.png",
-									"description": "Wallet description",
-									"display_name": "Display Name",
-									"updated_at": "2025-01-20T14:22:00Z",
-									"tx_count": 1234,
-									"first_onchain": "2024-01-15T10:30:00Z",
-									"last_onchain": "2025-01-20T14:22:00Z",
-									"first_seen": "2024-01-15T10:30:00Z",
-									"last_seen": "2025-01-20T14:22:00Z",
-									"first_utm_source": "google",
-									"last_utm_source": "direct",
-									"first_utm_medium": "cpc",
-									"last_utm_medium": null,
-									"first_utm_campaign": "summer_sale",
-									"last_utm_campaign": null,
-									"first_utm_content": null,
-									"last_utm_content": null,
-									"first_utm_term": null,
-									"last_utm_term": null,
-									"first_referrer": "example.com",
-									"last_referrer": null,
-									"first_referrer_url": "https://example.com/page",
-									"last_referrer_url": null,
-									"first_ref": "ref123",
-									"last_ref": null,
-									"location": "US",
-									"device": "Desktop",
-									"browser": "Chrome",
-									"os": "macOS",
-									"last_type": "track",
-									"last_event": "Page Viewed",
-									"last_properties": "{\"page\":\"/home\"}",
-									"num_sessions": 45,
-									"revenue": 1500.75,
-									"volume": 50000.00,
-									"points": 2500,
-									"activity_dates": [
-										"2024-01-15",
-										"2024-01-16",
-										"2024-01-20"
-									],
-									"labels": [
-										{
-											"id": "label_123",
-											"value": "Whale",
-											"chain_id": "1",
-											"source": "manual"
-										}
-									],
-									"apps": [
-										{
-											"chain_id": "1",
-											"id": "uniswap",
-											"name": "Uniswap",
-											"img": "https://example.com/uniswap.png",
-											"url": "https://uniswap.org",
-											"balance_usd": 50000.00
-										}
-									],
-									"tokens": [
-										{
-											"chain_id": "1",
-											"token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-											"app_id": "usdc",
-											"name": "USD Coin",
-											"symbol": "USDC",
-											"img": "https://example.com/usdc.png",
-											"decimals": 6,
-											"price": 1.00,
-											"balance": "1000000000",
-											"balance_usd": 1000.00
-										}
-									]
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request - Invalid wallet address format",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "BAD_REQUEST",
-										"message": "Invalid wallet address format"
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized - Missing authorization header, invalid header format, or invalid API key",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"examples": {
-									"missingHeader": {
-										"summary": "Missing authorization header",
-										"value": {
-											"error": {
-												"code": "UNAUTHORIZED",
-												"message": "Missing authorization header"
-											}
-										}
-									},
-									"invalidFormat": {
-										"summary": "Invalid header format",
-										"value": {
-											"error": {
-												"code": "UNAUTHORIZED",
-												"message": "Invalid authorization header format"
-											}
-										}
-									},
-									"invalidKey": {
-										"summary": "Invalid API key",
-										"value": {
-											"error": {
-												"code": "UNAUTHORIZED",
-												"message": "Invalid workspace API key"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden - API key does not have profiles:read permission",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "FORBIDDEN",
-										"message": "API key does not have profiles:read permission"
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found - Wallet profile not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "PROFILE_NOT_FOUND",
-										"message": "Profile does not exist"
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Server Error - Failed to fetch wallet profile data",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RestApiErrorResponse"
-								},
-								"example": {
-									"error": {
-										"code": "INTERNAL_SERVER_ERROR",
-										"message": "Failed to fetch wallet profile data"
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Formo API",
+    "version": "1.0.0",
+    "description": "API for managing form webhook subscriptions, form responses, and event tracking"
+  },
+  "servers": [
+    {
+      "url": "https://api.formo.so/api",
+      "description": "Forms API"
+    },
+    {
+      "url": "https://events.formo.so",
+      "description": "Events API"
+    },
+    {
+      "url": "https://api.formo.so",
+      "description": "Profile API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Bearer token for authentication. Format: 'Bearer <token>'"
+      }
+    },
+    "schemas": {
+      "FormResponse": {
+        "type": "object",
+        "properties": {
+          "formId": {
+            "type": "string",
+            "description": "Unique identifier of the form"
+          },
+          "formTitle": {
+            "type": "string",
+            "description": "Title of the form"
+          },
+          "submissionId": {
+            "type": "string",
+            "description": "Unique identifier of the submission"
+          },
+          "submittedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of form submission"
+          }
+        },
+        "additionalProperties": true
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FormResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "EventContext": {
+        "type": "object",
+        "description": "Contextual information about the event",
+        "properties": {
+          "user_agent": {
+            "type": "string",
+            "description": "The user agent of the device"
+          },
+          "locale": {
+            "type": "string",
+            "description": "Language of the device (e.g., en-US, en-GB)"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Timezone of the user (e.g., America/New_York)"
+          },
+          "location": {
+            "type": "string",
+            "description": "Geographic location country code (e.g., US, NG)"
+          },
+          "ref": {
+            "type": "string",
+            "description": "Referral code or identifier"
+          },
+          "referrer": {
+            "type": "string",
+            "description": "The referrer URL where the user came from"
+          },
+          "utm_campaign": {
+            "type": "string",
+            "description": "UTM campaign parameter"
+          },
+          "utm_content": {
+            "type": "string",
+            "description": "UTM content parameter"
+          },
+          "utm_medium": {
+            "type": "string",
+            "description": "UTM medium parameter"
+          },
+          "utm_source": {
+            "type": "string",
+            "description": "UTM source parameter"
+          },
+          "utm_term": {
+            "type": "string",
+            "description": "UTM term parameter"
+          },
+          "page_title": {
+            "type": "string",
+            "description": "Title of the current page"
+          },
+          "page_url": {
+            "type": "string",
+            "description": "Full URL of the current page"
+          },
+          "library_name": {
+            "type": "string",
+            "description": "Name of the SDK used (e.g., Formo Web SDK)"
+          },
+          "library_version": {
+            "type": "string",
+            "description": "Version of the SDK used"
+          },
+          "browser": {
+            "type": "string",
+            "description": "Name of the browser (e.g., chrome, firefox, safari)"
+          },
+          "screen_width": {
+            "type": "integer",
+            "description": "Width of the device screen in pixels"
+          },
+          "screen_height": {
+            "type": "integer",
+            "description": "Height of the device screen in pixels"
+          },
+          "screen_density": {
+            "type": "number",
+            "description": "Pixel density of the device screen (devicePixelRatio)"
+          },
+          "viewport_width": {
+            "type": "integer",
+            "description": "Width of the browser viewport in pixels"
+          },
+          "viewport_height": {
+            "type": "integer",
+            "description": "Height of the browser viewport in pixels"
+          }
+        }
+      },
+      "EventProperties": {
+        "type": "object",
+        "description": "Event-specific properties. Can contain any key-value pairs relevant to the event.",
+        "additionalProperties": true
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "identify",
+              "track",
+              "page",
+              "connect",
+              "disconnect",
+              "detect",
+              "chain",
+              "signature",
+              "transaction"
+            ],
+            "description": "Type of the event"
+          },
+          "channel": {
+            "type": "string",
+            "enum": ["web", "mobile", "server"],
+            "description": "Channel/source of the event"
+          },
+          "version": {
+            "type": "string",
+            "description": "Event spec version"
+          },
+          "anonymous_id": {
+            "type": "string",
+            "description": "Pseudo-identifier for the user (device ID)"
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Unique user identifier"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true,
+            "description": "Wallet address"
+          },
+          "event": {
+            "type": "string",
+            "description": "Name of the event (for track events)"
+          },
+          "context": {
+            "$ref": "#/components/schemas/EventContext"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/EventProperties"
+          },
+          "original_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time when the event occurred on the client"
+          },
+          "sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time when the event was sent from the client"
+          },
+          "message_id": {
+            "type": "string",
+            "description": "Unique identifier for the event"
+          }
+        }
+      },
+      "WalletLabel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Label ID"
+          },
+          "value": {
+            "type": "string",
+            "description": "Label value"
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "Chain ID where label applies"
+          },
+          "source": {
+            "type": "string",
+            "description": "Label source (e.g., manual, automated)"
+          }
+        }
+      },
+      "WalletChain": {
+        "type": "object",
+        "properties": {
+          "chain_id": {
+            "type": "string",
+            "description": "Chain ID"
+          },
+          "net_worth_usd": {
+            "type": "number",
+            "description": "Net worth on this chain"
+          },
+          "tx_count": {
+            "type": "integer",
+            "description": "Transaction count on this chain"
+          },
+          "first_onchain": {
+            "type": "string",
+            "format": "date-time",
+            "description": "First activity on this chain"
+          },
+          "last_onchain": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last activity on this chain"
+          }
+        }
+      },
+      "WalletApp": {
+        "type": "object",
+        "properties": {
+          "chain_id": {
+            "type": "string",
+            "description": "Chain ID"
+          },
+          "id": {
+            "type": "string",
+            "description": "App ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "App name"
+          },
+          "img": {
+            "type": "string",
+            "nullable": true,
+            "description": "App image URL"
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "description": "App URL"
+          },
+          "balance_usd": {
+            "type": "number",
+            "description": "Balance in USD for this app"
+          }
+        }
+      },
+      "WalletToken": {
+        "type": "object",
+        "properties": {
+          "chain_id": {
+            "type": "string",
+            "description": "Chain ID"
+          },
+          "token_address": {
+            "type": "string",
+            "description": "Token contract address"
+          },
+          "app_id": {
+            "type": "string",
+            "description": "App ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Token name"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Token symbol"
+          },
+          "img": {
+            "type": "string",
+            "nullable": true,
+            "description": "Token image URL"
+          },
+          "decimals": {
+            "type": "integer",
+            "description": "Token decimals"
+          },
+          "price": {
+            "type": "number",
+            "description": "Token price in USD"
+          },
+          "balance": {
+            "type": "string",
+            "description": "Token balance (as string to preserve precision)"
+          },
+          "balance_usd": {
+            "type": "number",
+            "description": "Token balance value in USD"
+          }
+        }
+      },
+      "WalletProfile": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "The wallet address"
+          },
+          "net_worth_usd": {
+            "type": "number",
+            "description": "Total net worth in USD"
+          },
+          "ens": {
+            "type": "string",
+            "nullable": true,
+            "description": "ENS name"
+          },
+          "farcaster": {
+            "type": "string",
+            "nullable": true,
+            "description": "Farcaster username"
+          },
+          "lens": {
+            "type": "string",
+            "nullable": true,
+            "description": "Lens handle"
+          },
+          "basenames": {
+            "type": "string",
+            "nullable": true,
+            "description": "Base names"
+          },
+          "linea": {
+            "type": "string",
+            "nullable": true,
+            "description": "Linea identifier"
+          },
+          "discord": {
+            "type": "string",
+            "nullable": true,
+            "description": "Discord username"
+          },
+          "telegram": {
+            "type": "string",
+            "nullable": true,
+            "description": "Telegram username"
+          },
+          "website": {
+            "type": "string",
+            "nullable": true,
+            "description": "Website URL"
+          },
+          "github": {
+            "type": "string",
+            "nullable": true,
+            "description": "GitHub username"
+          },
+          "twitter": {
+            "type": "string",
+            "nullable": true,
+            "description": "Twitter/X handle"
+          },
+          "linkedin": {
+            "type": "string",
+            "nullable": true,
+            "description": "LinkedIn profile"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true,
+            "description": "Email address"
+          },
+          "instagram": {
+            "type": "string",
+            "nullable": true,
+            "description": "Instagram handle"
+          },
+          "facebook": {
+            "type": "string",
+            "nullable": true,
+            "description": "Facebook profile"
+          },
+          "tiktok": {
+            "type": "string",
+            "nullable": true,
+            "description": "TikTok handle"
+          },
+          "youtube": {
+            "type": "string",
+            "nullable": true,
+            "description": "YouTube channel"
+          },
+          "reddit": {
+            "type": "string",
+            "nullable": true,
+            "description": "Reddit username"
+          },
+          "avatar": {
+            "type": "string",
+            "nullable": true,
+            "description": "Avatar image URL"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Profile description"
+          },
+          "display_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Display name"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Last update timestamp (ISO 8601)"
+          },
+          "tx_count": {
+            "type": "integer",
+            "description": "Total transaction count"
+          },
+          "first_onchain": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "First on-chain activity timestamp (ISO 8601)"
+          },
+          "last_onchain": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Last on-chain activity timestamp (ISO 8601)"
+          },
+          "first_seen": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "First seen timestamp (ISO 8601)"
+          },
+          "last_seen": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Last seen timestamp (ISO 8601)"
+          },
+          "first_utm_source": {
+            "type": "string",
+            "nullable": true,
+            "description": "First UTM source"
+          },
+          "last_utm_source": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last UTM source"
+          },
+          "first_utm_medium": {
+            "type": "string",
+            "nullable": true,
+            "description": "First UTM medium"
+          },
+          "last_utm_medium": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last UTM medium"
+          },
+          "first_utm_campaign": {
+            "type": "string",
+            "nullable": true,
+            "description": "First UTM campaign"
+          },
+          "last_utm_campaign": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last UTM campaign"
+          },
+          "first_utm_content": {
+            "type": "string",
+            "nullable": true,
+            "description": "First UTM content"
+          },
+          "last_utm_content": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last UTM content"
+          },
+          "first_utm_term": {
+            "type": "string",
+            "nullable": true,
+            "description": "First UTM term"
+          },
+          "last_utm_term": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last UTM term"
+          },
+          "first_referrer": {
+            "type": "string",
+            "nullable": true,
+            "description": "First referrer domain"
+          },
+          "last_referrer": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last referrer domain"
+          },
+          "first_referrer_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "First referrer full URL"
+          },
+          "last_referrer_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last referrer full URL"
+          },
+          "first_ref": {
+            "type": "string",
+            "nullable": true,
+            "description": "First referral code"
+          },
+          "last_ref": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last referral code"
+          },
+          "location": {
+            "type": "string",
+            "nullable": true,
+            "description": "User location"
+          },
+          "device": {
+            "type": "string",
+            "nullable": true,
+            "description": "Device type"
+          },
+          "browser": {
+            "type": "string",
+            "nullable": true,
+            "description": "Browser name"
+          },
+          "os": {
+            "type": "string",
+            "nullable": true,
+            "description": "Operating system"
+          },
+          "last_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last event type"
+          },
+          "last_event": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last event name"
+          },
+          "last_properties": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last event properties (JSON string)"
+          },
+          "num_sessions": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Total number of sessions"
+          },
+          "revenue": {
+            "type": "number",
+            "nullable": true,
+            "description": "Total revenue"
+          },
+          "volume": {
+            "type": "number",
+            "nullable": true,
+            "description": "Total volume"
+          },
+          "points": {
+            "type": "number",
+            "nullable": true,
+            "description": "Total points"
+          },
+          "activity_dates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "nullable": true,
+            "description": "Array of activity dates (YYYY-MM-DD format)"
+          },
+          "lifecycle": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["Churned", "New", "Power user", "Resurrected", "Returning"],
+            "description": "User lifecycle stage based on activity patterns"
+          },
+          "chains": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletChain"
+            },
+            "nullable": true,
+            "description": "Array of per-chain wallet data (only included when expand=chains)"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletLabel"
+            },
+            "nullable": true,
+            "description": "Array of wallet labels (only included when expand=labels)"
+          },
+          "apps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletApp"
+            },
+            "nullable": true,
+            "description": "Array of wallet apps (only included when expand=apps)"
+          },
+          "tokens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletToken"
+            },
+            "nullable": true,
+            "description": "Array of wallet tokens (only included when expand=tokens)"
+          }
+        }
+      },
+      "ProfileResponse": {
+        "$ref": "#/components/schemas/WalletProfile"
+      },
+      "SearchProfileResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletProfile"
+            },
+            "description": "Array of wallet profiles matching the search criteria"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total number of profiles matching the criteria (before pagination)"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Maximum number of profiles returned in this response"
+              },
+              "offset": {
+                "type": "integer",
+                "description": "Number of profiles skipped (for pagination)"
+              }
+            },
+            "required": ["total", "limit", "offset"]
+          }
+        },
+        "required": ["data", "meta"]
+      },
+      "PerformSqlQueryPublicResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "Rows returned by the SQL query"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total rows available"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Limit inferred from the query"
+              },
+              "offset": {
+                "type": "integer",
+                "description": "Offset inferred from the query"
+              }
+            },
+            "required": ["total", "limit", "offset"]
+          }
+        },
+        "required": ["data", "meta"]
+      },
+      "RestApiErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error code"
+              },
+              "message": {
+                "type": "string",
+                "description": "Error message"
+              }
+            },
+            "required": ["code", "message"]
+          }
+        },
+        "required": ["error"]
+      },
+      "ErrorWithCode": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "BAD_REQUEST",
+              "UNAUTHORIZED",
+              "FORBIDDEN",
+              "NOT_FOUND",
+              "INTERNAL_SERVER_ERROR"
+            ]
+          }
+        },
+        "required": ["isSuccess", "message", "code"]
+      }
+    }
+  },
+  "paths": {
+    "/webhooks/{formId}/poll": {
+      "get": {
+        "summary": "List Form Responses",
+        "description": "Retrieves recent form responses with transformed field data",
+        "operationId": "listFormResponses",
+        "tags": ["Forms API"],
+        "servers": [
+          {
+            "url": "https://api.formo.so/api",
+            "description": "Forms API"
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "formId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved form responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Form ID is required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Form not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks": {
+      "post": {
+        "summary": "Subscribe to Form Events",
+        "description": "Creates a new webhook subscription for form events",
+        "operationId": "subscribeFormEvents",
+        "tags": ["Forms API"],
+        "servers": [
+          {
+            "url": "https://api.formo.so/api",
+            "description": "Forms API"
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["formId", "targetUrl", "eventTypes"],
+                "properties": {
+                  "formId": {
+                    "type": "string",
+                    "description": "The unique identifier of the form"
+                  },
+                  "targetUrl": {
+                    "type": "string",
+                    "description": "The URL that will receive webhook events"
+                  },
+                  "eventTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["FORM_SUBMISSION", "FORM_UPDATED"]
+                    },
+                    "description": "Types of events to subscribe to"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully subscribed to webhook",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "webhookId": {
+                          "type": "string",
+                          "description": "Unique identifier of the webhook subscription"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing required fields or invalid event types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Unsubscribe from Form Events",
+        "description": "Removes a webhook subscription",
+        "operationId": "unsubscribeFormEvents",
+        "tags": ["Forms API"],
+        "servers": [
+          {
+            "url": "https://api.formo.so/api",
+            "description": "Forms API"
+          }
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "webhookId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the webhook subscription"
+          },
+          {
+            "name": "targetUrl",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL that receives webhook events"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully unsubscribed from webhook",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Webhook unsubscribed successfully"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Webhook not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/raw_events": {
+      "post": {
+        "summary": "Track Event",
+        "description": "Sends an event to the Formo Events API. Use the SDK Write Key from your project settings as the Bearer token for authentication.",
+        "operationId": "trackEvent",
+        "tags": ["Events API"],
+        "servers": [
+          {
+            "url": "https://events.formo.so",
+            "description": "Events API"
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Event"
+              },
+              "example": {
+                "type": "page",
+                "channel": "web",
+                "version": "0",
+                "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
+                "user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
+                "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+                "event": "",
+                "context": {
+                  "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+                  "locale": "en-GB",
+                  "timezone": "Africa/Lagos",
+                  "location": "NG",
+                  "ref": "",
+                  "referrer": "",
+                  "utm_campaign": "",
+                  "utm_content": "",
+                  "utm_medium": "",
+                  "utm_source": "",
+                  "utm_term": "",
+                  "page_title": "WalletConnect Content Cabal",
+                  "page_url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+                  "library_name": "Formo Web SDK",
+                  "library_version": "1.25.0",
+                  "browser": "chrome",
+                  "screen_width": 393,
+                  "screen_height": 873,
+                  "screen_density": 2.75,
+                  "viewport_width": 392,
+                  "viewport_height": 735
+                },
+                "properties": {
+                  "url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+                  "path": "/lByfTbeUSL_mxy_TN2m3d",
+                  "hash": "",
+                  "query": ""
+                },
+                "original_timestamp": "2025-04-23T13:15:17.000Z",
+                "sent_at": "2025-04-23T13:15:18.000Z",
+                "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event successfully tracked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "successful_rows": {
+                      "type": "integer",
+                      "description": "Number of events successfully ingested",
+                      "example": 1
+                    },
+                    "quarantined_rows": {
+                      "type": "integer",
+                      "description": "Number of events that failed validation and were quarantined",
+                      "example": 0
+                    }
+                  }
+                },
+                "example": {
+                  "successful_rows": 1,
+                  "quarantined_rows": 0
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid event data"
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid Bearer token"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/v0/query": {
+      "post": {
+        "summary": "Run SQL query",
+        "description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements, and must include a LIMIT that is less than or equal to 1000.",
+        "operationId": "performSqlQueryPublic",
+        "tags": ["Query API"],
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query API"
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "SQL query to execute. Must be read-only (SELECT/WITH), single statement, no comments, and include LIMIT <= 1000."
+                  }
+                },
+                "required": ["query"]
+              },
+              "example": {
+                "query": "SELECT * FROM events LIMIT 100"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully executed SQL query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerformSqlQueryPublicResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "event": "page",
+                      "address": "0x123...",
+                      "timestamp": "2025-01-20T10:00:00Z"
+                    }
+                  ],
+                  "meta": {
+                    "total": 120,
+                    "limit": 100,
+                    "offset": 0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Query missing/invalid or limit over 1000",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "Query is required"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "UNAUTHORIZED",
+                    "message": "Missing authorization header"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have query:read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "API key does not have query:read permission"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Project ID or read token not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "NOT_FOUND",
+                    "message": "Project id or read token not found"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error - Failed to perform SQL query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "INTERNAL_SERVER_ERROR",
+                    "message": "Failed to perform SQL query"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/profiles": {
+      "get": {
+        "summary": "Search Wallet Profiles",
+        "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports filtering by address, on-chain activity, user engagement data, social profiles, and per-chain metrics. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
+        "operationId": "searchWalletProfiles",
+        "tags": ["Profile API"],
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Profile API"
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by specific wallet address (exact match)"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON array of filter conditions for user engagement data. Each filter object has: field (e.g., 'revenue', 'num_sessions', 'first_seen', 'last_seen'), operator ('=', '!=', '>', '<', '>=', '<=', 'contains', 'not_contains'), and value. Example: [{\"field\":\"revenue\",\"operator\":\">\",\"value\":100}]"
+          },
+          {
+            "name": "profile_filters",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON array of filter conditions for on-chain profile data. Each filter object has: field (e.g., 'net_worth_usd', 'tx_count', 'first_onchain', 'last_onchain'), operator, and value. Example: [{\"field\":\"net_worth_usd\",\"operator\":\">\",\"value\":1000}]"
+          },
+          {
+            "name": "socials",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON array of social profile filters. Each filter object has: field (e.g., 'ens', 'farcaster', 'twitter', 'discord', 'telegram', 'lens', 'email'), operator ('exists', 'not_exists', '=', 'contains'), and optional value. Example: [{\"field\":\"ens\",\"operator\":\"exists\"}]"
+          },
+          {
+            "name": "chain_filters",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON array of per-chain filter conditions. Each filter object has: chain_id, field (e.g., 'net_worth_usd', 'tx_count'), operator, and value. Example: [{\"chain_id\":\"1\",\"field\":\"tx_count\",\"operator\":\">\",\"value\":10}]"
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated list of additional data to include in each profile. Valid options: apps, chains, tokens, labels. Example: expand=apps,chains"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["last_onchain", "first_onchain", "net_worth_usd", "updated_at", "tx_count"]
+            },
+            "description": "Field to sort results by. Default: last_onchain"
+          },
+          {
+            "name": "order_dir",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            },
+            "description": "Sort direction. Default: desc"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100
+            },
+            "description": "Maximum number of profiles to return. Default: 100, Maximum: 1000"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Number of profiles to skip for pagination. Default: 0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved wallet profiles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchProfileResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+                      "net_worth_usd": 125000.5,
+                      "ens": "vitalik.eth",
+                      "farcaster": null,
+                      "lens": null,
+                      "basenames": null,
+                      "linea": null,
+                      "discord": null,
+                      "telegram": null,
+                      "website": "https://example.com",
+                      "github": "github.com/username",
+                      "twitter": "@username",
+                      "linkedin": null,
+                      "email": null,
+                      "instagram": null,
+                      "facebook": null,
+                      "tiktok": null,
+                      "youtube": null,
+                      "reddit": null,
+                      "avatar": "https://example.com/avatar.png",
+                      "description": "Wallet description",
+                      "display_name": "Display Name",
+                      "updated_at": "2025-01-20T14:22:00Z",
+                      "tx_count": 1234,
+                      "first_onchain": "2024-01-15T10:30:00Z",
+                      "last_onchain": "2025-01-20T14:22:00Z",
+                      "lifecycle": "Returning"
+                    }
+                  ],
+                  "meta": {
+                    "total": 150,
+                    "limit": 100,
+                    "offset": 0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid query parameters or filter JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "examples": {
+                  "invalidFilters": {
+                    "summary": "Invalid filters JSON",
+                    "value": {
+                      "error": {
+                        "code": "BAD_REQUEST",
+                        "message": "Invalid filters JSON"
+                      }
+                    }
+                  },
+                  "invalidProfileFilters": {
+                    "summary": "Invalid profile_filters JSON",
+                    "value": {
+                      "error": {
+                        "code": "BAD_REQUEST",
+                        "message": "Invalid profile_filters JSON"
+                      }
+                    }
+                  },
+                  "invalidSocials": {
+                    "summary": "Invalid socials JSON",
+                    "value": {
+                      "error": {
+                        "code": "BAD_REQUEST",
+                        "message": "Invalid socials JSON"
+                      }
+                    }
+                  },
+                  "invalidChainFilters": {
+                    "summary": "Invalid chain_filters JSON",
+                    "value": {
+                      "error": {
+                        "code": "BAD_REQUEST",
+                        "message": "Invalid chain_filters JSON"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing authorization header, invalid header format, or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "examples": {
+                  "missingHeader": {
+                    "summary": "Missing authorization header",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Missing authorization header"
+                      }
+                    }
+                  },
+                  "invalidFormat": {
+                    "summary": "Invalid header format",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Invalid authorization header format"
+                      }
+                    }
+                  },
+                  "invalidKey": {
+                    "summary": "Invalid API key",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Invalid workspace API key"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have profiles:read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "API key does not have profiles:read permission"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error - Failed to fetch wallet profile data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "INTERNAL_SERVER_ERROR",
+                    "message": "Failed to fetch wallet profile data"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/profiles/{id}": {
+      "get": {
+        "summary": "Get Wallet Profile",
+        "description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, on-chain activity, tokens, apps, and user engagement metrics. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
+        "operationId": "getWalletProfile",
+        "tags": ["Profile API"],
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Profile API"
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The wallet address to retrieve profile information for (must be a valid Ethereum address)"
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated list of additional data to include in the response. Valid options: apps, chains, tokens, labels. Example: expand=apps,chains,tokens,labels"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved wallet profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                },
+                "example": {
+                  "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+                  "net_worth_usd": 125000.5,
+                  "ens": "vitalik.eth",
+                  "farcaster": null,
+                  "lens": null,
+                  "basenames": null,
+                  "linea": null,
+                  "discord": null,
+                  "telegram": null,
+                  "website": "https://example.com",
+                  "github": "github.com/username",
+                  "twitter": "@username",
+                  "linkedin": null,
+                  "email": null,
+                  "instagram": null,
+                  "facebook": null,
+                  "tiktok": null,
+                  "youtube": null,
+                  "reddit": null,
+                  "avatar": "https://example.com/avatar.png",
+                  "description": "Wallet description",
+                  "display_name": "Display Name",
+                  "updated_at": "2025-01-20T14:22:00Z",
+                  "tx_count": 1234,
+                  "first_onchain": "2024-01-15T10:30:00Z",
+                  "last_onchain": "2025-01-20T14:22:00Z",
+                  "first_seen": "2024-01-15T10:30:00Z",
+                  "last_seen": "2025-01-20T14:22:00Z",
+                  "first_utm_source": "google",
+                  "last_utm_source": "direct",
+                  "first_utm_medium": "cpc",
+                  "last_utm_medium": null,
+                  "first_utm_campaign": "summer_sale",
+                  "last_utm_campaign": null,
+                  "first_utm_content": null,
+                  "last_utm_content": null,
+                  "first_utm_term": null,
+                  "last_utm_term": null,
+                  "first_referrer": "example.com",
+                  "last_referrer": null,
+                  "first_referrer_url": "https://example.com/page",
+                  "last_referrer_url": null,
+                  "first_ref": "ref123",
+                  "last_ref": null,
+                  "location": "US",
+                  "device": "Desktop",
+                  "browser": "Chrome",
+                  "os": "macOS",
+                  "last_type": "track",
+                  "last_event": "Page Viewed",
+                  "last_properties": "{\"page\":\"/home\"}",
+                  "num_sessions": 45,
+                  "revenue": 1500.75,
+                  "volume": 50000.0,
+                  "points": 2500,
+                  "activity_dates": ["2024-01-15", "2024-01-16", "2024-01-20"],
+                  "lifecycle": "Returning",
+                  "chains": [
+                    {
+                      "chain_id": "1",
+                      "net_worth_usd": 100000.0,
+                      "tx_count": 1000,
+                      "first_onchain": "2024-01-15T10:30:00Z",
+                      "last_onchain": "2025-01-20T14:22:00Z"
+                    },
+                    {
+                      "chain_id": "137",
+                      "net_worth_usd": 25000.5,
+                      "tx_count": 234,
+                      "first_onchain": "2024-03-01T08:00:00Z",
+                      "last_onchain": "2025-01-18T12:00:00Z"
+                    }
+                  ],
+                  "labels": [
+                    {
+                      "id": "label_123",
+                      "value": "Whale",
+                      "chain_id": "1",
+                      "source": "manual"
+                    }
+                  ],
+                  "apps": [
+                    {
+                      "chain_id": "1",
+                      "id": "uniswap",
+                      "name": "Uniswap",
+                      "img": "https://example.com/uniswap.png",
+                      "url": "https://uniswap.org",
+                      "balance_usd": 50000.0
+                    }
+                  ],
+                  "tokens": [
+                    {
+                      "chain_id": "1",
+                      "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                      "app_id": "usdc",
+                      "name": "USD Coin",
+                      "symbol": "USDC",
+                      "img": "https://example.com/usdc.png",
+                      "decimals": 6,
+                      "price": 1.0,
+                      "balance": "1000000000",
+                      "balance_usd": 1000.0
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid wallet address format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "Invalid wallet address format"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing authorization header, invalid header format, or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "examples": {
+                  "missingHeader": {
+                    "summary": "Missing authorization header",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Missing authorization header"
+                      }
+                    }
+                  },
+                  "invalidFormat": {
+                    "summary": "Invalid header format",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Invalid authorization header format"
+                      }
+                    }
+                  },
+                  "invalidKey": {
+                    "summary": "Invalid API key",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Invalid workspace API key"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have profiles:read permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "FORBIDDEN",
+                    "message": "API key does not have profiles:read permission"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Wallet profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "PROFILE_NOT_FOUND",
+                    "message": "Profile does not exist"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error - Failed to fetch wallet profile data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "INTERNAL_SERVER_ERROR",
+                    "message": "Failed to fetch wallet profile data"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
