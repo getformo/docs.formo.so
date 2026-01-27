@@ -37,9 +37,9 @@ Formo supports token gating, giving you full control over who can access your fo
 </Frame>
 
 Your form will verify that responders fulfill your requirements before continuing. 
-Formo currently supports [15+ chains](/chains/overview).
+Formo currently supports [40+ chains](/chains/overview).
 
-Choose from different types of token gating requirements, such as ERC20, NFT, proof-of-personhood, and onchain attestations:
+Choose from different types of token gating requirements, such as ERC-20, NFT, Contract Read, proof-of-personhood, and onchain attestations:
 
 <Frame>
 	<img src="/images/token-gated-forms-token-gate-2.png" alt="Token Gated Form Builder" />
@@ -51,3 +51,90 @@ Token gating allows you to restrict form access based on blockchain-based requir
 This powerful feature enables you to create exclusive experiences for your token holders, NFT collectors, or verified community members. 
 
 Whether you're running a token-gated waitlist, collecting feedback from your NFT holders, or creating exclusive surveys for your community, Formo's token gating makes it easy to verify onchain credentials.
+
+## Contract Read
+
+Gate form access based on any smart contract's read function. This is useful for verifying staking balances, governance power, protocol participation, or any other onchain state that can be queried from a contract.
+
+### How it works
+
+Contract Read calls a read-only function on a smart contract and compares the result against a value you specify. The responder's wallet address can be passed as a function argument using the `{{address}}` placeholder.
+
+**Example:** Require that the responder has staked at least 100 WCT tokens by reading the `stakedBalance(address)` function.
+
+### Setup
+
+<Steps>
+  <Step title="Add a Contract Read requirement">
+    In your form settings, click **Add Requirement** and select **Contract Read**.
+  </Step>
+  <Step title="Select the chain">
+    Choose the chain where your contract is deployed (Ethereum, Base, Arbitrum, etc.)
+  </Step>
+  <Step title="Enter the contract address">
+    Paste the smart contract address (e.g., `0x1234...abcd`).
+  </Step>
+  <Step title="Provide the ABI">
+    Paste the contract ABI (JSON format). For verified contracts, you can copy the ABI from Etherscan.
+  </Step>
+  <Step title="Select a function">
+    Choose a read-only function from the ABI. Only `view` and `pure` functions are available.
+  </Step>
+  <Step title="Configure function arguments">
+    Enter the function arguments. Use `{{address}}` as a placeholder for the responder's wallet address.
+  </Step>
+  <Step title="Set the condition">
+    Choose a comparison operator and the expected value:
+
+    | Operator | Meaning |
+    |----------|---------|
+    | `>` | Greater than |
+    | `>=` | Greater than or equal |
+    | `<` | Less than |
+    | `<=` | Less than or equal |
+    | `==` | Equal to |
+    | `!=` | Not equal to |
+
+  </Step>
+  <Step title="Publish">
+    Publish your form. Formo will verify each responder's wallet against the contract before allowing submission.
+  </Step>
+</Steps>
+
+### Example: Staking requirement
+
+Gate access to users who have staked at least 100 tokens:
+
+| Field | Value |
+|-------|-------|
+| Chain | Ethereum |
+| Contract address | Your staking contract |
+| Function | `stakedBalance(address)` |
+| Arguments | `{{address}}` |
+| Operator | `>=` |
+| Value | `100000000000000000000` (100 tokens with 18 decimals) |
+
+<Tip>
+Values are compared as raw integers. For ERC-20 tokens with 18 decimals, 100 tokens = `100000000000000000000` (100 * 10^18). You can use scientific notation like `1e20`.
+</Tip>
+
+### Example: Governance power
+
+Require a minimum voting power to access a governance feedback form:
+
+| Field | Value |
+|-------|-------|
+| Chain | Base |
+| Contract address | Your governance token |
+| Function | `getVotes(address)` |
+| Arguments | `{{address}}` |
+| Operator | `>=` |
+| Value | `1000000000000000000000` (1000 tokens) |
+
+### Supported functions
+
+Contract Read supports any `view` or `pure` function that:
+- Returns a single scalar value (number, boolean, address, or string)
+- Takes scalar input parameters (no arrays or structs)
+
+Common use cases include `balanceOf`, `stakedBalance`, `getVotes`, `isWhitelisted`, `hasRole`, and any custom getter function on your contract.

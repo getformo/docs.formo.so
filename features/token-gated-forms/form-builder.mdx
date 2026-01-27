@@ -84,6 +84,14 @@ To restrict form access based on token ownership:
     - Paste the NFT contract address
     - Optionally set minimum quantity
   </Tab>
+  <Tab title="Contract Read">
+    - Select **Contract Read** as the type
+    - Choose the chain
+    - Paste the contract address and ABI
+    - Select a read function (e.g., `balanceOf`, `stakedAmount`)
+    - Set the comparison operator and expected value
+    - See [Contract Read guide](/features/token-gated-forms/token-gating#contract-read)
+  </Tab>
   <Tab title="World ID">
     - Select **World ID** as the type
     - Users must verify with World ID before submitting
