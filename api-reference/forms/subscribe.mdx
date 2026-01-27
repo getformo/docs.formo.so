@@ -18,7 +18,8 @@ Creates or updates a webhook subscription for receiving form events.
 
 ## Notes
 
--   If a webhook subscription already exists for the same form and target URL, the event types will be merged with existing ones
+-   Returns `201` when a new webhook is created, or `200` when new event types are merged into an existing webhook for the same form and target URL
+-   If a webhook already exists with the exact same event types, the request is rejected with a `400` error
 -   Duplicate event types are automatically removed
 -   Only `FORM_SUBMISSION` and `FORM_UPDATED` are valid event types
 -   The webhook will be automatically activated upon creation

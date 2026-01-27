@@ -5,9 +5,9 @@ icon: key
 iconType: solid
 ---
 
-All API endpoints require authentication using either: 
+All API endpoints require authentication using either:
 - a **SDK Write Key** to send events
-- a **Workspace API Key** to manage forms
+- a **Workspace API Key** to query data, fetch profiles, and manage forms
 
 You'll need to include the key or token in the request headers for all API calls.
 
@@ -48,11 +48,25 @@ The API Key must include the correct Read / Write scope for the API you are call
 	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
 </Frame>
 
-Include the API key in your request headers:
+The Workspace API Key is used with **two different header formats** depending on the API:
+
+#### Profiles API and Query API
+
+Send the key as a Bearer token:
+
+```bash
+Authorization: Bearer <your_workspace_api_key>
+```
+
+#### Forms API (Webhooks)
+
+Send the key in the `x-api-key` header:
 
 ```bash
 x-api-key: <your_workspace_api_key>
 ```
+
+### Verify Your API Key
 
 Call this endpoint with the workspace API key to view your workspace details.
 
