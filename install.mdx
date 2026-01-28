@@ -27,9 +27,9 @@ Use this pre-built prompt to get started faster: [Open in Cursor](https://cursor
 
   **Choose the right method based on the project:**
 
-  - **Wagmi (React)** — Recommended for dApps and apps with wallet connection (RainbowKit, ConnectKit, Reown, etc.)
-  - **React (without Wagmi)** — For standalone React apps without Wagmi
-  - **Next.js** — For Next.js apps (App Router or Pages Router). Requires a client component wrapper.
+  - **Wagmi (React)** - Recommended for dApps and apps with wallet connection (RainbowKit, ConnectKit, Reown, etc.)
+  - **React (without Wagmi)** - For standalone React apps without Wagmi
+  - **Next.js** - For Next.js apps (App Router or Pages Router). Requires a client component wrapper.
 
   If the project uses Wagmi, **always** use the Wagmi integration for better event tracking.
 
@@ -41,7 +41,7 @@ Use this pre-built prompt to get started faster: [Open in Cursor](https://cursor
 
   ## **2. Quickstart by Framework**
 
-  ### **Option A: Wagmi (React) — Recommended for dApps**
+  ### **Option A: Wagmi (React) - Recommended for dApps**
 
   npm install @formo/analytics --save
 
@@ -124,7 +124,7 @@ Use this pre-built prompt to get started faster: [Open in Cursor](https://cursor
     );
   }
 
-  Key: `FormoAnalyticsProvider` is a client component — it **must** be wrapped in a `'use client'` component. Do not use it directly in `app/layout.tsx`.
+  Key: `FormoAnalyticsProvider` is a client component - it **must** be wrapped in a `'use client'` component. Do not use it directly in `app/layout.tsx`.
 
   ### **Option D: Next.js (Pages Router)**
 
@@ -217,22 +217,22 @@ Use this pre-built prompt to get started faster: [Open in Cursor](https://cursor
   9. **Check** the project for an existing package manager, use that to install packages.
 
   ### **5.2 – NEVER DO THE FOLLOWING**
-  1. **Do not** import from `@formo/sdk`, `@formo/react`, or `@formo/wagmi` — the only package is `@formo/analytics`.
-  2. **Do not** use `useAnalytics()` — the correct hook is `useFormo()`.
+  1. **Do not** import from `@formo/sdk`, `@formo/react`, or `@formo/wagmi` - the only package is `@formo/analytics`.
+  2. **Do not** use `useAnalytics()` - the correct hook is `useFormo()`.
   3. **Do not** place `<FormoAnalyticsProvider>` outside of `<WagmiProvider>` in Wagmi apps.
-  4. **Do not** use `<FormoAnalyticsProvider>` directly in `app/layout.tsx` — it needs a `'use client'` wrapper.
-  5. **Do not** use `useFormo()` in Next.js Server Components — it only works in Client Components.
+  4. **Do not** use `<FormoAnalyticsProvider>` directly in `app/layout.tsx` - it needs a `'use client'` wrapper.
+  5. **Do not** use `useFormo()` in Next.js Server Components - it only works in Client Components.
   6. **Do not** mix App Router (`app/layout.tsx`) and Pages Router (`pages/_app.tsx`) patterns.
 
   ### **5.3 – OUTDATED PATTERNS TO AVOID**
   // ❌ Wrong packages:
   import { FormoAnalytics } from '@formo/sdk'
   import { FormoProvider } from '@formo/react'
-  import { useAnalytics } from '@formo/analytics' // Wrong hook name — use useFormo()
+  import { useAnalytics } from '@formo/analytics' // Wrong hook name - use useFormo()
   // ❌ Wrong provider order (Wagmi):
   <FormoAnalyticsProvider><WagmiProvider><App /></WagmiProvider></FormoAnalyticsProvider>
   // ❌ Missing 'use client' (Next.js App Router):
-  // app/layout.tsx — FormoAnalyticsProvider directly here will fail
+  // app/layout.tsx - FormoAnalyticsProvider directly here will fail
 
   ---
 

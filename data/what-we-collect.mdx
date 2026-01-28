@@ -60,7 +60,7 @@ Here's a comparison of how Formo compares to other analytics tools:
 
 | Data type | Collected? |
 | :--- | :--- |
-| IP addresses | **No** — discarded after session hashing |
+| IP addresses | **No** - discarded after session hashing |
 | Device fingerprints (Canvas, WebGL) | **No** |
 | Third-party cookies | **No** |
 | Email addresses | **No** |
@@ -90,7 +90,7 @@ To count unique visitors, we generate a daily-changing identifier on the server 
 hash(daily_salt + website_domain + ip_address + user_agent)
 ```
 
-This hash is a **one-way function** — it cannot be reversed to recover the original IP address or user-agent. The salt rotates every 24 hours, making cross-day correlation impossible.
+This hash is a **one-way function** - it cannot be reversed to recover the original IP address or user-agent. The salt rotates every 24 hours, making cross-day correlation impossible.
 
 ### NO Third-party Cookies
 
@@ -102,11 +102,30 @@ We care about the privacy of your visitors. Cookies are something that can track
 
 We do use first-party cookies to support cross-subdomain tracking. This is necessary to see when visitors go from your site (formo.so) to your app (app.formo.so).
 
+### No PII
+
+> We do NOT collect personally identifiable information.
+
+Wallet addresses are **pseudo-anonymous identifiers** - similar to session IDs. They are not inherently linked to a person's real-world identity.
+
+However, we recognize that under certain privacy frameworks (including GDPR), wallet addresses that *can* be linked to an individual may be considered personal data.
+
+**How Formo handles this:**
+
+- The SDK collects wallet addresses as analytics identifiers, not for personal identification
+- We do **not** collect social profiles (Twitter, Discord, email) through the SDK
+- If the Formo dashboard displays ENS names or social handles, this data is resolved from **public data sources** (e.g. ENS registry, Farcaster) - not collected by the SDK from your users
+- We do not correlate wallet addresses with off-chain personal data, through probabilistic matching or any other means.
+
+<Info>
+Public blockchain data (wallet addresses, ENS names, onchain social profiles) is already visible to anyone via block explorers like Etherscan. Formo does not create new data linkages, it surfaces data that is publicly available.
+</Info>
+
 ### User Agent
 
 > We collect and store the user agent and browser type.
 
-The SDK sends the full user-agent string (`navigator.userAgent`) and a classified browser type (e.g. `chrome`, `firefox`, `safari`). Both are stored.
+The SDK sends the full user-agent string (`navigator.userAgent`) and a browser type (e.g. `chrome`, `firefox`, `safari`). Both are stored.
 
 User agents are standard browser identifiers that websites use to understand which browsers and devices visitors are using. They are not unique enough to identify individuals on their own.
 
@@ -220,21 +239,3 @@ If you use [Token Gated Forms](/features/token-gated-forms/form-builder), any da
 
 You are responsible for ensuring that sensitive data is not collected through forms without appropriate legal basis and explicit consent.
 
----
-
-### PII and Wallet Addresses
-
-Wallet addresses are **pseudo-anonymous identifiers** — similar to session IDs. They are not inherently linked to a person's real-world identity.
-
-However, we recognize that under certain privacy frameworks (including GDPR), wallet addresses that *can* be linked to an individual may be considered personal data.
-
-**How Formo handles this:**
-
-- The SDK collects wallet addresses as analytics identifiers, not for personal identification
-- We do **not** collect social profiles (Twitter, Discord, email) through the SDK
-- If the Formo dashboard displays ENS names or social handles, this data is resolved from **public on-chain sources** (e.g. ENS registry, Farcaster) — not collected by the SDK from your users
-- We do not correlate wallet addresses with off-chain personal data, through probabilistic matching or any other means.
-
-<Info>
-Public blockchain data (wallet addresses, ENS names, onchain social profiles) is already visible to anyone via block explorers like Etherscan and the ENS protocol. Formo does not create new data linkages, it surfaces data that is already public for accessibility.
-</Info>

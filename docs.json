@@ -96,7 +96,7 @@
         "groups": [
           {
             "group": "Methodology",
-            "pages": ["data/attribution", "data/what-we-collect"]
+            "pages": ["data/what-we-collect", "data/attribution"]
           },
           {
             "group": "Data",

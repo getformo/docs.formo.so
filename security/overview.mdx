@@ -66,11 +66,11 @@ There are two ways to install the Formo SDK, each with different security proper
 
 | Method | MITM Protection | Supply Chain Verification |
 | :--- | :--- | :--- |
-| **NPM package** (`npm install @formo/analytics`) | Script is bundled into your own assets — no third-party script loading at runtime | npm integrity checks (SHA-512) + [provenance attestations](https://www.npmjs.com/package/@formo/analytics#provenance) verify the package came from GitHub |
+| **NPM package** (`npm install @formo/analytics`) | Script is bundled into your own assets - no third-party script loading at runtime | npm integrity checks (SHA-512) + [provenance attestations](https://www.npmjs.com/package/@formo/analytics#provenance) verify the package came from GitHub |
 | **CDN script tag** | Enable [SRI](/security/sri) + [CSP](/security/csp) for cryptographic verification | SRI hash verifies the script before browser execution |
 
 <Tip>
-**For security-sensitive deployments**, we recommend the NPM package install. When you install via `npm install @formo/analytics` and bundle the SDK into your own application, there is no third-party script loaded at runtime — eliminating the MITM vector entirely. The code is verified by npm's integrity checks during install and served from your own domain.
+**For security-sensitive deployments**, we recommend the NPM package install. When you install via `npm install @formo/analytics` and bundle the SDK into your own application, there is no third-party script loaded at runtime - eliminating the MITM vector entirely. The code is verified by npm's integrity checks during install and served from your own domain.
 </Tip>
 
 For the CDN script tag method, enable [SRI](/security/sri) and [CSP](/security/csp) for equivalent protection. See the [complete secure installation](/security/csp#complete-secure-installation) guide.
