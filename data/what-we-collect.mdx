@@ -4,43 +4,113 @@ icon: cubes-stacked
 description: 'Learn about what data Formo collects and how we protect user privacy.'
 ---
 
-### NO Third-party Cookies
+### Data Flow
 
-> We do NOT read nor set any third-party cookies.
+This diagram shows how data flows from the user's browser through the Formo SDK to our infrastructure.
 
-We care about the privacy of your visitors. Cookies are something that can track visitors across multiple websites and domains. 
+```mermaid
+flowchart TD
+    subgraph Browser ["User's Browser"]
+        SDK["Formo SDK"]
+        Q["Event Queue<br/>(batched, deduplicated)"]
+        SDK --> Q
+    end
 
-*We do not store, use, retrieve, nor extract third-party cookies from visitor’s devices.*
+    subgraph Formo ["Formo Infrastructure (AWS)"]
+        API["events.formo.so<br/>Ingestion API"]
+        HASH["Session Hashing<br/>hash(salt + domain + ip + ua)"]
+        DISCARD["Raw IP discarded"]
+        STORE["Encrypted Storage<br/>(AES-256 at rest)"]
+        API --> HASH
+        HASH --> DISCARD
+        HASH --> STORE
+    end
 
-We do use first-party cookies to support cross-subdomain tracking. This is necessary to see when visitors go from your site (formo.so) to your app (app.formo.so).
+    Q -- "HTTPS POST (TLS 1.2+)<br/>Bearer token auth" --> API
+
+    style Browser fill:#f0f9ff,stroke:#0D9373
+    style Formo fill:#f0fdf4,stroke:#0D9373
+    style DISCARD fill:#fef2f2,stroke:#dc2626
+```
+
+**What the SDK sends:** event type, anonymous session ID, wallet address, chain ID, user agent, browser type, timezone, language, page URL, UTM parameters, and custom event properties.
+
+**What the SDK does NOT send:** IP addresses, cookies, local storage data, device fingerprints, or social profiles.
+
+**What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only to compute a daily-rotating session hash for unique visitor counting, then discards it. The raw IP address is never stored in logs or databases.
+
+### Comparison
+
+Here's a comparison of how Formo compares to other analytics tools:
+
+| Data point | Formo | Google Analytics 4 | Plausible | Umami |
+| :--- | :--- | :--- | :--- | :--- |
+| IP address stored | No | [Yes (anonymized)](https://support.google.com/analytics/answer/2763052) | No | No |
+| Device fingerprinting | No | [Yes](https://support.google.com/analytics/answer/11593727) | No | No |
+| Third-party cookies | No | [Yes](https://developers.google.com/analytics/devguides/collection/ga4/cookies-user-id) | No | No |
+| Full user-agent stored | Yes | Yes | No | Yes |
+| Cross-site tracking | No | Yes | No | No |
+| Requires cookie consent banner | No | Yes (in EU) | No | No |
+| GDPR-compliant by default | Yes | [No (requires configuration)](https://support.google.com/analytics/answer/9019185) | Yes | Yes |
+| Open source SDK | Yes | No | Yes | Yes |
+| Self-hostable | No | No | Yes | Yes |
+| Blockchain-native analytics | Yes | No | No | No |
+
+### What We Do NOT Collect
+
+| Data type | Collected? |
+| :--- | :--- |
+| IP addresses | **No** — discarded after session hashing |
+| Device fingerprints (Canvas, WebGL) | **No** |
+| Third-party cookies | **No** |
+| Email addresses | **No** |
+| Phone numbers | **No** |
+| Social profiles (Twitter, Discord) | **No** |
+| Passwords or credentials | **No** |
+| Local storage or IndexedDB contents | **No** |
+| Cross-site tracking identifiers | **No** |
+
+---
+
+### NO IP Addresses
+
+> We do NOT store IP addresses.
+
+Every HTTP request to any server (including GA4, Umami, and Plausible) includes the sender's IP address as part of the protocol. Our server uses the IP address **only** to compute the daily session hash above, then discards it. The raw IP address is never written to logs, databases, or anywhere on disk.
 
 ### NO Fingerprinting
 
 > We do NOT use device or browser fingerprinting.
-We do not attempt to generate a device-persistent identifier because they are considered personal data under GDPR. 
 
-To count user sessions, we generate a daily changing identifier using the visitor’s IP address and User-Agent. Every single HTTP request sends this information to the server so that’s what we use. 
+We do not attempt to generate a device-persistent identifier because they are considered personal data under GDPR.
+
+To count unique visitors, we generate a daily-changing identifier on the server using data from standard HTTP headers:
 
 ```
 hash(daily_salt + website_domain + ip_address + user_agent)
 ```
 
-To anonymize these datapoints and make them impossible to relate back to the user, we run them through a hash function with a rotating salt.
+This hash is a **one-way function** — it cannot be reversed to recover the original IP address or user-agent. The salt rotates every 24 hours, making cross-day correlation impossible.
 
-### NO IP addresses
+### NO Third-party Cookies
 
-> We do NOT collect IP addresses.
+> We do NOT read nor set any third-party cookies.
 
-The raw IP address data is never stored in our logs, databases, or anywhere on disk at all.
+We care about the privacy of your visitors. Cookies are something that can track visitors across multiple websites and domains.
+
+*We do not store, use, retrieve, nor extract third-party cookies from visitor's devices.*
+
+We do use first-party cookies to support cross-subdomain tracking. This is necessary to see when visitors go from your site (formo.so) to your app (app.formo.so).
 
 ### User Agent
 
-> We collect and store user agents.
+> We collect and store the user agent and browser type.
 
-User agents are the identifiers of the browser and device of the visitor. Browsers or devices identify themselves to websites.
-We collect and store the user agent to identify the browser and device of the visitor.
+The SDK sends the full user-agent string (`navigator.userAgent`) and a classified browser type (e.g. `chrome`, `firefox`, `safari`). Both are stored.
 
-### Screen & Viewport Dimensions
+User agents are standard browser identifiers that websites use to understand which browsers and devices visitors are using. They are not unique enough to identify individuals on their own.
+
+### Screen Dimensions
 
 > We collect and store screen and viewport dimensions.
 
@@ -60,10 +130,10 @@ We collect device screen and browser viewport dimensions to understand how visit
 
 > We collect and store country of each visitor.
 
-We collect visitor country based on the their time zone, not their IP address. 
+We collect visitor country based on the their time zone, not their IP address.
 
-Every country has their own time zone and modern devices automatically update the time zone when the device travels. 
-The time zone is limited to a country, so we can’t get data about a city or region within a country.
+Every country has their own time zone and modern devices automatically update the time zone when the device travels.
+The time zone is limited to a country, so we can't get data about a city or region within a country.
 
 ### Language
 
@@ -81,14 +151,14 @@ We collect the URL to track page visits and referrers.
 
 > We collect and store referrers.
 
-Referrers answer the question “Where did this visitor come from?”. Browsers send the URL of the previous website as a referrer. 
+Referrers answer the question "Where did this visitor come from?". Browsers send the URL of the previous website as a referrer.
 We also check UTM-parameters. You can see a list of your site's referrers in your dashboard.
 
 ### UTM
 
 > We collect and store UTM parameters.
 
-UTM parameters such as `utm_source`, `utm_medium`, and `utm_campaign`, are a way to track the source of a visitor. 
+UTM parameters such as `utm_source`, `utm_medium`, and `utm_campaign`, are a way to track the source of a visitor.
 They are added to a URL to track where a visitor came from.
 
 We track these UTM codes:
@@ -103,7 +173,7 @@ We track these UTM codes:
 
 > We collect and store referral parameters.
 
-Referral parameters such as `referral` and `ref` are a way to track who referred a visitor. 
+Referral parameters such as `referral` and `ref` are a way to track who referred a visitor.
 They are added to a URL to track where a visitor came from.
 
 We track these UTM codes and assign it to each user:
@@ -142,4 +212,29 @@ We collect the wallet connected status to identify if a visitor has connected th
 
 We collect signature and transaction metadata such as statuses (success, failed, pending, etc.) and transaction hashes.
 
+### Form Data
 
+> Form data is determined by you, the Customer.
+
+If you use [Token Gated Forms](/features/token-gated-forms/form-builder), any data submitted by end users through your forms is collected and stored. The content of this data is determined entirely by the form fields you create.
+
+You are responsible for ensuring that sensitive data is not collected through forms without appropriate legal basis and explicit consent.
+
+---
+
+### PII and Wallet Addresses
+
+Wallet addresses are **pseudo-anonymous identifiers** — similar to session IDs. They are not inherently linked to a person's real-world identity.
+
+However, we recognize that under certain privacy frameworks (including GDPR), wallet addresses that *can* be linked to an individual may be considered personal data.
+
+**How Formo handles this:**
+
+- The SDK collects wallet addresses as analytics identifiers, not for personal identification
+- We do **not** collect social profiles (Twitter, Discord, email) through the SDK
+- If the Formo dashboard displays ENS names or social handles, this data is resolved from **public on-chain sources** (e.g. ENS registry, Farcaster) — not collected by the SDK from your users
+- We do not correlate wallet addresses with off-chain personal data, through probabilistic matching or any other means.
+
+<Info>
+Public blockchain data (wallet addresses, ENS names, onchain social profiles) is already visible to anyone via block explorers like Etherscan and the ENS protocol. Formo does not create new data linkages, it surfaces data that is already public for accessibility.
+</Info>
