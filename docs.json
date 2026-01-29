@@ -48,9 +48,7 @@
                   "features/wallet-intelligence/wallet-profiles",
                   "features/wallet-intelligence/audience-insights",
                   "features/wallet-intelligence/segments",
-                  "features/wallet-intelligence/wallet-labels",
-                  "features/wallet-intelligence/wallet-messaging",
-                  "features/wallet-intelligence/wallet-score"
+                  "features/wallet-intelligence/wallet-labels"
                 ]
               },
               {
