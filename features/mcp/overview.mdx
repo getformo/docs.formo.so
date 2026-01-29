@@ -1,5 +1,5 @@
 ---
-title: 'MCP Server'
+title: 'MCP Integration'
 icon: robot
 description: 'Connect your AI tools to Formo analytics using the Model Context Protocol (MCP).'
 ---
@@ -15,7 +15,101 @@ The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open 
 - "Show me user retention by cohort"
 - "Which pages have the highest bounce rate?"
 
-### Available Tools
+### Getting started
+
+<Tabs>
+  <Tab title="Prerequisites">
+    Before setting up the MCP server, you need:
+
+    1. **Workspace API Key** with MCP scope
+    2. **Cursor** or **Claude Desktop** installed
+
+    To create an API key:
+
+    1. Go to your [Formo workspace settings](https://app.formo.so)
+    2. Navigate to **Settings** → **API Keys**
+    3. Click **Create API Key**
+    4. Enable the **MCP** scope
+    5. Copy the generated key
+
+    Keep your API key secure. It provides read access to your analytics data.
+  </Tab>
+  <Tab title="Cursor">
+    Cursor natively supports HTTP-based MCP servers.
+
+    1. Press `Cmd+,` (macOS) or `Ctrl+,` (Windows/Linux) to open Settings
+    2. Find the "MCP" section in the settings sidebar
+    3. Click "Add new MCP server" and configure:
+       - **Name:** `formo`
+       - **Type:** `sse`
+       - **URL:** `https://api.formo.so/v0/mcp/`
+       - **Headers:** `Authorization: Bearer YOUR_API_KEY`
+
+    Alternatively, add to `.cursor/mcp.json` in your project:
+
+    ```json
+    {
+      "mcpServers": {
+        "formo": {
+          "url": "https://api.formo.so/v0/mcp/",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Claude Desktop">
+    Claude Desktop only supports stdio-based MCP servers, so HTTP servers require the `mcp-remote` bridge.
+
+    1. Ensure Node.js is installed: `node --version`
+    2. Open the Claude Desktop config file:
+       - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+       - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+    3. Add the following configuration:
+
+    ```json
+    {
+      "mcpServers": {
+        "formo": {
+          "command": "npx",
+          "args": [
+            "mcp-remote",
+            "https://api.formo.so/v0/mcp/",
+            "--header",
+            "Authorization: Bearer YOUR_API_KEY"
+          ]
+        }
+      }
+    }
+    ```
+
+    4. Restart Claude Desktop for the changes to take effect
+  </Tab>
+</Tabs>
+
+### Example queries
+
+Once connected, try these prompts with your AI assistant:
+
+**Traffic & Events**
+- "What are my KPIs for the last 7 days?"
+- "What are my top traffic sources?"
+- "Which pages have the highest engagement?"
+- "Show me traffic by country"
+- "What are the most common events?"
+
+**Custom Queries**
+- "How many users signed up this week?"
+- "Show me daily active users for the past month"
+- "What's the conversion rate from page view to wallet connection?"
+
+**Web3 Analytics**
+- "Show me wallet profiles with their net worth"
+- "What tokens do my users hold?"
+
+### Available tools
 
 The Formo MCP server exposes these analytics tools:
 
@@ -28,10 +122,6 @@ The Formo MCP server exposes these analytics tools:
 | `list_datasources` | List available data sources |
 | `kpis` | Get key performance indicators |
 | `distinct_values` | Get unique values for filtering |
-| `project_users` | Query user profiles with filters |
-| `project_users_count` | Get user counts with segmentation |
-| `user_lifecycle` | Analyze user lifecycle stages (New, Returning, Churned, etc.) |
-| `project_retention` | Calculate retention metrics |
 | `top_events` | View most common events |
 | `top_custom_events` | View custom tracked events |
 | `top_pages` | Analyze page performance |
@@ -40,96 +130,7 @@ The Formo MCP server exposes these analytics tools:
 | `revenue_overview` | Revenue analytics |
 | `wallet_profiles` | Web3 wallet data and enrichment |
 
-### Prerequisites
-
-Before setting up the MCP server, you need:
-
-1. **Workspace API Key** with MCP scope
-2. **Cursor** or **Claude Desktop** installed
-
-To create an API key:
-
-1. Go to your [Formo workspace settings](https://app.formo.so)
-2. Navigate to **Settings** → **API Keys**
-3. Click **Create API Key**
-4. Enable the **MCP** scope
-5. Copy the generated key
-
-Keep your API key secure. It provides read access to your analytics data.
-
-### Setup for Cursor
-
-Cursor natively supports HTTP-based MCP servers.
-
-1. Press `Cmd+,` (macOS) or `Ctrl+,` (Windows/Linux) to open Settings
-2. Find the "MCP" section in the settings sidebar
-3. Click "Add new MCP server" and configure:
-   - **Name:** `formo`
-   - **Type:** `sse`
-   - **URL:** `https://api.formo.so/v0/mcp/`
-   - **Headers:** `Authorization: Bearer YOUR_API_KEY`
-
-Alternatively, add to `.cursor/mcp.json` in your project:
-
-```json
-{
-  "mcpServers": {
-    "formo": {
-      "url": "https://api.formo.so/v0/mcp/",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_KEY"
-      }
-    }
-  }
-}
-```
-
-### Setup for Claude Desktop
-
-Claude Desktop only supports stdio-based MCP servers, so HTTP servers require the `mcp-remote` bridge.
-
-1. Ensure Node.js is installed: `node --version`
-2. Open the Claude Desktop config file:
-   - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-3. Add the following configuration:
-
-```json
-{
-  "mcpServers": {
-    "formo": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "https://api.formo.so/v0/mcp/",
-        "--header",
-        "Authorization: Bearer YOUR_API_KEY"
-      ]
-    }
-  }
-}
-```
-
-4. Restart Claude Desktop for the changes to take effect
-
-### Example Queries
-
-Once connected, try these prompts with your AI assistant:
-
-**User Analytics**
-- "How many new users signed up this week?"
-- "Show me the user lifecycle breakdown for the last 30 days"
-- "What's my week-1 retention rate?"
-
-**Traffic Analysis**
-- "What are my top traffic sources?"
-- "Which pages have the highest engagement?"
-- "Show me traffic by country"
-
-**Web3 Analytics**
-- "Show me users who hold more than $10k in their wallet"
-- "Which DeFi protocols do my users interact with?"
-- "What's the average net worth of my users?"
+For user analytics (retention, lifecycle, user profiles), use `text_to_sql` + `execute_query` to query the users datasource directly.
 
 ### Troubleshooting
 
