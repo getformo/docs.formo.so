@@ -63,18 +63,7 @@
                   "features/token-gated-forms/zapier"
                 ]
               },
-              {
-                "group": "Security",
-                "icon": "shield-check",
-                "pages": [
-                  "security/overview",
-                  "security/sso",
-                  "security/mfa",
-                  "security/roles",
-                  "security/sri",
-                  "security/csp"
-                ]
-              }
+              "features/mcp/overview"
             ]
           },
           {
@@ -192,7 +181,14 @@
         "groups": [
           {
             "group": "Security",
-            "pages": ["security/overview"]
+            "pages": [
+              "security/overview",
+              "security/sso",
+              "security/mfa",
+              "security/roles",
+              "security/sri",
+              "security/csp"
+            ]
           }
         ]
       }
