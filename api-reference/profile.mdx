@@ -1,10 +1,12 @@
 ---
 title: 'Get Profile'
 description: 'Get wallet profile information from an address'
-openapi: 'GET /v0/profiles/{id}'
+openapi: 'GET /v0/profiles/{address}'
 ---
 
-Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, onchain activity, tokens, apps, user demographics, lifecycle, volume, and revenue.
+Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps. 
+
+If you have Formo installed on your website and app, you will also get the user's web demographics (country, device, browser, operating system), lifecycle, volume, and revenue.
 
 <Frame>
 	<img src="/images/profile-api-diagram.png" alt="Profile API architecture diagram showing user device, Profiles API, and Wallet Profiles interaction" />
@@ -24,7 +26,7 @@ The API key needs to have the **read permission for profiles** in the API settin
 
 ## Path parameters
 
-- `id` (string): Wallet address (EVM / `0x…`).
+- `address` (string): EVM Wallet address e.g. `0x0000000000000000000000000000000000000000`.
 
 ## Query parameters
 

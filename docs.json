@@ -139,12 +139,12 @@
             "pages": ["api-reference/events/track"]
           },
           {
-            "group": "Query API",
-            "pages": ["api-reference/query"]
-          },
-          {
             "group": "Profiles API",
             "pages": ["api-reference/profile", "api-reference/search-profiles"]
+          },
+          {
+            "group": "Query API",
+            "pages": ["api-reference/query"]
           },
           {
             "group": "Forms API",

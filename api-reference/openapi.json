@@ -1549,8 +1549,8 @@
                       "discord": null,
                       "telegram": null,
                       "website": "https://example.com",
-                      "github": "github.com/username",
-                      "twitter": "@username",
+                      "github": "username",
+                      "twitter": "username",
                       "linkedin": null,
                       "email": null,
                       "instagram": null,
@@ -1695,10 +1695,10 @@
         }
       }
     },
-    "/v0/profiles/{id}": {
+    "/v0/profiles/{address}": {
       "get": {
         "summary": "Get Wallet Profile",
-        "description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, on-chain activity, tokens, apps, and user engagement metrics. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
+        "description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
         "operationId": "getWalletProfile",
         "tags": ["Profile API"],
         "servers": [
@@ -1714,13 +1714,13 @@
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "address",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The wallet address to retrieve profile information for (must be a valid Ethereum address)"
+            "description": "EVM Wallet address e.g. 0x0000000000000000000000000000000000000000"
           },
           {
             "name": "expand",
