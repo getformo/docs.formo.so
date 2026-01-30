@@ -812,6 +812,67 @@
           }
         },
         "required": ["isSuccess", "message", "code"]
+      },
+      "FilterCondition": {
+        "type": "object",
+        "description": "A single filter condition for the profile search",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "The field path to filter on. Supported formats:\n- User fields: `users.{attribute}` (e.g., `users.net_worth_usd`, `users.device`, `users.lifecycle`)\n- Social fields: `users.{social}` (e.g., `users.ens`, `users.farcaster`)\n- Chain filters: `chains.balance` (any chain) or `chains.{chain_id}.balance` (specific chain)\n- App filters: `apps.{app_id}.balance` (any chain) or `apps.{chain_id}.{app_id}.balance` (specific chain)\n- Token filters: `tokens.{address}.balance` (any chain) or `tokens.{chain_id}.{address}.balance` (specific chain)\n- Label filters: `labels.{tag_id}` (e.g., `labels.coinbase.verified_account`)"
+          },
+          "op": {
+            "type": "string",
+            "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "in", "nin"],
+            "description": "The comparison operator:\n- `eq`: Equals\n- `neq`: Not equals\n- `gt`: Greater than\n- `gte`: Greater than or equal\n- `lt`: Less than\n- `lte`: Less than or equal\n- `in`: Value is in array\n- `nin`: Value is not in array"
+          },
+          "value": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "number" },
+              { "type": "boolean" },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "number" }
+                  ]
+                }
+              }
+            ],
+            "description": "The value to compare against. Use arrays for `in` and `nin` operators."
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["any", "protocol"],
+            "description": "Only for token filters. `any` (default) matches holdings in wallet or any protocol. `protocol` matches only tokens deposited in DeFi protocols (use with `appId` to target a specific protocol)."
+          },
+          "appId": {
+            "type": "string",
+            "description": "Only for token filters with `scope: \"protocol\"`. The DeFi protocol ID to filter by (e.g., `aave-v3`, `compound-v3`, `uniswap-v3`, `lido`)."
+          }
+        },
+        "required": ["field", "op", "value"]
+      },
+      "ProfileFilter": {
+        "type": "object",
+        "description": "Filter configuration for searching wallet profiles",
+        "properties": {
+          "conditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FilterCondition"
+            },
+            "description": "Array of filter conditions to apply"
+          },
+          "logic": {
+            "type": "string",
+            "enum": ["and", "or"],
+            "default": "and",
+            "description": "How to combine multiple conditions: `and` (all must match) or `or` (any must match)"
+          }
+        }
       }
     }
   },
@@ -1413,9 +1474,9 @@
       }
     },
     "/v0/profiles": {
-      "get": {
+      "post": {
         "summary": "Search Wallet Profiles",
-        "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports filtering by address, on-chain activity, user engagement data, social profiles, and per-chain metrics. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
+        "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports advanced filtering by user data, on-chain activity, chains, apps, tokens, labels, and lifecycle. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
         "operationId": "searchWalletProfiles",
         "tags": ["Profile API"],
         "servers": [
@@ -1440,42 +1501,6 @@
             "description": "Filter by specific wallet address (exact match)"
           },
           {
-            "name": "filters",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "JSON array of filter conditions for user engagement data. Each filter object has: operand (e.g., 'revenue', 'num_sessions', 'first_seen', 'last_seen', 'volume', 'points', 'location', 'device', 'browser', 'os'), operator ('equals', 'greater', 'less', 'greaterOrEqual', 'lessOrEqual', 'in'), and value. Example: [{\"operand\":\"revenue\",\"operator\":\"greater\",\"value\":100}]"
-          },
-          {
-            "name": "profile_filters",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "JSON array of filter conditions for on-chain profile data. Each filter object has: operand (e.g., 'net_worth_usd', 'tx_count', 'first_onchain', 'last_onchain'), operator ('equals', 'greater', 'less', 'greaterOrEqual', 'lessOrEqual'), and value. Example: [{\"operand\":\"net_worth_usd\",\"operator\":\"greater\",\"value\":1000}]"
-          },
-          {
-            "name": "socials",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "JSON array of social field names to filter by. Only profiles with non-empty values for ALL specified fields will be returned. Supported fields: ens, farcaster, twitter, discord, telegram, lens, email, github, linkedin, basenames, linea, website. Example: [\"ens\",\"twitter\"]"
-          },
-          {
-            "name": "chain_filters",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "JSON array of per-chain net worth filter conditions. Each filter is an array [chain_id, operator, value]. Operators: 'greater', 'less', 'greaterOrEqual', 'lessOrEqual', 'equals'. Example: [[\"1\",\"greater\",1000]] filters for >$1000 on Ethereum"
-          },
-          {
             "name": "expand",
             "in": "query",
             "required": false,
@@ -1490,7 +1515,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["last_onchain", "first_onchain", "net_worth_usd", "updated_at", "tx_count"]
+              "enum": ["last_onchain", "first_onchain", "net_worth_usd", "updated_at", "tx_count", "first_seen", "last_seen", "num_sessions", "revenue", "volume", "points"]
             },
             "description": "Field to sort results by. Default: last_onchain"
           },
@@ -1528,6 +1553,80 @@
             "description": "Number of profiles to skip for pagination. Default: 0"
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileFilter"
+              },
+              "examples": {
+                "highNetWorth": {
+                  "summary": "Find high net worth users",
+                  "value": {
+                    "conditions": [
+                      { "field": "users.net_worth_usd", "op": "gt", "value": 10000 }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "chainFilter": {
+                  "summary": "Find users with >$5,000 on Ethereum",
+                  "value": {
+                    "conditions": [
+                      { "field": "chains.1.balance", "op": "gt", "value": 5000 }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "multipleConditions": {
+                  "summary": "Find power users with ENS",
+                  "value": {
+                    "conditions": [
+                      { "field": "users.lifecycle", "op": "eq", "value": "Power user" },
+                      { "field": "users.ens", "op": "eq", "value": true }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "labelFilter": {
+                  "summary": "Find Coinbase verified users",
+                  "value": {
+                    "conditions": [
+                      { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "appFilter": {
+                  "summary": "Find users with Uniswap or Aave activity",
+                  "value": {
+                    "conditions": [
+                      { "field": "apps.uniswap.balance", "op": "gt", "value": 0 },
+                      { "field": "apps.aave.balance", "op": "gt", "value": 0 }
+                    ],
+                    "logic": "or"
+                  }
+                },
+                "tokenProtocolFilter": {
+                  "summary": "Find users with USDC deposited in Aave V3",
+                  "value": {
+                    "conditions": [
+                      {
+                        "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+                        "op": "gt",
+                        "value": 1000,
+                        "scope": "protocol",
+                        "appId": "aave-v3"
+                      }
+                    ],
+                    "logic": "and"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successfully retrieved wallet profiles",
@@ -1578,46 +1677,37 @@
             }
           },
           "400": {
-            "description": "Bad Request - Invalid query parameters or filter JSON",
+            "description": "Bad Request - Invalid query parameters or malformed request body",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RestApiErrorResponse"
                 },
                 "examples": {
-                  "invalidFilters": {
-                    "summary": "Invalid filters JSON",
+                  "invalidRequestBody": {
+                    "summary": "Invalid request body JSON",
                     "value": {
                       "error": {
                         "code": "BAD_REQUEST",
-                        "message": "Invalid filters JSON"
+                        "message": "Invalid request body"
                       }
                     }
                   },
-                  "invalidProfileFilters": {
-                    "summary": "Invalid profile_filters JSON",
+                  "invalidFieldPath": {
+                    "summary": "Invalid filter field path",
                     "value": {
                       "error": {
                         "code": "BAD_REQUEST",
-                        "message": "Invalid profile_filters JSON"
+                        "message": "Invalid filter field: unknown.field"
                       }
                     }
                   },
-                  "invalidSocials": {
-                    "summary": "Invalid socials JSON",
+                  "invalidOperator": {
+                    "summary": "Invalid filter operator",
                     "value": {
                       "error": {
                         "code": "BAD_REQUEST",
-                        "message": "Invalid socials JSON"
-                      }
-                    }
-                  },
-                  "invalidChainFilters": {
-                    "summary": "Invalid chain_filters JSON",
-                    "value": {
-                      "error": {
-                        "code": "BAD_REQUEST",
-                        "message": "Invalid chain_filters JSON"
+                        "message": "Invalid operator. Must be one of: eq, neq, gt, gte, lt, lte, in, nin"
                       }
                     }
                   }

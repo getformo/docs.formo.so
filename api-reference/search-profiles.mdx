@@ -1,7 +1,7 @@
 ---
 title: "Search Profiles"
 description: "Search and filter wallet profiles with pagination support"
-openapi: "GET /v0/profiles"
+openapi: "POST /v0/profiles"
 ---
 
 Search and filter wallet profiles across your project with advanced filtering capabilities. Returns a paginated list of wallet profiles matching the specified criteria.
@@ -20,85 +20,14 @@ The API key needs to have the **read permission for profiles** in the API settin
 
 ## Query Parameters
 
-The search endpoint supports rich filtering capabilities through JSON-encoded parameters.
-
 ### `address`
 
 Filter by a specific wallet address (exact match).
 
 ```bash
-curl -sS \
+curl -sS -X POST \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   "https://api.formo.so/v0/profiles?address=0x1234..."
-```
-
-### `filters`
-
-JSON array of filter conditions for user engagement data. Each filter object has:
-- `operand`: The field to filter on (e.g., `revenue`, `num_sessions`, `first_seen`, `last_seen`, `volume`, `points`, `location`, `device`, `browser`, `os`)
-- `operator`: The comparison operator (`equals`, `greater`, `less`, `greaterOrEqual`, `lessOrEqual`, `in`)
-- `value`: The value to compare against
-
-Example:
-
-```json
-[
-  {"operand": "revenue", "operator": "greater", "value": 100},
-  {"operand": "num_sessions", "operator": "greaterOrEqual", "value": 5}
-]
-```
-
-### `profile_filters`
-
-JSON array of filter conditions for on-chain profile data. Each filter object has:
-- `operand`: The field to filter on (e.g., `net_worth_usd`, `tx_count`, `first_onchain`, `last_onchain`)
-- `operator`: The comparison operator (`equals`, `greater`, `less`, `greaterOrEqual`, `lessOrEqual`)
-- `value`: The value to compare against
-
-Example:
-
-```json
-[
-  {"operand": "net_worth_usd", "operator": "greater", "value": 1000},
-  {"operand": "tx_count", "operator": "greater", "value": 10}
-]
-```
-
-### `socials`
-
-JSON array of social field names to filter by. Only profiles that have a non-empty value for ALL specified social fields will be returned.
-
-Supported fields: `ens`, `farcaster`, `twitter`, `discord`, `telegram`, `lens`, `email`, `github`, `linkedin`, `basenames`, `linea`, `website`, `instagram`, `facebook`, `tiktok`, `youtube`, `reddit`
-
-Example - Find profiles with ENS names:
-
-```json
-["ens"]
-```
-
-Example - Find profiles with both ENS and Twitter:
-
-```json
-["ens", "twitter"]
-```
-
-### `chain_filters`
-
-JSON array of per-chain filter conditions for net worth. Each filter is an array with three elements:
-- `[0]`: Chain ID (e.g., `"1"` for Ethereum, `"137"` for Polygon)
-- `[1]`: Operator (`greater`, `less`, `greaterOrEqual`, `lessOrEqual`, `equals`)
-- `[2]`: Value (net worth in USD)
-
-Example - Find profiles with >$1000 net worth on Ethereum:
-
-```json
-[["1", "greater", 1000]]
-```
-
-Example - Find profiles with >$500 on both Ethereum and Polygon:
-
-```json
-[["1", "greater", 500], ["137", "greater", 500]]
 ```
 
 ### `expand`
@@ -111,10 +40,8 @@ Supported values:
 - `tokens` - Token holdings
 - `labels` - Wallet labels
 
-Example:
-
 ```bash
-curl -sS \
+curl -sS -X POST \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   "https://api.formo.so/v0/profiles?expand=apps,chains,labels"
 ```
@@ -131,6 +58,12 @@ Field to sort results by. Supported values:
 - `net_worth_usd` - Total net worth
 - `updated_at` - Last profile update timestamp
 - `tx_count` - Total transaction count
+- `first_seen` - First seen timestamp in your app
+- `last_seen` - Last seen timestamp in your app
+- `num_sessions` - Number of sessions
+- `revenue` - Total revenue
+- `volume` - Total volume
+- `points` - Total points
 
 ### `order_dir`
 
@@ -148,6 +81,521 @@ Maximum number of profiles to return per request.
 
 Number of profiles to skip for pagination.
 - Default: `0`
+
+## Request Body (Filters)
+
+The search endpoint supports rich filtering capabilities through a JSON request body. The body contains a filter object with `conditions` and `logic`.
+
+### Filter Schema
+
+```json
+{
+  "conditions": [
+    {
+      "field": "users.net_worth_usd",
+      "op": "gt",
+      "value": 1000
+    }
+  ],
+  "logic": "and"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `conditions` | array | Array of filter conditions |
+| `logic` | string | How to combine conditions: `and` (all must match) or `or` (any must match). Default: `and` |
+
+### Filter Condition
+
+Each condition in the `conditions` array has:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `field` | string | The field path to filter on (see Field Reference below) |
+| `op` | string | The comparison operator |
+| `value` | string \| number \| boolean \| array | The value to compare against |
+| `scope` | string | (Optional) Only for token filters: `any` (wallet + protocols) or `protocol` (specific protocol only) |
+| `appId` | string | (Optional) Only for token filters with `scope: "protocol"`. The DeFi protocol ID (e.g., `aave-v3`, `compound-v3`) |
+
+### Operators
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `eq` | Equals | `{"field": "users.device", "op": "eq", "value": "Desktop"}` |
+| `neq` | Not equals | `{"field": "users.os", "op": "neq", "value": "Windows"}` |
+| `gt` | Greater than | `{"field": "users.net_worth_usd", "op": "gt", "value": 1000}` |
+| `gte` | Greater than or equal | `{"field": "users.tx_count", "op": "gte", "value": 100}` |
+| `lt` | Less than | `{"field": "users.net_worth_usd", "op": "lt", "value": 50000}` |
+| `lte` | Less than or equal | `{"field": "chains.1.balance", "op": "lte", "value": 10000}` |
+| `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
+| `nin` | Not in array | `{"field": "users.location", "op": "nin", "value": ["US", "UK"]}` |
+
+---
+
+## Field Reference
+
+### User Fields (`users.*`)
+
+Filter by user engagement and profile data. Use the format `users.{attribute}`.
+
+#### Profile Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `users.net_worth_usd` | number | Total net worth in USD |
+| `users.tx_count` | number | Total transaction count |
+
+**Example - Find users with net worth > $10,000:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.net_worth_usd", "op": "gt", "value": 10000 }
+  ],
+  "logic": "and"
+}
+```
+
+#### Engagement Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `users.device` | string | Device type (e.g., `Desktop`, `Mobile`) |
+| `users.browser` | string | Browser name (e.g., `Chrome`, `Safari`) |
+| `users.os` | string | Operating system (e.g., `macOS`, `Windows`) |
+| `users.location` | string | Country code (e.g., `US`, `NG`) |
+
+**Example - Find mobile users from the US:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.device", "op": "eq", "value": "Mobile" },
+    { "field": "users.location", "op": "eq", "value": "US" }
+  ],
+  "logic": "and"
+}
+```
+
+#### UTM & Referral Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `users.first_utm_source` | string | First UTM source |
+| `users.last_utm_source` | string | Last UTM source |
+| `users.first_utm_medium` | string | First UTM medium |
+| `users.last_utm_medium` | string | Last UTM medium |
+| `users.first_utm_campaign` | string | First UTM campaign |
+| `users.last_utm_campaign` | string | Last UTM campaign |
+| `users.first_utm_content` | string | First UTM content |
+| `users.last_utm_content` | string | Last UTM content |
+| `users.first_utm_term` | string | First UTM term |
+| `users.last_utm_term` | string | Last UTM term |
+| `users.first_referrer` | string | First referrer domain |
+| `users.last_referrer` | string | Last referrer domain |
+| `users.first_referrer_url` | string | First referrer full URL |
+| `users.last_referrer_url` | string | Last referrer full URL |
+| `users.first_ref` | string | First referral code |
+| `users.last_ref` | string | Last referral code |
+
+**Example - Find users from Google Ads campaign:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.first_utm_source", "op": "eq", "value": "google" },
+    { "field": "users.first_utm_medium", "op": "eq", "value": "cpc" }
+  ],
+  "logic": "and"
+}
+```
+
+#### Lifecycle Filter
+
+Filter by user lifecycle stage. Valid values: `Churned`, `New`, `Power user`, `Resurrected`, `Returning`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `users.lifecycle` | string | User lifecycle stage |
+
+**Example - Find new and power users:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.lifecycle", "op": "in", "value": ["New", "Power user"] }
+  ],
+  "logic": "and"
+}
+```
+
+#### Social Fields
+
+Filter by presence of social identities. These check if the user has a non-empty value for the specified social field.
+
+| Field | Description |
+|-------|-------------|
+| `users.ens` | ENS name |
+| `users.farcaster` | Farcaster username |
+| `users.lens` | Lens handle |
+| `users.basenames` | Base names |
+| `users.linea` | Linea identifier |
+| `users.discord` | Discord username |
+| `users.telegram` | Telegram username |
+| `users.twitter` | Twitter/X handle |
+| `users.github` | GitHub username |
+| `users.linkedin` | LinkedIn profile |
+| `users.email` | Email address |
+
+**Example - Find users with ENS names:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.ens", "op": "eq", "value": true }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users with both ENS and Farcaster:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.ens", "op": "eq", "value": true },
+    { "field": "users.farcaster", "op": "eq", "value": true }
+  ],
+  "logic": "and"
+}
+```
+
+---
+
+### Chain Filters (`chains.*`)
+
+Filter by per-chain net worth. Supports filtering across all chains or specific chains.
+
+#### All Chains
+
+Use `chains.balance` to filter across all chains (returns profiles where **any** chain matches).
+
+**Example - Find users with >$1,000 on any chain:**
+
+```json
+{
+  "conditions": [
+    { "field": "chains.balance", "op": "gt", "value": 1000 }
+  ],
+  "logic": "and"
+}
+```
+
+#### Specific Chain
+
+Use `chains.{chain_id}.balance` to filter on a specific chain.
+
+Common chain IDs:
+- `1` - Ethereum Mainnet
+- `137` - Polygon
+- `42161` - Arbitrum One
+- `10` - Optimism
+- `8453` - Base
+- `56` - BNB Chain
+- `43114` - Avalanche
+
+**Example - Find users with >$5,000 on Ethereum:**
+
+```json
+{
+  "conditions": [
+    { "field": "chains.1.balance", "op": "gt", "value": 5000 }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users with >$1,000 on both Ethereum and Polygon:**
+
+```json
+{
+  "conditions": [
+    { "field": "chains.1.balance", "op": "gt", "value": 1000 },
+    { "field": "chains.137.balance", "op": "gt", "value": 1000 }
+  ],
+  "logic": "and"
+}
+```
+
+---
+
+### App Filters (`apps.*`)
+
+Filter by DeFi app interactions and balances.
+
+#### All Chains
+
+Use `apps.{app_id}.balance` to filter by app balance across all chains.
+
+**Example - Find users with >$1,000 in Uniswap:**
+
+```json
+{
+  "conditions": [
+    { "field": "apps.uniswap.balance", "op": "gt", "value": 1000 }
+  ],
+  "logic": "and"
+}
+```
+
+#### Specific Chain
+
+Use `apps.{chain_id}.{app_id}.balance` to filter by app balance on a specific chain.
+
+**Example - Find users with >$500 in Aave on Ethereum:**
+
+```json
+{
+  "conditions": [
+    { "field": "apps.1.aave.balance", "op": "gt", "value": 500 }
+  ],
+  "logic": "and"
+}
+```
+
+---
+
+### Token Filters (`tokens.*`)
+
+Filter by token holdings. Supports optional `scope` and `appId` parameters.
+
+#### Token Filter Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `scope` | string | `any` (default) = wallet + all protocols, `protocol` = specific protocol only |
+| `appId` | string | Only for `scope: "protocol"`. Specifies the DeFi protocol ID (e.g., `aave-v3`, `compound-v3`, `uniswap-v3`) |
+
+#### All Chains
+
+Use `tokens.{token_address}.balance` to filter by token balance across all chains.
+
+**Example - Find users holding >1000 USDC (any chain):**
+
+```json
+{
+  "conditions": [
+    {
+      "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "op": "gt",
+      "value": 1000
+    }
+  ],
+  "logic": "and"
+}
+```
+
+#### Specific Chain
+
+Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a specific chain.
+
+**Example - Find users with >500 USDC on Ethereum:**
+
+```json
+{
+  "conditions": [
+    {
+      "field": "tokens.1.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "op": "gt",
+      "value": 500
+    }
+  ],
+  "logic": "and"
+}
+```
+
+#### Protocol-Specific Token Filters
+
+Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specific DeFi protocol.
+
+**Example - Find users with USDC deposited in any protocol:**
+
+```json
+{
+  "conditions": [
+    {
+      "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "op": "gt",
+      "value": 0,
+      "scope": "protocol"
+    }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users with USDC deposited in Aave V3:**
+
+```json
+{
+  "conditions": [
+    {
+      "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "op": "gt",
+      "value": 1000,
+      "scope": "protocol",
+      "appId": "aave-v3"
+    }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users with ETH staked in Lido:**
+
+```json
+{
+  "conditions": [
+    {
+      "field": "tokens.0x0000000000000000000000000000000000000000.balance",
+      "op": "gt",
+      "value": 1,
+      "scope": "protocol",
+      "appId": "lido"
+    }
+  ],
+  "logic": "and"
+}
+```
+
+---
+
+### Label Filters (`labels.*`)
+
+Filter by wallet labels. Use the format `labels.{tag_id}`.
+
+Common label IDs:
+- `coinbase.verified_account` - Coinbase verified account (boolean)
+- `coinbase.verified_country` - Coinbase verified country code
+- `coinbase.verified_coinbase_one` - Coinbase One membership (boolean)
+- `sanctions.designated` - Sanctioned address (boolean)
+- `passport.models_aggregate_score` - Passport aggregate score (0-100)
+- `passport.unique_humanity_score` - Passport uniqueness score
+
+**Example - Find Coinbase verified users:**
+
+```json
+{
+  "conditions": [
+    { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find US-verified Coinbase users:**
+
+```json
+{
+  "conditions": [
+    { "field": "labels.coinbase.verified_country", "op": "eq", "value": "US" }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users with high Passport score:**
+
+```json
+{
+  "conditions": [
+    { "field": "labels.passport.models_aggregate_score", "op": "gte", "value": "50" }
+  ],
+  "logic": "and"
+}
+```
+
+---
+
+## Combined Filter Examples
+
+### High-Value Web3 Users
+
+Find users with >$10,000 net worth, ENS name, and activity on Ethereum:
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "conditions": [
+      { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
+      { "field": "users.ens", "op": "eq", "value": true },
+      { "field": "chains.1.balance", "op": "gt", "value": 0 }
+    ],
+    "logic": "and"
+  }' \
+  "https://api.formo.so/v0/profiles?expand=chains,labels"
+```
+
+### Active DeFi Users
+
+Find users with activity in Uniswap or Aave:
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "conditions": [
+      { "field": "apps.uniswap.balance", "op": "gt", "value": 0 },
+      { "field": "apps.aave.balance", "op": "gt", "value": 0 }
+    ],
+    "logic": "or"
+  }' \
+  "https://api.formo.so/v0/profiles?expand=apps"
+```
+
+### Verified Power Users
+
+Find Coinbase-verified power users from specific countries:
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "conditions": [
+      { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" },
+      { "field": "labels.coinbase.verified_country", "op": "in", "value": ["US", "UK", "DE"] },
+      { "field": "users.lifecycle", "op": "eq", "value": "Power user" }
+    ],
+    "logic": "and"
+  }' \
+  "https://api.formo.so/v0/profiles"
+```
+
+### Multi-Chain Whales
+
+Find users with significant holdings across multiple chains:
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "conditions": [
+      { "field": "chains.1.balance", "op": "gt", "value": 10000 },
+      { "field": "chains.137.balance", "op": "gt", "value": 5000 },
+      { "field": "chains.42161.balance", "op": "gt", "value": 5000 }
+    ],
+    "logic": "and"
+  }' \
+  "https://api.formo.so/v0/profiles?expand=chains&order_by=net_worth_usd&order_dir=desc"
+```
+
+---
 
 ## Response
 
@@ -213,55 +661,11 @@ Each profile in the `data` array includes:
 | `tokens` | array \| null | Token holdings (when expanded) |
 | `labels` | array \| null | Wallet labels (when expanded) |
 
-## Examples
-
-### Basic Search with Pagination
-
-```bash
-curl -sS \
-  -H "Authorization: Bearer <your_workspace_api_key>" \
-  "https://api.formo.so/v0/profiles?limit=50&offset=100&order_by=net_worth_usd&order_dir=desc"
-```
-
-### Find High-Value Users
-
-```bash
-curl -sS \
-  -H "Authorization: Bearer <your_workspace_api_key>" \
-  -G "https://api.formo.so/v0/profiles" \
-  --data-urlencode 'profile_filters=[{"operand":"net_worth_usd","operator":"greater","value":10000}]' \
-  --data-urlencode 'filters=[{"operand":"num_sessions","operator":"greaterOrEqual","value":5}]'
-```
-
-### Find Users with ENS on Ethereum
-
-```bash
-curl -sS \
-  -H "Authorization: Bearer <your_workspace_api_key>" \
-  -G "https://api.formo.so/v0/profiles" \
-  --data-urlencode 'socials=["ens"]' \
-  --data-urlencode 'chain_filters=[["1","greater",0]]' \
-  --data-urlencode 'expand=chains,labels'
-```
-
-### Find Users by Revenue and Sessions
-
-```bash
-curl -sS \
-  -H "Authorization: Bearer <your_workspace_api_key>" \
-  -G "https://api.formo.so/v0/profiles" \
-  --data-urlencode 'filters=[{"operand":"revenue","operator":"greater","value":1000},{"operand":"num_sessions","operator":"greaterOrEqual","value":10}]'
-```
-
-<Note>
-The `lifecycle` field is computed dynamically based on user activity patterns and cannot be used as a filter. To find users by lifecycle stage, you can filter by the underlying fields (`first_seen`, `last_seen`, `activity_dates`) or retrieve profiles and filter client-side.
-</Note>
-
 ## Error Responses
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `BAD_REQUEST` | Invalid query parameters or malformed JSON in filters |
+| 400 | `BAD_REQUEST` | Invalid query parameters or malformed JSON in request body |
 | 401 | `UNAUTHORIZED` | Missing or invalid API key |
 | 403 | `FORBIDDEN` | API key does not have `profiles:read` permission |
 | 500 | `INTERNAL_SERVER_ERROR` | Failed to fetch wallet profile data |
