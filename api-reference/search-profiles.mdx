@@ -115,7 +115,8 @@ Each condition in the `conditions` array has:
 | `field` | string | The field path to filter on (see Field Reference below) |
 | `op` | string | The comparison operator |
 | `value` | string \| number \| boolean \| array | The value to compare against |
-| `scope` | string | (Optional) Only for token filters: `any` or `protocol` |
+| `scope` | string | (Optional) Only for token filters: `any` (wallet + protocols) or `protocol` (specific protocol only) |
+| `appId` | string | (Optional) Only for token filters with `scope: "protocol"`. The DeFi protocol ID (e.g., `aave-v3`, `compound-v3`) |
 
 ### Operators
 
@@ -367,14 +368,14 @@ Use `apps.{chain_id}.{app_id}.balance` to filter by app balance on a specific ch
 
 ### Token Filters (`tokens.*`)
 
-Filter by token holdings. Supports an optional `scope` parameter.
+Filter by token holdings. Supports optional `scope` and `appId` parameters.
 
-#### Token Scope
+#### Token Filter Parameters
 
-| Scope | Description |
-|-------|-------------|
-| `any` (default) | Match token holdings in wallet or any protocol |
-| `protocol` | Match only tokens deposited in DeFi protocols |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `scope` | string | `any` (default) = wallet + all protocols, `protocol` = specific protocol only |
+| `appId` | string | Only for `scope: "protocol"`. Specifies the DeFi protocol ID (e.g., `aave-v3`, `compound-v3`, `uniswap-v3`) |
 
 #### All Chains
 
@@ -414,7 +415,11 @@ Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a 
 }
 ```
 
-**Example - Find users with USDC deposited in protocols:**
+#### Protocol-Specific Token Filters
+
+Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specific DeFi protocol.
+
+**Example - Find users with USDC deposited in any protocol:**
 
 ```json
 {
@@ -424,6 +429,40 @@ Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a 
       "op": "gt",
       "value": 0,
       "scope": "protocol"
+    }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users with USDC deposited in Aave V3:**
+
+```json
+{
+  "conditions": [
+    {
+      "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "op": "gt",
+      "value": 1000,
+      "scope": "protocol",
+      "appId": "aave-v3"
+    }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users with ETH staked in Lido:**
+
+```json
+{
+  "conditions": [
+    {
+      "field": "tokens.0x0000000000000000000000000000000000000000.balance",
+      "op": "gt",
+      "value": 1,
+      "scope": "protocol",
+      "appId": "lido"
     }
   ],
   "logic": "and"

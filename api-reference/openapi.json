@@ -846,7 +846,11 @@
           "scope": {
             "type": "string",
             "enum": ["any", "protocol"],
-            "description": "Only for token filters. `any` (default) matches holdings in wallet or protocols. `protocol` matches only tokens deposited in DeFi protocols."
+            "description": "Only for token filters. `any` (default) matches holdings in wallet or any protocol. `protocol` matches only tokens deposited in DeFi protocols (use with `appId` to target a specific protocol)."
+          },
+          "appId": {
+            "type": "string",
+            "description": "Only for token filters with `scope: \"protocol\"`. The DeFi protocol ID to filter by (e.g., `aave-v3`, `compound-v3`, `uniswap-v3`, `lido`)."
           }
         },
         "required": ["field", "op", "value"]
@@ -1602,6 +1606,21 @@
                       { "field": "apps.aave.balance", "op": "gt", "value": 0 }
                     ],
                     "logic": "or"
+                  }
+                },
+                "tokenProtocolFilter": {
+                  "summary": "Find users with USDC deposited in Aave V3",
+                  "value": {
+                    "conditions": [
+                      {
+                        "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+                        "op": "gt",
+                        "value": 1000,
+                        "scope": "protocol",
+                        "appId": "aave-v3"
+                      }
+                    ],
+                    "logic": "and"
                   }
                 }
               }
