@@ -1,7 +1,510 @@
 ---
 title: 'Mobile'
 icon: mobile
-description: 'Track user events in your mobile apps with SDKs for React Native, iOS, and Android.'
+description: 'Track user events in your mobile apps with the Formo React Native SDK. Measure what matters onchain with full device context and wallet event tracking.'
 ---
 
-> 🚧 In development. <a href="https://cal.com/formo/30min">Reach out</a> to get early access. 🚧
+<Frame>
+  <img src="/images/intro3.png" alt="Formo" />
+</Frame>
+
+The Formo React Native SDK is designed for mobile dApps and implements the standard [Events API](/data/events#events-api) with rich mobile context including device information, network status, and app metadata.
+
+## Installation
+
+Install the SDK and required peer dependencies:
+
+```bash
+npm install @formo/react-native-analytics @react-native-async-storage/async-storage react-native-device-info @react-native-community/netinfo
+```
+
+### iOS Setup
+
+After installing, run pod install:
+
+```bash
+cd ios && pod install
+```
+
+### Android Setup
+
+No additional setup required. The native modules are automatically linked.
+
+## Quick Start
+
+### Basic Setup
+
+Wrap your app with the `FormoAnalyticsProvider`:
+
+```tsx
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FormoAnalyticsProvider } from '@formo/react-native-analytics';
+
+function App() {
+  return (
+    <FormoAnalyticsProvider
+      writeKey="<YOUR_WRITE_KEY>"
+      asyncStorage={AsyncStorage}
+    >
+      <YourApp />
+    </FormoAnalyticsProvider>
+  );
+}
+```
+
+### With Wagmi
+
+For apps using [Wagmi](https://wagmi.sh), enable native integration for automatic wallet event tracking:
+
+```tsx
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { WagmiProvider, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { FormoAnalyticsProvider } from '@formo/react-native-analytics';
+import { mainnet } from 'wagmi/chains';
+
+const wagmiConfig = createConfig({
+  chains: [mainnet],
+  // ... your transports
+});
+
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <FormoAnalyticsProvider
+          writeKey="<YOUR_WRITE_KEY>"
+          asyncStorage={AsyncStorage}
+          options={{
+            wagmi: {
+              config: wagmiConfig,
+              queryClient: queryClient,
+            },
+          }}
+        >
+          <YourApp />
+        </FormoAnalyticsProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
+```
+
+## Track Screen Views
+
+Use the [`screen()`](/data/events/screen) method to track screen views - the mobile equivalent of page views:
+
+```tsx
+import { useFormo } from '@formo/react-native-analytics';
+import { useEffect } from 'react';
+
+function WalletScreen() {
+  const formo = useFormo();
+
+  useEffect(() => {
+    formo.screen('Wallet', { category: 'Main' });
+  }, [formo]);
+
+  return <View>...</View>;
+}
+```
+
+<Note>
+Include `formo` in the dependency array. The SDK initializes asynchronously, so including it ensures the screen event fires once initialization completes.
+</Note>
+
+### With React Navigation
+
+Automatically track all screen transitions:
+
+```tsx
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { useFormo } from '@formo/react-native-analytics';
+import { useRef } from 'react';
+
+function App() {
+  const analytics = useFormo();
+  const navigationRef = useNavigationContainerRef();
+  const routeNameRef = useRef<string>();
+
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        routeNameRef.current = navigationRef.getCurrentRoute()?.name;
+      }}
+      onStateChange={() => {
+        const previousRouteName = routeNameRef.current;
+        const currentRouteName = navigationRef.getCurrentRoute()?.name;
+
+        if (previousRouteName !== currentRouteName && currentRouteName) {
+          analytics.screen(currentRouteName);
+        }
+        routeNameRef.current = currentRouteName;
+      }}
+    >
+      {/* Your navigation stack */}
+    </NavigationContainer>
+  );
+}
+```
+
+## Identify Users
+
+Call [`identify()`](/data/events/identify) after a user connects their wallet:
+
+```tsx
+const formo = useFormo();
+
+formo.identify({
+  address: '0x1234...abcd',
+  userId: 'optional-user-id',
+  providerName: 'MetaMask',
+});
+```
+
+<Note>
+When using Wagmi integration, wallet connections are automatically tracked. You only need to call `identify()` manually if you want to associate additional user data or use a custom user ID.
+</Note>
+
+## Track Custom Events
+
+Track custom events with the [`track()`](/data/events/track) method:
+
+```tsx
+const formo = useFormo();
+
+// Basic custom event
+formo.track('Swap Completed', {
+  from_token: 'ETH',
+  to_token: 'USDC',
+  amount: '1.5',
+});
+
+// With reserved properties for analytics
+formo.track('Purchase Completed', {
+  productId: 'premium-nft-001',
+  revenue: 99.99,   // Reserved: revenue tracking
+  currency: 'USD',  // Reserved: currency for revenue
+});
+
+formo.track('Achievement Unlocked', {
+  achievementId: 'first_transaction',
+  points: 500,      // Reserved: points tracking
+});
+
+formo.track('Swap Executed', {
+  fromToken: 'ETH',
+  toToken: 'USDC',
+  volume: 1.5,      // Reserved: volume tracking
+});
+```
+
+## Deep Link Attribution
+
+Parse UTM parameters and referral codes from deep links:
+
+```tsx
+import { Linking } from 'react-native';
+import { useFormo } from '@formo/react-native-analytics';
+import { useEffect } from 'react';
+
+function App() {
+  const formo = useFormo();
+
+  useEffect(() => {
+    // Handle initial deep link (app opened via link)
+    Linking.getInitialURL().then((url) => {
+      if (url) formo.setTrafficSourceFromUrl(url);
+    });
+
+    // Handle deep links while app is open
+    const subscription = Linking.addEventListener('url', (event) => {
+      formo.setTrafficSourceFromUrl(event.url);
+    });
+
+    return () => subscription.remove();
+  }, [formo]);
+
+  return <YourApp />;
+}
+```
+
+The SDK automatically extracts and stores:
+- UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`)
+- Referral codes (`ref`, `referral`, `refcode`, `referrer_code`)
+
+Example deep link: `myapp://home?utm_source=twitter&utm_campaign=launch&ref=friend123`
+
+## Configuration
+
+### Provider Props
+
+| Prop | Type | Required | Description |
+|:-----|:-----|:---------|:------------|
+| `writeKey` | String | Yes | Your Formo project write key. |
+| `asyncStorage` | AsyncStorage | Yes | AsyncStorage instance for persistent storage. |
+| `options` | Object | No | Configuration options (see below). |
+| `disabled` | Boolean | No | Disable the SDK entirely. |
+| `onReady` | Function | No | Callback when SDK is initialized. |
+| `onError` | Function | No | Callback when initialization fails. |
+
+### Options
+
+```tsx
+<FormoAnalyticsProvider
+  writeKey="<YOUR_WRITE_KEY>"
+  asyncStorage={AsyncStorage}
+  options={{
+    // Wagmi integration
+    wagmi: {
+      config: wagmiConfig,
+      queryClient: queryClient,
+    },
+
+    // App metadata (enriches all events)
+    app: {
+      name: 'MyDeFiApp',
+      version: '2.1.0',
+      build: '42',
+      bundleId: 'com.example.mydefiapp',
+    },
+
+    // Batching configuration
+    flushAt: 20,              // Batch size (default: 20, max: 20)
+    flushInterval: 30000,     // Auto-flush interval in ms (default: 30s)
+
+    // Retry configuration
+    retryCount: 3,            // Retry attempts (default: 3, max: 5)
+    maxQueueSize: 500000,     // Max queue size in bytes (default: 500KB)
+
+    // Tracking control
+    tracking: true,           // Enable/disable tracking
+
+    // Autocapture control
+    autocapture: true,        // Enable/disable wallet autocapture
+
+    // Logging
+    logger: {
+      enabled: true,
+      levels: ['error', 'warn', 'info'],
+    },
+
+    // Custom API endpoint
+    apiHost: 'https://your-proxy.com/api/ingest',
+  }}
+>
+```
+
+### App Metadata
+
+The SDK automatically detects app information from your app's native configuration:
+- `app_name` - from your app's display name
+- `app_version` - from your app's version (e.g., `2.1.0`)
+- `app_build` - from your app's build number (e.g., `42`)
+- `app_bundle_id` - from your bundle/package identifier
+
+To override the auto-detected values, provide custom app information:
+
+```tsx
+options={{
+  app: {
+    name: 'MyDeFiApp',        // Override detected app name
+    version: '2.1.0',         // Override detected version
+    build: '42',              // Override detected build
+    bundleId: 'com.example.mydefiapp',
+  },
+}}
+```
+
+### Tracking Control
+
+Control tracking behavior for different environments or chains:
+
+```tsx
+// Disable tracking entirely
+options={{
+  tracking: false,
+}}
+
+// Exclude specific chains (e.g., testnets)
+options={{
+  tracking: {
+    excludeChains: [5, 11155111], // Goerli, Sepolia
+  },
+}}
+```
+
+### Autocapture
+
+Control which wallet events are automatically captured:
+
+```tsx
+// Enable all autocapture (default)
+options={{
+  autocapture: true,
+}}
+
+// Disable specific events
+options={{
+  autocapture: {
+    connect: true,
+    disconnect: true,
+    signature: false,    // Disable signature tracking
+    transaction: false,  // Disable transaction tracking
+    chain: true,
+  },
+}}
+
+// Disable all autocapture
+options={{
+  autocapture: false,
+}}
+```
+
+### Logging
+
+Enable debug logging during development:
+
+```tsx
+options={{
+  logger: {
+    enabled: __DEV__,
+    levels: ['error', 'warn', 'info', 'debug'],
+  },
+}}
+```
+
+| Log Level | Description |
+|:----------|:------------|
+| `error` | Error messages only. |
+| `warn` | Warning and error messages. |
+| `info` | Informative messages about normal operation. |
+| `debug` | Detailed diagnostic information. |
+| `trace` | Most detailed tracing information. |
+
+### Ready Callback
+
+Execute code when the SDK is fully initialized:
+
+```tsx
+<FormoAnalyticsProvider
+  writeKey="<YOUR_WRITE_KEY>"
+  asyncStorage={AsyncStorage}
+  onReady={(sdk) => {
+    console.log('Formo SDK ready!');
+    // Auto-identify or perform other initialization
+  }}
+  onError={(error) => {
+    console.error('Formo SDK failed to initialize:', error);
+  }}
+>
+```
+
+## Consent Management
+
+Comply with privacy regulations using built-in consent management:
+
+```tsx
+const formo = useFormo();
+
+// Check if user has opted out
+if (formo.hasOptedOutTracking()) {
+  console.log('User has opted out');
+}
+
+// Opt out of tracking (stops all tracking, clears queue)
+formo.optOutTracking();
+
+// Opt back into tracking
+formo.optInTracking();
+```
+
+<Tip>
+When opting out, track the opt-out event *before* calling `optOutTracking()` so it gets recorded. When opting in, call `optInTracking()` first, then track the opt-in event.
+</Tip>
+
+## Wagmi Integration
+
+When Wagmi integration is enabled, the SDK automatically tracks:
+
+| Event Type | Without QueryClient | With QueryClient |
+|:-----------|:--------------------|:-----------------|
+| Connect | Tracked | Tracked |
+| Disconnect | Tracked | Tracked |
+| Chain Change | Tracked | Tracked |
+| Signatures | Not tracked | Tracked |
+| Transactions | Not tracked | Tracked |
+
+<Tip>
+Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating multiple cache instances.
+</Tip>
+
+## Mobile Context
+
+The SDK automatically enriches every event with mobile-specific context:
+
+| Field | Description |
+|:------|:------------|
+| `os_name` | Operating system (iOS, Android). |
+| `os_version` | OS version number. |
+| `device_model` | Device model (iPhone 14 Pro, Pixel 8). |
+| `device_manufacturer` | Device manufacturer (Apple, Google, Samsung). |
+| `device_type` | Device type (mobile, tablet). |
+| `screen_width` | Screen width in pixels. |
+| `screen_height` | Screen height in pixels. |
+| `screen_density` | Pixel density (devicePixelRatio). |
+| `locale` | Device language setting. |
+| `timezone` | Device timezone. |
+| `wifi` | Whether connected to WiFi. |
+| `cellular` | Whether connected to cellular. |
+| `carrier` | Mobile carrier name (when available). |
+| `app_name` | Your app name. |
+| `app_version` | Your app version. |
+| `app_build` | Your app build number. |
+
+## Session Management
+
+Reset the current user session:
+
+```tsx
+const formo = useFormo();
+
+// Clear current user session (anonymous_id, user_id, etc.)
+formo.reset();
+```
+
+## Manual Event Flushing
+
+Force flush pending events (useful before app backgrounding):
+
+```tsx
+const formo = useFormo();
+
+await formo.flush();
+```
+
+<Note>
+The SDK automatically flushes events when the app goes to background.
+</Note>
+
+## Verification
+
+To verify the SDK is working:
+
+1. Enable debug logging in development
+2. Trigger a screen view or custom event
+3. Check the console for event logs
+4. Verify events appear in the [Activity page](https://app.formo.so) on your Formo dashboard
+
+## Peer Dependencies
+
+| Package | Version | Required |
+|:--------|:--------|:---------|
+| `react` | >=18.0.0 | Yes |
+| `react-native` | >=0.70.0 | Yes |
+| `@react-native-async-storage/async-storage` | >=1.17.0 | Yes |
+| `wagmi` | >=2.0.0 | No (for Wagmi integration) |
+| `@tanstack/react-query` | >=5.0.0 | No (for signature/transaction tracking) |
