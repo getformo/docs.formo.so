@@ -88,7 +88,7 @@ function App() {
 }
 ```
 
-## Track Screen Views
+## Track screen views
 
 Use the [`screen()`](/data/events/screen) method to track screen views - the mobile equivalent of page views:
 
@@ -147,7 +147,7 @@ function App() {
 }
 ```
 
-## Identify Users
+## Identify users
 
 Call [`identify()`](/data/events/identify) after a user connects their wallet:
 
@@ -165,7 +165,7 @@ formo.identify({
 When using Wagmi integration, wallet connections are automatically tracked. You only need to call `identify()` manually if you want to associate additional user data or use a custom user ID.
 </Note>
 
-## Track Custom Events
+## Track custom events
 
 Track custom events with the [`track()`](/data/events/track) method:
 
@@ -198,7 +198,19 @@ formo.track('Swap Executed', {
 });
 ```
 
-## Deep Link Attribution
+## Code examples
+
+<CardGroup>
+  <Card
+    title="React Native"
+    icon="file-code"
+    href="https://github.com/getformo/formo-example-react-native"
+  >
+    formo-example-react-native
+  </Card>
+</CardGroup>
+
+## Deep link attribution
 
 Parse UTM parameters and referral codes from deep links:
 
@@ -236,7 +248,7 @@ Example deep link: `myapp://home?utm_source=twitter&utm_campaign=launch&ref=frie
 
 ## Configuration
 
-### Provider Props
+### Provider props
 
 | Prop | Type | Required | Description |
 |:-----|:-----|:---------|:------------|
@@ -294,7 +306,7 @@ Example deep link: `myapp://home?utm_source=twitter&utm_campaign=launch&ref=frie
 >
 ```
 
-### App Metadata
+### App metadata
 
 The SDK automatically detects app information from your app's native configuration:
 - `app_name` - from your app's display name
@@ -315,7 +327,7 @@ options={{
 }}
 ```
 
-### Tracking Control
+### Tracking control
 
 Control tracking behavior for different environments or chains:
 
@@ -381,7 +393,7 @@ options={{
 | `debug` | Detailed diagnostic information. |
 | `trace` | Most detailed tracing information. |
 
-### Ready Callback
+### Ready callback
 
 Execute code when the SDK is fully initialized:
 
@@ -399,7 +411,7 @@ Execute code when the SDK is fully initialized:
 >
 ```
 
-## Consent Management
+## Consent management
 
 Comply with privacy regulations using built-in consent management:
 
@@ -422,7 +434,7 @@ formo.optInTracking();
 When opting out, track the opt-out event *before* calling `optOutTracking()` so it gets recorded. When opting in, call `optInTracking()` first, then track the opt-in event.
 </Tip>
 
-## Wagmi Integration
+## Wagmi integration
 
 When Wagmi integration is enabled, the SDK automatically tracks:
 
@@ -438,7 +450,7 @@ When Wagmi integration is enabled, the SDK automatically tracks:
 Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating multiple cache instances.
 </Tip>
 
-## Mobile Context
+## Mobile context
 
 The SDK automatically enriches every event with mobile-specific context:
 
@@ -461,7 +473,7 @@ The SDK automatically enriches every event with mobile-specific context:
 | `app_version` | Your app version. |
 | `app_build` | Your app build number. |
 
-## Session Management
+## Session management
 
 Reset the current user session:
 
@@ -472,7 +484,7 @@ const formo = useFormo();
 formo.reset();
 ```
 
-## Manual Event Flushing
+## Manual event flushing
 
 Force flush pending events (useful before app backgrounding):
 
@@ -495,7 +507,7 @@ To verify the SDK is working:
 3. Check the console for event logs
 4. Verify events appear in the [Activity page](https://app.formo.so) on your Formo dashboard
 
-## Peer Dependencies
+## Peer dependencies
 
 | Package | Version | Required |
 |:--------|:--------|:---------|
