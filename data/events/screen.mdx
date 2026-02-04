@@ -1,0 +1,159 @@
+---
+title: 'Spec: Screen'
+description: 'Get started with the Screen view event for mobile apps.'
+---
+
+The `screen` event is the mobile equivalent of the [page](/data/events/page) event. It records whenever a user views a screen in your mobile app.
+
+Use the `screen` call to track screen views and navigation patterns in your React Native, iOS, or Android apps.
+
+## Fields
+
+Apart from the [common fields](/data/events/common), the `screen` call accepts the following properties:
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `name` | String | Name of the screen viewed (e.g., `Home`, `Profile`, `Settings`). |
+| `category` | String | Category of the screen for grouping (e.g., `Onboarding`, `Wallet`, `DeFi`). |
+
+## Sample Payload
+
+Here's the payload of a typical call with most common fields removed:
+
+```json
+{
+    "type": "screen",
+    "properties": {
+        "name": "Wallet",
+        "category": "Main"
+    }
+}
+```
+
+## Full Payload with Mobile Context
+
+Screen events from mobile SDKs include rich device context automatically:
+
+```json
+{
+    "type": "screen",
+    "channel": "mobile",
+    "version": "1",
+    "project_id": "d5naNbBlqxSBXLuNa6zwc",
+    "session_id": "117b982a451dc22edea6413b8e20958216c0a5b3baaa1d90699c42dbf4e74e33",
+    "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
+    "context": {
+        "library_name": "Formo React Native SDK",
+        "library_version": "1.0.0",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "location": "US",
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
+        "screen_width": 390,
+        "screen_height": 844,
+        "screen_density": 3,
+        "os_name": "iOS",
+        "os_version": "17.0",
+        "device_model": "iPhone 14 Pro",
+        "device_manufacturer": "Apple",
+        "device_type": "mobile",
+        "app_name": "MyDeFiApp",
+        "app_version": "2.1.0",
+        "app_build": "42",
+        "wifi": true,
+        "cellular": false
+    },
+    "properties": {
+        "name": "Wallet",
+        "category": "Main"
+    },
+    "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f",
+    "original_timestamp": "2025-04-03T18:21:00.000Z",
+    "sent_at": "2025-04-03T18:21:00.000Z",
+    "received_at": "2025-04-03T18:21:00.000Z",
+    "timestamp": "2025-04-03T18:21:00.000Z"
+}
+```
+
+## Mobile Context Fields
+
+The mobile SDK automatically enriches screen events with additional context not available on web:
+
+| Field | Type | Description |
+|:------|:-----|:------------|
+| `os_name` | String | Operating system name (e.g., `iOS`, `Android`). |
+| `os_version` | String | Operating system version (e.g., `17.0`, `14`). |
+| `device_model` | String | Device model identifier (e.g., `iPhone 14 Pro`, `Pixel 8`). |
+| `device_manufacturer` | String | Device manufacturer (e.g., `Apple`, `Google`, `Samsung`). |
+| `device_type` | String | Type of device (`mobile` or `tablet`). |
+| `app_name` | String | Name of your application. |
+| `app_version` | String | Version of your application. |
+| `app_build` | String | Build number of your application. |
+| `wifi` | Boolean | Whether the device is connected to WiFi. |
+| `cellular` | Boolean | Whether the device is connected to cellular network. |
+| `carrier` | String | Mobile carrier name (when available). |
+
+## Usage
+
+### React Native
+
+```tsx
+import { useFormo } from '@formo/analytics-react-native';
+
+function ProfileScreen() {
+  const analytics = useFormo();
+
+  useEffect(() => {
+    // Track screen view when component mounts
+    analytics.screen('Profile', {
+      category: 'User',
+      user_type: 'premium'
+    });
+  }, []);
+
+  return <View>...</View>;
+}
+```
+
+### With React Navigation
+
+```tsx
+import { NavigationContainer } from '@react-navigation/native';
+import { useFormo } from '@formo/analytics-react-native';
+
+function App() {
+  const analytics = useFormo();
+  const routeNameRef = useRef<string>();
+  const navigationRef = useNavigationContainerRef();
+
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        routeNameRef.current = navigationRef.getCurrentRoute()?.name;
+      }}
+      onStateChange={() => {
+        const previousRouteName = routeNameRef.current;
+        const currentRouteName = navigationRef.getCurrentRoute()?.name;
+
+        if (previousRouteName !== currentRouteName && currentRouteName) {
+          analytics.screen(currentRouteName);
+        }
+        routeNameRef.current = currentRouteName;
+      }}
+    >
+      {/* ... */}
+    </NavigationContainer>
+  );
+}
+```
+
+## Best Practices
+
+1. **Use consistent naming**: Establish a naming convention for screens (e.g., PascalCase: `WalletDetails`, `SwapConfirmation`).
+
+2. **Add categories**: Group related screens together using the `category` property for better analysis.
+
+3. **Track on mount**: Call `screen()` in a `useEffect` hook when the screen component mounts.
+
+4. **Include relevant properties**: Add custom properties that help segment screen views (e.g., `token_symbol`, `network`).
