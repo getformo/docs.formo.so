@@ -34,6 +34,91 @@ Each user's lifecycle stage is automatically calculated based on their activity:
 
 Filter users by lifecycle to create [segments](/features/wallet-intelligence/segments) and audiences. For example, "Show me whales who use app X who are power users" or "Show me high net worth wallets who have churned."
 
+## Wallet Metadata
+
+Each wallet profile includes key metadata aggregated across all chains:
+
+| Field | Description |
+|:------|:------------|
+| **Net Worth** | Total USD value of all token holdings and DeFi positions across all chains, with a per-chain breakdown showing percentage allocation. |
+| **Wallet Age** | Time since the wallet's first onchain transaction. |
+| **Last Onchain** | When the wallet last had onchain activity. |
+| **Total Transactions** | Lifetime transaction count across all chains, with a per-chain breakdown. |
+| **Linked Addresses** | Other wallet addresses linked to the same user session. |
+| **Sessions** | Total number of sessions on your app. |
+| **First Seen / Last Seen** | When the user first and last interacted with your app. |
+| **Country, Device, Browser, OS** | Geographic and device information from the user's sessions. |
+
+## User Socials
+
+View social accounts linked to a wallet address. Formo resolves onchain identities and social profiles from multiple sources including ENS, Web3Bio, and more.
+
+Supported platforms:
+
+| Platform | Description |
+|:---------|:------------|
+| **Twitter / X** | X (formerly Twitter) handle |
+| **Farcaster** | Farcaster profile |
+| **Lens** | Lens Protocol handle |
+| **GitHub** | GitHub username |
+| **LinkedIn** | LinkedIn profile |
+| **Discord** | Discord username |
+| **Telegram** | Telegram handle |
+| **Reddit** | Reddit username |
+| **Instagram** | Instagram handle |
+| **Facebook** | Facebook profile |
+| **TikTok** | TikTok handle |
+| **YouTube** | YouTube channel |
+| **Email** | Email address |
+| **Basenames** | Base chain name |
+| **Website** | Personal or project website |
+
+Social cards are displayed in a grid on the wallet profile page. Click any card to copy the handle or open the external profile.
+
+## User Apps
+
+The **Apps** tab shows a user's complete DeFi positions and portfolio across all major chains. See which protocols a user is active in and the USD value of their positions.
+
+| Column | Description |
+|:-------|:------------|
+| **App** | Protocol name and logo (e.g., Aave, Uniswap, Lido) |
+| **Chain** | The blockchain network |
+| **Balance** | USD value of the position |
+| **Portfolio %** | Percentage of the user's total DeFi portfolio |
+
+Filter by individual chain or view all positions at once. Apps are sorted by USD value from highest to lowest.
+
+## User Tokens
+
+The **Tokens** tab shows token balances held by the wallet across all major chains.
+
+| Column | Description |
+|:-------|:------------|
+| **Token** | Token name, symbol, and logo |
+| **Chain** | The blockchain network |
+| **App** | Protocol where the token is held (if applicable) |
+| **Amount** | Token quantity |
+| **Value** | USD value of the balance |
+| **Portfolio %** | Percentage of the user's total token holdings |
+
+Filter by individual chain or view all tokens at once. Tokens are sorted by USD value from highest to lowest.
+
+## User Attribution
+
+Track how each user discovered and arrived at your app. Formo captures both first-touch and last-touch attribution for every user.
+
+| Field | Description |
+|:------|:------------|
+| **Referrer** | The website or page that sent the user to your app. Both first and last referrer are tracked. |
+| **Referral** | The referral parameter (`ref`) used when the user arrived. |
+| **UTM Source** | The traffic source (e.g., `twitter`, `google`). |
+| **UTM Medium** | The marketing medium (e.g., `cpc`, `email`, `social`). |
+| **UTM Campaign** | The campaign name. |
+| **UTM Term** | The paid search keyword. |
+| **UTM Content** | Differentiates ad variations or links within the same campaign. |
+
+All UTM parameters track both first-touch and last-touch values, so you can see how a user originally found your app and what brought them back most recently.
+
 ## User Activity
 
 View users' active days at a glance with the activity chart. Activity charts are available on wallet profile and anonymous profile pages, showing engagement patterns over time.
@@ -42,7 +127,7 @@ View users' active days at a glance with the activity chart. Activity charts are
 
 ---
 
-## How to investigate individual users
+## How to research individual users
 
 Wallet profiles let you drill into specific users to understand their behavior, investigate issues, or identify opportunities. This guide shows you how.
 
