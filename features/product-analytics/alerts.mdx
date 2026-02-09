@@ -7,45 +7,76 @@ description: "Get notified of high-value users and important actions."
   <img src="/images/alerts.png" alt="Alerts" />
 </Frame>
 
-Get notified on Email or Slack of high-value whales and important user actions:
+Get notified in real time when high-value whales and important user actions happen:
 
 - Key user events (connect wallet events, conversions, drop off)
 - When whales and high-value users visit your app
 
 In the project settings page, you can create an alert that will notify you via:
 
-- Email
-- Webhooks
+- Webhooks (including Slack via incoming webhooks)
 
 ### Webhooks
 
 Webhooks allow you to send alerts to your own server or third-party service. You can set up a webhook URL in the project settings, and when an alert is triggered, a POST request will be sent to that URL with the alert data.
 
-Here's an example of the JSON payload that will be sent to your webhook:
+When an alert is triggered, Formo batches all matching events into a single webhook call. The generic webhook payload uses the `alerts.triggered` event type and contains raw analytics events from Tinybird:
 
 ```json
 {
-  "alert_id": "XXXX_Test Alert 3_1753771336519_1753771433251",
-  "alert_name": "Test Alert 3",
-  "project_id": "XXXX",
-  "project_name": "Example",
-  "team_id": "XXXX",
-  "event": {
-    "properties": {
-      "chain_id": 84532
-    },
-    "address": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc",
-    "type": "connect",
-    "locale": "en-US",
-    "timezone": "Asia/Saigon",
-    "location": "VN",
-    "timestamp": "2025-07-29T06:42:16.519Z",
-    "anonymous_id": "4b48c7b6-3d61-409f-b695-1d9452954d6b"
-  },
-  "timestamp": "2025-07-29T06:43:53.268Z",
-  "webhook_version": "1.0"
+  "id": "evt_3f7f9c4e-8b2c-4d1f-9a4b-4a2e9c1d2f01",
+  "type": "alerts.triggered",
+  "created": 1739097600,
+  "data": [
+    {
+      "project_id": "proj_123",
+      "session_id": "sess_456",
+      "channel": "web",
+      "type": "connect",
+      "anonymous_id": "4b48c7b6-3d61-409f-b695-1d9452954d6b",
+      "user_id": "",
+      "address": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc",
+      "event": "Connected wallet",
+      "context": {
+        "ip": "203.0.113.10",
+        "user_agent": "Mozilla/5.0 ..."
+      },
+      "properties": {
+        "chain_id": 84532,
+        "net_worth": 250000
+      },
+      "version": "1",
+      "timestamp": "2026-02-09T06:42:16.519Z",
+      "message_id": "msg_01J8ABCDEF1234567890",
+      "origin": "app.formo.so",
+      "locale": "en-US",
+      "location": "VN",
+      "timezone": "Asia/Saigon",
+      "page_path": "/pricing",
+      "page_title": "Pricing",
+      "page_url": "https://app.formo.so/pricing",
+      "page_query": "",
+      "page_hash": "",
+      "library_name": "@formo/sdk-js",
+      "library_version": "1.0.0",
+      "referrer_url": "https://google.com/",
+      "referrer": "google.com",
+      "ref": "",
+      "utm_source": "google",
+      "utm_medium": "cpc",
+      "utm_campaign": "whale-acquisition",
+      "utm_term": "",
+      "utm_content": "",
+      "user_agent": "Mozilla/5.0 (...)",
+      "device": "desktop",
+      "browser": "Chrome",
+      "os": "MacOS"
+    }
+  ]
 }
 ```
+
+For Slack incoming webhooks (`hooks.slack.com`), Formo sends the same events but formatted as a Slack Block Kit table (Time, Event, User, Country, Device, Browser, OS, Referrer) instead of the raw Tinybird rows.
 
 ---
 
@@ -70,7 +101,7 @@ Get real-time notifications when high-value users interact with your app. This g
 | **Name** | Descriptive name (e.g., "Whale Alert") |
 | **Event Type** | Which event triggers the alert |
 | **Conditions** | Filter conditions (optional) |
-| **Notification** | Email or Webhook |
+| **Notification** | Webhook (generic HTTP or Slack) |
 
 ### Step 3: Choose an event type
 
@@ -83,52 +114,58 @@ Select which events should trigger notifications:
 | **page** | User visits a specific page |
 | **custom** | Your custom tracked events |
 
-### Step 4: Add filter conditions (optional)
-
-Make alerts more targeted by adding conditions:
-
-**Example: Alert only for whales**
-- Event type: `connect`
-- Condition: `net_worth > 100000`
-
-**Example: Alert for specific contract interaction**
-- Event type: `transaction`
-- Condition: `contract_address = 0x...`
-
-### Step 5: Configure notifications
+### Step 4: Configure notifications
 
 <Tabs>
-  <Tab title="Email">
-    1. Select **Email** as the notification type
-    2. Enter the email addresses to notify
-    3. Alerts arrive in real-time as events occur
-  </Tab>
   <Tab title="Webhook">
     1. Select **Webhook** as the notification type
-    2. Enter your webhook URL
-    3. Formo sends a POST request with event data
+    2. Enter your webhook URL (generic HTTPS endpoint or Slack incoming webhook)
+    3. Formo sends a POST request with batched event data
 
-    **Webhook payload fields:**
-    - `alert_id` - Unique alert identifier
-    - `alert_name` - Your alert name
-    - `event` - Full event data including address, type, and properties
-    - `timestamp` - When the alert fired
+    **Generic webhook payload (raw events):**
+
+    - `id` - Crypto UUID for this alert delivery (e.g., `evt_...`)
+    - `type` - Always `alerts.triggered`
+    - `created` - Unix timestamp (seconds) when the webhook was created
+    - `data` - Array of raw analytics events (Tinybird rows) that matched your filters
+
+    **Slack webhook payload (formatted table):**
+
+    - Automatically detected when the URL host contains `hooks.slack.com`
+    - Events are rendered as a Slack Block Kit table (Time, Event, User, Country, Device, Browser, OS, Referrer)
+    - Up to 50 events are shown per alert, with a truncation note if more were found
+
+    **Webhook security and signatures:**
+
+    - Optional **secret**: In the alert configuration, you can provide a signing secret used to verify requests on your server.
+    - Usage: For **generic webhooks** (non-Slack URLs), Formo uses your secret to compute an HMAC-SHA256 signature over the string `{timestamp}.{body}`, where:
+      - `timestamp` is the Unix timestamp (seconds) used for the request
+      - `body` is the exact JSON payload string sent in the request
+
+    **HTTP headers sent:**
+
+    - `Content-Type`: `application/json`
+    - `User-Agent`: `Formo-Alerts/1.0`
+    - `X-Formo-Alert-Id`: The alert ID in Formo
+    - `X-Webhook-Signature`: HMAC-SHA256 signature (only for generic webhooks when a secret is set)
+    - `X-Webhook-Timestamp`: Unix timestamp (seconds) used in the signature (only for signed generic webhooks)
+    - `X-Webhook-Event`: Always `alerts.triggered` (only for signed generic webhooks)
   </Tab>
   <Tab title="Slack (via Webhook)">
     1. Create a [Slack incoming webhook](https://api.slack.com/messaging/webhooks)
     2. Use the Slack webhook URL as your Formo webhook URL
-    3. Messages post to your configured Slack channel
+    3. Messages post to your configured Slack channel with a formatted alert summary and event table
   </Tab>
 </Tabs>
 
-### Step 6: Test your alert
+### Step 5: Test your alert
 
 1. Save your alert configuration
 2. Trigger a test event:
    - Visit your app in a browser
    - Connect a wallet
    - Perform the action that matches your alert
-3. Check your email or webhook endpoint for the notification
+3. Check your Slack channel or webhook endpoint for the notification
 
 ### Example: Whale detection alert
 
@@ -152,9 +189,9 @@ Track when users encounter issues:
 | Name | Failed TX Alert |
 | Event type | transaction |
 | Condition | status = failed |
-| Notification | Email |
+| Notification | Webhook (generic HTTPS or Slack) |
 
-Get notified when transactions fail so you can investigate UX issues.
+Get notified when transactions fail so you can investigate UX issues through your own incident tooling or Slack.
 
 ### Webhook integration examples
 
