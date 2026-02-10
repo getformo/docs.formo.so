@@ -200,11 +200,6 @@
           "icon": "map"
         },
         {
-          "anchor": "Community",
-          "href": "https://formo.so/slack",
-          "icon": "slack"
-        },
-        {
           "anchor": "Support",
           "href": "https://formo.so/support",
           "icon": "headset"
@@ -238,7 +233,6 @@
     "socials": {
       "x": "https://x.com/getformo",
       "linkedin": "https://linkedin.com/company/getformo",
-      "slack": "https://formo.so/slack",
       "github": "https://github.com/getformo",
       "website": "https://formo.so"
     }
