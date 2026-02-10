@@ -32,8 +32,8 @@ Enable SRI on the browser [install](/install) snippet by updating the `src` and 
 
 ```html
 <script
-  src="https://cdn.formo.so/analytics@1.24.0"
-  integrity="sha384-I84ELjt74eiqNbn2rc8XPfM1ujYclMAMfbFz1Q17Gohaax62TVy49hx/SRNC2MdV"
+  src="https://cdn.formo.so/analytics@1.27.0"
+  integrity="sha384-Of/xaFqbXZEsMr8slF/A5m/gGtH17zowAzrQ1AGCKglE6hqmTSKmHr50f8NHTHvU"
   crossorigin="anonymous"
   defer
   onload="window.formofy('<YOUR_WRITE_KEY>');"
@@ -52,7 +52,7 @@ You can independently verify the SRI hash using the following methods:
 
 **Using OpenSSL (macOS/Linux):**
 ```bash
-curl -s https://cdn.formo.so/analytics@1.24.0 | openssl dgst -sha384 -binary | openssl base64 -A
+curl -s https://cdn.formo.so/analytics@1.27.0 | openssl dgst -sha384 -binary | openssl base64 -A
 ```
 
 **Using Node.js:**
@@ -60,7 +60,7 @@ curl -s https://cdn.formo.so/analytics@1.24.0 | openssl dgst -sha384 -binary | o
 const crypto = require('crypto');
 const https = require('https');
 
-https.get('https://cdn.formo.so/analytics@1.24.0', (res) => {
+https.get('https://cdn.formo.so/analytics@1.27.0', (res) => {
   const hash = crypto.createHash('sha384');
   res.on('data', (chunk) => hash.update(chunk));
   res.on('end', () => console.log('sha384-' + hash.digest('base64')));
