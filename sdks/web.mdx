@@ -262,6 +262,13 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
   >
     formo-example-farcaster
   </Card>
+  <Card
+    title="Solana"
+    icon="file-code"
+    href="https://github.com/getformo/formo-example-solana"
+  >
+    formo-example-solana
+  </Card>
 </CardGroup>
 
 ## Configuration
@@ -472,6 +479,60 @@ When Wagmi mode is enabled, the SDK:
 Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating multiple cache instances.
 </Tip>
 
+### Solana integration
+
+The Formo Web SDK supports Solana wallet tracking via the Solana Wallet Adapter ecosystem. Solana tracking works alongside EVM tracking — you can track both EVM and Solana wallets in the same app.
+
+See the full [Solana example app](https://github.com/getformo/formo-example-solana) for a working implementation.
+
+<Tabs>
+  <Tab title="React useWallet (Recommended)">
+    Pass the `useWallet()` context and connection to the SDK. This is the recommended approach for React apps — the SDK automatically tracks wallet lifecycle changes (connects, disconnects, wallet switches).
+
+    ```tsx
+    import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+    import { useFormo } from '@formo/analytics';
+    import { useEffect } from 'react';
+
+    function SolanaTracker() {
+      const wallet = useWallet();
+      const { connection } = useConnection();
+      const analytics = useFormo();
+
+      useEffect(() => {
+        if (analytics) {
+          analytics.setSolanaWallet(wallet);
+          analytics.setSolanaConnection(connection);
+        }
+      }, [analytics, wallet, connection]);
+
+      return null;
+    }
+    ```
+
+    Place `<SolanaTracker />` inside both `WalletProvider` and `FormoAnalyticsProvider`.
+  </Tab>
+  <Tab title="Init options">
+    Pass Solana options directly during initialization. Use this for non-React setups or when you manage the wallet adapter instance directly.
+
+    ```tsx
+    const analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
+      solana: {
+        wallet: wallet,
+        connection: connection,
+        cluster: 'mainnet-beta', // Optional. 'mainnet-beta' (default) | 'devnet'
+      },
+    });
+    ```
+  </Tab>
+</Tabs>
+
+The SDK defaults to Solana mainnet-beta. To track on devnet, set the cluster:
+
+```tsx
+analytics.setSolanaCluster('devnet');
+```
+
 ### Referrals
 
 Formo autodetects `ref`, `referral`, and `refcode` query parameters in the URL. You can customize how referrals are detected by the SDK:
@@ -501,7 +562,7 @@ Here are the domains used by Formo to load the SDK and send data:
 
 | Domain | Use case |
 |--------|----------|
-| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) e.g. `https://cdn.formo.so/analytics@1.23.0` |
+| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) e.g. `https://cdn.formo.so/analytics@1.27.0` |
 | events.formo.so | Receives data from the SDK (`http://events.formo.so/v0/raw_events`)|
 
 ### CDN
@@ -520,7 +581,7 @@ module.exports = {
     return [
       {
         source: "/formo.js",
-        destination: "https://cdn.formo.so/analytics@1.23.0", // If using website install script
+        destination: "https://cdn.formo.so/analytics@1.27.0", // If using website install script
       },
       {
         source: "/api/ingest",
