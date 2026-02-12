@@ -7,7 +7,7 @@ iconType: solid
 
 All API endpoints require authentication using either:
 - a **SDK Write Key** to send events
-- a **Workspace API Key** to query data, fetch profiles, and manage forms
+- a **Workspace API Key** to query data and fetch profiles
 
 You'll need to include the key or token in the request headers for all API calls.
 
@@ -56,14 +56,6 @@ Send the key as a Bearer token:
 
 ```bash
 Authorization: Bearer <your_workspace_api_key>
-```
-
-#### Forms API (Webhooks)
-
-Send the key in the `x-api-key` header:
-
-```bash
-x-api-key: <your_workspace_api_key>
 ```
 
 ### Verify Your API Key

@@ -57,8 +57,7 @@
                 "pages": [
                   "features/token-gated-forms/form-builder",
                   "features/token-gated-forms/token-gating",
-                  "features/token-gated-forms/world-id",
-                  "features/token-gated-forms/zapier"
+                  "features/token-gated-forms/world-id"
                 ]
               },
               "features/mcp/overview"
@@ -131,8 +130,7 @@
             "group": "API Documentation",
             "pages": [
               "api-reference/overview",
-              "api-reference/authentication",
-              "api-reference/webhooks"
+              "api-reference/authentication"
             ]
           },
           {
@@ -146,14 +144,6 @@
           {
             "group": "Query API",
             "pages": ["api-reference/query"]
-          },
-          {
-            "group": "Forms API",
-            "pages": [
-              "api-reference/forms/list",
-              "api-reference/forms/subscribe",
-              "api-reference/forms/unsubscribe"
-            ]
           }
         ]
       },

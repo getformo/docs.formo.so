@@ -3,91 +3,27 @@
   "info": {
     "title": "Formo API",
     "version": "1.0.0",
-    "description": "API for managing form webhook subscriptions, form responses, and event tracking"
+    "description": "API for event tracking, querying data, and managing wallet profiles"
   },
   "servers": [
-    {
-      "url": "https://api.formo.so/api",
-      "description": "Forms API"
-    },
     {
       "url": "https://events.formo.so",
       "description": "Events API (separate service from api.formo.so)"
     },
     {
       "url": "https://api.formo.so",
-      "description": "Profile API"
+      "description": "Query and Profiles API"
     }
   ],
   "components": {
     "securitySchemes": {
-      "ApiKeyAuth": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "x-api-key"
-      },
       "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Bearer token for authentication. Use an SDK Write Key for the Events API, or a Workspace API Key for the Query and Profile APIs. Format: 'Bearer <token>'"
+        "description": "Bearer token for authentication. Use an SDK Write Key for the Events API, or a Workspace API Key for the Query and Profiles APIs. Format: 'Bearer <token>'"
       }
     },
     "schemas": {
-      "FormResponse": {
-        "type": "object",
-        "properties": {
-          "formId": {
-            "type": "string",
-            "description": "Unique identifier of the form"
-          },
-          "formTitle": {
-            "type": "string",
-            "description": "Title of the form"
-          },
-          "submissionId": {
-            "type": "string",
-            "description": "Unique identifier of the submission"
-          },
-          "submittedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp of form submission"
-          }
-        },
-        "additionalProperties": true
-      },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "isSuccess": {
-            "type": "boolean",
-            "example": false
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      },
-      "SuccessResponse": {
-        "type": "object",
-        "properties": {
-          "isSuccess": {
-            "type": "boolean",
-            "example": true
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "items": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/FormResponse"
-                }
-              }
-            }
-          }
-        }
-      },
       "EventContext": {
         "type": "object",
         "description": "Contextual information about the event",
@@ -877,352 +813,6 @@
     }
   },
   "paths": {
-    "/webhooks/{formId}/poll": {
-      "get": {
-        "summary": "List Form Responses",
-        "description": "Retrieves recent form responses with transformed field data",
-        "operationId": "listFormResponses",
-        "tags": ["Forms API"],
-        "servers": [
-          {
-            "url": "https://api.formo.so/api",
-            "description": "Forms API"
-          }
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "formId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The unique identifier of the form"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully retrieved form responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Form ID is required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Missing or invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found - Form not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks": {
-      "post": {
-        "summary": "Subscribe to Form Events",
-        "description": "Creates a new webhook subscription for form events",
-        "operationId": "subscribeFormEvents",
-        "tags": ["Forms API"],
-        "servers": [
-          {
-            "url": "https://api.formo.so/api",
-            "description": "Forms API"
-          }
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["formId", "targetUrl", "eventTypes"],
-                "properties": {
-                  "formId": {
-                    "type": "string",
-                    "description": "The unique identifier of the form"
-                  },
-                  "targetUrl": {
-                    "type": "string",
-                    "description": "The URL that will receive webhook events"
-                  },
-                  "eventTypes": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": ["FORM_SUBMISSION", "FORM_UPDATED"]
-                    },
-                    "description": "Types of events to subscribe to"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Webhook already exists for this form and URL. New event types were merged with existing ones.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "webhookId": {
-                          "type": "string",
-                          "description": "Unique identifier of the webhook subscription"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "New webhook subscription created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "webhookId": {
-                          "type": "string",
-                          "description": "Unique identifier of the newly created webhook subscription"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Missing required fields, invalid event types, or webhook with identical event types already exists",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Missing or invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Unsubscribe from Form Events",
-        "description": "Removes a webhook subscription",
-        "operationId": "unsubscribeFormEvents",
-        "tags": ["Forms API"],
-        "servers": [
-          {
-            "url": "https://api.formo.so/api",
-            "description": "Forms API"
-          }
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "webhookId",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The unique identifier of the webhook subscription"
-          },
-          {
-            "name": "targetUrl",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "The URL that receives webhook events"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully unsubscribed from webhook",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "message": {
-                          "type": "string",
-                          "example": "Webhook unsubscribed successfully"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Must provide either webhookId or targetUrl query parameter",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - Missing or invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found - Webhook not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v0/raw_events": {
       "post": {
         "summary": "Track Event",
@@ -1478,11 +1068,11 @@
         "summary": "Search Wallet Profiles",
         "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports advanced filtering by user data, on-chain activity, chains, apps, tokens, labels, and lifecycle. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
         "operationId": "searchWalletProfiles",
-        "tags": ["Profile API"],
+        "tags": ["Profiles API"],
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Profile API"
+            "description": "Profiles API"
           }
         ],
         "security": [
@@ -1790,11 +1380,11 @@
         "summary": "Get Wallet Profile",
         "description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
         "operationId": "getWalletProfile",
-        "tags": ["Profile API"],
+        "tags": ["Profiles API"],
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Profile API"
+            "description": "Profiles API"
           }
         ],
         "security": [
