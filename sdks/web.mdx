@@ -154,6 +154,74 @@ window.formo.identify(...);
 
 If no parameters are specified, the Formo SDK will attempt to auto-identify the wallet address.
 
+<Tabs>
+  <Tab title="Wagmi">
+    Call `identify()` in a `useEffect` that triggers when the wallet address changes:
+
+    ```tsx
+    import { useFormo } from '@formo/analytics';
+    import { useAccount } from 'wagmi';
+    import { useEffect } from 'react';
+
+    function App() {
+      const { address } = useAccount();
+      const analytics = useFormo();
+
+      useEffect(() => {
+        if (address && analytics) {
+          analytics.identify({ address });
+        }
+      }, [address, analytics]);
+    }
+    ```
+  </Tab>
+  <Tab title="Privy">
+    The SDK includes `parsePrivyProperties()` which extracts profile properties (email, social accounts) and all linked wallet addresses from the Privy user object.
+
+    Call `identify()` in a `useEffect` that triggers when the Privy user becomes available:
+
+    ```tsx
+    import { useFormo, parsePrivyProperties } from '@formo/analytics';
+    import { usePrivy } from '@privy-io/react-auth';
+    import { useEffect } from 'react';
+
+    function App() {
+      const { user } = usePrivy();
+      const formo = useFormo();
+
+      useEffect(() => {
+        if (!user || !formo) return;
+
+        const { properties, wallets } = parsePrivyProperties(user);
+
+        for (const wallet of wallets) {
+          formo.identify({ address: wallet.address, userId: user.id }, properties);
+        }
+      }, [user, formo]);
+    }
+    ```
+
+    `parsePrivyProperties()` returns:
+    - `properties` — a flat object with `email`, `discord`, `twitter`, `farcaster`, `github`, `telegram`, `google`, `apple`, and other social identifiers from the Privy user's linked accounts
+    - `wallets` — all wallets linked to the Privy user, so each wallet is identified with the same profile properties
+  </Tab>
+  <Tab title="HTML Snippet">
+    ```html
+    <script
+      src="https://cdn.formo.so/analytics@latest"
+      defer
+      onload="
+        window.formofy('<YOUR_WRITE_KEY>', {
+          ready: function(formo) {
+            formo.identify({ address: '0x...' });
+          }
+        });
+      "
+    ></script>
+    ```
+  </Tab>
+</Tabs>
+
 ## Track events
 
 The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.) 
