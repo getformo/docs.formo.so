@@ -34,6 +34,8 @@ When `wagmi` options are provided, the SDK hooks directly into Wagmi's state man
 - Native event handling via Wagmi's built-in state system
 - Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
 - Full tracking of signatures and transactions via TanStack Query's mutation cache
+
+Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration)
 </Note>
 
 Install the Web SDK via NPM.
@@ -516,7 +518,7 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 
 ### Wagmi integration
 
-For apps using [Wagmi v2](https://wagmi.sh), enable native integration by providing the Wagmi config and QueryClient:
+For apps using [Wagmi](https://wagmi.sh), enable native integration by providing the Wagmi config and QueryClient:
 
 ```tsx
 <FormoAnalyticsProvider
@@ -529,6 +531,10 @@ For apps using [Wagmi v2](https://wagmi.sh), enable native integration by provid
   }}
 >
 ```
+
+<Warning>
+Transaction and signature autocapture requires the use of [wagmi React hooks](https://wagmi.sh/react/api/hooks) (`useWriteContract`, `useSendTransaction`, `useSignMessage`). Calls via `@wagmi/core` or viem directly bypass the mutation cache and won't be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.
+</Warning>
 
 When Wagmi mode is enabled, the SDK:
 - Hooks directly into Wagmi's state management for connection events

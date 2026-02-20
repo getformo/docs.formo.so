@@ -74,6 +74,8 @@ Use this pre-built prompt to get started faster: [Open in Cursor](https://cursor
 
   Key: `<FormoAnalyticsProvider>` must be **inside** `<WagmiProvider>` and `<QueryClientProvider>`. Use the same `QueryClient` instance for both. Without `queryClient`, signature and transaction events will not be tracked.
 
+  **Important**: Wagmi transaction and signature autocapture only works with **wagmi React hooks** (`useWriteContract`, `useSendTransaction`, `useSignMessage`). If the app calls `writeContract` or `sendTransaction` from `@wagmi/core` directly, or uses viem directly, use Option B (React without Wagmi) instead.
+
   ### **Option B: React (without Wagmi)**
 
   npm install @formo/analytics --save
@@ -215,6 +217,7 @@ Use this pre-built prompt to get started faster: [Open in Cursor](https://cursor
   7. For **Next.js App Router**, create a separate `AnalyticsProvider.tsx` with `'use client'`.
   8. For **Wagmi**, pass both `config` and `queryClient` to `options.wagmi`.
   9. **Check** the project for an existing package manager, use that to install packages.
+  10. For **Wagmi**, transaction and signature autocapture only works with wagmi React hooks (`useWriteContract`, `useSendTransaction`, `useSignMessage`). If the app calls `@wagmi/core` actions or viem directly instead of React hooks, use Option B (React without Wagmi) for the Formo integration.
 
   ### **5.2 – NEVER DO THE FOLLOWING**
   1. **Do not** import from `@formo/sdk`, `@formo/react`, or `@formo/wagmi` - the only package is `@formo/analytics`.
@@ -309,6 +312,10 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
     ```
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
+
+    <Warning>
+    Transaction and signature autocapture requires the use of [wagmi React hooks](https://wagmi.sh/react/api/hooks) (`useWriteContract`, `useSendTransaction`, `useSignMessage`). Calls via `@wagmi/core` or viem directly bypass the mutation cache and won't be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.
+    </Warning>
 
     #### 3. Identify users
 
