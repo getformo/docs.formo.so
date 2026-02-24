@@ -20,7 +20,6 @@
           {
             "group": "Features",
             "pages": [
-              "features/concepts",
               {
                 "group": "Product Analytics",
                 "icon": "compass",
@@ -87,9 +86,10 @@
           {
             "group": "Data",
             "pages": [
+              "data/concepts",
               "data/metrics",
               {
-                "group": "Event Spec",
+                "group": "Events",
                 "icon": "cube",
                 "pages": [
                   "data/events/overview",
