@@ -6,10 +6,31 @@ iconType: solid
 ---
 
 All API endpoints require authentication using either:
-- a **SDK Write Key** to send events
 - a **Workspace API Key** to query data and fetch profiles
+- a **SDK Write Key** to send events
 
 You'll need to include the key or token in the request headers for all API calls.
+
+## Workspace API Key
+
+Find your API key in your workspace settings. Create one with the appropriate scope if you don't have one yet.
+
+<Frame>
+	<img
+		src="/images/workspace-api-key.png"
+		alt="Where to find your Workspace API key"
+	/>
+</Frame>
+
+To access the Profiles and Query API, include your workspace API key in your request headers as a Bearer token:
+
+```bash
+Authorization: Bearer <your_workspace_api_key>
+```
+
+<Frame>
+	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
+</Frame>
 
 ## SDK Write Key
 
@@ -19,49 +40,8 @@ Find your SDK Write Key in your project settings.
 	<img src="/images/project-settings.png" alt="Tokens in project settings page" />
 </Frame>
 
-Send events through the Events API or SDKs with the SDK Write Key.
-
-### Request Headers
-
-Include the Token in your request headers:
+To send events through the Events API, include the SDK Write Key in your request headers:
 
 ```bash
 Authorization: Bearer <token>
-```
-
-## Workspace API Key
-
-Find your API key in your workspace settings. This key is unique to your workspace and should be kept secure.
-
-<Frame>
-	<img
-		src="/images/workspace-api-key.png"
-		alt="Where to find your Workspace API key"
-	/>
-</Frame>
-
-The API Key must include the correct Read / Write scope for the API you are calling.
-
-### Request Headers
-
-<Frame>
-	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
-</Frame>
-
-The Workspace API Key is used with **two different header formats** depending on the API:
-
-#### Profiles API and Query API
-
-Send the key as a Bearer token:
-
-```bash
-Authorization: Bearer <your_workspace_api_key>
-```
-
-### Verify Your API Key
-
-Call this endpoint with the workspace API key to view your workspace details.
-
-```bash
-POST https://api.formo.so/api/validate-api-key
 ```
