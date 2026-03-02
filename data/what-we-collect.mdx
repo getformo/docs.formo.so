@@ -39,23 +39,6 @@ flowchart TD
 
 **What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only to compute a daily-rotating session hash for unique visitor counting, then discards it. The raw IP address is never stored in logs or databases.
 
-### Comparison
-
-Here's a comparison of how Formo compares to other analytics tools:
-
-| Data point | Formo | Google Analytics 4 | Plausible | Umami |
-| :--- | :--- | :--- | :--- | :--- |
-| IP address stored | No | [Yes (anonymized)](https://support.google.com/analytics/answer/2763052) | No | No |
-| Device fingerprinting | No | [Yes](https://support.google.com/analytics/answer/11593727) | No | No |
-| Third-party cookies | No | [Yes](https://developers.google.com/analytics/devguides/collection/ga4/cookies-user-id) | No | No |
-| Full user-agent stored | Yes | Yes | No | Yes |
-| Cross-site tracking | No | Yes | No | No |
-| Requires cookie consent banner | No | Yes (in EU) | No | No |
-| GDPR-compliant by default | Yes | [No (requires configuration)](https://support.google.com/analytics/answer/9019185) | Yes | Yes |
-| Open source SDK | Yes | No | Yes | Yes |
-| Self-hostable | No | No | Yes | Yes |
-| Blockchain-native analytics | Yes | No | No | No |
-
 ### What We Do NOT Collect
 
 | Data type | Collected? |
