@@ -3,12 +3,34 @@ title: 'Spec: Transaction'
 description: 'Get started with the wallet Transaction event.'
 ---
 
-The `transaction` event is emitted whenever the user's performs a transaction.
+The `transaction` event is emitted whenever the user performs a transaction.
 It includes the transaction status (started, broadcasted, rejected), to address, data, value, transaction hash, chain ID, and wallet address.
+
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `status` | string | Transaction status: `started`, `broadcasted`, `confirmed`, or `rejected` |
+| `chain_id` | number | Chain ID of the network |
+| `data` | string | Transaction calldata (hex-encoded) |
+| `to` | string | Recipient address |
+| `value` | string | Transaction value (hex-encoded) |
+| `transaction_hash` | string | Transaction hash (available after broadcast) |
+| `function_name` | string | Decoded function name (if contract interaction) |
+| `function_args` | object | Decoded function arguments (if contract interaction) |
+| `builder_codes` | string | Comma-separated [builder codes](#builder-codes) extracted from the transaction calldata (ERC-8021) |
+
+## Builder Codes
+
+The SDK automatically detects and extracts [ERC-8021](https://www.erc8021.com/) builder codes from transaction calldata. Builder codes are an onchain attribution standard that lets apps identify themselves in transactions.
+
+When a transaction includes an ERC-8021 data suffix, the SDK parses it and includes the `builder_codes` field in the transaction event. For example, a transaction with the builder code `"uniswap"` would include `"builder_codes": "uniswap"` in the event properties.
+
+This works automatically — no additional SDK configuration is needed. If your app appends builder codes to transactions, Formo will detect and attribute them.
 
 ## Sample Payload
 
-Here’s the payload of a typical call with most common fields removed:
+Here's the payload of a typical call with most common fields removed:
 
 ```json
 {
@@ -19,8 +41,13 @@ Here’s the payload of a typical call with most common fields removed:
         "data": "0xa4136862000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000086173646661647366000000000000000000000000000000000000000000000000",
         "to": "0x76BB9C9758F62822Abaa652D49e52Ce85383FC26",
         "value": "0x1",
-        "transaction_hash": "0x489daee9ded2bfcceb9f9c3edeaf695bd2c3acef0dfb7558e461b2aba59378ba"
+        "transaction_hash": "0x489daee9ded2bfcceb9f9c3edeaf695bd2c3acef0dfb7558e461b2aba59378ba",
+        "function_name": "setText",
+        "function_args": {
+            "text": "asdfadsf"
+        },
+        "text": "asdfadsf",
+        "builder_codes": "uniswap"
     }
 }
 ```
-
