@@ -675,6 +675,26 @@ Events that are tracked correctly should also show up in the Activity page of yo
   </Card>
 </CardGroup>
 
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Which installation method should I use: Wagmi, React, Next.js, or HTML snippet?">
+    If your dApp uses [Wagmi](https://wagmi.sh/) for wallet connections, use the [Wagmi integration](#wagmi) — it automatically tracks wallet events. For React or Next.js apps without Wagmi, use the [React integration](#react--nextjs). For static sites or non-React apps, use the [HTML snippet](#websites). For mobile apps, use the [React Native SDK](/sdks/mobile).
+  </Accordion>
+  <Accordion title="Why are my transactions and signatures not being tracked?">
+    Transaction and signature tracking requires either the Wagmi integration or manually calling [formo.transaction()](/data/events/transaction) and [formo.signature()](/data/events/signature). The HTML snippet alone tracks pageviews, sessions, referrer sources, and UTM parameters — but not wallet transactions or signatures. Make sure you have installed the SDK with one of the framework integrations that support wallet event tracking.
+  </Accordion>
+  <Accordion title="How do I verify that the Formo SDK is installed correctly?">
+    After installing, visit your site and open [Live View](/features/product-analytics/live-view) in the Formo dashboard. You should see your pageview appear in real-time. You can also check your browser's Network tab for requests to `api.formo.so`.
+  </Accordion>
+  <Accordion title="Does the Formo SDK work on localhost during development?">
+    Yes. The SDK works on localhost and all domains by default. Events from localhost will appear in your dashboard, so you may want to use a separate project for development and production.
+  </Accordion>
+  <Accordion title="How do I prevent ad blockers from blocking Formo?">
+    Set up a [reverse proxy](/sdks/web#proxy) to route Formo requests through your own domain. This prevents ad blockers from intercepting requests to `api.formo.so`.
+  </Accordion>
+</AccordionGroup>
+
 ## Support
 
 <CardGroup cols={2}>

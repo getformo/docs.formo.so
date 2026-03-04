@@ -634,6 +634,23 @@ The SDK automatically detects and extracts [ERC-8021](https://www.erc8021.com/) 
 
 No additional SDK configuration is required — builder code extraction happens automatically for all tracked transactions.
 
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="What is the difference between the Wagmi integration and the standard React integration?">
+    The [Wagmi integration](#wagmi) automatically tracks wallet connections, disconnections, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs) tracks pageviews and sessions but requires manual calls to track wallet events. Use the Wagmi integration if your dApp uses Wagmi.
+  </Accordion>
+  <Accordion title="How do I track custom events like swaps, deposits, or mints?">
+    Use [formo.track()](/data/events/track) to send custom events with any properties you need. For example: `formo.track('swap', { tokenIn: 'USDC', tokenOut: 'ETH', amount: 1000 })`. Custom events appear in the [Activity](/features/product-analytics/activity) feed and can be queried in the [Explorer](/features/product-analytics/explore).
+  </Accordion>
+  <Accordion title="Does the Formo SDK support consent management for GDPR?">
+    Yes. The SDK provides built-in [consent management](#consent-management) with `optOutTracking()` and `optInTracking()` methods. Call `optOutTracking()` to stop all tracking for a user, and `optInTracking()` to re-enable it. Formo does not use third-party cookies, IP addresses, or device fingerprinting, so most jurisdictions do not require a cookie consent banner.
+  </Accordion>
+  <Accordion title="Can I use Formo with Privy or other embedded wallet providers?">
+    Yes. The SDK includes a dedicated [Privy integration](#privy) with `parsePrivyProperties()` to extract profile properties and linked wallet addresses. For other wallet providers, use the standard [React integration](#react--nextjs). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
+  </Accordion>
+</AccordionGroup>
+
 ## Proxy
 
 To avoid ad-blockers from blocking your requests, we recommend setting up a reverse proxy.

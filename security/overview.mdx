@@ -142,6 +142,23 @@ For the CDN script tag method, enable [SRI](/security/sri) and [CSP](/security/c
 </Card>
 
 
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Does Formo store IP addresses or use device fingerprinting?">
+    No. Formo does not store IP addresses, use device fingerprinting, or set third-party cookies. See [what we collect](/data/what-we-collect) for a full breakdown of the data Formo processes.
+  </Accordion>
+  <Accordion title="Is the Formo SDK open source? Can I audit the code?">
+    Yes. The Formo SDK is fully [open source on GitHub](https://github.com/getformo/sdk). You can audit the code, verify what data is collected, and contribute improvements.
+  </Accordion>
+  <Accordion title="How should I install Formo for maximum security?">
+    Use [Subresource Integrity (SRI)](/security/sri) to verify SDK integrity, configure a [Content Security Policy (CSP)](/security/csp) to control allowed domains, and set up a [reverse proxy](/sdks/web#proxy) to route requests through your own domain.
+  </Accordion>
+  <Accordion title="Does Formo support SSO and role-based access control?">
+    Yes. Formo supports [Single Sign-On (SSO)](/security/sso) for centralized authentication through your identity provider, [multi-factor authentication (MFA)](/security/mfa) via TOTP, and [role-based access control](/security/roles) with Owner, Admin, Editor, and Member roles.
+  </Accordion>
+</AccordionGroup>
+
 ## Contact
 
 If you have any questions, [contact us](https://formo.so/support).

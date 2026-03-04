@@ -42,6 +42,23 @@ Formo automatically tracks visitors across all subdomains of your main domain, g
 
 To enable cross-subdomain analytics, simply use your root domain when adding your project in the Formo dashboard. The Formo SDK handles identity resolution and session management for you, ensuring seamless analytics across your entire product.
 
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="What events does Formo autocapture for product analytics?">
+    After installing the SDK, Formo automatically tracks [pageviews](/data/events/page), sessions, [wallet connections](/data/events/connect), [disconnections](/data/events/disconnect), [chain switches](/data/events/chain), [transactions](/data/events/transaction), and [signatures](/data/events/signature). You can also define [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
+  </Accordion>
+  <Accordion title="Can I track users across my marketing site and my dApp?">
+    Yes. Formo supports cross-subdomain analytics out of the box. Use your root domain when adding your project in the dashboard, and the SDK handles identity resolution and session management across subdomains.
+  </Accordion>
+  <Accordion title="How does Formo count unique visitors?">
+    Formo generates an anonymous visitor ID (UUID) stored in a first-party cookie on your domain. This ID is not linked to any personal information — no IP addresses or device fingerprints are used. A server-side daily-rotating hash is also used for session deduplication. See [what we collect](/data/what-we-collect) for details.
+  </Accordion>
+  <Accordion title="Can I write SQL queries against my analytics data?">
+    Yes. Use the [Explorer](/features/product-analytics/explore) to run SQL queries directly against your analytics data. You can also use the [Query API](/api-reference/query) or connect [BI tools](/data/bi) like Metabase or Grafana.
+  </Accordion>
+</AccordionGroup>
+
 ## Next steps
 
 <CardGroup cols={2}>
