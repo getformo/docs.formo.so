@@ -638,7 +638,7 @@ No additional SDK configuration is required — builder code extraction happens 
 
 <AccordionGroup>
   <Accordion title="What is the difference between the Wagmi integration and the standard React integration?">
-    The [Wagmi integration](#wagmi) automatically tracks wallet connections, disconnections, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs) tracks pageviews and sessions but requires manual calls to track wallet events. Use the Wagmi integration if your dApp uses Wagmi.
+    The [Wagmi integration](#wagmi) automatically tracks wallet connections, disconnections, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs) tracks wallet events by wrapping the EIP-1193 wallet provider to track signatures and transactions. Use the Wagmi integration if your dApp uses Wagmi and its hooks.
   </Accordion>
   <Accordion title="How do I track custom events like swaps, deposits, or mints?">
     Use [formo.track()](/data/events/track) to send custom events with any properties you need. For example: `formo.track('swap', { tokenIn: 'USDC', tokenOut: 'ETH', amount: 1000 })`. Custom events appear in the [Activity](/features/product-analytics/activity) feed and can be queried in the [Explorer](/features/product-analytics/explore).
