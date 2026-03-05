@@ -685,7 +685,7 @@ Events that are tracked correctly should also show up in the Activity page of yo
     Transaction and signature tracking requires either the Wagmi integration or manually calling [formo.transaction()](/data/events/transaction) and [formo.signature()](/data/events/signature). The HTML snippet alone tracks pageviews, sessions, referrer sources, and UTM parameters — but not wallet transactions or signatures. Make sure you have installed the SDK with one of the framework integrations that support wallet event tracking.
   </Accordion>
   <Accordion title="How do I verify that the Formo SDK is installed correctly?">
-    After installing, visit your site and open [Live View](/features/product-analytics/live-view) in the Formo dashboard. You should see your pageview appear in real-time. You can also check your browser's Network tab for requests to `api.formo.so`.
+    After installing, visit your site and open [Live View](/features/product-analytics/live-view) in the Formo dashboard. You should see your pageview appear in real-time. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent succesfully.
   </Accordion>
   <Accordion title="Does the Formo SDK work on localhost during development?">
     Yes. The SDK works on localhost and all domains by default. Events from localhost will appear in your dashboard, so you may want to use a separate project for development and production.
