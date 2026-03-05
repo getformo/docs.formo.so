@@ -682,7 +682,7 @@ Events that are tracked correctly should also show up in the Activity page of yo
     If your app uses [Wagmi](https://wagmi.sh/) for wallet connections and its hooks for transactions, use the [Wagmi integration](#wagmi). For React or Next.js apps without Wagmi, use the [React integration](#react--nextjs). For static sites or non-React apps, use the [HTML snippet](#websites). For mobile apps, use the [React Native SDK](/sdks/mobile).
   </Accordion>
   <Accordion title="Why are my transactions and signatures not being tracked?">
-    Transaction and signature tracking requires either the Wagmi integration or manually calling [formo.transaction()](/data/events/transaction) and [formo.signature()](/data/events/signature). The HTML snippet alone tracks pageviews, sessions, referrer sources, and UTM parameters — but not wallet transactions or signatures. Make sure you have installed the SDK with one of the framework integrations that support wallet event tracking.
+    When using the Wagmi integration, transaction and signature tracking requires your app to use the wagmi `useWriteContract` hooks. Contract calls via `@wagmi/core` or `viem` directly bypass the mutation cache and won’t be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.
   </Accordion>
   <Accordion title="How do I verify that the Formo SDK is installed correctly?">
     After installing, visit your site and open [Live View](/features/product-analytics/live-view) in the Formo dashboard. You should see your pageview appear in real-time. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent succesfully.
