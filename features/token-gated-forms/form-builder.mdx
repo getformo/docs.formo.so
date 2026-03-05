@@ -151,7 +151,24 @@ Here's a practical example of a token-gated survey:
 
 Only users holding at least 1 NFT from your collection can submit the form.
 
-### Next Steps
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Which blockchains are supported for token gating?">
+    Token gating supports EVM-compatible chains (Ethereum, Base, Arbitrum, Optimism, Polygon, and more) as well as Solana. See the full list of [supported chains](/chains/overview).
+  </Accordion>
+  <Accordion title="Can I require multiple token conditions (AND/OR logic)?">
+    Yes. You can configure multiple token gate conditions and choose whether users must meet all conditions (AND) or any one condition (OR). See [token gating](/features/token-gated-forms/token-gating) for details on configuring multi-condition gates.
+  </Accordion>
+  <Accordion title="What social accounts can be verified on token-gated forms?">
+    You can verify Twitter/X, Discord, Farcaster, Telegram, and more. Additional verification options include Solana wallet, World ID, Human Passport, and Contract Read conditions. Social verification helps you build richer profiles and prevent sybil submissions.
+  </Accordion>
+  <Accordion title="Can I customize the branding and design of my form?">
+    Yes. You can add your logo, set brand colors, customize the background, and configure the form layout. Forms are designed to be embeddable on your own site or shareable as standalone links.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
 
 <CardGroup cols={2}>
   <Card title="Token Gating Details" icon="lock" href="/features/token-gated-forms/token-gating">

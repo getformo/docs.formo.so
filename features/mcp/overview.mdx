@@ -234,6 +234,20 @@ The Formo MCP server exposes these analytics tools:
 
 For user analytics (retention, lifecycle, user profiles), use `text_to_sql` + `execute_query` to query the users datasource directly.
 
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Which AI tools support the Formo MCP Server?">
+    The Formo MCP Server works with Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any AI client that supports HTTP or stdio MCP transports. See the setup tabs above for configuration instructions for each client.
+  </Accordion>
+  <Accordion title="What analytics data can I query through the MCP Server?">
+    You can query KPIs, traffic sources, top pages, top events, custom events, geographic distribution, revenue data, and wallet profiles. For advanced queries like retention and cohort analysis, use the `text_to_sql` and `execute_query` tools to run SQL directly against your data.
+  </Accordion>
+  <Accordion title="Is my analytics data secure when using the MCP Server?">
+    Yes. The MCP Server provides read-only access scoped to your project. Each API key is project-specific and no data is stored by the MCP server itself. You can revoke API keys at any time from your workspace settings.
+  </Accordion>
+</AccordionGroup>
+
 ## Troubleshooting
 
 **Tools not appearing:** Verify your API key has the MCP scope enabled. Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart your AI assistant after configuration changes.

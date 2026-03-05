@@ -30,6 +30,20 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Return the activity feed / event stream for an anonymous visitor or wallet.
 - Export data periodically to your data warehouse.
 
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What are the rate limits for the Formo API?">
+    API rate limits depend on your plan. Check the [authentication docs](/api-reference/authentication) for details on rate limits and API key scopes.
+  </Accordion>
+  <Accordion title="Can I use the Profiles API for real-time app personalization?">
+    Yes. The [Profiles API](/api-reference/profile) returns wallet profile data including holdings, net worth, lifecycle stage, and labels. It also returns your first-party data (if the user has visited your app) such as country, device, browser, OS, and more. You can use this to personalize your app experience based on a user's onchain activity.
+  </Accordion>
+  <Accordion title="Can I connect BI tools like Metabase or Looker to Formo?">
+    Yes. Formo provides [BI tool integration](/data/bi) via BI Read tokens that connect to the Formo data warehouse. You can connect Metabase, Grafana, and other SQL-based tools to query your analytics data.
+  </Accordion>
+</AccordionGroup>
+
 ## Support
 
 <CardGroup cols={2}>

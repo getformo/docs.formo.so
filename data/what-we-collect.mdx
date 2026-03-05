@@ -222,3 +222,16 @@ If you use [Token Gated Forms](/features/token-gated-forms/form-builder), any da
 
 You are responsible for ensuring that sensitive data is not collected through forms without appropriate legal basis and explicit consent.
 
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Are wallet addresses considered personal data under GDPR?">
+    The classification of wallet addresses under GDPR depends on context. Formo treats wallet addresses as pseudonymous identifiers — they are not linked to names, emails, or IP addresses in our system. We recommend consulting your legal counsel for guidance specific to your jurisdiction and use case.
+  </Accordion>
+  <Accordion title="How does Formo determine a visitor's country without storing IP addresses?">
+    Formo derives the visitor's country from the browser's timezone (`Intl.DateTimeFormat().resolvedOptions().timeZone`) on the client side. This maps a timezone to a country code without using IP geolocation. The raw IP address is never stored.
+  </Accordion>
+  <Accordion title="Does Formo set any cookies?">
+    Formo uses first-party cookies for anonymous visitor identification and cross-subdomain tracking (e.g., an `anonymous-id` cookie and session cookies). These are first-party cookies scoped to your domain only — Formo does **not** set any third-party cookies or cross-site tracking cookies. Because Formo does not use third-party cookies, most jurisdictions do not require a cookie consent banner, but consult your legal counsel for your specific case.
+  </Accordion>
+</AccordionGroup>
