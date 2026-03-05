@@ -679,7 +679,7 @@ Events that are tracked correctly should also show up in the Activity page of yo
 
 <AccordionGroup>
   <Accordion title="Which installation method should I use: Wagmi, React, Next.js, or HTML snippet?">
-    If your dApp uses [Wagmi](https://wagmi.sh/) for wallet connections, use the [Wagmi integration](#wagmi) — it automatically tracks wallet events. For React or Next.js apps without Wagmi, use the [React integration](#react--nextjs). For static sites or non-React apps, use the [HTML snippet](#websites). For mobile apps, use the [React Native SDK](/sdks/mobile).
+    If your app uses [Wagmi](https://wagmi.sh/) for wallet connections and its hooks for transactions, use the [Wagmi integration](#wagmi). For React or Next.js apps without Wagmi, use the [React integration](#react--nextjs). For static sites or non-React apps, use the [HTML snippet](#websites). For mobile apps, use the [React Native SDK](/sdks/mobile).
   </Accordion>
   <Accordion title="Why are my transactions and signatures not being tracked?">
     Transaction and signature tracking requires either the Wagmi integration or manually calling [formo.transaction()](/data/events/transaction) and [formo.signature()](/data/events/signature). The HTML snippet alone tracks pageviews, sessions, referrer sources, and UTM parameters — but not wallet transactions or signatures. Make sure you have installed the SDK with one of the framework integrations that support wallet event tracking.
