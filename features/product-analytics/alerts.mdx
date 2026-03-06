@@ -9,23 +9,193 @@ description: "Get notified of high-value users and important actions."
 
 Get notified in real time when high-value whales and important user actions happen:
 
-- Key user events (connect wallet events, conversions, drop off)
+- Key user events (connect wallet, transactions, conversions, drop off)
 - When whales and high-value users visit your app
 
 In the project settings page, you can create an alert that will notify you via:
 
 - Webhooks (including Slack via incoming webhooks)
 
-### Webhooks
+---
 
-Webhooks allow you to send alerts to your own server or third-party service. You can set up a webhook URL in the project settings, and when an alert is triggered, a POST request will be sent to that URL with the alert data.
+## How to set up your first alert
 
-When an alert is triggered, Formo batches all matching events into a single webhook call. The generic webhook payload uses the `alerts.triggered` event type and contains raw analytics events from Tinybird:
+Get real-time notifications when high-value users interact with your app. This guide walks you through creating alerts for whale detection and key events.
+
+### Step 1: Navigate to Alerts
+
+1. Go to the [Formo Dashboard](https://app.formo.so)
+2. Select your project
+3. Click **Settings** in the left navigation (gear icon)
+4. Select the **Alerts** tab
+
+### Step 2: Create a new alert
+
+1. Click **Create Alert**
+2. Configure your alert:
+
+| Setting | Description |
+|---------|-------------|
+| **Name** | Descriptive name (e.g., "Whale Alert") |
+| **Trigger Type** | Events or Users (see below) |
+| **Conditions** | Filter conditions (optional) |
+| **Notification** | Webhook (generic HTTP or Slack) |
+
+### Step 3: Choose a trigger type
+
+Select whether the alert fires on **events** or **users**:
+
+<Tabs>
+  <Tab title="Events">
+    Triggers when a new event matches your filters. Each matching event is sent to your webhook.
+
+    | Event Type | When it fires |
+    |------------|--------------|
+    | **connect** | User connects their wallet |
+    | **transaction** | User submits a transaction |
+    | **page** | User visits a specific page |
+    | **custom** | Your custom tracked events |
+
+    You can add conditions to filter on event properties (e.g., `chain_id = 8453`, `status = failed`).
+  </Tab>
+  <Tab title="Users">
+    Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your criteria.
+
+    Each matching user is **notified once per 24 hours** — if the same user remains active and continues to match, they won't be re-sent until the dedup window expires.
+
+    Available user filters:
+
+    | Filter | Description |
+    |--------|-------------|
+    | **net_worth_usd** | Wallet net worth (e.g., > $100,000) |
+    | **tx_count** | Number of transactions |
+    | **volume** | Trading volume |
+    | **revenue** | Revenue generated |
+    | **location** | Country code |
+    | **device** | Device type (desktop, mobile) |
+    | **browser** | Browser name |
+    | **os** | Operating system |
+    | **referrer / UTM** | Acquisition source filters |
+    | **apps** | Specific onchain app usage |
+    | **tokens** | Token holdings |
+    | **chains** | Chain activity |
+    | **labels** | Wallet labels (e.g., Coinbase verified) |
+    | **lifecycle** | User lifecycle stage (New, Returning, etc.) |
+    | **socials** | Social profiles (e.g., Farcaster) |
+  </Tab>
+</Tabs>
+
+### Step 4: Configure notifications
+
+<Tabs>
+  <Tab title="Webhook">
+    1. Select **Webhook** as the notification type
+    2. Enter your webhook URL (generic HTTPS endpoint or Slack incoming webhook)
+    3. Formo sends a POST request with batched data
+
+    **Webhook security and signatures:**
+
+    - Optional **secret**: In the alert configuration, you can provide a signing secret used to verify requests on your server.
+    - For **generic webhooks** (non-Slack URLs), Formo uses your secret to compute an HMAC-SHA256 signature over the string `{timestamp}.{body}`, where:
+      - `timestamp` is the Unix timestamp (seconds) used for the request
+      - `body` is the exact JSON payload string sent in the request
+
+    **HTTP headers sent:**
+
+    | Header | Description |
+    |--------|-------------|
+    | `Content-Type` | `application/json` |
+    | `User-Agent` | `Formo-Alerts/1.0` |
+    | `X-Formo-Alert-Id` | The alert ID in Formo |
+    | `X-Webhook-Signature` | HMAC-SHA256 signature (generic webhooks with a secret only) |
+    | `X-Webhook-Timestamp` | Unix timestamp used in the signature (generic webhooks with a secret only) |
+    | `X-Webhook-Event` | `alert.event.triggered` or `alert.user.triggered` (generic webhooks with a secret only) |
+  </Tab>
+  <Tab title="Slack (via Webhook)">
+    1. Create a [Slack incoming webhook](https://api.slack.com/messaging/webhooks)
+    2. Use the Slack webhook URL as your Formo webhook URL
+    3. Formo auto-detects `hooks.slack.com` URLs and formats messages as Slack Block Kit
+    4. Messages post to your configured Slack channel with a formatted alert summary
+  </Tab>
+</Tabs>
+
+### Step 5: Test your alert
+
+1. Save your alert configuration
+2. Trigger a test event:
+   - Visit your app in a browser
+   - Connect a wallet
+   - Perform the action that matches your alert
+3. Check your Slack channel or webhook endpoint for the notification
+
+---
+
+## Alert payloads
+
+### Event alerts
+
+When an event alert is triggered, Formo batches all matching events into a single webhook call.
+
+#### Webhook payload
+
+The webhook payload uses the `alert.event.triggered` event type and contains raw analytics events:
+
+**Top-level properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Unique event ID (e.g., `evt_3f7f9c4e-...`) |
+| `type` | string | Always `alert.event.triggered` |
+| `created` | number | Unix timestamp (seconds) when the webhook was created |
+| `data` | array | Array of raw analytics events that matched your filters |
+
+**Each event in `data`:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `project_id` | string | Your Formo project ID |
+| `session_id` | string | User session ID |
+| `channel` | string | Event channel (e.g., `web`, `import`) |
+| `type` | string | Event type (e.g., `connect`, `transaction`, `page`, `track`) |
+| `anonymous_id` | string | Anonymous user ID |
+| `user_id` | string | Identified user ID (if available) |
+| `address` | string | Wallet address (if available) |
+| `event` | string | Event name |
+| `context` | object | Context data (IP, user agent) |
+| `properties` | object | Event-specific properties |
+| `version` | string | SDK version |
+| `timestamp` | string | ISO 8601 timestamp |
+| `message_id` | string | Unique message ID |
+| `origin` | string | Origin domain |
+| `locale` | string | User locale |
+| `location` | string | Country code |
+| `timezone` | string | User timezone |
+| `page_path` | string | Page path |
+| `page_title` | string | Page title |
+| `page_url` | string | Full page URL |
+| `page_query` | string | URL query string |
+| `page_hash` | string | URL hash |
+| `library_name` | string | SDK library name |
+| `library_version` | string | SDK library version |
+| `referrer_url` | string | Full referrer URL |
+| `referrer` | string | Referrer domain |
+| `ref` | string | Ref parameter |
+| `utm_source` | string | UTM source |
+| `utm_medium` | string | UTM medium |
+| `utm_campaign` | string | UTM campaign |
+| `utm_term` | string | UTM term |
+| `utm_content` | string | UTM content |
+| `user_agent` | string | Raw user agent string |
+| `device` | string | Device type (e.g., `desktop`, `mobile`) |
+| `browser` | string | Browser name |
+| `os` | string | Operating system |
+
+**Sample payload:**
 
 ```json
 {
   "id": "evt_3f7f9c4e-8b2c-4d1f-9a4b-4a2e9c1d2f01",
-  "type": "alerts.triggered",
+  "type": "alert.event.triggered",
   "created": 1739097600,
   "data": [
     {
@@ -76,122 +246,328 @@ When an alert is triggered, Formo batches all matching events into a single webh
 }
 ```
 
-For Slack incoming webhooks (`hooks.slack.com`), Formo sends the same events but formatted as a Slack Block Kit table (Time, Event, User, Country, Device, Browser, OS, Referrer) instead of the raw Tinybird rows.
+#### Slack payload
+
+For Slack incoming webhooks (`hooks.slack.com`), Formo formats events as a Slack Block Kit table instead of raw data.
+
+The Slack message includes:
+- A header with the alert name
+- A table with columns: **Time**, **User** (clickable link to Formo profile), **[dynamic property columns]**, **Country**, **Device**, **Browser**, **OS**, **Referrer**
+- Property columns are collected dynamically from all events in the batch
+- Up to **50 events** are shown per message, with a truncation note if more were found
+
+**Sample Slack Block Kit payload:**
+
+```json
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": ":bell: Whale Alert",
+        "emoji": true
+      }
+    },
+    {
+      "type": "table",
+      "rows": [
+        [
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Time", "style": { "bold": true } }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "User", "style": { "bold": true } }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "chain_id", "style": { "bold": true } }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Country", "style": { "bold": true } }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Device", "style": { "bold": true } }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Browser", "style": { "bold": true } }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "OS", "style": { "bold": true } }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Referrer", "style": { "bold": true } }] }] }
+        ],
+        [
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Feb 9, 06:42 AM" }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "link", "url": "https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8...E26bdc", "text": "0xF04bC8...E26bdc" }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "84532" }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Vietnam" }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Desktop" }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Chrome" }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "MacOS" }] }] },
+          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "google.com" }] }] }
+        ]
+      ]
+    }
+  ]
+}
+```
 
 ---
 
-## How to set up your first alert
+### User alerts
 
-Get real-time notifications when high-value users interact with your app. This guide walks you through creating alerts for whale detection and key events.
+When a user alert is triggered, Formo sends matching user profiles to your webhook.
 
-### Step 1: Navigate to Alerts
+#### Webhook payload
 
-1. Go to the [Formo Dashboard](https://app.formo.so)
-2. Select your project
-3. Click **Settings** in the left navigation (gear icon)
-4. Select the **Alerts** tab
+The webhook payload uses the `alert.user.triggered` event type:
 
-### Step 2: Create a new alert
+**Top-level properties:**
 
-1. Click **Create Alert**
-2. Configure your alert:
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | string | Unique event ID (e.g., `evt_3f7f9c4e-...`) |
+| `type` | string | Always `alert.user.triggered` |
+| `created` | number | Unix timestamp (seconds) when the webhook was created |
+| `data` | array | Array of user profiles that matched your filters |
 
-| Setting | Description |
-|---------|-------------|
-| **Name** | Descriptive name (e.g., "Whale Alert") |
-| **Event Type** | Which event triggers the alert |
-| **Conditions** | Filter conditions (optional) |
-| **Notification** | Webhook (generic HTTP or Slack) |
+**Each user in `data`** contains the full wallet profile. All fields from the profile are included — key properties:
 
-### Step 3: Choose an event type
+**Wallet identity:**
 
-Select which events should trigger notifications:
+| Property | Type | Description |
+|----------|------|-------------|
+| `address` | string | Wallet address |
+| `net_worth_usd` | number | Wallet net worth in USD |
+| `tx_count` | number | Total transaction count |
+| `first_onchain` | string | First on-chain transaction timestamp |
+| `last_onchain` | string | Last on-chain transaction timestamp |
+| `updated_at` | string | When the wallet profile was last updated |
+| `ens` | string | ENS name |
+| `farcaster` | string | Farcaster username |
+| `lens` | string | Lens handle |
+| `basenames` | string | Base name |
+| `linea` | string | Linea name |
+| `avatar` | string \| null | ENS/Farcaster avatar URL |
+| `display_name` | string | Display name |
+| `description` | string | Profile description |
+| `profile_url` | string | Link to user profile in Formo dashboard |
 
-| Event Type | When it fires |
-|------------|--------------|
-| **connect** | User connects their wallet |
-| **transaction** | User submits a transaction |
-| **page** | User visits a specific page |
-| **custom** | Your custom tracked events |
+**Socials** (included when available):
 
-### Step 4: Configure notifications
+`discord`, `telegram`, `website`, `github`, `twitter`, `linkedin`, `email`, `instagram`, `facebook`, `tiktok`, `youtube`, `reddit`, `linea`
 
-<Tabs>
-  <Tab title="Webhook">
-    1. Select **Webhook** as the notification type
-    2. Enter your webhook URL (generic HTTPS endpoint or Slack incoming webhook)
-    3. Formo sends a POST request with batched event data
+**Project-level engagement:**
 
-    **Generic webhook payload (raw events):**
+| Property | Type | Description |
+|----------|------|-------------|
+| `first_seen` | string | When the user was first seen (UTC) |
+| `last_seen` | string | When the user was last active (UTC) |
+| `num_sessions` | number | Total unique sessions |
+| `revenue` | number | Total revenue |
+| `volume` | number | Total transaction volume |
+| `points` | number | Total loyalty points |
+| `lifecycle` | string | Lifecycle stage (`New`, `Returning`, `Power user`, `Churned`, `Resurrected`) |
+| `activity_dates` | string[] | Array of dates the user was active |
+| `location` | string | Country code |
+| `device` | string | Device type |
+| `browser` | string | Browser name |
+| `os` | string | Operating system |
 
-    - `id` - Crypto UUID for this alert delivery (e.g., `evt_...`)
-    - `type` - Always `alerts.triggered`
-    - `created` - Unix timestamp (seconds) when the webhook was created
-    - `data` - Array of raw analytics events (Tinybird rows) that matched your filters
+**Attribution (first-touch and last-touch):**
 
-    **Slack webhook payload (formatted table):**
+| Property | Type | Description |
+|----------|------|-------------|
+| `first_referrer` | string | First-touch referrer domain |
+| `first_referrer_url` | string | First-touch full referrer URL |
+| `first_ref` | string | First-touch referral code |
+| `first_utm_source` | string | First-touch UTM source |
+| `first_utm_medium` | string | First-touch UTM medium |
+| `first_utm_campaign` | string | First-touch UTM campaign |
+| `first_utm_term` | string | First-touch UTM term |
+| `first_utm_content` | string | First-touch UTM content |
+| `last_referrer` | string | Last-touch referrer domain |
+| `last_referrer_url` | string | Last-touch full referrer URL |
+| `last_ref` | string | Last-touch referral code |
+| `last_utm_source` | string | Last-touch UTM source |
+| `last_utm_medium` | string | Last-touch UTM medium |
+| `last_utm_campaign` | string | Last-touch UTM campaign |
+| `last_utm_term` | string | Last-touch UTM term |
+| `last_utm_content` | string | Last-touch UTM content |
 
-    - Automatically detected when the URL host contains `hooks.slack.com`
-    - Events are rendered as a Slack Block Kit table (Time, Event, User, Country, Device, Browser, OS, Referrer)
-    - Up to 50 events are shown per alert, with a truncation note if more were found
+**Last activity:**
 
-    **Webhook security and signatures:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `last_type` | string | Last event type (e.g., `connect`, `page`, `track`) |
+| `last_event` | string | Last event name |
+| `last_properties` | string | JSON-encoded properties of the last event |
 
-    - Optional **secret**: In the alert configuration, you can provide a signing secret used to verify requests on your server.
-    - Usage: For **generic webhooks** (non-Slack URLs), Formo uses your secret to compute an HMAC-SHA256 signature over the string `{timestamp}.{body}`, where:
-      - `timestamp` is the Unix timestamp (seconds) used for the request
-      - `body` is the exact JSON payload string sent in the request
+**Sample payload:**
 
-    **HTTP headers sent:**
+```json
+{
+  "id": "evt_a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+  "type": "alert.user.triggered",
+  "created": 1739097600,
+  "data": [
+    {
+      "address": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc",
+      "net_worth_usd": 250000,
+      "ens": "whale.eth",
+      "farcaster": "",
+      "lens": "",
+      "basenames": "",
+      "linea": "",
+      "discord": "",
+      "telegram": "",
+      "website": "",
+      "github": "",
+      "twitter": "whale_trader",
+      "linkedin": "",
+      "email": "",
+      "instagram": "",
+      "facebook": "",
+      "tiktok": "",
+      "youtube": "",
+      "reddit": "",
+      "avatar": "https://euc.li/whale.eth",
+      "display_name": "Whale",
+      "description": "",
+      "updated_at": "2026-02-09 06:40:00",
+      "tx_count": 142,
+      "first_onchain": "2022-03-15 12:00:00",
+      "last_onchain": "2026-02-09 06:40:00",
+      "profile_url": "https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc",
+      "first_seen": "2025-11-15 08:30:00",
+      "last_seen": "2026-02-09 06:42:16",
+      "num_sessions": 47,
+      "revenue": 5200.50,
+      "volume": 89000.00,
+      "points": 1500,
+      "lifecycle": "Returning",
+      "activity_dates": ["2026-02-09", "2026-02-08", "2026-02-05"],
+      "location": "VN",
+      "device": "desktop",
+      "browser": "Chrome",
+      "os": "MacOS",
+      "first_referrer": "google.com",
+      "first_referrer_url": "https://google.com/search?q=formo",
+      "first_ref": "",
+      "first_utm_source": "google",
+      "first_utm_medium": "cpc",
+      "first_utm_campaign": "whale-acquisition",
+      "first_utm_term": "",
+      "first_utm_content": "",
+      "last_referrer": "twitter.com",
+      "last_referrer_url": "https://twitter.com/formo",
+      "last_ref": "",
+      "last_utm_source": "twitter",
+      "last_utm_medium": "social",
+      "last_utm_campaign": "",
+      "last_utm_term": "",
+      "last_utm_content": "",
+      "last_type": "connect",
+      "last_event": "Connected wallet",
+      "last_properties": "{\"chain_id\":8453}"
+    }
+  ]
+}
+```
 
-    - `Content-Type`: `application/json`
-    - `User-Agent`: `Formo-Alerts/1.0`
-    - `X-Formo-Alert-Id`: The alert ID in Formo
-    - `X-Webhook-Signature`: HMAC-SHA256 signature (only for generic webhooks when a secret is set)
-    - `X-Webhook-Timestamp`: Unix timestamp (seconds) used in the signature (only for signed generic webhooks)
-    - `X-Webhook-Event`: Always `alerts.triggered` (only for signed generic webhooks)
-  </Tab>
-  <Tab title="Slack (via Webhook)">
-    1. Create a [Slack incoming webhook](https://api.slack.com/messaging/webhooks)
-    2. Use the Slack webhook URL as your Formo webhook URL
-    3. Messages post to your configured Slack channel with a formatted alert summary and event table
-  </Tab>
-</Tabs>
+#### Slack payload
 
-### Step 5: Test your alert
+For Slack incoming webhooks, Formo formats user profiles as a rich card layout:
 
-1. Save your alert configuration
-2. Trigger a test event:
-   - Visit your app in a browser
-   - Connect a wallet
-   - Perform the action that matches your alert
-3. Check your Slack channel or webhook endpoint for the notification
+- A header with the alert name
+- Per user: a clickable address header, a **field grid** with key profile data, an avatar image (if available), and a **View Profile** button
+- Up to **10 users** per message, with a truncation note if more were found
 
-### Example: Whale detection alert
+**Fields displayed:**
 
-Here's a practical alert configuration to notify you when high-value users visit:
+| Field | Source | Conditional |
+|-------|--------|-------------|
+| Lifecycle | `lifecycle` (e.g., New, Returning, Power user) | Yes — only shown when non-empty |
+| Net Worth | `net_worth_usd` (formatted as `$1,234`) | No — always shown |
+| First Seen | `first_seen` (formatted date) | No — always shown |
+| Location | `location` | Yes — only shown when non-empty |
+| Referrer | `first_referrer` or `last_referrer` | Yes — only shown when non-empty |
+| Referral | `first_ref` or `last_ref` | Yes — only shown when non-empty |
+| UTM | `first_utm_*` or `last_utm_*` (comma-joined) | Yes — only shown when non-empty |
+| Browser | `browser` | Yes — only shown when non-empty |
+| Device | `device` | Yes — only shown when non-empty |
+| OS | `os` | Yes — only shown when non-empty |
+
+**Sample Slack Block Kit payload:**
+
+```json
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": ":bell: Whale Alert",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*<https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc|0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc>*"
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        { "type": "mrkdwn", "text": "*Lifecycle:* Returning" },
+        { "type": "mrkdwn", "text": "*Net Worth:* $250,000" },
+        { "type": "mrkdwn", "text": "*First Seen:* Nov 15, 2025" },
+        { "type": "mrkdwn", "text": "*Location:* VN" },
+        { "type": "mrkdwn", "text": "*Referrer:* google.com" },
+        { "type": "mrkdwn", "text": "*UTM:* google, cpc, whale-acquisition" },
+        { "type": "mrkdwn", "text": "*Browser:* Chrome" },
+        { "type": "mrkdwn", "text": "*Device:* desktop" },
+        { "type": "mrkdwn", "text": "*OS:* MacOS" }
+      ],
+      "accessory": {
+        "type": "image",
+        "image_url": "https://euc.li/vitalik.eth",
+        "alt_text": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc"
+      }
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": { "type": "plain_text", "emoji": true, "text": "View Profile" },
+          "style": "primary",
+          "url": "https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc",
+          "value": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Examples
+
+### Whale detection alert
+
+Notify when high-value users visit:
 
 | Setting | Value |
 |---------|-------|
 | Name | Whale Alert |
-| Event type | connect |
-| Condition | net_worth > 100000 |
+| Trigger type | Users |
+| Condition | net_worth_usd > 100000 |
 | Notification | Slack webhook |
 
-Every time a wallet with over $100k net worth connects, you'll get a Slack message with their details.
+Every time a wallet with over $100k net worth is active, you'll get a Slack message with their profile.
 
-### Example: Failed transaction alert
+### Failed transaction alert
 
 Track when users encounter issues:
 
 | Setting | Value |
 |---------|-------|
 | Name | Failed TX Alert |
-| Event type | transaction |
-| Condition | status = failed |
-| Notification | Webhook (generic HTTPS or Slack) |
+| Trigger type | Events |
+| Condition | type = transaction, status = failed |
+| Notification | Webhook |
 
-Get notified when transactions fail so you can investigate UX issues through your own incident tooling or Slack.
+Get notified when transactions fail so you can investigate UX issues.
 
 ### Webhook integration examples
 
@@ -209,7 +585,9 @@ https://hooks.zapier.com/hooks/catch/123456/abcdef/
 
 Then use Zapier to route alerts to any destination: Notion, Airtable, Discord, SMS, etc.
 
-### Next Steps
+---
+
+## Next Steps
 
 <CardGroup cols={2}>
   <Card title="Wallet Profiles" icon="user" href="/features/wallet-intelligence/wallet-profiles">
