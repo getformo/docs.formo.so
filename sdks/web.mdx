@@ -626,14 +626,6 @@ In the above configuration, Formo will detect referrals from:
 - the `via` and `ref` query parameters in the URL, and 
 - from the `/referral/([^/]+)` path pattern
 
-### Builder codes (ERC-8021)
-
-The SDK automatically detects and extracts [ERC-8021](https://www.erc8021.com/) builder codes from transaction calldata. If your app appends builder codes to transactions, Formo will detect and include them in [transaction events](/data/events/transaction#builder-codes).
-
-[Integrate Builder Codes into your app using Wagmi or Viem to attribute onchain activity.](https://docs.base.org/base-chain/builder-codes/app-developers)
-
-No additional SDK configuration is required — builder code extraction happens automatically for all tracked transactions.
-
 ## FAQ
 
 <AccordionGroup>

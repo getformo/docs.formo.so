@@ -22,11 +22,11 @@ It includes the transaction status (started, broadcasted, rejected), to address,
 
 ## Builder Codes
 
-The SDK automatically detects and extracts [ERC-8021](https://www.erc8021.com/) builder codes from transaction calldata. Builder codes are an onchain attribution standard that lets apps identify themselves in transactions.
+The Formo data platform automatically detects and extracts [ERC-8021](https://www.erc8021.com/) builder codes from transaction calldata. Builder codes are an onchain attribution standard that lets apps identify themselves in transactions.
 
-When a transaction includes an ERC-8021 data suffix, the SDK parses it and includes the `builder_codes` field in the transaction event. For example, a transaction with the builder code `"uniswap"` would include `"builder_codes": "uniswap"` in the event properties.
+When a transaction includes an ERC-8021 data suffix, Formo parses it and includes the `builder_codes` field in the transaction event. For example, a transaction with the builder code `"uniswap"` would include `"builder_codes": "uniswap"` in the event properties.
 
-This works automatically — no additional SDK configuration is needed. If your app appends builder codes to transactions, Formo will detect and attribute them.
+This works automatically — no additional configuration is needed. If your app appends builder codes to transactions, Formo will detect and attribute them.
 
 ## Sample Payload
 
