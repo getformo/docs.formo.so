@@ -115,7 +115,7 @@
         ]
       },
       {
-        "tab": "SDK Reference",
+        "tab": "SDK",
         "groups": [
           {
             "group": "SDK",
@@ -124,7 +124,7 @@
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "API",
         "groups": [
           {
             "group": "API Documentation",
