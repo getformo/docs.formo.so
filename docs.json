@@ -15,7 +15,7 @@
         "groups": [
           {
             "group": "Getting started",
-            "pages": ["intro", "install"]
+            "pages": ["intro", "install", "data/concepts"]
           },
           {
             "group": "Features",
@@ -86,7 +86,6 @@
           {
             "group": "Data",
             "pages": [
-              "data/concepts",
               "data/metrics",
               {
                 "group": "Events",
