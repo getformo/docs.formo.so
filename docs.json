@@ -129,7 +129,8 @@
             "group": "API Documentation",
             "pages": [
               "api-reference/overview",
-              "api-reference/authentication"
+              "api-reference/authentication",
+              "api-reference/x402"
             ]
           },
           {
