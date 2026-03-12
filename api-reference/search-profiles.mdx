@@ -679,6 +679,7 @@ Each profile in the `data` array includes:
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `BAD_REQUEST` | Invalid query parameters or malformed JSON in request body |
-| 401 | `UNAUTHORIZED` | Missing or invalid API key |
+| 401 | `UNAUTHORIZED` | Missing or invalid API key, or unsupported `Authorization` scheme |
+| 402 | `PAYMENT_REQUIRED` | No API key was sent. This endpoint supports [pay-per-request via x402](/api-reference/x402) — pay $0.05 USDC on Base per call, no API key needed |
 | 403 | `FORBIDDEN` | API key does not have `profiles:read` permission |
 | 500 | `INTERNAL_SERVER_ERROR` | Failed to fetch wallet profile data |
