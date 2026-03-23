@@ -21,9 +21,9 @@ There are several ways to install the Formo SDK:
 - [HTML Snippet](#html-snippet) is recommended for static websites
 - [React & Next.js (without Wagmi)](#react-&-next-js-without-wagmi)
 
-> For best results, install Formo on both your website (example.com) and your app (app.example.com) using the same project/SDK write key.
->
-> The standard setup is to use the HTML snippet on your website and Wagmi on your app.
+We recommend installing Formo on **both your website (example.com) and your app (app.example.com)** on the same project with the same SDK write key. 
+
+The standard setup is to use the HTML snippet on your website and Wagmi on your app, with [cross-subdomain tracking](#cross-subdomain-tracking) enabled.
 
 ### Wagmi
 
@@ -358,6 +358,51 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
 </CardGroup>
 
 ## Configuration
+
+### Cross subdomain tracking
+
+By default, Formo scopes identity cookies to minimize data sharing across subdomains. With the default `crossSubdomainCookies` setting, cookies remain scoped to the current host, which reduces unintended cross-subdomain tracking.
+
+| Value | Behavior |
+|-------|----------|
+| `false` (default) | Cookies are scoped to the current hostname only. A cookie set on `app.example.com` is **not** visible from `www.example.com`. |
+| `true` | Cookies are set on the root domain (e.g. `.example.com`), sharing visitor identity across all subdomains. |
+
+If your product surface spans multiple subdomains (e.g. `example.com` and `app.example.com`), we recommend enabling `crossSubdomainCookies` to ensure accurate visitor counts and consistent attribution across your subdomains.
+
+When `crossSubdomainCookies` is enabled:
+
+- **Cross subdomain tracking**: track users as they move between your marketing site, app, docs, and other subdomains.
+- **Accurate attribution**: attribute conversions to the correct channel, even when users cross subdomains.
+- **Automatic migration**: the SDK migrates existing host-scoped cookies to the apex domain so visitors are not double-counted.
+
+<Tabs>
+  <Tab title="HTML Snippet">
+```html
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer onload="window.formofy('WRITE_KEY', { crossSubdomainCookies: true });"
+></script>
+```
+  </Tab>
+  <Tab title="React / Next.js">
+```tsx
+<FormoAnalyticsProvider
+  writeKey="WRITE_KEY"
+  options={{
+    crossSubdomainCookies: true
+  }}
+>
+```
+  </Tab>
+  <Tab title="JavaScript">
+```javascript
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  crossSubdomainCookies: true
+});
+```
+  </Tab>
+</Tabs>
 
 ### Local testing
 
