@@ -66,12 +66,21 @@
             "group": "Use Cases",
             "pages": [
               "guides/use-cases/dau-tracking",
-              "guides/use-cases/defi-conversions",
-              "guides/use-cases/wallet-targeting",
-              "guides/use-cases/attribution-guide",
-              "guides/use-cases/onboarding-analysis",
-              "guides/use-cases/churn-prevention",
-              "guides/use-cases/protocol-dashboard"
+              "guides/use-cases/attribution-guide"
+            ]
+          },
+          {
+            "group": "How-To Guides",
+            "pages": [
+              "guides/howto/getting-started",
+              "guides/howto/conversion-funnel",
+              "guides/howto/retention",
+              "guides/howto/protocol-dashboard",
+              "guides/howto/ask-ai",
+              "guides/howto/wallet-segmentation",
+              "guides/howto/onboarding-flows",
+              "guides/howto/contract-events",
+              "guides/howto/sql-explorer"
             ]
           }
         ]

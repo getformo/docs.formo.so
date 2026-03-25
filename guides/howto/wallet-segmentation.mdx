@@ -1,0 +1,252 @@
+---
+title: "How to Segment and Export Wallets for Targeted Campaigns"
+sidebarTitle: "Wallet Segmentation"
+description: "Build targeted user segments using wallet properties, onchain behavior, and lifecycle data, then export them as CSV for marketing campaigns on X and Farcaster."
+keywords: ["wallet segmentation", "crypto audience targeting", "web3 user segments", "DeFi marketing segments", "onchain targeting"]
+---
+
+Stop marketing to everyone. Start marketing to the right wallets.
+
+Wallet segmentation is how you identify and target your most valuable users. With Formo, you can slice your audience by net worth, lifecycle stage, onchain behavior, and more, then export those segments for campaigns on X, Farcaster, and Lens.
+
+## Prerequisites
+
+- Formo is installed on your dapp and collecting data
+- You have a **Growth+ plan** to use saved segments
+- Users page is accessible from your sidebar
+
+## Part 1: Start on the Users Page
+
+Open Formo's dashboard and click **Users** in the sidebar. You'll see a table of all users with their wallet addresses, lifecycle stages, net worth, labels, and last activity timestamp.
+
+<Frame>
+  <img src="/images/wallet-intelligence-users.png" alt="Users page showing wallet table with lifecycle and net worth columns" />
+</Frame>
+
+Each row is a wallet. Every column is filterable. This is your segmentation starting point.
+
+## Part 2: Apply Property Filters
+
+Click the **Filter** button to add conditions. You can filter by:
+
+- **Lifecycle**: New, Returning, Power User, Churned, Resurrected
+- **Net Worth**: Exact ranges ($0-$10k, $10k-$100k, $100k+, custom)
+- **Wallet Labels**: Verified accounts, sanctions flags, passport scores
+- **Apps Used**: Filter to users who used specific dapps
+- **Tokens Held**: Filter by specific token holdings
+- **Chains**: Filter by blockchain activity (Ethereum, Polygon, etc.)
+- **Device**: Mobile, desktop, tablet
+- **Country**: Geographic filtering
+
+For example, to target whale prospects, filter for net worth > $100k AND lifecycle = New.
+
+## Part 3: Apply Attribution Filters
+
+Under **Attribution** section, filter by:
+
+- **UTM Source / Medium / Campaign**: First-touch or last-touch attribution
+- **Referrer**: How users arrived at your dapp
+- **First Touch vs Last Touch**: Distinguish acquisition vs conversion sources
+
+Example: Show me all users from a specific Twitter campaign (utm_source=twitter) who had at least one transaction.
+
+## Part 4: Build Behavioral Segments
+
+Click the **Behavioral** tab to create segments based on user actions.
+
+Define conditions like: "Users who performed Event X at least N times in the last Y days"
+
+Combine multiple behaviors with AND/NOT logic:
+- Users who completed at least 2 swaps AND connected a wallet
+- Users who visited the app 5+ times AND did NOT make a transaction
+
+These filters are powerful for identifying power users vs disengaged users.
+
+## Part 5: Save as a Segment
+
+Once your filters are set, click the **Save as Segment** button in the top right. Give it a name like "Q1 Whale Prospects" or "Churned Power Users".
+
+Saved segments appear in a dropdown menu for quick reuse across the app. You can apply the same segment to multiple dashboards and reports.
+
+## Part 6: Export Your Segment
+
+With your segment active, click **Export as CSV** in the top right.
+
+Formo downloads a CSV file with columns: address, ENS name, net worth, lifecycle stage, last activity, and more. This is campaign-ready data.
+
+## Part 7: Use Exported Data for Campaigns
+
+Import the CSV into your marketing tools:
+
+- **X/Twitter**: Upload to Tailwind, Buffer, or Twitter Ads for wallet-based targeting
+- **Farcaster**: Use Neynar or Warpcast's audience upload feature
+- **Lens**: Import to Lens' native campaign tools
+- **Email**: If you have wallet owners' emails, import for email campaigns
+
+Each exported wallet is a real, verified onchain identity with transaction history.
+
+## 5 Ready-to-Use Segment Recipes
+
+### Recipe 1: Whale Prospects
+
+Target high-net-worth users who are brand new.
+
+Filter config:
+- Net Worth: > $100,000
+- Lifecycle: New
+- Sessions: = 1
+
+Expected size: 2-5% of your user base (highly valuable)
+
+### Recipe 2: Churned Power Users
+
+Re-engage users who were once active but disappeared.
+
+Filter config:
+- Lifecycle: Churned
+- Sessions: > 10
+- No Activity: > 30 days
+
+Expected size: 5-15% of your user base
+
+### Recipe 3: Campaign Converts
+
+Identify users who arrived from a specific campaign and converted.
+
+Filter config:
+- UTM Source: [your campaign source]
+- Last Touch: [same campaign]
+- Behavioral: Completed Transaction at least 1 time
+
+Expected size: Variable, depends on campaign
+
+### Recipe 4: DeFi Crossover
+
+Find users who use competitor dapps and yours (cross-protocol opportunity).
+
+Filter config:
+- Apps Used: [Competitor App A] AND [Your App]
+- Behavioral: Performed swap at least 1 time in your app
+
+Expected size: 10-20% of your user base
+
+### Recipe 5: Dormant High-Value
+
+Wake up large wallets that haven't returned recently.
+
+Filter config:
+- Net Worth: > $50,000
+- Lifecycle: Churned OR Returning
+- Last Activity: > 14 days ago
+
+Expected size: 5-10% of your user base
+
+## What's Next?
+
+Once segments are exported and campaigns run, track their performance:
+- Segment users by campaign in your **Activity** feed to measure ROI
+- Create funnels comparing segment conversion rates
+- Set up alerts for when high-value wallets become active again
+
+For deeper analysis, see [How to Build Conversion Funnels](/guides/howto/conversion-funnel) and [How to Analyze User Onboarding with Flows](/guides/howto/onboarding-flows).
+
+---
+
+## Targeting Recipes for Campaigns
+
+### ICP Definition by App Type
+
+| App Type | Characteristics | Avg. Net Worth | Transaction Frequency |
+|----------|-----------------|-----------------|----------------------|
+| **DEX** | Active traders, high risk tolerance, frequent swaps | $50k-$500k | 10+ txs/month |
+| **Lending** | Risk-averse, capital preservation focus | $100k+ | 2-5 txs/month |
+| **Gaming** | Regular engagement, competitive interest | $5k-$50k | 20+ txs/month |
+| **Bridge** | Multi-chain users, often whales | $200k+ | 5+ txs/month |
+
+### Four Ready-Made Segment Recipes
+
+**Recipe: High-Value DeFi Users**
+
+| Filter | Condition |
+|--------|-----------|
+| Label | DeFi Active |
+| Net Worth | > $50,000 |
+| Lifecycle | Power User OR Returning |
+
+**Recipe: Churned Whales**
+
+| Filter | Condition |
+|--------|-----------|
+| Net Worth | > $100,000 |
+| Lifecycle | Churned |
+| Last Activity | > 30 days ago |
+
+**Recipe: Competitor Users**
+
+| Filter | Condition |
+|--------|-----------|
+| Apps Used | [Competitor App Name] |
+| Net Worth | > $10,000 |
+| Your App | Has NOT transacted |
+
+**Recipe: Campaign Responders**
+
+| Filter | Condition |
+|--------|-----------|
+| UTM Source | twitter |
+| UTM Campaign | [Campaign Name] |
+| Wallet Connected | Yes |
+
+### Campaign Channels
+
+- X/Twitter ads (upload CSV to Twitter Ads Manager)
+- Farcaster outreach (use Neynar audience upload)
+- Discord community targeting
+- Airdrop/rewards distribution
+
+### Track Campaign Performance
+
+| Metric | Measurement |
+|--------|-------------|
+| Wallet Connections | Count from UTM tracking |
+| Transactions | Conversions from segment |
+| Volume | Total value transferred |
+| Cohort Retention | Segment reactivation after 30 days |
+
+### UTM Tracking Tip
+
+Add unique UTM parameters to your campaign links:
+```
+https://yourapp.com?utm_source=twitter&utm_campaign=whale_targets&utm_medium=social
+```
+Formo captures these automatically. Filter by UTM in the Attribution section to measure each campaign's impact.
+
+---
+
+<AccordionGroup>
+
+<Accordion title="What's the difference between saved segments and filters?">
+Filters are temporary. They disappear when you reload the page. Saved segments persist and can be reused across dashboards, funnels, and reports. Growth+ plans can save unlimited segments.
+</Accordion>
+
+<Accordion title="Can I combine segments with other segments?">
+Yes. Apply a saved segment, then add additional filters on top. The results will be the intersection of both.
+</Accordion>
+
+<Accordion title="How often do wallet metrics like net worth update?">
+Net worth and wallet labels update daily. Behavioral data (sessions, last activity) updates in real time.
+</Accordion>
+
+<Accordion title="Can I export segments to my email provider?">
+Yes, if you've collected email addresses alongside wallet addresses. Export the CSV and import it into Mailchimp, ConvertKit, or your email platform's upload feature.
+</Accordion>
+
+<Accordion title="Do I need Growth+ to use segments?">
+Yes. Growth+ is required to save segments. Free and Pro plans can still filter and export, but can't save segment configurations for reuse.
+</Accordion>
+
+<Accordion title="What's the maximum segment size I can export?">
+There is no hard limit. Export times vary by size (100k wallets typically takes 30-60 seconds). Contact support for bulk exports larger than 1M wallets.
+</Accordion>
+
+</AccordionGroup>

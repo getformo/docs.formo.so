@@ -1,0 +1,390 @@
+---
+title: "How to Track and Improve User Retention"
+sidebarTitle: "User Retention"
+description: "Measure Day 7, 30, and 90 retention rates for your crypto app with cohort analysis, identify churn patterns, and build segments to re-engage at-risk users."
+keywords: ["crypto retention analytics", "DeFi user retention", "web3 churn analysis", "cohort retention", "onchain retention tracking"]
+---
+
+
+Acquiring users is expensive. Keeping them is where the real growth happens. In crypto, a 10 percent improvement in Day 7 retention can be worth thousands in LTV. This guide shows you how to measure retention, spot churn, and re-engage at-risk users.
+
+## Prerequisites
+
+- Formo installed and tracking sessions
+- At least 7 days of data (for Day 7 retention)
+- A product you're actively improving
+
+## Part 1: View Retention on the Overview Page
+
+The fastest way to see retention is on your **Overview** dashboard:
+
+<Steps>
+<Step>
+Open the **Overview** page in Formo.
+</Step>
+
+<Step>
+Scroll down to the **Retention** section. You'll see:
+- **Day 7 Retention**: Percent of users active on Day 7 (default 14-day window)
+- **Day 30 Retention**: Percent of users active on Day 30
+- **Day 90 Retention**: Percent of users active on Day 90
+- **Delta**: Week-over-week change (up or down)
+</Step>
+
+<Step>
+Compare your retention to your baseline. A 2-3 percent week-over-week improvement is excellent. A 5+ percent drop is a red flag.
+</Step>
+</Steps>
+
+<Frame caption="Retention metrics on the Overview page">
+<img src="/images/screenshots/overview.png" alt="Overview retention" />
+</Frame>
+
+<Tip>
+**What's a good retention rate?** In crypto, benchmarks vary by product:
+- **DEX**: Day 7 = 15-25%, Day 30 = 5-10%
+- **Lending**: Day 7 = 25-40%, Day 30 = 10-20%
+- **NFT marketplace**: Day 7 = 10-20%, Day 30 = 3-7%
+- **Gaming**: Day 7 = 30-50%, Day 30 = 15-30%
+
+Your goal: beat the benchmark. A 2-3% improvement is meaningful.
+</Tip>
+
+## Part 2: Build a Retention Cohort Chart
+
+For deeper insights, create a retention cohort chart on a dashboard. This shows how each cohort of users (grouped by signup date) retains over time:
+
+<Steps>
+<Step>
+Click **Dashboards** → **Create Chart** → select **Retention** chart type.
+</Step>
+
+<Step>
+Choose your **cohort grouping**:
+- **Daily**: See retention of users who signed up on each day
+- **Weekly**: Group by signup week (cleaner view for smaller apps)
+- **Monthly**: For apps with high volume
+</Step>
+
+<Step>
+Click **Save to Dashboard**. This cohort chart is now live.
+</Step>
+</Steps>
+
+The retention table shows cohorts (rows) and retention days (columns). Green cells mean high retention. Red means churn. Look for diagonal patterns:
+
+- **Declining diagonal**: Older cohorts have worse retention. (Possible: product degraded, new cohorts are higher quality)
+- **Level diagonal**: Consistent retention across all cohorts. (Healthy.)
+- **Rising diagonal**: Newer cohorts retain better. (Possible: product improvements are working)
+
+<Frame caption="Retention cohort table showing Day 7, 30, 90">
+<img src="/images/retention.png" alt="Retention table" />
+</Frame>
+
+## Part 3: Identify Churn Patterns
+
+The **Insights** page uses AI to spot churn signals. Check it weekly:
+
+<Steps>
+<Step>
+Click **Insights** in the sidebar.
+</Step>
+
+<Step>
+Look for the **Issues** section. Formo flags patterns like:
+- "Users from country=US are churning 25% faster than average"
+- "Mobile users have 40% lower Day 7 retention"
+- "Cohort from Week 3 of March dropped 15% on Day 5"
+</Step>
+
+<Step>
+Click on an insight to drill into the data. Ask: Is this a real problem or noise?
+</Step>
+</Steps>
+
+**Red flags to act on immediately:**
+- A sudden drop in Day 7 retention (5%+ week-over-week) usually means a bug or product issue
+- A specific geography or device churning faster suggests a UX or localization problem
+- A cohort that performs poorly across all retention windows suggests they were bad-fit users to begin with
+
+## Part 4: Segment Churned and At-Risk Users
+
+To re-engage users, you must first identify them. Use the **Users** page to create segments:
+
+<Steps>
+<Step>
+Click **Users** in the sidebar to see all users.
+</Step>
+
+<Step>
+Apply filters to find at-risk users:
+- **Lifecycle = "Churned"**: Users inactive for 30+ days
+- **Lifecycle = "Resurrecting"**: Users who returned after being inactive
+- **Last Activity < 7 days ago**: Users who haven't returned this week
+</Step>
+
+<Step>
+Click **Save as Segment** (Growth+ plan required). Name it "Churned Users Q1 2026".
+</Step>
+
+<Step>
+Once saved, you can export this segment as CSV for re-engagement campaigns or use it to build exclusion lists.
+</Step>
+</Steps>
+
+<Frame caption="User lifecycle stages in the Users page">
+<img src="/images/users.png" alt="Users page" />
+</Frame>
+
+<Note>
+**User Lifecycle Stages:**
+- **New**: First session
+- **Returning**: 1-10 sessions, visited recently
+- **Power User**: 10+ sessions, highly engaged
+- **Churned**: 30+ days inactive
+- **Resurrecting**: Returned after being churned
+
+Use these stages to build segments for targeted campaigns.
+</Note>
+
+## Part 5: Export Your Segment for Re-Engagement
+
+<Steps>
+<Step>
+In your saved segment, click **Export as CSV**.
+</Step>
+
+<Step>
+Download the file. It contains wallet addresses, ENS names, and event counts.
+</Step>
+
+<Step>
+Use this list to:
+- Send a Farcaster DM campaign: "We missed you. Here's what's new."
+- Create a rewards campaign: "Return this week, get 100 points."
+- Build a lookalike audience: "Find more users like these high-retainers."
+</Step>
+</Steps>
+
+## Part 6: Set Retention Alerts
+
+Monitor retention health with alerts. If Day 7 retention drops below your threshold, get notified immediately:
+
+<Steps>
+<Step>
+Go to **Project Settings → Alerts**.
+</Step>
+
+<Step>
+Click **Create Alert**.
+</Step>
+
+<Step>
+Set up: "Day 7 Retention drops below 20%". Choose notification method (email, Slack, webhook).
+</Step>
+
+<Step>
+Save. You'll be alerted the moment it triggers.
+</Step>
+</Steps>
+
+See [Alerts documentation](/features/product-analytics/alerts) for full setup.
+
+## Part 7: Use Ask AI to Understand Churn
+
+Click the **Ask AI** chat bubble (bottom right) and ask natural language questions:
+
+- "Why is Day 7 retention down 10% this week?"
+- "Which countries have the worst retention?"
+- "Do mobile users churn faster than web?"
+- "What do my highest-retaining users have in common?"
+
+Formo analyzes your data and provides insights with supporting numbers.
+
+<Frame caption="Ask AI interface for analytical questions">
+<img src="/images/ai.png" alt="Ask AI" />
+</Frame>
+
+## Real-World Example: Improving Retention by 5%
+
+**Scenario**: Your DEX app has 25% Day 7 retention. You want to hit 30%.
+
+<Steps>
+<Step>
+**Identify the problem** (Week 1): Create a retention cohort chart. See that mobile users churn 15 points faster than web.
+</Step>
+
+<Step>
+**Understand the why** (Week 2): Use Ask AI: "Why are mobile users churning faster?" Discover: mobile users have 3x higher transaction failures due to MetaMask timeout.
+</Step>
+
+<Step>
+**Build a fix** (Week 3): Increase timeout from 30s to 60s. Roll out to 10% of mobile users.
+</Step>
+
+<Step>
+**Measure impact** (Week 4): Create a segment of "mobile users who upgraded on Day 3". Compare their Day 7 retention vs old cohorts. See 8% improvement in that segment.
+</Step>
+
+<Step>
+**Roll out fully** (Week 5): Deploy 60s timeout to all. Your Day 7 retention climbs from 25% to 28%. Repeat for other friction points.
+</Step>
+</Steps>
+
+By the end of 6 weeks, you've hit 30% Day 7 retention. That's a 20% improvement in user value.
+
+## Retention Benchmarks by App Type
+
+Use these to set your targets:
+
+| App Type | Day 7 | Day 30 | Day 90 | Notes |
+|----------|-------|--------|--------|-------|
+| DEX | 15-25% | 5-10% | 2-4% | High volume, low commitment |
+| Lending | 25-40% | 10-20% | 5-10% | Recurring value, sticky |
+| NFT Marketplace | 10-20% | 3-7% | 1-3% | Collectible-driven, sparse |
+| Gaming | 30-50% | 15-30% | 8-15% | Highly engaging, daily drivers |
+| Staking | 35-50% | 15-25% | 8-15% | Lock-in effect, recurring value |
+
+## Pro Tips for Improving Retention
+
+- **Weekly deep dives**: Check Insights every Monday. Act on red flags immediately.
+- **Cohort comparisons**: Compare Week 1 vs Week 2 cohorts. Which is healthier? Why?
+- **Segment tests**: Create two segments (e.g., "High fee payers" vs "Low fee payers"). Compare retention. High spenders often retain better, revealing your value lever.
+- **Pair with conversion**: High conversion doesn't mean high retention. A user who swaps once and never returns is not a retained user. Optimize for both.
+- **Monitor by source**: Create segments by referrer. Which traffic sources give best-retaining users? Double down there.
+- **Check wallet labels**: If you use [Wallet Intelligence](/features/wallet-intelligence/overview), segment by wallet label (e.g., "Verified Coinbase User"). Some labels correlate with higher retention.
+
+## Churn Prevention Playbook
+
+Churn isn't just "users who left." It's a measurable, predictable pattern. Use this playbook to define, detect, and prevent churn in your specific app.
+
+**Churn Definition by App Type**
+
+| App Type | Churn Threshold | Rationale |
+|----------|---|---|
+| DeFi (DEX, Lending) | 30+ days | Long gaps between trades are normal, but 30 days suggests abandonment |
+| Gaming | 14+ days | Daily drivers; 2 weeks without a session signals churn |
+| Bridge/Cross-chain | 60+ days | Multi-week cycles are normal; 60 days is the safety threshold |
+
+**Monthly Churn Rate Query**
+
+Use this SQL to calculate month-over-month churn:
+
+```sql
+SELECT
+  toStartOfMonth(first_seen) as cohort_month,
+  count(*) as total_users,
+  countIf(last_seen < now() - interval '30 days') as churned_users,
+  round(countIf(last_seen < now() - interval '30 days') / count(*) * 100, 2) as churn_rate_pct
+FROM users
+GROUP BY cohort_month
+ORDER BY cohort_month DESC
+```
+
+**At-Risk Segments to Build**
+
+<Note>
+Create these three segments in the Users page and save them for weekly monitoring:
+</Note>
+
+1. **At-Risk Power Users** (High priority)
+   - Filter: `Sessions > 20` AND `Last Activity 7-14 days ago`
+   - Why: These users have proven value. Re-engage before they churn.
+
+2. **New Users Not Returning** (Medium priority)
+   - Filter: `Sessions < 5` AND `Last Activity 3-7 days ago`
+   - Why: Early-stage friction. A small push converts them to returning users.
+
+3. **Declining Activity** (Watch list)
+   - Filter: `Sessions > 10` AND `Last Activity 7-30 days ago`
+   - Why: Gradual drop-off. These need incentives before hitting 30+ days.
+
+**Churn Alert Templates**
+
+Set up these alerts in Project Settings:
+
+- **Whale Going Inactive**: User with `Lifetime Value > $10k` AND `Last Activity > 7 days`
+- **Power User Declining**: User with `Sessions > 15` AND `Day-over-day activity drop > 50%`
+- **Failed Transaction Spike**: Cohort-level alert if `Failed Transactions` increase 3x week-over-week
+
+**Re-engagement Campaign Strategies**
+
+| Segment | Trigger | Action | Expected Lift |
+|---------|---------|--------|---|
+| Power users going quiet | 7 days of inactivity | VIP email + bonus points | 15-25% return |
+| New users stalling | 3 days, <5 sessions | In-app nudge + tutorial replay | 20-30% return |
+| Recently churned | 30-45 days inactive | "We miss you" discount offer | 10-15% return |
+
+## What's Next
+
+You've set up retention tracking. Here's what to do next:
+
+- **[Create a Conversion Funnel](/guides/howto/conversion-funnel)**: High retention is good, but you need high conversion first.
+- **[Use Segments for Re-engagement](/features/wallet-intelligence/segments)**: Build audiences of churned users for campaigns. (Growth+ plan)
+- **[Build a Protocol Dashboard](/guides/howto/protocol-dashboard)**: Track retention alongside other key metrics in one view.
+- **[Set Up Alerts](/features/product-analytics/alerts)**: Get notified of retention drops.
+- **[Explore Your Users](/features/wallet-intelligence/wallet-profiles)**: Click on a user in the Users page to see their full profile, including lifecycle stage and activity feed.
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="How is retention calculated?">
+Day 7 retention = (Users active on Day 7 / Users who signed up on Day 0) * 100
+
+A user is considered active if they have at least one session (page view or transaction) on that day.
+
+Example: 1000 users sign up on Monday. 250 of them return and are active on the following Monday. Day 7 retention = 25%.
+</Accordion>
+
+<Accordion title="What's the difference between Day 7, 30, and 90 retention?">
+- **Day 7**: Users who returned within 7 days of signup. Measures short-term activation.
+- **Day 30**: Users active within 30 days. Measures habit formation.
+- **Day 90**: Users active within 90 days. Measures long-term value.
+
+All three matter. Day 7 catches immediate churn. Day 30 shows if you built a habit. Day 90 shows if users stick around.
+</Accordion>
+
+<Accordion title="What user lifecycle stage should I re-engage first?">
+Priority order:
+1. **Resurrecting**: Users who just came back. Momentum is on your side.
+2. **At-risk Returning**: Users with only 2-3 sessions. Easy to convert to Power Users.
+3. **Recent Churned**: Users inactive for 30-60 days. Still remember your product.
+4. **Old Churned**: Users inactive for 6+ months. Hard to re-activate.
+
+Focus on 1 and 2 first for best ROI.
+</Accordion>
+
+<Accordion title="Can I compare retention across different UTM sources?">
+Yes. Create two retention charts (or use breakdowns). Filter the first by UTM Source = "twitter" and the second by UTM Source = "discord". Compare Day 7 retention across both. You'll likely see significant differences.
+
+If one source has 2x better retention, invest more in that channel.
+</Accordion>
+
+<Accordion title="Why does my Day 7 retention look low compared to benchmarks?">
+Crypto apps typically have lower retention than traditional apps because:
+1. **High user acquisition cost** attracts price-sensitive, low-LTV users
+2. **Price volatility** causes churn (markets down, users disappear)
+3. **Regulatory uncertainty** spooks users away
+4. **App fatigue** (so many crypto apps, users bounce between them)
+
+Your goal: beat your own baseline, not match a Fortune 500 SaaS.
+</Accordion>
+
+<Accordion title="Do I need a Growth+ plan to use segments?">
+Yes. Segments are a Growth+ feature. Free and Starter plans can view retention and export user lists manually via CSV, but cannot save reusable segments.
+</Accordion>
+
+<Accordion title="How long does retention data take to update?">
+Retention analysis runs on daily aggregates. Your retention metrics update once per day, typically in the morning (UTC). Real-time retention data is not available.
+</Accordion>
+
+<Accordion title="Can I set a custom retention window?">
+By default, retention is measured from signup date. You can create custom cohort charts by setting a custom event (e.g., "first_transaction") as your cohort start. Contact support if you need help.
+</Accordion>
+</AccordionGroup>
+
+---
+
+**Ready to act?** Start with the Insights page this week. Pick one churn signal and fix it. You'll be surprised how fast retention improves.
+
+Questions? Email us at support@formo.so or ask the chat bubble in your dashboard.

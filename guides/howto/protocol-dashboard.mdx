@@ -1,0 +1,206 @@
+---
+title: "How to Build a Protocol Health Dashboard"
+sidebarTitle: "Protocol Dashboard"
+description: "Create a real-time protocol dashboard with charts for users, transactions, revenue, retention, and acquisition channels using Formo's dashboard builder."
+keywords: ["protocol dashboard", "DeFi metrics dashboard", "crypto analytics dashboard", "onchain KPIs", "web3 reporting"]
+---
+
+A dashboard is your protocol's cockpit. It's where you see everything that matters at a glance: user growth, transaction volume, revenue trends, and whether your acquisition channels are working. Let's build one.
+
+## Prerequisites
+
+- A Formo account with a connected project
+- At least 7 days of data flowing through your [SDK](/sdks/web) or [contract events](/guides/howto/contract-events)
+- Edit access to your project dashboard
+
+## Part 1: Create Your Dashboard Board
+
+Navigate to **Dashboards** in the sidebar. Click **Create Board** in the top right.
+
+Name your board "Protocol Health" (or whatever makes sense for your protocol). This is your custom dashboard page where all charts will live.
+
+<Frame>
+  <img src="/images/screenshots/overview.png" alt="Dashboards overview in sidebar" />
+</Frame>
+
+## Part 2: Add Key Metrics Chart
+
+Click **Create Chart** on your empty board. In the chart builder:
+
+1. Select **Line Chart** (or Bar for comparison)
+2. Choose your metric: Unique Visitors, Wallet Connects, or Transactions
+3. Set your time range (last 30 days is standard)
+4. Group by Day
+
+This chart shows your protocol's heartbeat. Are users growing? Are transaction volumes stable or declining?
+
+**What to track:**
+- Unique Visitors (DAU/WAU/MAU)
+- Wallet Connects per day
+- Transaction count per day
+
+## Part 3: Add Traffic Sources Chart
+
+Create another chart:
+
+1. Select **Bar Chart**
+2. Metric: Unique Visitors or Transactions
+3. Dimension: Referrer (or UTM Source if tracking campaigns)
+4. Sort by value, descending
+
+This shows you where your users come from. Which channels drive the most traffic? Which convert best?
+
+<Frame>
+  <img src="/images/dapp-analytics-referrers.png" alt="Traffic sources breakdown" />
+</Frame>
+
+## Part 4: Add Funnel Chart
+
+Create a new chart:
+
+1. Select **Funnel** chart type
+2. Define your funnel steps:
+   - Step 1: Page view (using the `page` event type)
+   - Step 2: Connect wallet (using the `connect` event type)
+   - Step 3: First Transaction
+   - Step 4: Repeat Transaction (optional)
+3. Set your time range (30 days)
+
+This chart answers the hardest question: how many users actually convert? Where do people drop off?
+
+<Frame>
+  <img src="/images/funnels.png" alt="Conversion funnel visualization" />
+</Frame>
+
+## Part 5: Add Retention Chart
+
+Create another chart:
+
+1. Select **Retention** chart type
+2. Choose your cohort dimension: Sign-up Date or First Transaction Date
+3. Metric: Unique Users returning
+4. Set retention windows: D1, D7, D14, D30, D90
+
+Retention is the metric most protocols ignore until they need it. This chart shows whether users stick around or ghost after their first transaction.
+
+<Frame>
+  <img src="/images/retention.png" alt="Day 7 and Day 30 retention rates" />
+</Frame>
+
+## Part 6: Add User Path Chart (Sankey)
+
+Create another chart:
+
+1. Select **User Path** chart type (Sankey diagram)
+2. Configure: Page (or custom event) flows
+3. Limit to top 5-10 paths for clarity
+
+This shows the most common user journeys through your protocol. Do users go straight to swap? Do they explore first? Which paths lead to transactions?
+
+<Frame>
+  <img src="/images/flows.png" alt="Sankey user path visualization" />
+</Frame>
+
+## Part 7: Add Custom SQL Chart
+
+For advanced metrics (daily revenue, top wallets, gas spent), use a custom SQL chart:
+
+1. Click **Create Chart** and select **SQL Query**
+2. Open the [Explorer](/guides/howto/sql-explorer) to build and test your query first
+3. Paste your tested SQL into the chart builder
+4. Select your chart visualization (Line, Bar, Pie)
+
+Example: Daily revenue by tracking transaction values from contract events.
+
+<Frame>
+  <img src="/images/chartbuilder.png" alt="Chart builder interface" />
+</Frame>
+
+## Part 8: Arrange Your Dashboard
+
+Once all charts are created:
+
+1. Drag charts to reorder them
+2. Resize charts (larger for important metrics, smaller for supporting data)
+3. Group related charts together (top row: key metrics, middle: funnel and retention, bottom: traffic sources)
+4. Save your layout
+
+A well-arranged dashboard tells a story: growth, conversion, retention, and acquisition all in one view.
+
+## Part 9: Share Your Dashboard
+
+Click **Share** in the top right:
+
+- Copy the public link to share with stakeholders
+- Invite team members and set permissions (viewer, editor)
+- Set auto-refresh intervals if you need real-time updates
+
+Your team can now check protocol health anytime without asking for a report.
+
+## 5 Essential Dashboard Charts Every Protocol Needs
+
+| Chart | Metric | Why It Matters |
+|-------|--------|---|
+| **Key Metrics Line Chart** | DAU, Transactions | Your protocol's growth trajectory |
+| **Funnel Chart** | Pageview → Connect → Transaction | Where users drop off and your biggest opportunity |
+| **Retention Chart** | D7, D30 cohort retention | Whether users actually come back (stickiness) |
+| **Traffic Sources** | Referrer breakdown | Best acquisition channels to double down on |
+| **User Path (Sankey)** | Common flows | How real users navigate your protocol |
+
+## Pro Tips
+
+<Tip>
+**Benchmark retention.** Most DeFi protocols see D7 retention between 5-15%. If yours is 20%+, you have exceptional product-market fit.
+</Tip>
+
+<Tip>
+**Watch for seasonal patterns.** Most protocols show dips on weekends and during bear markets. Use 90-day views to spot real trends beneath the noise.
+</Tip>
+
+<Tip>
+**Compare channels.** A channel with lower volume but higher conversion rate is worth more than a high-volume channel with poor conversion. Funnel by UTM source.
+</Tip>
+
+<Tip>
+**Set up alerts.** Create alerts in Project Settings for critical metrics (DAU drop >20%, conversion rate below threshold). See [Alerts guide](/guides/howto/alerts) for details.
+</Tip>
+
+## What's Next
+
+- [Create a conversion funnel](/guides/howto/conversion-funnel) to dig deeper into user acquisition
+- [Track retention cohorts](/guides/howto/retention) by wallet label or geography
+- [Use Ask AI](/guides/howto/ask-ai) to surface insights from your dashboard data
+- [Set up contract events](/guides/howto/contract-events) to track onchain activity beyond SDK events
+- [View your Insights page](/features/product-analytics/insights) for AI-generated growth opportunities
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How often do dashboards update?">
+    Charts update every 5-10 minutes with new data. For real-time metrics, check the Activity page which updates second-by-second.
+  </Accordion>
+
+  <Accordion title="Can I schedule dashboard reports?">
+    Not yet, but you can share your dashboard link with stakeholders or export individual charts. Email reports are on our roadmap.
+  </Accordion>
+
+  <Accordion title="What's the difference between a Board and a Chart?">
+    A Chart is a single visualization (line, bar, funnel, etc.). A Board is a collection of charts arranged on one dashboard page. You can create multiple boards for different purposes (Protocol Health, Marketing Performance, Wallet Intelligence, etc.).
+  </Accordion>
+
+  <Accordion title="Can I filter dashboard charts by date range?">
+    Yes. Each chart has its own date range setting. You can also add filters at the board level to filter all charts at once (filtered views coming soon).
+  </Accordion>
+
+  <Accordion title="How far back can I view historical data?">
+    You can view data for as long as your project has been collecting it (usually from your first SDK install). Most protocols have 3-12 months of data. Older data can be queried via the Explorer.
+  </Accordion>
+
+  <Accordion title="What if my dashboard is loading slowly?">
+    Dashboards with 10+ complex charts may load slower. Try breaking your analysis into multiple boards (one for acquisition, one for monetization, etc.) or simplifying chart queries.
+  </Accordion>
+
+  <Accordion title="Can I compare dashboards across different projects?">
+    Not yet. However, you can view insights across all projects from your Workspace. For cross-project analysis, use the Explorer to write custom SQL queries.
+  </Accordion>
+</AccordionGroup>

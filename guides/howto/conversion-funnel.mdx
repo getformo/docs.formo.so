@@ -1,0 +1,338 @@
+---
+title: "How to Build an Onchain Conversion Funnel"
+sidebarTitle: "Conversion Funnels"
+description: "Build multi-step conversion funnels to track user journeys from first page view to wallet connect to onchain transaction, and identify where users drop off."
+keywords: ["onchain funnel", "crypto conversion tracking", "DeFi funnel analytics", "wallet connect funnel", "web3 conversion rate"]
+---
+
+
+Most crypto apps lose 60 to 80 percent of users between landing page and first transaction. Funnels show you exactly where your leaks are, and Conversion Insights reveal the underlying why.
+
+## Prerequisites
+
+- Formo installed and tracking events on your dapp
+- At least 24 hours of data flowing
+- Basic understanding of your user journey
+
+## Part 1: Navigate to the Chart Builder
+
+<Steps>
+<Step>
+Click **Dashboards** in the sidebar, then click **Create Chart**.
+</Step>
+
+<Step>
+In the chart type selector, choose **Funnel**.
+</Step>
+
+<Step>
+Name your funnel (e.g., "Landing to First Swap") and click **Create**.
+</Step>
+</Steps>
+
+The funnel builder opens with a blank canvas. You'll see the chart editor on the right and a preview pane on the left.
+
+## Part 2: Define Your Funnel Steps
+
+Funnels require at least 2 steps. Each step is an event that users must complete in sequence. Let's build a classic conversion funnel:
+
+**Step 1: Pageview**
+
+<Steps>
+<Step>
+Click the **+ Add Step** button.
+</Step>
+
+<Step>
+Select **page** from the event dropdown. This captures every user who lands on your dapp.
+</Step>
+
+<Step>
+(Optional) Add a filter: Path = "/swap" to track only users who visit your swap page.
+</Step>
+</Steps>
+
+**Step 2: Wallet Connect**
+
+<Steps>
+<Step>
+Click **+ Add Step** again.
+</Step>
+
+<Step>
+Select **connect** from the events list.
+</Step>
+
+<Step>
+(Optional) Add a filter to track only specific chains: Chain = "ethereum".
+</Step>
+</Steps>
+
+**Step 3: Transaction**
+
+<Steps>
+<Step>
+Click **+ Add Step** once more.
+</Step>
+
+<Step>
+Select **transaction** from the events list. This counts users who completed an onchain transaction.
+</Step>
+
+<Step>
+(Optional) Add a filter: Contract Address = "0x..." to track swaps on your DEX only.
+</Step>
+</Steps>
+
+<Frame caption="Three-step funnel in the builder">
+<img src="/images/funnels.png" alt="Funnel chart" />
+</Frame>
+
+<Tip>
+**Too many steps?** Start with 3-4 key steps. Long funnels (6+ steps) can hide important patterns because conversion drops exponentially. Create separate funnels for different user paths (e.g., one for swaps, one for pools).
+</Tip>
+
+## Part 3: Set Your Conversion Window
+
+The conversion window defines how much time a user has to complete the next step. For example, if Step 1 is "page" and Step 2 is "connect", a 1-day window means we count the user toward Step 2 only if they connect a wallet within 24 hours of landing.
+
+<Steps>
+<Step>
+Scroll to **Conversion Window** in the settings panel.
+</Step>
+
+<Step>
+Choose your window based on your funnel:
+- **1 day**: Fast decisions (DEX swaps, quick stakes)
+- **7 days**: Deliberate decisions (pool deposits, farm selections)
+- **14 days**: Default (balances most use cases)
+- **30 days**: Long consideration cycles (lending protocols, governance)
+</Step>
+</Steps>
+
+## Part 4: Choose Funnel Type
+
+Formo supports two funnel types:
+
+**Closed Funnel**
+Each step must follow the previous step. User must view a page, then connect, then swap. Most common.
+
+**Open Funnel**
+Each step is independent. User can swap without connecting first (e.g., batch transactions, programmatic access). Choose this if your funnel steps can happen in any order.
+
+<Steps>
+<Step>
+Click the **Funnel Type** dropdown (default: Closed).
+</Step>
+
+<Step>
+Select **Open** only if your user journey allows non-sequential steps.
+</Step>
+</Steps>
+
+## Part 5: Analyze the Results
+
+Once your funnel is configured, the preview pane shows your funneling data in real-time:
+
+- **Absolute numbers**: Count of users at each step
+- **Conversion rate**: Percentage of users who advance
+- **Drop-off**: Users who left at each step
+- **Visual width**: Bar width represents conversion percentage
+
+Look for bottlenecks. If 80 percent of users land on a page but only 20 percent connect a wallet, your wallet connection is the biggest leak.
+
+<Frame caption="Funnel showing 80% landing page to 15% wallet connect drop">
+<img src="/images/funnels.png" alt="Funnel analysis" />
+</Frame>
+
+## Part 6: Add Breakdown Dimensions
+
+Break down your funnel by user attributes to find patterns:
+
+<Steps>
+<Step>
+In the settings panel, scroll to **Breakdowns**.
+</Step>
+
+<Step>
+Select a dimension:
+- **Referrer**: Which traffic source converts best?
+- **Country**: Geographic patterns?
+- **Device**: Mobile vs desktop conversion?
+- **UTM Source**: Which campaign drives best users?
+- **Chain**: Which blockchain has highest conversion?
+</Step>
+
+<Step>
+The funnel splits into multiple bands, one per breakdown value. Compare conversion rates across each.
+</Step>
+</Steps>
+
+**Pro tip**: If your iOS users convert at 5 percent but web at 25 percent, you have a mobile UX problem. If users from Twitter convert at 40 percent but Discord at 15 percent, adjust your acquisition strategy.
+
+## Part 7: Use Conversion Insights
+
+Formo uses statistical analysis to find what drives conversions. Click the **Insights** tab (next to the funnel chart) to see:
+
+- **Lift**: Which attributes increase conversion probability
+- **Odds ratio**: How much more (or less) likely users with this attribute convert
+- **Statistical significance**: Is this insight real or noise
+
+Example insight: "Users from Referrer=twitter have 2.3x lift in Step 2 conversion (wallet connect). This is statistically significant (p < 0.05)."
+
+Act on this: Double down on Twitter traffic if wallet conversion is your bottleneck.
+
+## Part 8: Save Your Funnel to a Dashboard
+
+<Steps>
+<Step>
+Click **Save to Dashboard** in the top right.
+</Step>
+
+<Step>
+Select an existing dashboard or create a new one (e.g., "Conversion Analytics").
+</Step>
+
+<Step>
+Add a title for the chart (e.g., "Swap Conversion Funnel") and click **Save**.
+</Step>
+</Steps>
+
+Your funnel is now saved and will update daily with new data. Return to your dashboard anytime to track trends.
+
+## Real-World Example: DEX Swap Funnel
+
+Here's how to set up a high-quality funnel for a DEX:
+
+| Step | Event | Filter | Meaning |
+|------|-------|--------|---------|
+| 1 | page | path = "/swap" | Users who visit the swap page |
+| 2 | connect | chain in (ethereum, polygon, arbitrum) | Users who connect a supported wallet |
+| 3 | transaction | contract_address = "0xE592427A0AEce92De3Edee1F18E0157C05861564" | Users who execute a swap |
+
+Set conversion window to **1 day** (most swaps happen quickly). Add breakdowns for **referrer** and **device** to see which sources and platforms convert best. Check **Insights** weekly to catch new patterns.
+
+Expected baseline: 80% page view to 25% wallet connect to 8% transaction completion.
+
+## Pro Tips
+
+- **Segment your funnels**: Don't mix swap and pool deposit users in one funnel. Create separate funnels for each user path.
+- **Monitor daily**: Check your funnel once a week. Look for drops (potential bugs) or spikes (successful campaigns).
+- **Pair with retention**: A high-conversion funnel is great, but if users don't return, you're not growing. Use [Retention tracking](/guides/howto/retention) to measure long-term value.
+- **Use Ask AI**: Click the chat bubble and ask "Why did my wallet connection rate drop 10% this week?" Formo will analyze your data.
+- **Contract events**: If you track [Contract Events](/features/product-analytics/contract-events), you can create funnels for specific contract interactions (e.g., "approved" to "swap" to "received").
+
+## DeFi-Specific Funnel Recipes
+
+### Staking Funnel
+
+Track staking adoption with this canonical four-step funnel:
+
+| Step | Event | Filter | Conversion Rate |
+|------|-------|--------|-----------------|
+| 1 | page | path = "/stake" | 100% |
+| 2 | connect | chain = "ethereum" | 25-35% |
+| 3 | approval | contract_address = "0x..." | 60-70% |
+| 4 | stake | function_name = "stake" | 80-90% |
+
+Typical baseline: 25% of page visitors stake within 7 days. High drop-off at Step 2 (wallet connect) indicates UX friction; at Step 3 (approval) suggests confusing token permissions.
+
+### Liquidity Provision Funnel
+
+Liquidity provision funnels are longer because users must approve two tokens, then add liquidity:
+
+| Step | Event | Filter |
+|------|-------|--------|
+| 1 | page | path = "/pool" |
+| 2 | connect | - |
+| 3 | approval_1 | function = "approve", token = "tokenA" |
+| 4 | approval_2 | function = "approve", token = "tokenB" |
+| 5 | addLiquidity | function = "addLiquidity" |
+
+Expected conversion: 20% page to 5% liquidity provider. Two approval steps cause most drop-off.
+
+### Multi-Step DeFi Flow: Deposit to Borrow
+
+Track the full lending funnel (Deposit > Borrow > Repay):
+
+| Step | Event | Filter |
+|------|-------|--------|
+| 1 | deposit | function = "supply" |
+| 2 | borrow | function = "borrow" |
+| 3 | swap | (optional) use borrowed assets |
+| 4 | repay | function = "repay" |
+
+Use **Open Funnel** here (borrow and swap may happen out of order).
+
+### Key DeFi Drop-Off Patterns
+
+Common friction points and solutions:
+
+| Drop-Off Point | Common Cause | Fix |
+|---|---|---|
+| Wallet Connect (Step 2) | No visible button; multi-chain confusion | Add prominent connect button; default to user's last-used chain |
+| Token Approval (Step 3) | Unclear why approval needed | Add UX explainer ("We need permission to transfer your tokens") |
+| Transaction Submit | High gas fees; browser extension timeout | Show gas estimate upfront; increase approval window |
+
+### Whale Swap Alert Setup
+
+Monitor high-value swaps on your DEX:
+
+1. Create a funnel with step: **transaction** + filter **amount_usd > 100000**
+2. Add breakdown by **user_address** to spot repeat whale traders
+3. Set an [alert](/features/product-analytics/alerts) if this funnel drops (fewer whale transactions)
+4. Use **Insights** to find attributes of whale traders and target similar users
+
+## What's Next
+
+Your conversion funnel is live. Next steps:
+
+- **[Improve with Segments](/features/wallet-intelligence/segments)**: Create a segment of high-converting users and re-target similar users. (Growth+ plan required.)
+- **[Set Alerts](/features/product-analytics/alerts)**: Get notified if conversion dips below your threshold.
+- **[Read the Funnel Guide](/features/product-analytics/funnels)**: Deep dive into advanced funnel features.
+- **[Compare with Retention](/guides/howto/retention)**: Track if high-converting cohorts also retain well.
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Can I use contract events in my funnel?">
+Yes. If you've set up [Contract Events](/features/product-analytics/contract-events), you can select any of them in the funnel builder. For example, a Uniswap funnel might be: "page" > "swap (contract event)" > "Transfer (contract event)".
+</Accordion>
+
+<Accordion title="What's the difference between closed and open funnels?">
+**Closed funnel**: User must complete steps in order. Page view, then wallet connect, then swap.
+
+**Open funnel**: Steps are independent. User can swap without a page view event (e.g., direct contract calls, wallet batch operations). Use open funnels when your steps can happen in any sequence.
+</Accordion>
+
+<Accordion title="How long does data take to appear in my funnel?">
+Events are ingested in real-time, but funnel analysis (especially Insights) runs on daily aggregates. Your funnel updates within 30 seconds of a new event, but Insights refresh daily.
+</Accordion>
+
+<Accordion title="Can I compare two funnels side by side?">
+Not directly in the UI yet. Create both funnels on the same dashboard, then compare their conversion rates and breakdowns manually.
+</Accordion>
+
+<Accordion title="What conversion window should I use?">
+- **Swap, stake, claim**: 1 day (fast decisions)
+- **Pool deposits, farming**: 7 days (deliberate)
+- **Loans, governance**: 14-30 days (long consideration)
+
+Start with 14 days (default) and adjust based on your product.
+</Accordion>
+
+<Accordion title="Why is my funnel showing 0 users?">
+1. Check that your events are being tracked. Go to **Live View** to confirm events are flowing.
+2. Verify your filters are not too restrictive (e.g., filtering by a contract address that hasn't had activity).
+3. Check your conversion window. If set to 1 day, users have only 24 hours to convert.
+4. Ensure your funnel has at least 2 steps.
+</Accordion>
+
+<Accordion title="Can I export funnel data?">
+Yes. Click the three-dot menu on your funnel chart and select **Export as CSV** to download conversion data for presentation or deeper analysis.
+</Accordion>
+</AccordionGroup>
+
+---
+
+**Ready to dive deeper?** See the complete [Funnel Analytics documentation](/features/product-analytics/funnels) or email us at support@formo.so.

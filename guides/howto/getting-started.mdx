@@ -1,0 +1,239 @@
+---
+title: "Getting Started: Install Formo and Track Your First Users"
+sidebarTitle: "Getting Started"
+description: "Learn how to install the Formo analytics SDK, create your first project, and start tracking wallet connects, transactions, and page views for your onchain app."
+keywords: ["formo install", "web3 analytics setup", "crypto analytics SDK", "onchain tracking", "wallet analytics"]
+---
+
+
+Go from zero to real-time analytics in 10 minutes. By the end of this guide, you'll have the Formo SDK tracking wallet connects, transactions, and page views across your onchain app, with real-time data flowing into your dashboard.
+
+## Prerequisites
+
+- A web app built with React, Vue, Next.js, or vanilla JavaScript
+- Node.js and npm (or pnpm/yarn) installed
+- 10 minutes of your time
+
+## Part 1: Create Your Workspace and Project
+
+<Steps>
+<Step>
+Go to [app.formo.so](https://app.formo.so) and sign up with email or wallet.
+</Step>
+
+<Step>
+Create a workspace. This is your analytics home, shared with your team. Name it after your dapp (e.g., "MyDEX Analytics").
+</Step>
+
+<Step>
+Create your first project. Projects let you track different products or environments separately. Create one for your mainnet dapp.
+</Step>
+
+<Step>
+Navigate to **Project Settings → Credentials**. Copy your **API Key** and **Project ID**. You'll need these in the next step.
+</Step>
+</Steps>
+
+<Frame caption="Get your credentials from Project Settings">
+<img src="/images/project-credentials.png" alt="Project credentials" />
+</Frame>
+
+## Part 2: Install the SDK
+
+The Formo SDK is distributed as `@formo/analytics` on npm. Install it in your project's root:
+
+```bash
+npm install @formo/analytics
+# or
+pnpm add @formo/analytics
+# or
+yarn add @formo/analytics
+```
+
+<Tip>
+**Framework support**: Formo works with React, Vue, Svelte, Next.js, and vanilla JavaScript. If you use wagmi or RainbowKit, Formo integrates seamlessly.
+</Tip>
+
+## Part 3: Initialize Tracking
+
+Add Formo initialization to your app's entry point. This should run once, before your app renders.
+
+**React / Next.js:**
+
+```typescript
+import Formo from '@formo/analytics';
+
+// In your root component or _app.tsx
+Formo.init({
+  apiKey: 'your-api-key-here',
+  projectId: 'your-project-id-here'
+});
+
+export default function App() {
+  return (
+    // Your app components
+  );
+}
+```
+
+**Vue.js:**
+
+```javascript
+import Formo from '@formo/analytics';
+
+Formo.init({
+  apiKey: 'your-api-key-here',
+  projectId: 'your-project-id-here'
+});
+```
+
+**Vanilla JavaScript:**
+
+```html
+<script>
+  window.Formo.init({
+    apiKey: 'your-api-key-here',
+    projectId: 'your-project-id-here'
+  });
+</script>
+```
+
+<Note>
+**Never hardcode credentials in production.** Use environment variables:
+
+```javascript
+Formo.init({
+  apiKey: process.env.REACT_APP_FORMO_API_KEY,
+  projectId: process.env.REACT_APP_FORMO_PROJECT_ID
+});
+```
+
+Create a `.env.local` file:
+```
+REACT_APP_FORMO_API_KEY=your-api-key
+REACT_APP_FORMO_PROJECT_ID=your-project-id
+```
+</Note>
+
+## Part 4: Verify Installation
+
+After deploying or running your app locally, verify events are flowing:
+
+<Steps>
+<Step>
+Open your Formo dashboard and navigate to the **Live View** (globe icon in sidebar).
+</Step>
+
+<Step>
+Interact with your app: click a button, navigate to a new page, connect a wallet.
+</Step>
+
+<Step>
+Watch events appear in real-time in Live View. You should see page views, wallet connects, and chain switches automatically.
+</Step>
+
+<Step>
+If events aren't appearing, check your browser console for errors. Verify your API key and project ID are correct.
+</Step>
+</Steps>
+
+<Frame caption="Real-time events flowing in Live View">
+<img src="/images/live.png" alt="Live view" />
+</Frame>
+
+## Part 5: Explore Your First Data
+
+Now that events are flowing, explore your data:
+
+<Steps>
+<Step>
+Open the **Overview** page. You'll see key metrics like total sessions, unique wallets, and transaction count.
+</Step>
+
+<Step>
+Click **Activity** in the sidebar to see your event feed, broken down by event type, country, device, and referrer source.
+</Step>
+
+<Step>
+Use the **Explore** section to write custom SQL queries against your raw events data (no coding experience required, or use the schema browser on the left).
+</Step>
+</Steps>
+
+## Part 6 (Optional): Track Custom Events and Users
+
+Formo automatically captures page views, wallet connects, and transactions. To track custom events like "Swap Initiated" or "Liquidity Added":
+
+```javascript
+// Track a custom event with properties
+Formo.track('swap_initiated', {
+  tokenIn: 'USDC',
+  tokenOut: 'ETH',
+  amount: '1000',
+  slippage: '0.5'
+});
+```
+
+To identify users and tie events to a user ID:
+
+```javascript
+// After wallet connect or login
+Formo.identify('user-123');
+
+// Clear user identity on disconnect
+Formo.identify(null);
+```
+
+For advanced use cases (cross-subdomain tracking, server-side tracking), see the [SDK documentation](/sdks/web).
+
+## What's Next
+
+You've set up Formo and verified data is flowing. Here's what to explore next:
+
+- **[Build a Conversion Funnel](/guides/howto/conversion-funnel)**: Track drop-off from landing page to first swap.
+- **[Track User Retention](/guides/howto/retention)**: Understand which cohorts stick around and why.
+- **[Set Up Alerts](/features/product-analytics/alerts)**: Get notified when metrics dip.
+- **[Use Ask AI](/features/product-analytics/ai)**: Ask questions like "Why did swap volume drop 20% yesterday?"
+- **[Create Segments](/features/wallet-intelligence/segments)**: Build audience groups for targeting (Growth+ plan required).
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Which frameworks does Formo support?">
+Formo works with any JavaScript framework: React, Vue, Svelte, Next.js, Remix, Astro, and vanilla JavaScript. We have optimized integration guides for wagmi and RainbowKit. See [SDKs](/sdks/web) for framework-specific examples.
+</Accordion>
+
+<Accordion title="What data is captured automatically?">
+Formo automatically captures:
+- **Page views**: Every time the user navigates to a new page
+- **Sessions**: User visits with referrer and UTM source
+- **Wallet events**: Connect, disconnect, chain switch
+- **Transactions**: All onchain tx events from your contract
+- **Device/geo data**: Browser type, OS, country
+
+No additional configuration needed.
+</Accordion>
+
+<Accordion title="Is my data private and secure?">
+Yes. Formo uses OAuth and wallet-based auth with no email passwords stored. All data is encrypted in transit and at rest. We comply with GDPR and SOC 2. See [Security](/security) for details.
+</Accordion>
+
+<Accordion title="Do you charge by event volume or users?">
+Formo pricing is based on monthly active wallets, not event count. Free tier includes up to 1,000 wallets. See [Pricing](https://formo.so/pricing) for Growth and Pro plans.
+</Accordion>
+
+<Accordion title="Can I track events from my backend?">
+Yes. Formo provides a [Server SDK](/sdks/server) for backend tracking. Use it to send custom events, identify users, or batch track historical data.
+</Accordion>
+
+<Accordion title="How often is my data updated?">
+All events are ingested in real-time. Dashboards and reports refresh within 30 seconds. Retention and cohort analysis updates daily.
+</Accordion>
+
+<Accordion title="What if I need to track a different app or environment?">
+Create a new project in your workspace for each app or environment (mainnet, testnet, staging). Each has its own credentials and dashboard.
+</Accordion>
+</AccordionGroup>
+
+---
+
+**Have questions?** Email us at support@formo.so or message the chat bubble in your dashboard.
