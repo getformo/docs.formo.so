@@ -141,8 +141,8 @@ LIMIT 10
 
 ```sql
 SELECT 
-  avg(date_diff('minute', 
-    first_connect_time, 
+  avg(dateDiff('minute',
+    first_connect_time,
     first_swap_time)) as avg_minutes_to_swap
 FROM (
   SELECT 
@@ -212,7 +212,7 @@ For protocol-specific dashboards, see [How to Build a Protocol Dashboard](/guide
 <AccordionGroup>
 
 <Accordion title="What blockchains does Formo support for contract events?">
-Formo supports Ethereum, Polygon, Arbitrum, Optimism, Base, BNB Chain, Avalanche, Linea, Scroll, zkSync, Blast, and more. Full list at /chains/overview.
+Formo supports Ethereum, Polygon, Arbitrum, Optimism, Base, BNB Chain, Avalanche, Linea, Scroll, zkSync, Blast, and more. Full list at [Supported Chains](/chains/overview).
 </Accordion>
 
 <Accordion title="How does Formo detect contract ABIs automatically?">

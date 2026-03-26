@@ -80,7 +80,8 @@
               "guides/howto/wallet-segmentation",
               "guides/howto/onboarding-flows",
               "guides/howto/contract-events",
-              "guides/howto/sql-explorer"
+              "guides/howto/sql-explorer",
+              "guides/howto/token-gated-forms"
             ]
           }
         ]
