@@ -34,8 +34,9 @@
                   "features/product-analytics/explore",
                   "features/product-analytics/funnels",
                   "features/product-analytics/flows",
-                  "features/product-analytics/retention",
                   "features/product-analytics/alerts",
+                  "features/product-analytics/retention",
+                  "features/product-analytics/insights",
                   "features/product-analytics/ai"
                 ]
               },
@@ -45,9 +46,10 @@
                 "pages": [
                   "features/wallet-intelligence/overview",
                   "features/wallet-intelligence/wallet-profiles",
+                  "features/wallet-intelligence/wallet-labels",
+                  "features/wallet-intelligence/search",
                   "features/wallet-intelligence/audience-insights",
-                  "features/wallet-intelligence/segments",
-                  "features/wallet-intelligence/wallet-labels"
+                  "features/wallet-intelligence/segments"
                 ]
               },
               {
