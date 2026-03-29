@@ -38,16 +38,22 @@ When creating a Workspace API Key, select the scopes your key needs. Each API en
 
 | Scope | Description | Required Plan |
 |-------|-------------|---------------|
-| `query:read` | Execute SQL queries via the Query API | All plans |
-| `profiles:read` | Read wallet profiles via the Profiles API | All plans |
+| `query:read` | Execute SQL analytics queries | All plans |
+| `profiles:read` | Search and get wallet profiles | All plans |
+| `profiles:write` | Import wallet addresses (requires profiles:read) | Scale / Enterprise |
 | `alerts:read` | List and get alerts | Scale / Enterprise |
-| `alerts:write` | Create, update, delete, and toggle alerts | Scale / Enterprise |
+| `alerts:write` | Create, update, delete alerts (requires alerts:read) | Scale / Enterprise |
 | `boards:read` | List and get boards and charts | Scale / Enterprise |
-| `boards:write` | Create, update, delete, and duplicate boards and charts | Scale / Enterprise |
-| `ai:read` | Chat with the AI analytics assistant | Scale / Enterprise |
+| `boards:write` | Create, update, delete boards and charts (requires boards:read) | Scale / Enterprise |
+| `contracts:read` | List contracts | Scale / Enterprise |
+| `contracts:write` | Create, update, delete contracts (requires contracts:read) | Scale / Enterprise |
+| `segments:read` | List segments | Scale / Enterprise |
+| `segments:write` | Create and delete segments (requires segments:read) | Scale / Enterprise |
+| `ai:read` | AI analytics chat | Scale / Enterprise |
+| `mcp:read` | MCP protocol access | Scale / Enterprise |
 
 <Note>
-  Write scopes (e.g., `alerts:write`) automatically require the corresponding read scope. Premium scopes (`alerts`, `boards`, `ai`) are only available on Scale and Enterprise plans.
+  Write scopes automatically require the corresponding read scope. Premium scopes are only available on Scale and Enterprise plans. Create keys with the required scopes in Team Settings &gt; API Keys.
 </Note>
 
 ## SDK Write Key

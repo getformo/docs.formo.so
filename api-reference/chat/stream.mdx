@@ -12,6 +12,6 @@ This endpoint returns a streaming response using **Server-Sent Events (SSE)**. E
 ```bash
 curl -N -H "Authorization: Bearer <your_workspace_api_key>" \
   -H "Content-Type: application/json" \
-  -d '{"message": "What were my top events last week?"}' \
+  -d '{"messages": [{"id": "msg-1", "role": "user", "content": "What were my top events last week?"}]}' \
   https://api.formo.so/v0/chat
 ```
