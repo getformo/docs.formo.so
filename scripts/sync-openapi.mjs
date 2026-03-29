@@ -9,10 +9,10 @@
  *   npm run sync:openapi -- --remote-path apps/backend/openapi.json
  */
 
-import { existsSync, copyFileSync } from "fs";
+import { existsSync, copyFileSync, writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const destPath = resolve(__dirname, "..", "api-reference", "openapi.json");
@@ -50,10 +50,18 @@ console.log(
 // 2. Try gh CLI (handles private repo auth)
 const repo = "getformo/formono";
 try {
-  execSync(
-    `gh api "repos/${repo}/contents/${remotePath}?ref=${branch}" --jq '.content' | base64 -d > "${destPath}"`,
-    { stdio: ["pipe", "pipe", "pipe"] }
-  );
+  const ghOutput = execFileSync("gh", [
+    "api",
+    `repos/${repo}/contents/${remotePath}?ref=${branch}`,
+    "--jq",
+    ".content",
+  ], { encoding: "utf-8" });
+
+  const decoded = Buffer.from(ghOutput.trim(), "base64");
+  if (decoded.length === 0) {
+    throw new Error("Received empty content from GitHub API");
+  }
+  writeFileSync(destPath, decoded);
   console.log(`Saved to ${destPath} (via gh CLI)`);
   process.exit(0);
 } catch {
@@ -61,14 +69,17 @@ try {
 }
 
 // 3. Fallback to curl (public repos or CI with GITHUB_TOKEN)
-const curlHeaders = process.env.GITHUB_TOKEN
-  ? `-H "Authorization: token ${process.env.GITHUB_TOKEN}"`
-  : "";
 try {
-  execSync(
-    `curl -fsSL ${curlHeaders} "https://raw.githubusercontent.com/${repo}/${branch}/${remotePath}" -o "${destPath}"`,
-    { stdio: ["pipe", "pipe", "pipe"] }
+  const curlArgs = ["-fsSL"];
+  if (process.env.GITHUB_TOKEN) {
+    curlArgs.push("-H", `Authorization: token ${process.env.GITHUB_TOKEN}`);
+  }
+  curlArgs.push(
+    `https://raw.githubusercontent.com/${repo}/${branch}/${remotePath}`,
+    "-o",
+    destPath
   );
+  execFileSync("curl", curlArgs, { stdio: ["pipe", "pipe", "pipe"] });
   console.log(`Saved to ${destPath} (via curl)`);
   process.exit(0);
 } catch {
