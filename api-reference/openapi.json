@@ -3,7 +3,7 @@
   "info": {
     "title": "Formo API",
     "version": "1.0.0",
-    "description": "API for event tracking, querying data, and managing wallet profiles"
+    "description": "API for event tracking, querying data, managing wallet profiles, alerts, boards, and AI chat"
   },
   "servers": [
     {
@@ -809,6 +809,447 @@
             "description": "How to combine multiple conditions: `and` (all must match) or `or` (any must match)"
           }
         }
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique alert identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Alert name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Alert description"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the alert is currently enabled"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["metric_threshold", "event_match", "anomaly"],
+            "description": "Alert type"
+          },
+          "conditions": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Alert trigger conditions (structure depends on alert type)"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["webhook", "email", "slack"],
+                  "description": "Notification channel type"
+                },
+                "config": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "description": "Channel-specific configuration (e.g., webhook URL, email address)"
+                }
+              }
+            },
+            "description": "Notification channels for this alert"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (ISO 8601)"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (ISO 8601)"
+          }
+        }
+      },
+      "AlertListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Alert"
+            },
+            "description": "Array of alerts"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total number of alerts"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Maximum number of alerts returned"
+              },
+              "offset": {
+                "type": "integer",
+                "description": "Number of alerts skipped"
+              }
+            },
+            "required": ["total", "limit", "offset"]
+          }
+        },
+        "required": ["data", "meta"]
+      },
+      "CreateAlertRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Alert name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Alert description"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["metric_threshold", "event_match", "anomaly"],
+            "description": "Alert type"
+          },
+          "conditions": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Alert trigger conditions"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["webhook", "email", "slack"]
+                },
+                "config": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "description": "Notification channels"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether the alert is enabled (defaults to true)"
+          }
+        },
+        "required": ["name", "type", "conditions", "channels"]
+      },
+      "UpdateAlertRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Alert name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Alert description"
+          },
+          "conditions": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Alert trigger conditions"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["webhook", "email", "slack"]
+                },
+                "config": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "description": "Notification channels"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the alert is enabled"
+          }
+        }
+      },
+      "Chart": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique chart identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Chart name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["line", "bar", "pie", "number", "table", "area"],
+            "description": "Chart visualization type"
+          },
+          "query": {
+            "type": "string",
+            "description": "SQL query or metric definition for the chart"
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Chart display configuration (colors, axes, formatting, etc.)"
+          },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "integer" },
+              "y": { "type": "integer" },
+              "w": { "type": "integer" },
+              "h": { "type": "integer" }
+            },
+            "description": "Chart position and size on the board grid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (ISO 8601)"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (ISO 8601)"
+          }
+        }
+      },
+      "Board": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique board identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Board name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Board description"
+          },
+          "charts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Chart"
+            },
+            "nullable": true,
+            "description": "Charts on this board (included when fetching a single board)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (ISO 8601)"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (ISO 8601)"
+          }
+        }
+      },
+      "BoardListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Board"
+            },
+            "description": "Array of boards"
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total number of boards"
+              },
+              "limit": {
+                "type": "integer",
+                "description": "Maximum number of boards returned"
+              },
+              "offset": {
+                "type": "integer",
+                "description": "Number of boards skipped"
+              }
+            },
+            "required": ["total", "limit", "offset"]
+          }
+        },
+        "required": ["data", "meta"]
+      },
+      "CreateBoardRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Board name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Board description"
+          }
+        },
+        "required": ["name"]
+      },
+      "UpdateBoardRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Board name"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Board description"
+          }
+        }
+      },
+      "CreateChartRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Chart name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["line", "bar", "pie", "number", "table", "area"],
+            "description": "Chart visualization type"
+          },
+          "query": {
+            "type": "string",
+            "description": "SQL query or metric definition"
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Chart display configuration"
+          },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "integer" },
+              "y": { "type": "integer" },
+              "w": { "type": "integer" },
+              "h": { "type": "integer" }
+            },
+            "description": "Chart position and size on the board grid"
+          }
+        },
+        "required": ["name", "type", "query"]
+      },
+      "UpdateChartRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Chart name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["line", "bar", "pie", "number", "table", "area"],
+            "description": "Chart visualization type"
+          },
+          "query": {
+            "type": "string",
+            "description": "SQL query or metric definition"
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Chart display configuration"
+          },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "integer" },
+              "y": { "type": "integer" },
+              "w": { "type": "integer" },
+              "h": { "type": "integer" }
+            },
+            "description": "Chart position and size"
+          }
+        }
+      },
+      "ChatRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The user's question or prompt for the AI assistant"
+          },
+          "conversation_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Conversation ID for multi-turn context. Omit to start a new conversation."
+          }
+        },
+        "required": ["message"]
+      },
+      "ChatCompactRequest": {
+        "type": "object",
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "description": "Conversation ID to compact/summarize"
+          }
+        },
+        "required": ["conversation_id"]
+      },
+      "ChatCompactResponse": {
+        "type": "object",
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "description": "The conversation ID"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Summarized conversation context"
+          }
+        },
+        "required": ["conversation_id", "summary"]
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["isSuccess"]
       }
     }
   },
@@ -1627,6 +2068,878 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v0/alerts": {
+      "get": {
+        "summary": "List Alerts",
+        "description": "List all alerts for the project. Requires a Workspace API Key with `alerts:read` permission. Available on Scale and Enterprise plans.",
+        "operationId": "listAlerts",
+        "tags": ["Alerts API"],
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Alerts API"
+          }
+        ],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 },
+            "description": "Maximum number of alerts to return. Default: 50"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 0, "default": 0 },
+            "description": "Number of alerts to skip for pagination. Default: 0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved alerts",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AlertListResponse" },
+                "example": {
+                  "data": [
+                    {
+                      "id": "alert_abc123",
+                      "name": "Whale Visit Alert",
+                      "description": "Notify when a whale wallet visits the app",
+                      "enabled": true,
+                      "type": "event_match",
+                      "conditions": { "event": "page", "filter": { "field": "users.net_worth_usd", "op": "gt", "value": 100000 } },
+                      "channels": [{ "type": "webhook", "config": { "url": "https://hooks.example.com/alert" } }],
+                      "created_at": "2025-03-01T10:00:00Z",
+                      "updated_at": "2025-03-15T14:30:00Z"
+                    }
+                  ],
+                  "meta": { "total": 5, "limit": 50, "offset": 0 }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have alerts:read permission",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorWithCode" },
+                "example": { "isSuccess": false, "code": "FORBIDDEN", "message": "API key does not have alerts:read permission" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Alert",
+        "description": "Create a new alert for the project. Requires a Workspace API Key with `alerts:write` permission. Available on Scale and Enterprise plans.",
+        "operationId": "createAlert",
+        "tags": ["Alerts API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Alerts API" }],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateAlertRequest" },
+              "example": {
+                "name": "High-Value Wallet Alert",
+                "description": "Alert when wallets with >$100k visit",
+                "type": "event_match",
+                "conditions": { "event": "page", "filter": { "field": "users.net_worth_usd", "op": "gt", "value": 100000 } },
+                "channels": [{ "type": "webhook", "config": { "url": "https://hooks.example.com/whale" } }]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Alert created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Alert" } } }
+          },
+          "400": {
+            "description": "Bad Request - Invalid alert data",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have alerts:write permission",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorWithCode" },
+                "example": { "isSuccess": false, "code": "FORBIDDEN", "message": "API key does not have alerts:write permission" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/alerts/{alertId}": {
+      "get": {
+        "summary": "Get Alert",
+        "description": "Retrieve a specific alert by ID. Requires a Workspace API Key with `alerts:read` permission.",
+        "operationId": "getAlert",
+        "tags": ["Alerts API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Alerts API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The alert ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved alert",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Alert" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have alerts:read permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Alert not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Alert",
+        "description": "Update an existing alert. Requires a Workspace API Key with `alerts:write` permission.",
+        "operationId": "updateAlert",
+        "tags": ["Alerts API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Alerts API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The alert ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAlertRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Alert" } } }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have alerts:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Alert not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Alert",
+        "description": "Delete an alert. Requires a Workspace API Key with `alerts:write` permission.",
+        "operationId": "deleteAlert",
+        "tags": ["Alerts API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Alerts API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The alert ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert deleted successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" }, "example": { "isSuccess": true, "message": "Alert deleted" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have alerts:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Alert not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/alerts/{alertId}/toggle": {
+      "patch": {
+        "summary": "Toggle Alert",
+        "description": "Enable or disable an alert. Requires a Workspace API Key with `alerts:write` permission.",
+        "operationId": "toggleAlert",
+        "tags": ["Alerts API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Alerts API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The alert ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "Set to true to enable, false to disable"
+                  }
+                },
+                "required": ["enabled"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert toggled successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Alert" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have alerts:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Alert not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/boards": {
+      "get": {
+        "summary": "List Boards",
+        "description": "List all boards for the project. Requires a Workspace API Key with `boards:read` permission. Available on Scale and Enterprise plans.",
+        "operationId": "listBoards",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 },
+            "description": "Maximum number of boards to return. Default: 50"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 0, "default": 0 },
+            "description": "Number of boards to skip for pagination. Default: 0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved boards",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BoardListResponse" },
+                "example": {
+                  "data": [
+                    {
+                      "id": "board_abc123",
+                      "name": "Product Overview",
+                      "description": "Key product metrics dashboard",
+                      "created_at": "2025-02-01T10:00:00Z",
+                      "updated_at": "2025-03-10T08:30:00Z"
+                    }
+                  ],
+                  "meta": { "total": 3, "limit": 50, "offset": 0 }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:read permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Board",
+        "description": "Create a new board. Requires a Workspace API Key with `boards:write` permission.",
+        "operationId": "createBoard",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBoardRequest" },
+              "example": { "name": "Weekly Metrics", "description": "Weekly performance dashboard" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Board created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Board" } } }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/boards/{boardId}": {
+      "get": {
+        "summary": "Get Board",
+        "description": "Retrieve a board with all its charts. Requires a Workspace API Key with `boards:read` permission.",
+        "operationId": "getBoard",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The board ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved board with charts",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Board" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:read permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Board not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Board",
+        "description": "Update an existing board. Requires a Workspace API Key with `boards:write` permission.",
+        "operationId": "updateBoard",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The board ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBoardRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Board updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Board" } } }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Board not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Board",
+        "description": "Delete a board and all its charts. Requires a Workspace API Key with `boards:write` permission.",
+        "operationId": "deleteBoard",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The board ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Board deleted successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Board not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/boards/{boardId}/duplicate": {
+      "post": {
+        "summary": "Duplicate Board",
+        "description": "Create a copy of an existing board including all its charts. Requires a Workspace API Key with `boards:write` permission.",
+        "operationId": "duplicateBoard",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The board ID to duplicate"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name for the duplicated board. Defaults to '{original name} (Copy)'."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Board duplicated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Board" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Board not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/boards/{boardId}/charts": {
+      "post": {
+        "summary": "Create Chart",
+        "description": "Add a new chart to a board. Requires a Workspace API Key with `boards:write` permission.",
+        "operationId": "createChart",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The board ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateChartRequest" },
+              "example": {
+                "name": "Daily Active Users",
+                "type": "line",
+                "query": "SELECT date, count(distinct anonymous_id) as dau FROM events WHERE type = 'page' GROUP BY date ORDER BY date DESC LIMIT 30",
+                "config": { "xAxis": "date", "yAxis": "dau" },
+                "position": { "x": 0, "y": 0, "w": 6, "h": 4 }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Chart created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Chart" } } }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Board not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}": {
+      "put": {
+        "summary": "Update Chart",
+        "description": "Update an existing chart on a board. Requires a Workspace API Key with `boards:write` permission.",
+        "operationId": "updateChart",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The board ID"
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The chart ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateChartRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chart updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Chart" } } }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Board or chart not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Chart",
+        "description": "Delete a chart from a board. Requires a Workspace API Key with `boards:write` permission.",
+        "operationId": "deleteChart",
+        "tags": ["Boards API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "Boards API" }],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The board ID"
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The chart ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chart deleted successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have boards:write permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Board or chart not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/chat": {
+      "post": {
+        "summary": "Chat with AI",
+        "description": "Send a message to Formo's AI analytics assistant and receive a streaming response via Server-Sent Events (SSE). The AI can answer questions about your analytics data, generate SQL queries, and provide insights. Requires a Workspace API Key with `ai:read` permission. Available on Scale and Enterprise plans.",
+        "operationId": "streamChat",
+        "tags": ["AI Chat API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "AI Chat API" }],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChatRequest" },
+              "example": {
+                "message": "What were my top 5 events by volume last week?",
+                "conversation_id": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Streaming response via Server-Sent Events. Each event contains a chunk of the AI's response.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Server-Sent Events stream. Each event is a JSON object with `type` and `data` fields."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid message",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have ai:read permission",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorWithCode" },
+                "example": { "isSuccess": false, "code": "FORBIDDEN", "message": "API key does not have ai:read permission" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/v0/chat/compact": {
+      "post": {
+        "summary": "Compact Conversation",
+        "description": "Compact/summarize a conversation to reduce context size while preserving key information. Useful for long-running conversations. Requires a Workspace API Key with `ai:read` permission.",
+        "operationId": "compactChat",
+        "tags": ["AI Chat API"],
+        "servers": [{ "url": "https://api.formo.so", "description": "AI Chat API" }],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChatCompactRequest" },
+              "example": { "conversation_id": "conv_abc123" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conversation compacted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChatCompactResponse" },
+                "example": { "conversation_id": "conv_abc123", "summary": "User asked about DAU trends and top events. AI provided SQL queries showing 15% growth in DAU over the last month." }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have ai:read permission",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorWithCode" } } }
+          },
+          "404": {
+            "description": "Conversation not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } }
           }
         }
       }

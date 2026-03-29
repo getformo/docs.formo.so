@@ -32,9 +32,27 @@ Authorization: Bearer <your_workspace_api_key>
 	<img src="/images/auth-flow.png" alt="API Authentication Flow Diagram" />
 </Frame>
 
+## API Scopes
+
+When creating a Workspace API Key, select the scopes your key needs. Each API endpoint requires a specific scope.
+
+| Scope | Description | Required Plan |
+|-------|-------------|---------------|
+| `query:read` | Execute SQL queries via the Query API | All plans |
+| `profiles:read` | Read wallet profiles via the Profiles API | All plans |
+| `alerts:read` | List and get alerts | Scale / Enterprise |
+| `alerts:write` | Create, update, delete, and toggle alerts | Scale / Enterprise |
+| `boards:read` | List and get boards and charts | Scale / Enterprise |
+| `boards:write` | Create, update, delete boards and charts | Scale / Enterprise |
+| `ai:read` | Chat with the AI analytics assistant | Scale / Enterprise |
+
+<Note>
+  Write scopes (e.g., `alerts:write`) automatically require the corresponding read scope. Premium scopes (`alerts`, `boards`, `ai`) are only available on Scale and Enterprise plans.
+</Note>
+
 ## SDK Write Key
 
-Find your SDK Write Key in your project settings. 
+Find your SDK Write Key in your project settings.
 
 <Frame>
 	<img src="/images/project-settings.png" alt="Tokens in project settings page" />

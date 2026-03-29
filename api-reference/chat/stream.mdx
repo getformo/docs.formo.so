@@ -1,0 +1,17 @@
+---
+title: 'Chat with AI'
+openapi: 'POST /v0/chat'
+---
+
+<Note>
+  The AI Chat API is available on **Scale** and **Enterprise** plans. Requires a Workspace API Key with `ai:read` permission.
+</Note>
+
+This endpoint returns a streaming response using **Server-Sent Events (SSE)**. Each event contains a chunk of the AI assistant's response. Use an SSE client or `EventSource` to consume the stream.
+
+```bash
+curl -N -H "Authorization: Bearer <your_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What were my top events last week?"}' \
+  https://api.formo.so/v0/chat
+```

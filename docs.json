@@ -145,6 +145,38 @@
           {
             "group": "Query API",
             "pages": ["api-reference/query"]
+          },
+          {
+            "group": "Alerts API",
+            "pages": [
+              "api-reference/alerts/list",
+              "api-reference/alerts/create",
+              "api-reference/alerts/get",
+              "api-reference/alerts/update",
+              "api-reference/alerts/delete",
+              "api-reference/alerts/toggle"
+            ]
+          },
+          {
+            "group": "Boards API",
+            "pages": [
+              "api-reference/boards/list",
+              "api-reference/boards/create",
+              "api-reference/boards/get",
+              "api-reference/boards/update",
+              "api-reference/boards/delete",
+              "api-reference/boards/duplicate",
+              "api-reference/boards/create-chart",
+              "api-reference/boards/update-chart",
+              "api-reference/boards/delete-chart"
+            ]
+          },
+          {
+            "group": "AI Chat API",
+            "pages": [
+              "api-reference/chat/stream",
+              "api-reference/chat/compact"
+            ]
           }
         ]
       },

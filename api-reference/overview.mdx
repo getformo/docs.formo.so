@@ -30,6 +30,27 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Return the activity feed / event stream for an anonymous visitor or wallet.
 - Export data periodically to your data warehouse.
 
+## Alerts API
+
+- Create, update, and manage project alerts programmatically via `api.formo.so`.
+- Configure alert conditions and notification channels (webhook, email, Slack).
+- Toggle alerts on/off and monitor alert status.
+- Requires `alerts:read` / `alerts:write` scopes. Available on Scale and Enterprise plans.
+
+## Boards API
+
+- Create and manage custom dashboards and charts via `api.formo.so`.
+- Add, update, and remove charts with SQL-based queries and visualization options.
+- Duplicate entire boards including all charts.
+- Requires `boards:read` / `boards:write` scopes. Available on Scale and Enterprise plans.
+
+## AI Chat API
+
+- Interact with Formo's AI analytics assistant programmatically via `api.formo.so`.
+- Stream chat queries and receive real-time AI-generated insights about your data.
+- Manage conversation context with the compact endpoint.
+- Requires `ai:read` scope. Available on Scale and Enterprise plans.
+
 ## FAQ
 
 <AccordionGroup>
@@ -41,6 +62,9 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
   </Accordion>
   <Accordion title="Can I connect BI tools like Metabase or Looker to Formo?">
     Yes. Formo provides [BI tool integration](/data/bi) via BI Read tokens that connect to the Formo data warehouse. You can connect Metabase, Grafana, and other SQL-based tools to query your analytics data.
+  </Accordion>
+  <Accordion title="What are the Alerts, Boards, and AI Chat APIs?">
+    These are premium APIs available on Scale and Enterprise plans. They let you programmatically manage [alerts](/api-reference/alerts/list), [dashboards and charts](/api-reference/boards/list), and [interact with the AI analytics assistant](/api-reference/chat/stream) using Workspace API Keys with the appropriate scopes.
   </Accordion>
 </AccordionGroup>
 
