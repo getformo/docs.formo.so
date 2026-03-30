@@ -147,10 +147,6 @@
             "pages": ["api-reference/query"]
           },
           {
-            "group": "Ask AI API",
-            "pages": ["api-reference/chat/stream"]
-          },
-          {
             "group": "Boards API",
             "pages": [
               "api-reference/boards/list",

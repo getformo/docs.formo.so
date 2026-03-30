@@ -30,14 +30,6 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Return the activity feed / event stream for an anonymous visitor or wallet.
 - Export data periodically to your data warehouse.
 
-## Ask AI API
-
-- Interact with Formo's AI analytics assistant programmatically.
-- Stream chat queries and receive real-time AI-generated insights about your data.
-- Supports multi-turn conversations with context management.
-- For integration with existing AI tools like Claude and Cursor, use the [Formo MCP server](/features/mcp/overview) instead.
-- Requires `ai:read` scope. Available on Scale and Enterprise plans.
-
 ## Boards & Charts API
 
 - Create and manage custom dashboards and charts.
@@ -76,7 +68,7 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
     Yes. Formo provides [BI tool integration](/data/bi) via BI Read tokens that connect to the Formo data warehouse. You can connect Metabase, Grafana, and other SQL-based tools to query your analytics data.
   </Accordion>
   <Accordion title="What are the premium APIs (Alerts, Boards, Contracts, etc.)?">
-    These are APIs available on Scale and Enterprise plans. They let you programmatically manage [alerts](/api-reference/alerts/list), [dashboards and charts](/api-reference/boards/list), [contracts](/api-reference/contracts/list), [segments](/api-reference/segments/list), [import wallets](/api-reference/import), and [ask the AI analytics assistant](/api-reference/chat/stream) using Workspace API Keys with the appropriate scopes.
+    These are APIs available on Scale and Enterprise plans. They let you programmatically manage [alerts](/api-reference/alerts/list), [dashboards and charts](/api-reference/boards/list), [contracts](/api-reference/contracts/list), [segments](/api-reference/segments/list), and [import wallets](/api-reference/import) using Workspace API Keys with the appropriate scopes. For AI-powered analytics, use the [Formo MCP server](/features/mcp/overview) to integrate with tools like Claude and Cursor.
   </Accordion>
 </AccordionGroup>
 

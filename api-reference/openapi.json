@@ -3,7 +3,7 @@
   "info": {
     "title": "Formo API",
     "version": "1.0.0",
-    "description": "API for event tracking, querying data, managing wallet profiles, alerts, boards, contracts, segments, and AI chat",
+    "description": "API for event tracking, querying data, managing wallet profiles, alerts, boards, contracts, segments",
     "contact": {
       "name": "Formo",
       "url": "https://formo.so"
@@ -1177,35 +1177,6 @@
       "Profile": {
         "type": "object",
         "description": "Wallet profile data"
-      },
-      "ChatMessage": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "user",
-              "assistant",
-              "system"
-            ]
-          },
-          "content": {
-            "type": "string"
-          },
-          "parts": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "role"
-        ]
       }
     }
   },
@@ -3822,101 +3793,6 @@
           }
         ]
       }
-    },
-    "/v0/chat": {
-      "post": {
-        "operationId": "chat",
-        "summary": "AI analytics chat",
-        "description": "Ask questions about your project's analytics data. Supports multi-turn conversations. Returns a streaming SSE response with tool calls and text.",
-        "tags": [
-          "AI"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "messages": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/ChatMessage"
-                    },
-                    "description": "Conversation history. Send the full message array on each request."
-                  },
-                  "conversationSummary": {
-                    "type": "string",
-                    "description": "Summary of compacted earlier messages"
-                  },
-                  "compactedUpToIndex": {
-                    "type": "integer",
-                    "description": "Messages before this index have been compacted"
-                  }
-                },
-                "required": [
-                  "messages"
-                ],
-                "x-examples": {
-                  "singleQuestion": {
-                    "summary": "Ask a single analytics question",
-                    "value": {
-                      "messages": [
-                        {
-                          "id": "msg-1",
-                          "role": "user",
-                          "content": "How many unique users visited in the last 7 days?"
-                        }
-                      ]
-                    }
-                  },
-                  "multiTurn": {
-                    "summary": "Continue a conversation",
-                    "value": {
-                      "messages": [
-                        {
-                          "id": "msg-1",
-                          "role": "user",
-                          "content": "How many unique users visited in the last 7 days?"
-                        },
-                        {
-                          "id": "msg-2",
-                          "role": "assistant",
-                          "content": "There were 1,245 unique visitors in the last 7 days."
-                        },
-                        {
-                          "id": "msg-3",
-                          "role": "user",
-                          "content": "Break that down by traffic source"
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Streaming SSE response with AI-generated analytics insights",
-            "content": {
-              "text/event-stream": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "x-required-scope": "ai:read",
-        "servers": [
-          {
-            "url": "https://api.formo.so",
-            "description": "AI"
-          }
-        ]
-      }
     }
   },
   "x-api-scopes": {
@@ -3933,7 +3809,6 @@
       "profiles:read": "Search and get wallet profiles",
       "profiles:write": "Import wallet addresses (requires profiles:read)",
       "query:read": "Execute SQL analytics queries",
-      "ai:read": "AI analytics chat",
       "mcp:read": "MCP protocol access (analytics tools + management tools based on other scopes)"
     }
   },
@@ -3965,10 +3840,6 @@
     {
       "name": "Query",
       "description": "Execute SQL analytics queries"
-    },
-    {
-      "name": "AI",
-      "description": "AI-powered analytics chat"
     }
   ]
 }
