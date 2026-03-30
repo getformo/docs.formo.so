@@ -168,13 +168,13 @@ ORDER BY date DESC
 Where do your best users come from?
 
 ```sql
-SELECT 
+SELECT
   argMaxMerge(last_utm_source) as utm_source,
   count(DISTINCT address) as users,
   avg(uniqMerge(num_sessions)) as avg_sessions
 FROM users
-WHERE argMaxMerge(last_utm_source) IS NOT NULL
 GROUP BY utm_source
+HAVING utm_source IS NOT NULL
 ORDER BY users DESC
 ```
 
@@ -310,7 +310,7 @@ Supported tools:
 - Power BI
 - Custom integrations
 
-Configuration details are at [/data/bi](/data/bi). You'll need your API key from [Workspace Settings > API Keys](/features/product-analytics/api-reference).
+Configuration details are at [/data/bi](/data/bi). You'll need your API key from [Workspace Settings > API Keys](/api-reference/authentication).
 
 Example Metabase connection:
 1. In Metabase, click Settings > Databases > Add Database
