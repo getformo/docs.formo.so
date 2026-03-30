@@ -1323,7 +1323,21 @@
                 },
                 "required": [
                   "query"
-                ]
+                ],
+                "x-examples": {
+                  "dailyActiveUsers": {
+                    "summary": "Daily active users over last 30 days",
+                    "value": {
+                      "query": "SELECT toDate(timestamp) as date, uniq(anonymous_id) as dau FROM analytics_events WHERE timestamp >= now() - interval 30 day GROUP BY date ORDER BY date"
+                    }
+                  },
+                  "topEvents": {
+                    "summary": "Top 10 events by count",
+                    "value": {
+                      "query": "SELECT event, count() as total FROM analytics_events WHERE timestamp >= now() - interval 7 day GROUP BY event ORDER BY total DESC LIMIT 10"
+                    }
+                  }
+                }
               },
               "example": {
                 "query": "SELECT * FROM events LIMIT 100"
@@ -2178,58 +2192,129 @@
                   "trigger_filters"
                 ],
                 "x-examples": {
-                  "eventAlert": {
-                    "summary": "Alert on high-value transactions",
+                  "eventAlertWithWebhook": {
+                    "summary": "Alert on swap events from mobile devices with webhook",
                     "value": {
-                      "name": "High-value transaction alert",
+                      "name": "Mobile swap alert",
                       "trigger_type": "event",
                       "trigger_filters": [
                         {
-                          "name": "event",
-                          "value": "swap"
+                          "name": "type",
+                          "value": "swap",
+                          "operator": "equals"
                         },
                         {
-                          "name": "value",
-                          "operator": "greater",
+                          "name": "device",
+                          "value": "mobile",
+                          "operator": "equals"
+                        },
+                        {
+                          "name": "volume",
                           "value": "1000",
+                          "operator": "greater",
                           "numericThreshold": "1000"
                         }
                       ],
                       "recipient": [
                         {
-                          "type": "email",
-                          "value": [
-                            "alerts@myapp.com"
-                          ]
-                        },
-                        {
                           "type": "webhook",
                           "value": [
                             "https://hooks.myapp.com/formo-alerts"
+                          ]
+                        },
+                        {
+                          "type": "email",
+                          "value": [
+                            "alerts@myapp.com"
                           ]
                         }
                       ],
                       "secret": "whsec_mysigningsecret123"
                     }
                   },
-                  "userAlert": {
-                    "summary": "Alert on new user spike",
+                  "eventAlertWithUtmFilter": {
+                    "summary": "Alert on events from specific UTM campaigns",
                     "value": {
-                      "name": "New user spike",
-                      "trigger_type": "user",
+                      "name": "Paid campaign activity",
+                      "trigger_type": "event",
                       "trigger_filters": [
                         {
-                          "name": "new_users",
-                          "operator": "greater",
-                          "value": "100",
-                          "numericThreshold": "100"
+                          "name": "type",
+                          "value": "purchase"
+                        },
+                        {
+                          "name": "utm_source",
+                          "value": "google",
+                          "operator": "equals"
+                        },
+                        {
+                          "name": "utm_medium",
+                          "value": "cpc",
+                          "operator": "equals"
                         }
                       ],
                       "recipient": [
                         {
                           "type": "slack",
                           "value": [
-                            "#alerts|https://hooks.slack.com/services/T00/B00/xxx"
+                            "#marketing-alerts|https://hooks.slack.com/services/T00/B00/xxx"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "userAlertWithLocationFilter": {
+                    "summary": "Alert when new users spike from a specific country",
+                    "value": {
+                      "name": "US user spike",
+                      "trigger_type": "user",
+                      "trigger_filters": [
+                        {
+                          "name": "location",
+                          "value": "US",
+                          "operator": "equals"
+                        },
+                        {
+                          "name": "net_worth_usd",
+                          "value": "10000",
+                          "operator": "greaterOrEqual",
+                          "numericThreshold": "10000"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "email",
+                          "value": [
+                            "team@myapp.com"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "eventAlertWithNumericThreshold": {
+                    "summary": "Alert when users hold >5 tokens in a specific app",
+                    "value": {
+                      "name": "High token holder alert",
+                      "trigger_type": "event",
+                      "trigger_filters": [
+                        {
+                          "name": "apps",
+                          "value": "uniswap",
+                          "operator": "greater",
+                          "numericThreshold": "5"
+                        },
+                        {
+                          "name": "chains",
+                          "value": "1",
+                          "operator": "greaterOrEqual",
+                          "numericThreshold": "3"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "webhook",
+                          "value": [
+                            "https://hooks.myapp.com/token-alerts"
                           ]
                         }
                       ]
@@ -2367,7 +2452,40 @@
                   "name",
                   "trigger_type",
                   "trigger_filters"
-                ]
+                ],
+                "x-examples": {
+                  "updateRecipients": {
+                    "summary": "Update alert recipients",
+                    "value": {
+                      "name": "Mobile swap alert (updated)",
+                      "trigger_type": "event",
+                      "trigger_filters": [
+                        {
+                          "name": "type",
+                          "value": "swap"
+                        },
+                        {
+                          "name": "device",
+                          "value": "mobile"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "webhook",
+                          "value": [
+                            "https://hooks.myapp.com/v2/alerts"
+                          ]
+                        },
+                        {
+                          "type": "slack",
+                          "value": [
+                            "#alerts|https://hooks.slack.com/services/T00/B00/new"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
               }
             }
           }
@@ -2477,7 +2595,21 @@
                 },
                 "required": [
                   "status"
-                ]
+                ],
+                "x-examples": {
+                  "activate": {
+                    "summary": "Activate alert",
+                    "value": {
+                      "status": "active"
+                    }
+                  },
+                  "deactivate": {
+                    "summary": "Deactivate alert",
+                    "value": {
+                      "status": "inactive"
+                    }
+                  }
+                }
               }
             }
           }
@@ -2673,6 +2805,28 @@
                   "isPublic": {
                     "type": "boolean",
                     "description": "Whether the board is publicly accessible"
+                  }
+                },
+                "x-examples": {
+                  "updateTitle": {
+                    "summary": "Update board title",
+                    "value": {
+                      "title": "Weekly Dashboard"
+                    }
+                  },
+                  "makePublic": {
+                    "summary": "Make board publicly accessible",
+                    "value": {
+                      "isPublic": true
+                    }
+                  },
+                  "fullUpdate": {
+                    "summary": "Update all fields",
+                    "value": {
+                      "title": "Revenue Dashboard",
+                      "description": "Weekly revenue metrics and KPIs",
+                      "isPublic": true
+                    }
                   }
                 }
               }
@@ -2940,23 +3094,31 @@
                     }
                   },
                   "funnelChart": {
-                    "summary": "Signup to purchase funnel",
+                    "summary": "Funnel with event property filters (e.g. rdns = metamask)",
                     "value": {
                       "query": "SELECT 1",
                       "chart_type": "funnel",
-                      "title": "Signup → Purchase Funnel",
+                      "title": "MetaMask Conversion Funnel",
                       "steps": [
                         {
                           "type": "event",
-                          "event": "page_view"
+                          "event": "page"
                         },
                         {
                           "type": "event",
-                          "event": "sign_up"
+                          "event": "connect",
+                          "rdns": {
+                            "op": "equals",
+                            "value": "io.metamask"
+                          },
+                          "chain_id": {
+                            "op": "equals",
+                            "value": "1"
+                          }
                         },
                         {
                           "type": "event",
-                          "event": "purchase"
+                          "event": "transaction"
                         }
                       ],
                       "settings": {
@@ -2968,8 +3130,38 @@
                       }
                     }
                   },
+                  "funnelWithBreakdown": {
+                    "summary": "3-step funnel with device breakdown",
+                    "value": {
+                      "query": "SELECT 1",
+                      "chart_type": "funnel",
+                      "title": "Onboarding Funnel by Device",
+                      "steps": [
+                        {
+                          "type": "event",
+                          "event": "page"
+                        },
+                        {
+                          "type": "event",
+                          "event": "connect"
+                        },
+                        {
+                          "type": "event",
+                          "event": "signature"
+                        }
+                      ],
+                      "settings": {
+                        "funnelType": "closed",
+                        "conversionWindow": {
+                          "value": 30,
+                          "unit": "day"
+                        },
+                        "breakdown": "device"
+                      }
+                    }
+                  },
                   "stackedChart": {
-                    "summary": "Revenue by UTM campaign",
+                    "summary": "Revenue by UTM campaign over time",
                     "value": {
                       "query": "SELECT toDate(timestamp) as date, utm_campaign, sum(value) as revenue FROM analytics_events WHERE event = 'purchase' AND timestamp >= now() - interval 30 day GROUP BY date, utm_campaign ORDER BY date",
                       "chart_type": "stacked",
@@ -2979,6 +3171,125 @@
                         "revenue"
                       ],
                       "group_by": "utm_campaign"
+                    }
+                  },
+                  "retentionChart": {
+                    "summary": "Weekly retention filtered to transaction events on desktop",
+                    "value": {
+                      "query": "",
+                      "chart_type": "retention",
+                      "title": "Weekly User Retention",
+                      "settings": {
+                        "retentionFilter": {
+                          "type": "event",
+                          "event": "transaction"
+                        },
+                        "retentionUserFilters": [
+                          {
+                            "operand": "device",
+                            "operator": "equals",
+                            "value": "desktop"
+                          },
+                          {
+                            "operand": "utm_source",
+                            "operator": "notEquals",
+                            "value": "direct"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "retentionChartUnfiltered": {
+                    "summary": "Basic retention (all users, no filters)",
+                    "value": {
+                      "query": "",
+                      "chart_type": "retention",
+                      "title": "Overall Retention"
+                    }
+                  },
+                  "userPathsChart": {
+                    "summary": "User flow from connect with max 5 steps",
+                    "value": {
+                      "query": "SELECT anonymous_id, event, timestamp FROM analytics_events WHERE timestamp >= now() - interval 30 day ORDER BY anonymous_id, timestamp",
+                      "chart_type": "user_paths",
+                      "title": "Post-Connect User Flow",
+                      "settings": {
+                        "startStep": {
+                          "type": "event",
+                          "event": "connect"
+                        },
+                        "endStep": {
+                          "type": "event",
+                          "event": "transaction"
+                        },
+                        "maxSteps": 5
+                      }
+                    }
+                  },
+                  "userPathsOpenEnded": {
+                    "summary": "Open-ended user flow from page view",
+                    "value": {
+                      "query": "SELECT anonymous_id, event, timestamp FROM analytics_events WHERE timestamp >= now() - interval 14 day ORDER BY anonymous_id, timestamp",
+                      "chart_type": "user_paths",
+                      "title": "User Discovery Paths",
+                      "settings": {
+                        "startStep": {
+                          "type": "event",
+                          "event": "page"
+                        },
+                        "maxSteps": 8,
+                        "nodesPerStep": 10
+                      }
+                    }
+                  },
+                  "tableChart": {
+                    "summary": "Top pages by unique visitors",
+                    "value": {
+                      "query": "SELECT pathname, uniq(anonymous_id) as visitors, count() as pageviews FROM analytics_events WHERE event = 'page_view' AND timestamp >= now() - interval 7 day GROUP BY pathname ORDER BY visitors DESC LIMIT 20",
+                      "chart_type": "table",
+                      "title": "Top Pages This Week"
+                    }
+                  },
+                  "funnelWithMultiplePropertyFilters": {
+                    "summary": "Funnel with device/country filters on steps",
+                    "value": {
+                      "query": "SELECT 1",
+                      "chart_type": "funnel",
+                      "title": "Mobile Onboarding Funnel",
+                      "steps": [
+                        {
+                          "type": "event",
+                          "event": "page",
+                          "device": {
+                            "op": "equals",
+                            "value": "mobile"
+                          },
+                          "country": {
+                            "op": "notEquals",
+                            "value": "CN"
+                          }
+                        },
+                        {
+                          "type": "event",
+                          "event": "connect",
+                          "provider_name": {
+                            "op": "in",
+                            "value": "metamask|rainbow|coinbase"
+                          }
+                        },
+                        {
+                          "type": "event",
+                          "event": "transaction"
+                        }
+                      ],
+                      "settings": {
+                        "funnelType": "open",
+                        "conversionWindow": {
+                          "value": 30,
+                          "unit": "day"
+                        },
+                        "breakdown": "device"
+                      }
                     }
                   }
                 }
@@ -3633,23 +3944,86 @@
                   "filterSets"
                 ],
                 "x-examples": {
-                  "highValueUsers": {
-                    "summary": "Users with >10 transactions on desktop",
+                  "highValueMobileUsers": {
+                    "summary": "High-value mobile users from paid campaigns",
                     "value": {
-                      "title": "High-value desktop users",
+                      "title": "High-value mobile users",
                       "filterSets": [
-                        "tx_count||greater||10",
-                        "device||equals||desktop"
+                        "device::equals::mobile",
+                        "net_worth_usd::greaterOrEqual::10000",
+                        "utm_source::equals::paid_ads"
                       ]
                     }
                   },
-                  "mobileChrome": {
-                    "summary": "Mobile Chrome users",
+                  "multiDeviceChromeSafari": {
+                    "summary": "Chrome or Safari users (multi-value filter)",
                     "value": {
-                      "title": "Mobile Chrome segment",
+                      "title": "Chrome/Safari users",
                       "filterSets": [
-                        "device||equals||mobile",
-                        "browser||in||Chrome|Chrome Mobile"
+                        "browser::in::Chrome|Safari"
+                      ]
+                    }
+                  },
+                  "excludeUSUsers": {
+                    "summary": "All users except from the US",
+                    "value": {
+                      "title": "Non-US users",
+                      "filterSets": [
+                        "location::notEquals::US"
+                      ]
+                    }
+                  },
+                  "powerUsers": {
+                    "summary": "Power users with high transaction count from organic traffic",
+                    "value": {
+                      "title": "Organic power users",
+                      "filterSets": [
+                        "tx_count::greater::100",
+                        "utm_source::notIn::google_ads|facebook_ads",
+                        "lifecycle::equals::power"
+                      ]
+                    }
+                  },
+                  "multiChainWhaleUsers": {
+                    "summary": "Users active on 3+ chains with high net worth",
+                    "value": {
+                      "title": "Multi-chain whales",
+                      "filterSets": [
+                        "chains::greaterOrEqual::3",
+                        "net_worth_usd::greater::100000",
+                        "apps::greater::5"
+                      ]
+                    }
+                  },
+                  "behavioralFilterSimple": {
+                    "summary": "Users who performed 'signature' event at least once in last 30 days",
+                    "description": "Behavioural filters use the 'events' operand with a base64-encoded JSON array as the value.",
+                    "value": {
+                      "title": "Recent signers",
+                      "filterSets": [
+                        "events::equals::W3siZXZlbnQiOiAic2lnbmF0dXJlIiwgIm9wZXJhdG9yIjogImdyZWF0ZXJPckVxdWFsIiwgInRpbWVzIjogMSwgInByZXNldCI6ICJsYXN0XzMwZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0wOS0xOSIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifV0="
+                      ]
+                    }
+                  },
+                  "behavioralFilterWithProperties": {
+                    "summary": "Users who connected via MetaMask on Ethereum mainnet + from India",
+                    "description": "Combines a behavioural filter and a demographic filter.",
+                    "value": {
+                      "title": "Indian MetaMask users",
+                      "filterSets": [
+                        "events::equals::W3siZXZlbnQiOiAiY29ubmVjdCIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5IiwgInJkbnMiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICJpby5tZXRhbWFzayJ9LCAiY2hhaW5faWQiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICIxIn19XQ==",
+                        "location::equals::IN"
+                      ]
+                    }
+                  },
+                  "behavioralFilterMultipleEvents": {
+                    "summary": "Users with 5+ page views last week AND at least 1 transaction last month",
+                    "description": "Multiple behavioural events in a single filter. Valid event types: page, screen, connect, disconnect, chain, signature, transaction, track, decoded_log, detect, identify.",
+                    "value": {
+                      "title": "Active transactors",
+                      "filterSets": [
+                        "events::equals::W3siZXZlbnQiOiAicGFnZSIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDUsICJwcmVzZXQiOiAibGFzdF83ZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0xMC0xMiIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifSwgeyJldmVudCI6ICJ0cmFuc2FjdGlvbiIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5In1d",
+                        "device::equals::desktop"
                       ]
                     }
                   }
