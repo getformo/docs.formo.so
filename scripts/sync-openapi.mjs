@@ -9,10 +9,11 @@
  *   npm run sync:openapi -- --remote-path apps/backend/openapi.json
  */
 
-import { existsSync, copyFileSync, writeFileSync } from "fs";
-import { resolve, dirname } from "path";
+import { existsSync, copyFileSync, writeFileSync, unlinkSync } from "fs";
+import { resolve, dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { execFileSync } from "child_process";
+import { tmpdir } from "os";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const destPath = resolve(__dirname, "..", "api-reference", "openapi.json");
@@ -69,6 +70,8 @@ try {
 }
 
 // 3. Fallback to curl (public repos or CI with GITHUB_TOKEN)
+// Download to a temp file first to avoid truncating destPath on failure
+const tmpFile = join(tmpdir(), `openapi-sync-${Date.now()}.json`);
 try {
   const curlArgs = ["-fsSL"];
   if (process.env.GITHUB_TOKEN) {
@@ -77,12 +80,15 @@ try {
   curlArgs.push(
     `https://raw.githubusercontent.com/${repo}/${branch}/${remotePath}`,
     "-o",
-    destPath
+    tmpFile
   );
   execFileSync("curl", curlArgs, { stdio: ["pipe", "pipe", "pipe"] });
+  copyFileSync(tmpFile, destPath);
+  unlinkSync(tmpFile);
   console.log(`Saved to ${destPath} (via curl)`);
   process.exit(0);
 } catch {
+  try { unlinkSync(tmpFile); } catch {}
   console.error(
     "Failed to fetch openapi.json from GitHub.\n" +
       "Make sure you have access to the repo via gh CLI or set GITHUB_TOKEN."
