@@ -30,12 +30,13 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Return the activity feed / event stream for an anonymous visitor or wallet.
 - Export data periodically to your data warehouse.
 
-## Alerts API
+## Ask AI API
 
-- Create, update, and manage project alerts programmatically.
-- Configure alert conditions and notification channels (email, Slack, webhook).
-- Toggle alerts active/inactive.
-- Requires `alerts:read` / `alerts:write` scopes. Available on Scale and Enterprise plans.
+- Interact with Formo's AI analytics assistant programmatically.
+- Stream chat queries and receive real-time AI-generated insights about your data.
+- Supports multi-turn conversations with context management.
+- For integration with existing AI tools like Claude and Cursor, use the [Formo MCP server](/features/mcp/overview) instead.
+- Requires `ai:read` scope. Available on Scale and Enterprise plans.
 
 ## Boards & Charts API
 
@@ -43,24 +44,24 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Add, update, and remove charts with SQL-based queries and visualization options (bar, line, pie, funnel, stacked, retention, and more).
 - Requires `boards:read` / `boards:write` scopes. Available on Scale and Enterprise plans.
 
-## Contracts API
-
-- Monitor blockchain smart contracts and their events.
-- Add contracts by chain ID and address, with ABI and event definitions.
-- Requires `contracts:read` / `contracts:write` scopes. Available on Scale and Enterprise plans.
-
 ## Segments API
 
 - Create and manage user segments based on filter conditions.
 - Segment users by transaction count, device, browser, and other attributes.
 - Requires `segments:read` / `segments:write` scopes. Available on Scale and Enterprise plans.
 
-## Ask AI API
+## Contracts API
 
-- Interact with Formo's AI analytics assistant programmatically.
-- Stream chat queries and receive real-time AI-generated insights about your data.
-- Supports multi-turn conversations with context management.
-- Requires `ai:read` scope. Available on Scale and Enterprise plans.
+- Monitor blockchain smart contracts and their events.
+- Add contracts by chain ID and address, with ABI and event definitions.
+- Requires `contracts:read` / `contracts:write` scopes. Available on Scale and Enterprise plans.
+
+## Alerts API
+
+- Create, update, and manage project alerts programmatically.
+- Configure alert conditions and notification channels (email, Slack, webhook).
+- Toggle alerts active/inactive.
+- Requires `alerts:read` / `alerts:write` scopes. Available on Scale and Enterprise plans.
 
 ## FAQ
 

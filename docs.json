@@ -147,15 +147,8 @@
             "pages": ["api-reference/query"]
           },
           {
-            "group": "Alerts API",
-            "pages": [
-              "api-reference/alerts/list",
-              "api-reference/alerts/get",
-              "api-reference/alerts/create",
-              "api-reference/alerts/update",
-              "api-reference/alerts/delete",
-              "api-reference/alerts/toggle"
-            ]
+            "group": "Ask AI API",
+            "pages": ["api-reference/chat/stream"]
           },
           {
             "group": "Boards API",
@@ -178,6 +171,14 @@
             ]
           },
           {
+            "group": "Segments API",
+            "pages": [
+              "api-reference/segments/list",
+              "api-reference/segments/create",
+              "api-reference/segments/delete"
+            ]
+          },
+          {
             "group": "Contracts API",
             "pages": [
               "api-reference/contracts/list",
@@ -187,16 +188,15 @@
             ]
           },
           {
-            "group": "Segments API",
+            "group": "Alerts API",
             "pages": [
-              "api-reference/segments/list",
-              "api-reference/segments/create",
-              "api-reference/segments/delete"
+              "api-reference/alerts/list",
+              "api-reference/alerts/get",
+              "api-reference/alerts/create",
+              "api-reference/alerts/update",
+              "api-reference/alerts/delete",
+              "api-reference/alerts/toggle"
             ]
-          },
-          {
-            "group": "Ask AI API",
-            "pages": ["api-reference/chat/stream"]
           }
         ]
       },
