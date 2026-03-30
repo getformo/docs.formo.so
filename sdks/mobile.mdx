@@ -8,23 +8,37 @@ The Formo React Native SDK is designed for mobile dApps and implements the stand
 
 ## Installation
 
-Install the SDK and required peer dependencies:
+Install the SDK and its required peer dependency:
 
 ```bash
-npm install @formo/react-native-analytics @react-native-async-storage/async-storage react-native-device-info @react-native-community/netinfo
+npm install @formo/analytics-react-native @react-native-async-storage/async-storage
 ```
 
-### iOS Setup
+### Optional dependencies
 
-After installing, run pod install:
+For automatic device info detection (version, build number, device model), install one of:
+
+```bash
+# Expo projects (recommended)
+npx expo install expo-application expo-device
+
+# Bare React Native projects
+npm install react-native-device-info
+```
+
+If neither is installed, provide app metadata via the `app` option instead.
+
+### iOS Setup (bare React Native only)
+
+If you're using bare React Native (not Expo), run pod install after adding native dependencies:
 
 ```bash
 cd ios && pod install
 ```
 
-### Android Setup
-
-No additional setup required. The native modules are automatically linked.
+<Note>
+Expo projects handle native linking automatically — no `pod install` needed.
+</Note>
 
 ## Quick Start
 
@@ -34,7 +48,7 @@ Wrap your app with the `FormoAnalyticsProvider`:
 
 ```tsx
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FormoAnalyticsProvider } from '@formo/react-native-analytics';
+import { FormoAnalyticsProvider } from '@formo/analytics-react-native';
 
 function App() {
   return (
@@ -56,12 +70,15 @@ For apps using [Wagmi](https://wagmi.sh), enable native integration for automati
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { WagmiProvider, createConfig } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FormoAnalyticsProvider } from '@formo/react-native-analytics';
+import { FormoAnalyticsProvider } from '@formo/analytics-react-native';
 import { mainnet } from 'wagmi/chains';
 
 const wagmiConfig = createConfig({
   chains: [mainnet],
-  // ... your transports
+  // Required for React Native — MIPD uses browser APIs (window.addEventListener)
+  // that don't exist in the React Native environment
+  multiInjectedProviderDiscovery: false,
+  // ... your connectors and transports
 });
 
 const queryClient = new QueryClient();
@@ -93,18 +110,24 @@ function App() {
 Use the [`screen()`](/data/events/screen) method to track screen views - the mobile equivalent of page views:
 
 ```tsx
-import { useFormo } from '@formo/react-native-analytics';
+import { useFormo } from '@formo/analytics-react-native';
 import { useEffect } from 'react';
 
 function WalletScreen() {
   const formo = useFormo();
 
   useEffect(() => {
-    formo.screen('Wallet', { category: 'Main' });
+    formo.screen('Wallet', 'Main');
   }, [formo]);
 
   return <View>...</View>;
 }
+```
+
+The `screen()` method signature is:
+
+```tsx
+formo.screen(name: string, category?: string, properties?: object)
 ```
 
 <Note>
@@ -117,7 +140,7 @@ Automatically track all screen transitions:
 
 ```tsx
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
-import { useFormo } from '@formo/react-native-analytics';
+import { useFormo } from '@formo/analytics-react-native';
 import { useRef } from 'react';
 
 function App() {
@@ -146,6 +169,31 @@ function App() {
   );
 }
 ```
+
+## Mobile lifecycle events
+
+The SDK automatically tracks application lifecycle events following the Segment/RudderStack specification:
+
+| Event | When | Properties |
+|:------|:-----|:-----------|
+| `Application Installed` | First app launch (no stored version) | `version`, `build` |
+| `Application Updated` | App version or build changed since last launch | `version`, `build`, `previous_version`, `previous_build` |
+| `Application Opened` | Every cold start and return from background | `version`, `build`, `from_background`, `url` (if deep linked) |
+| `Application Backgrounded` | App transitions to background | `version`, `build` |
+
+Lifecycle events are enabled by default and require `asyncStorage` to be provided for accurate install/update detection. To disable:
+
+```tsx
+options={{
+  autocapture: {
+    lifecycle: false,
+  },
+}}
+```
+
+<Note>
+The SDK detects app version and build from `expo-application`, `react-native-device-info`, or the `app` option (in that order). If none are available, version and build will be empty strings.
+</Note>
 
 ## Identify users
 
@@ -204,7 +252,7 @@ formo.track('Swap Executed', {
   <Card
     title="React Native"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/react-native"
+    href="https://github.com/getformo/examples/tree/main/with-react-native"
   >
     examples/react-native
   </Card>
@@ -216,7 +264,7 @@ Parse UTM parameters and referral codes from deep links:
 
 ```tsx
 import { Linking } from 'react-native';
-import { useFormo } from '@formo/react-native-analytics';
+import { useFormo } from '@formo/analytics-react-native';
 import { useEffect } from 'react';
 
 function App() {
@@ -363,6 +411,7 @@ options={{
     signature: false,    // Disable signature tracking
     transaction: false,  // Disable transaction tracking
     chain: true,
+    lifecycle: true,     // Application lifecycle events
   },
 }}
 
@@ -391,7 +440,7 @@ options={{
 | `warn` | Warning and error messages. |
 | `info` | Informative messages about normal operation. |
 | `debug` | Detailed diagnostic information. |
-| `trace` | Most detailed tracing information. |
+| `log` | General log messages. |
 
 ### Ready callback
 
@@ -516,3 +565,6 @@ To verify the SDK is working:
 | `@react-native-async-storage/async-storage` | >=1.17.0 | Yes |
 | `wagmi` | >=2.0.0 | No (for Wagmi integration) |
 | `@tanstack/react-query` | >=5.0.0 | No (for signature/transaction tracking) |
+| `expo-application` | >=5.0.0 | No (for auto version/build detection in Expo) |
+| `expo-device` | >=5.0.0 | No (for device info in Expo) |
+| `react-native-device-info` | >=10.0.0 | No (for auto version/build detection in bare RN) |

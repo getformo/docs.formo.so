@@ -30,11 +30,35 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Return the activity feed / event stream for an anonymous visitor or wallet.
 - Export data periodically to your data warehouse.
 
+## Charts API
+
+- Create and manage custom dashboards and charts.
+- Add, update, and remove charts with SQL-based queries and visualization options (bar, line, pie, funnel, stacked, retention, and more).
+
+## Segments API
+
+- Create and manage user segments based on filter conditions.
+- Segment users by DeFi positions, net worth, transaction count, device, browser, lifetime volume, and other attributes.
+
+## Contracts API
+
+- Monitor blockchain smart contract events across all major chains.
+- Add contracts by chain ID, address, and ABI to get fully-decoded transaction and smart contract events.
+
+## Alerts API
+
+- Create, update, and manage project alerts programmatically.
+- Configure alert conditions and notification channels (email, Slack, webhook).
+
 ## FAQ
 
 <AccordionGroup>
   <Accordion title="What are the rate limits for the Formo API?">
-    API rate limits depend on your plan. Check the [authentication docs](/api-reference/authentication) for details on rate limits and API key scopes.
+    | Layer | Limit | Window |
+    |-------|-------|--------|
+    | API (except Profiles) | 1,000 requests | 15 minutes |
+    | Profiles API | 10,000 requests | 15 minutes |
+    | Workspace | 100 requests | 1 second |
   </Accordion>
   <Accordion title="Can I use the Profiles API for real-time app personalization?">
     Yes. The [Profiles API](/api-reference/profile) returns wallet profile data including holdings, net worth, lifecycle stage, and labels. It also returns your first-party data (if the user has visited your app) such as country, device, browser, OS, and more. You can use this to personalize your app experience based on a user's onchain activity.

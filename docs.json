@@ -140,11 +140,54 @@
           },
           {
             "group": "Profiles API",
-            "pages": ["api-reference/profile", "api-reference/search-profiles"]
+            "pages": ["api-reference/profile", "api-reference/search-profiles", "api-reference/import"]
           },
           {
             "group": "Query API",
             "pages": ["api-reference/query"]
+          },
+          {
+            "group": "Charts API",
+            "pages": [
+              "api-reference/boards/list",
+              "api-reference/boards/get",
+              "api-reference/boards/create",
+              "api-reference/boards/update",
+              "api-reference/boards/delete",
+              "api-reference/boards/list-charts",
+              "api-reference/boards/get-chart",
+              "api-reference/boards/create-chart",
+              "api-reference/boards/update-chart",
+              "api-reference/boards/delete-chart"
+            ]
+          },
+          {
+            "group": "Segments API",
+            "pages": [
+              "api-reference/segments/list",
+              "api-reference/segments/create",
+              "api-reference/segments/delete"
+            ]
+          },
+          {
+            "group": "Contracts API",
+            "pages": [
+              "api-reference/contracts/list",
+              "api-reference/contracts/create",
+              "api-reference/contracts/update",
+              "api-reference/contracts/delete"
+            ]
+          },
+          {
+            "group": "Alerts API",
+            "pages": [
+              "api-reference/alerts/list",
+              "api-reference/alerts/get",
+              "api-reference/alerts/create",
+              "api-reference/alerts/update",
+              "api-reference/alerts/delete",
+              "api-reference/alerts/toggle"
+            ]
           }
         ]
       },
