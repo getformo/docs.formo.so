@@ -2064,7 +2064,6 @@
         "tags": [
           "Alerts"
         ],
-        "x-required-scope": "alerts:read",
         "responses": {
           "200": {
             "description": "List of alerts",
@@ -2102,7 +2101,6 @@
         "tags": [
           "Alerts"
         ],
-        "x-required-scope": "alerts:write",
         "requestBody": {
           "required": true,
           "content": {
@@ -2305,7 +2303,6 @@
             }
           }
         },
-        "x-required-scope": "alerts:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2392,7 +2389,6 @@
             }
           }
         },
-        "x-required-scope": "alerts:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2436,7 +2432,6 @@
             }
           }
         },
-        "x-required-scope": "alerts:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2502,7 +2497,6 @@
             }
           }
         },
-        "x-required-scope": "alerts:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2541,7 +2535,6 @@
             }
           }
         },
-        "x-required-scope": "boards:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2587,7 +2580,6 @@
             }
           }
         },
-        "x-required-scope": "boards:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2633,7 +2625,6 @@
             }
           }
         },
-        "x-required-scope": "boards:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2699,7 +2690,6 @@
             }
           }
         },
-        "x-required-scope": "boards:write",
         "description": "Update board title, description, and/or public visibility.",
         "x-examples": {
           "updateTitle": {
@@ -2767,7 +2757,6 @@
             }
           }
         },
-        "x-required-scope": "boards:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -2824,7 +2813,6 @@
             }
           }
         },
-        "x-required-scope": "boards:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3007,7 +2995,6 @@
             }
           }
         },
-        "x-required-scope": "boards:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3061,7 +3048,6 @@
             }
           }
         },
-        "x-required-scope": "boards:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3176,7 +3162,6 @@
             }
           }
         },
-        "x-required-scope": "boards:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3213,7 +3198,6 @@
             "description": "Chart deleted"
           }
         },
-        "x-required-scope": "boards:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3268,7 +3252,6 @@
             }
           }
         },
-        "x-required-scope": "contracts:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3409,7 +3392,6 @@
             }
           }
         },
-        "x-required-scope": "contracts:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3504,7 +3486,6 @@
             }
           }
         },
-        "x-required-scope": "contracts:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3556,7 +3537,6 @@
             }
           }
         },
-        "x-required-scope": "contracts:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3595,7 +3575,6 @@
             }
           }
         },
-        "x-required-scope": "segments:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3678,7 +3657,6 @@
             }
           }
         },
-        "x-required-scope": "segments:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3724,7 +3702,6 @@
             }
           }
         },
-        "x-required-scope": "segments:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3737,7 +3714,7 @@
       "post": {
         "operationId": "importWallets",
         "summary": "Import wallet addresses",
-        "description": "Import wallet addresses into the project. Requires profiles:write scope and Scale/Enterprise plan.",
+        "description": "Import wallet addresses into the project.",
         "tags": [
           "Profiles"
         ],
@@ -3785,7 +3762,6 @@
             "description": "Wallets imported successfully"
           }
         },
-        "x-required-scope": "profiles:write",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -3793,23 +3769,6 @@
           }
         ]
       }
-    }
-  },
-  "x-api-scopes": {
-    "description": "API key scopes control access to endpoints. Create keys with the required scopes in Team Settings > API Keys.",
-    "scopes": {
-      "alerts:read": "List and get alerts",
-      "alerts:write": "Create, update, delete alerts (requires alerts:read)",
-      "boards:read": "List and get boards and charts",
-      "boards:write": "Create, update, delete boards and charts (requires boards:read)",
-      "contracts:read": "List contracts",
-      "contracts:write": "Create, update, delete contracts (requires contracts:read)",
-      "segments:read": "List segments",
-      "segments:write": "Create and delete segments (requires segments:read)",
-      "profiles:read": "Search and get wallet profiles",
-      "profiles:write": "Import wallet addresses (requires profiles:read)",
-      "query:read": "Execute SQL analytics queries",
-      "mcp:read": "MCP protocol access (analytics tools + management tools based on other scopes)"
     }
   },
   "tags": [
