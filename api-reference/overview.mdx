@@ -30,30 +30,26 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Return the activity feed / event stream for an anonymous visitor or wallet.
 - Export data periodically to your data warehouse.
 
-## Boards & Charts API
+## Charts API
 
 - Create and manage custom dashboards and charts.
 - Add, update, and remove charts with SQL-based queries and visualization options (bar, line, pie, funnel, stacked, retention, and more).
-- Requires `boards:read` / `boards:write` scopes. Available on Scale and Enterprise plans.
 
 ## Segments API
 
 - Create and manage user segments based on filter conditions.
 - Segment users by transaction count, device, browser, and other attributes.
-- Requires `segments:read` / `segments:write` scopes. Available on Scale and Enterprise plans.
 
 ## Contracts API
 
 - Monitor blockchain smart contracts and their events.
 - Add contracts by chain ID and address, with ABI and event definitions.
-- Requires `contracts:read` / `contracts:write` scopes. Available on Scale and Enterprise plans.
 
 ## Alerts API
 
 - Create, update, and manage project alerts programmatically.
 - Configure alert conditions and notification channels (email, Slack, webhook).
 - Toggle alerts active/inactive.
-- Requires `alerts:read` / `alerts:write` scopes. Available on Scale and Enterprise plans.
 
 ## FAQ
 
@@ -66,9 +62,6 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
   </Accordion>
   <Accordion title="Can I connect BI tools like Metabase or Looker to Formo?">
     Yes. Formo provides [BI tool integration](/data/bi) via BI Read tokens that connect to the Formo data warehouse. You can connect Metabase, Grafana, and other SQL-based tools to query your analytics data.
-  </Accordion>
-  <Accordion title="What are the premium APIs (Alerts, Boards, Contracts, etc.)?">
-    These are APIs available on Scale and Enterprise plans. They let you programmatically manage [alerts](/api-reference/alerts/list), [dashboards and charts](/api-reference/boards/list), [contracts](/api-reference/contracts/list), [segments](/api-reference/segments/list), and [import wallets](/api-reference/import) using Workspace API Keys with the appropriate scopes. For AI-powered analytics, use the [Formo MCP server](/features/mcp/overview) to integrate with tools like Claude and Cursor.
   </Accordion>
 </AccordionGroup>
 

@@ -147,18 +147,13 @@
             "pages": ["api-reference/query"]
           },
           {
-            "group": "Boards API",
+            "group": "Charts API",
             "pages": [
               "api-reference/boards/list",
               "api-reference/boards/get",
               "api-reference/boards/create",
               "api-reference/boards/update",
-              "api-reference/boards/delete"
-            ]
-          },
-          {
-            "group": "Charts API",
-            "pages": [
+              "api-reference/boards/delete",
               "api-reference/boards/list-charts",
               "api-reference/boards/get-chart",
               "api-reference/boards/create-chart",
