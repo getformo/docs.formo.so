@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Formo API",
-    "version": "1.0.0",
-    "description": "API for event tracking, querying data, managing wallet profiles, alerts, boards, contracts, segments",
+    "title": "Formo Public API",
+    "version": "0.1.0",
+    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat. All endpoints require a workspace API key with the appropriate scopes.",
     "contact": {
       "name": "Formo",
       "url": "https://formo.so"
@@ -11,25 +11,25 @@
   },
   "servers": [
     {
-      "url": "https://events.formo.so",
-      "description": "Events API (separate service)"
+      "url": "https://api.formo.so",
+      "description": "API Server (boards, alerts, contracts, segments, profiles, query, import)"
     },
     {
-      "url": "https://api.formo.so",
-      "description": "Query, Profiles, and Management APIs"
+      "url": "https://events.formo.so",
+      "description": "Events Server (event ingestion)"
     }
   ],
   "security": [
     {
-      "BearerAuth": []
+      "WorkspaceApiKey": []
     }
   ],
   "components": {
     "securitySchemes": {
-      "BearerAuth": {
+      "WorkspaceApiKey": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Workspace API Key"
+        "description": "Workspace API key (e.g. `formo_xxx`). Create one in the Formo dashboard under Team Settings > API Keys."
       }
     },
     "schemas": {
@@ -81,13 +81,29 @@
             "type": "string",
             "description": "UTM term parameter"
           },
+          "page_url": {
+            "type": "string",
+            "description": "Full URL of the current page"
+          },
+          "page_path": {
+            "type": "string",
+            "description": "Path portion of the current page URL"
+          },
           "page_title": {
             "type": "string",
             "description": "Title of the current page"
           },
-          "page_url": {
+          "page_query": {
             "type": "string",
-            "description": "Full URL of the current page"
+            "description": "Query string of the current page URL"
+          },
+          "page_hash": {
+            "type": "string",
+            "description": "Hash fragment of the current page URL"
+          },
+          "referrer_url": {
+            "type": "string",
+            "description": "Full referrer URL"
           },
           "library_name": {
             "type": "string",
@@ -100,6 +116,19 @@
           "browser": {
             "type": "string",
             "description": "Name of the browser (e.g., chrome, firefox, safari)"
+          },
+          "device": {
+            "type": "string",
+            "enum": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ],
+            "description": "Device type"
+          },
+          "os": {
+            "type": "string",
+            "description": "Operating system (e.g., macOS, Windows, iOS, Android)"
           },
           "screen_width": {
             "type": "integer",
@@ -130,30 +159,31 @@
       },
       "Event": {
         "type": "object",
+        "required": [
+          "type",
+          "anonymous_id"
+        ],
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "identify",
-              "track",
               "page",
+              "screen",
               "connect",
               "disconnect",
-              "detect",
               "chain",
               "signature",
-              "transaction"
+              "transaction",
+              "track",
+              "decoded_log",
+              "detect",
+              "identify"
             ],
             "description": "Type of the event"
           },
           "channel": {
             "type": "string",
-            "enum": [
-              "web",
-              "mobile",
-              "server"
-            ],
-            "description": "Channel/source of the event"
+            "description": "Event channel (e.g. client, server, import)"
           },
           "version": {
             "type": "string",
@@ -1187,17 +1217,17 @@
         "description": "Sends an event to the Formo Events API. Use the SDK Write Key from your project settings as the Bearer token for authentication.",
         "operationId": "trackEvent",
         "tags": [
-          "Events API"
+          "Events"
         ],
         "servers": [
           {
             "url": "https://events.formo.so",
-            "description": "Events API"
+            "description": "Events"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "requestBody": {
@@ -1205,49 +1235,57 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Event"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Event"
+                }
               },
-              "example": {
-                "type": "page",
-                "channel": "web",
-                "version": "0",
-                "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
-                "user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
-                "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
-                "event": "",
-                "context": {
-                  "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
-                  "locale": "en-GB",
-                  "timezone": "Africa/Lagos",
-                  "location": "NG",
-                  "ref": "",
-                  "referrer": "",
-                  "utm_campaign": "",
-                  "utm_content": "",
-                  "utm_medium": "",
-                  "utm_source": "",
-                  "utm_term": "",
-                  "page_title": "WalletConnect Content Cabal",
-                  "page_url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
-                  "library_name": "Formo Web SDK",
-                  "library_version": "1.25.0",
-                  "browser": "chrome",
-                  "screen_width": 393,
-                  "screen_height": 873,
-                  "screen_density": 2.75,
-                  "viewport_width": 392,
-                  "viewport_height": 735
-                },
-                "properties": {
-                  "url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
-                  "path": "/lByfTbeUSL_mxy_TN2m3d",
-                  "hash": "",
-                  "query": ""
-                },
-                "original_timestamp": "2025-04-23T13:15:17.000Z",
-                "sent_at": "2025-04-23T13:15:18.000Z",
-                "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
-              }
+              "example": [
+                {
+                  "type": "page",
+                  "channel": "client",
+                  "version": "0",
+                  "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
+                  "user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
+                  "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+                  "event": "",
+                  "context": {
+                    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+                    "locale": "en-GB",
+                    "timezone": "Africa/Lagos",
+                    "location": "NG",
+                    "ref": "",
+                    "referrer": "",
+                    "utm_campaign": "",
+                    "utm_content": "",
+                    "utm_medium": "",
+                    "utm_source": "",
+                    "utm_term": "",
+                    "page_title": "WalletConnect Content Cabal",
+                    "page_url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+                    "page_path": "/lByfTbeUSL_mxy_TN2m3d",
+                    "library_name": "Formo Web SDK",
+                    "library_version": "1.25.0",
+                    "browser": "chrome",
+                    "device": "mobile",
+                    "os": "Android",
+                    "screen_width": 393,
+                    "screen_height": 873,
+                    "screen_density": 2.75,
+                    "viewport_width": 392,
+                    "viewport_height": 735
+                  },
+                  "properties": {
+                    "url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+                    "path": "/lByfTbeUSL_mxy_TN2m3d",
+                    "hash": "",
+                    "query": ""
+                  },
+                  "original_timestamp": "2025-04-23T13:15:17.000Z",
+                  "sent_at": "2025-04-23T13:15:18.000Z",
+                  "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
+                }
+              ]
             }
           }
         },
@@ -1293,20 +1331,20 @@
     "/v0/query": {
       "post": {
         "summary": "Run SQL query",
-        "description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements, and must include a LIMIT that is less than or equal to 1000.",
+        "description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements. LIMIT is capped at 1,000,000.",
         "operationId": "performSqlQueryPublic",
         "tags": [
-          "Query API"
+          "Query"
         ],
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Query API"
+            "description": "Query"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "requestBody": {
@@ -1318,7 +1356,7 @@
                 "properties": {
                   "query": {
                     "type": "string",
-                    "description": "SQL query to execute. Must be read-only (SELECT/WITH), single statement, no comments, and include LIMIT <= 1000."
+                    "description": "SQL query to execute. Must be read-only (SELECT/WITH), single statement, no comments. LIMIT is capped at 1,000,000."
                   }
                 },
                 "required": [
@@ -1371,7 +1409,7 @@
             }
           },
           "400": {
-            "description": "Bad Request - Query missing/invalid or limit over 1000",
+            "description": "Bad Request - Query missing/invalid or limit over 1,000,000",
             "content": {
               "application/json": {
                 "schema": {
@@ -1452,22 +1490,22 @@
       }
     },
     "/v0/profiles": {
-      "post": {
+      "get": {
         "summary": "Search Wallet Profiles",
         "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports advanced filtering by user data, on-chain activity, chains, apps, tokens, labels, and lifecycle. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
         "operationId": "searchWalletProfiles",
         "tags": [
-          "Profiles API"
+          "Profiles"
         ],
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Profiles API"
+            "description": "Profiles"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "parameters": [
@@ -1814,17 +1852,17 @@
         "description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
         "operationId": "getWalletProfile",
         "tags": [
-          "Profiles API"
+          "Profiles"
         ],
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Profiles API"
+            "description": "Profiles"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "parameters": [
@@ -4214,6 +4252,10 @@
     {
       "name": "Query",
       "description": "Execute SQL analytics queries"
+    },
+    {
+      "name": "Events",
+      "description": "Event ingestion API (events.formo.so)"
     }
   ]
 }
