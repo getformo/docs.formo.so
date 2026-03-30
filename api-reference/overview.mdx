@@ -55,7 +55,11 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 
 <AccordionGroup>
   <Accordion title="What are the rate limits for the Formo API?">
-    API rate limits depend on your plan. Check the [authentication docs](/api-reference/authentication) for details on rate limits and API key scopes.
+    | Layer | Limit | Window | Scope | Applied to |
+    |-------|-------|--------|-------|------------|
+    | API (except Profiles) | 1,000 requests | 15 minutes | Per IP | All `/v0/*` routes except Profiles |
+    | Profiles API | 10,000 requests | 15 minutes | Per IP | `/v0/profiles` only |
+    | Workspace | 100 requests | 1 second | Per workspace (team) | All authenticated `/v0/*` routes, aggregated across all API keys |
   </Accordion>
   <Accordion title="Can I use the Profiles API for real-time app personalization?">
     Yes. The [Profiles API](/api-reference/profile) returns wallet profile data including holdings, net worth, lifecycle stage, and labels. It also returns your first-party data (if the user has visited your app) such as country, device, browser, OS, and more. You can use this to personalize your app experience based on a user's onchain activity.
