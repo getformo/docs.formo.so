@@ -195,7 +195,7 @@
             ]
           },
           {
-            "group": "AI Chat API",
+            "group": "Ask AI API",
             "pages": ["api-reference/chat/stream"]
           }
         ]

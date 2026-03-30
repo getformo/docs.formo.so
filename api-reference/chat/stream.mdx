@@ -1,10 +1,10 @@
 ---
-title: 'Chat with AI'
+title: 'Ask AI'
 openapi: 'POST /v0/chat'
 ---
 
 <Note>
-  The AI Chat API is available on **Scale** and **Enterprise** plans. Requires a Workspace API Key with `ai:read` permission.
+  The Ask AI API is available on **Scale** and **Enterprise** plans. Requires a Workspace API Key with `ai:read` permission.
 </Note>
 
 This endpoint returns a streaming response using **Server-Sent Events (SSE)**. Each event contains a chunk of the AI assistant's response. Since this is a POST endpoint requiring authentication headers, use a streaming HTTP client (e.g., `fetch` with stream parsing) to consume the response.
