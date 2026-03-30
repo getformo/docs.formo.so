@@ -205,6 +205,7 @@
           },
           "event": {
             "type": "string",
+            "nullable": true,
             "description": "Name of the event (for track events)"
           },
           "context": {
@@ -1215,7 +1216,7 @@
       "post": {
         "summary": "Track Event",
         "description": "Sends an event to the Formo Events API. Use the SDK Write Key from your project settings as the Bearer token for authentication.",
-        "operationId": "trackEvent",
+        "operationId": "ingestEvents",
         "tags": [
           "Events"
         ],
@@ -1332,10 +1333,11 @@
       "post": {
         "summary": "Run SQL query",
         "description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements. LIMIT is capped at 1,000,000.",
-        "operationId": "performSqlQueryPublic",
+        "operationId": "executeQuery",
         "tags": [
           "Query"
         ],
+        "x-required-scope": "query:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -1389,20 +1391,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PerformSqlQueryPublicResponse"
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PerformSqlQueryPublicResponse"
+                    }
+                  }
                 },
                 "example": {
-                  "data": [
-                    {
-                      "event": "page",
-                      "address": "0x123...",
-                      "timestamp": "2025-01-20T10:00:00Z"
+                  "isSuccess": true,
+                  "data": {
+                    "data": [
+                      {
+                        "event": "page",
+                        "address": "0x123...",
+                        "timestamp": "2025-01-20T10:00:00Z"
+                      }
+                    ],
+                    "meta": {
+                      "total": 120,
+                      "limit": 100,
+                      "offset": 0
                     }
-                  ],
-                  "meta": {
-                    "total": 120,
-                    "limit": 100,
-                    "offset": 0
                   }
                 }
               }
@@ -1493,10 +1506,11 @@
       "get": {
         "summary": "Search Wallet Profiles",
         "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports advanced filtering by user data, on-chain activity, chains, apps, tokens, labels, and lifecycle. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
-        "operationId": "searchWalletProfiles",
+        "operationId": "searchProfiles",
         "tags": [
           "Profiles"
         ],
+        "x-required-scope": "profiles:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -1694,9 +1708,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchProfileResponse"
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SearchProfileResponse"
+                    }
+                  }
                 },
                 "example": {
+                  "isSuccess": true,
+                  "data": {
                   "data": [
                     {
                       "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
@@ -1732,6 +1756,7 @@
                     "total": 150,
                     "limit": 100,
                     "offset": 0
+                  }
                   }
                 }
               }
@@ -1850,10 +1875,11 @@
       "get": {
         "summary": "Get Wallet Profile",
         "description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
-        "operationId": "getWalletProfile",
+        "operationId": "getProfile",
         "tags": [
           "Profiles"
         ],
+        "x-required-scope": "profiles:read",
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -1891,9 +1917,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProfileResponse"
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProfileResponse"
+                    }
+                  }
                 },
                 "example": {
+                  "isSuccess": true,
+                  "data": {
                   "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
                   "net_worth_usd": 125000.5,
                   "ens": "vitalik.eth",
@@ -2002,6 +2038,7 @@
                       "balance_usd": 1000
                     }
                   ]
+                  }
                 }
               }
             }
