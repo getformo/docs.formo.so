@@ -29,7 +29,7 @@
       "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Bearer token for authentication. Use an SDK Write Key for the Events API, or a Workspace API Key (e.g. `formo_xxx`) for all other APIs. Create keys in the Formo dashboard under Team Settings > API Keys."
+        "description": "Workspace API Key"
       }
     },
     "schemas": {
