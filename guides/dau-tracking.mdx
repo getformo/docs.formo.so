@@ -1,5 +1,6 @@
 ---
-title: 'Track DAU for Crypto Apps'
+title: 'How to Track DAU, WAU, and MAU'
+sidebarTitle: 'How to Track DAU'
 description: 'Measure daily, weekly, and monthly active users for your onchain application with wallet-based analytics.'
 ---
 
@@ -23,11 +24,11 @@ Unlike traditional analytics that count page views, Formo tracks actual wallet e
 
 ## Part 1: Understanding Crypto App User Metrics
 
-### Traditional vs. onchain active users
+### What is a user?
 
 Traditional web analytics count "active users" by sessions or page views. For crypto apps, this misses the mark:
 
-| Metric | Traditional Analytics | Formo (Onchain) |
+| Metric | Traditional Analytics | Formo |
 |--------|----------------------|-----------------|
 | **Active user** | Any visitor with a session | Wallet connected OR transaction completed |
 | **Unique users** | Cookie-based (easily duplicated) | Wallet address (unique by design) |
@@ -147,29 +148,6 @@ ORDER BY date
 
 <Note>For a true rolling 7-day WAU, you'll need a window function. The Ask AI feature can help generate this query.</Note>
 
-### Step 4: Create a DAU/MAU stickiness chart
-
-This ratio shows what percentage of monthly users engage daily. It's a key health metric.
-
-**Using Ask AI:**
-
-Type: "Calculate DAU/MAU ratio for the last 30 days"
-
-A healthy DAU/MAU ratio for crypto apps:
-- **5-10%**: Normal for most crypto apps
-- **10-20%**: Strong engagement
-- **20%+**: Exceptional stickiness (common for DEXes, gaming)
-
-### Step 5: Organize your dashboard
-
-Arrange your charts into a useful layout:
-
-| Row | Charts |
-|-----|--------|
-| **Top** | DAU (number), WAU (number), MAU (number) |
-| **Middle** | Daily active wallets trend (line chart) |
-| **Bottom** | DAU/MAU ratio, New vs. Returning users |
-
 ---
 
 ## Part 4: How to Segment Active Users
@@ -237,8 +215,9 @@ Look for:
 Track how each week's users retain over time:
 
 <Steps>
-  <Step title="Go to Retention in the left navigation" />
-  <Step title="View the cohort retention chart" />
+  <Step title="Go to Dashboards in the sidebar" />
+  <Step title="Click Create Chart and select the Retention chart type" />
+  <Step title="Set the starting event to connect and the returning event to connect" />
   <Step title="Compare retention rates across weekly cohorts" />
 </Steps>
 
@@ -289,16 +268,16 @@ You've learned how to:
 ## Next steps
 
 <CardGroup cols={2}>
-  <Card title="Retention Analysis" icon="calendar" href="/features/product-analytics/retention">
+  <Card title="Retention Analysis" icon="calendar" href="/guides/retention">
     Measure week-over-week retention
   </Card>
-  <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
+  <Card title="Wallet Segmentation" icon="users" href="/guides/wallet-segmentation">
     Create behavioral segments
   </Card>
-  <Card title="Dashboards" icon="chart-line" href="/features/product-analytics/charts">
-    Build more custom visualizations
+  <Card title="Protocol Dashboard" icon="chart-line" href="/guides/protocol-dashboard">
+    Build a complete metrics dashboard
   </Card>
-  <Card title="Explorer" icon="compass" href="/features/product-analytics/explore">
+  <Card title="SQL Explorer" icon="compass" href="/guides/sql-explorer">
     Run custom SQL queries
   </Card>
 </CardGroup>

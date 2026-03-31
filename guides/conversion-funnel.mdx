@@ -1,6 +1,6 @@
 ---
 title: "How to Build an Onchain Conversion Funnel"
-sidebarTitle: "Conversion Funnels"
+sidebarTitle: "How to Build Conversion Funnels"
 description: "Build multi-step conversion funnels to track user journeys from first page view to wallet connect to onchain transaction, and identify where users drop off."
 keywords: ["onchain funnel", "crypto conversion tracking", "DeFi funnel analytics", "wallet connect funnel", "web3 conversion rate"]
 ---
@@ -218,9 +218,9 @@ Expected baseline: 80% page view to 25% wallet connect to 8% transaction complet
 
 - **Segment your funnels**: Don't mix swap and pool deposit users in one funnel. Create separate funnels for each user path.
 - **Monitor daily**: Check your funnel once a week. Look for drops (potential bugs) or spikes (successful campaigns).
-- **Pair with retention**: A high-conversion funnel is great, but if users don't return, you're not growing. Use [Retention tracking](/guides/howto/retention) to measure long-term value.
+- **Pair with retention**: A high-conversion funnel is great, but if users don't return, you're not growing. Use [Retention tracking](/guides/retention) to measure long-term value.
 - **Use Ask AI**: Click the chat bubble and ask "Why did my wallet connection rate drop 10% this week?" Formo will analyze your data.
-- **Contract events**: If you track [Contract Events](/guides/howto/contract-events), you can create funnels for specific contract interactions (e.g., "approved" to "swap" to "received").
+- **Contract events**: If you track [Contract Events](/guides/contract-events), you can create funnels for specific contract interactions (e.g., "approved" to "swap" to "received").
 
 ## DeFi-Specific Funnel Recipes
 
@@ -283,6 +283,16 @@ Monitor high-value swaps on your DEX:
 3. Set an [alert](/features/product-analytics/alerts) if this funnel drops (fewer whale transactions)
 4. Use **Insights** to find attributes of whale traders and target similar users
 
+### Failed Transaction Alert
+
+Track when transactions fail to identify UX issues that cause drop-off:
+
+1. Go to **Project Settings** > **Alerts**
+2. Click **Create Alert**
+3. Configure: Event = `transaction`, Condition = `status = failed`
+4. Set notification to Slack or email
+5. Investigate spikes in failures — they often correlate with funnel drop-off at the transaction step
+
 ## What's Next
 
 Your conversion funnel is live. Next steps:
@@ -290,13 +300,13 @@ Your conversion funnel is live. Next steps:
 - **[Improve with Segments](/features/wallet-intelligence/segments)**: Create a segment of high-converting users and re-target similar users. (Growth+ plan required.)
 - **[Set Alerts](/features/product-analytics/alerts)**: Get notified if conversion dips below your threshold.
 - **[Read the Funnel Guide](/features/product-analytics/funnels)**: Deep dive into advanced funnel features.
-- **[Compare with Retention](/guides/howto/retention)**: Track if high-converting cohorts also retain well.
+- **[Compare with Retention](/guides/retention)**: Track if high-converting cohorts also retain well.
 
 ## FAQ
 
 <AccordionGroup>
 <Accordion title="Can I use contract events in my funnel?">
-Yes. If you've set up [Contract Events](/guides/howto/contract-events), you can select any of them in the funnel builder. For example, a Uniswap funnel might be: "page" > "swap (contract event)" > "Transfer (contract event)".
+Yes. If you've set up [Contract Events](/guides/contract-events), you can select any of them in the funnel builder. For example, a Uniswap funnel might be: "page" > "swap (contract event)" > "Transfer (contract event)".
 </Accordion>
 
 <Accordion title="What's the difference between closed and open funnels?">

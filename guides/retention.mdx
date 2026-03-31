@@ -1,6 +1,6 @@
 ---
 title: "How to Track and Improve User Retention"
-sidebarTitle: "User Retention"
+sidebarTitle: "How to Improve Retention"
 description: "Measure Day 7, 30, and 90 retention rates for your crypto app with cohort analysis, identify churn patterns, and build segments to re-engage at-risk users."
 keywords: ["crypto retention analytics", "DeFi user retention", "web3 churn analysis", "cohort retention", "onchain retention tracking"]
 ---
@@ -315,13 +315,27 @@ Set up these alerts in Project Settings:
 | New users stalling | 3 days, fewer than 5 sessions | In-app nudge + tutorial replay | 20-30% return |
 | Recently churned | 30-45 days inactive | "We miss you" discount offer | 10-15% return |
 
+**Analyze Churned User Behavior with Flows**
+
+Use [User Path charts](/guides/flows) to understand what churned users did in their last session:
+
+1. Go to **Dashboards** > **Create Chart** > select **User Path**
+2. Filter by users whose lifecycle is **Churned**
+3. Look for patterns: failed transactions, abandoned flows, or limited exploration
+
+Compare churned vs. retained users side by side:
+- **Churned cohort**: Active 60+ days ago, has not returned in 30+ days
+- **Retained cohort**: Active 60+ days ago, has returned in the last 30 days
+
+Compare their first-week behavior: sessions count, features used, transaction volume, and entry referrer. This reveals what retained users do differently — and what to optimize in onboarding.
+
 ## What's Next
 
 You've set up retention tracking. Here's what to do next:
 
-- **[Create a Conversion Funnel](/guides/howto/conversion-funnel)**: High retention is good, but you need high conversion first.
+- **[Create a Conversion Funnel](/guides/conversion-funnel)**: High retention is good, but you need high conversion first.
 - **[Use Segments for Re-engagement](/features/wallet-intelligence/segments)**: Build audiences of churned users for campaigns. (Growth+ plan)
-- **[Build a Protocol Dashboard](/guides/howto/protocol-dashboard)**: Track retention alongside other key metrics in one view.
+- **[Build a Protocol Dashboard](/guides/protocol-dashboard)**: Track retention alongside other key metrics in one view.
 - **[Set Up Alerts](/features/product-analytics/alerts)**: Get notified of retention drops.
 - **[Explore Your Users](/features/wallet-intelligence/wallet-profiles)**: Click on a user in the Users page to see their full profile, including lifecycle stage and activity feed.
 

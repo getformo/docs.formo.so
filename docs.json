@@ -11,7 +11,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Overview",
         "groups": [
           {
             "group": "Getting started",
@@ -63,27 +63,26 @@
               },
               "features/mcp/overview"
             ]
-          },
-          {
-            "group": "Use Cases",
-            "pages": [
-              "guides/use-cases/dau-tracking",
-              "guides/use-cases/attribution-guide"
-            ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
           {
             "group": "How-To Guides",
             "pages": [
-              "guides/howto/getting-started",
-              "guides/howto/conversion-funnel",
-              "guides/howto/retention",
-              "guides/howto/protocol-dashboard",
-              "guides/howto/ask-ai",
-              "guides/howto/wallet-segmentation",
-              "guides/howto/onboarding-flows",
-              "guides/howto/contract-events",
-              "guides/howto/sql-explorer",
-              "guides/howto/token-gated-forms"
+              "guides/dau-tracking",
+              "guides/attribution-guide",
+              "guides/contract-events",
+              "guides/conversion-funnel",
+              "guides/flows",
+              "guides/protocol-dashboard",
+              "guides/sql-explorer",
+              "guides/ask-ai",
+              "guides/wallet-segmentation",
+              "guides/retention",
+              "guides/token-gated-forms"
             ]
           }
         ]

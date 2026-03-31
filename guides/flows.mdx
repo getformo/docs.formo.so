@@ -1,6 +1,6 @@
 ---
 title: "How to Analyze User Onboarding with Flows"
-sidebarTitle: "Onboarding Flows"
+sidebarTitle: "How to Analyze User Flows"
 description: "Visualize how new users navigate your crypto app with Sankey flow diagrams, identify drop-off points, and optimize the path to first wallet transaction."
 keywords: ["user flow analysis", "onboarding analytics", "Sankey diagram crypto", "web3 user paths", "DeFi onboarding optimization"]
 ---
@@ -187,12 +187,22 @@ ORDER BY date
 | High bounce on app page | Improve loading speed, add guidance | Flows showing exits |
 | Users don't return | Email/notification follow-up | Week 1 retention |
 
+### A/B test onboarding changes
+
+When you ship changes to improve onboarding:
+
+1. Note the date of the change
+2. Compare funnel metrics before and after using date filters on your dashboard
+3. Check if retention improved for post-change cohorts using a [Retention chart](/guides/retention)
+
+This lets you measure whether each change actually moved the needle.
+
 ## What's Next?
 
 Combine flow analysis with conversion funnels for deeper insights:
 
-- See [How to Build Conversion Funnels](/guides/howto/conversion-funnel) to measure step-by-step conversion
-- Use [SQL Explorer](/guides/howto/sql-explorer) to query average time spent in each step
+- See [How to Build Conversion Funnels](/guides/conversion-funnel) to measure step-by-step conversion
+- Use [SQL Explorer](/guides/sql-explorer) to query average time spent in each step
 - Set up dashboards to track onboarding KPIs weekly
 
 ---
