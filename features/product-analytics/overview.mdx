@@ -22,6 +22,7 @@ Capture the full user journey from page visit to onchain transaction, with unifi
 - 🧭 <a href="/features/product-analytics/flows">**Flows.**</a> Analyze user paths and flows throughout your app.
 - 📅 <a href="/features/product-analytics/retention">**Retention.**</a> Measure how many users return to your app over weeks and months.
 - 🔔 <a href="/features/product-analytics/alerts">**Alerts.**</a> Get notified of high-value users and important actions.
+- 💡 <a href="/features/product-analytics/insights">**Insights.**</a> AI-powered weekly analysis of acquisition quality, activation, revenue, and churn.
 - ✨ <a href="/features/product-analytics/ai">**Ask AI.**</a> Use natural language to query your data and get insights.
 
 ## Autocapture
@@ -32,16 +33,6 @@ Once you install the Formo SDK, **it automatically collects and tracks user [eve
 
 It's the easiest way to capture the user interactions on your site. No need to rely on manual tracking. No need to choose what to measure. No need to wrangle engineers to write code.
 
-## Cross-subdomain tracking
-
-Formo automatically tracks visitors across all subdomains of your main domain, giving you a unified view of user journeys and attribution accuracy. This means you can follow users as they move between your marketing site, app, blog, and other subdomains. No extra setup required.
-
-- **Unified visitor journey**: Track users as they navigate between your main site, app, and other subdomains
-- **Accurate attribution**: Attribute conversions to the correct marketing channel, even if users move between subdomains
-- **Simplified reporting**: View combined traffic, user behavior, and conversion data in a single dashboard
-
-To enable cross-subdomain analytics, simply use your root domain when adding your project in the Formo dashboard. The Formo SDK handles identity resolution and session management for you, ensuring seamless analytics across your entire product.
-
 ## FAQ
 
 <AccordionGroup>
@@ -49,7 +40,7 @@ To enable cross-subdomain analytics, simply use your root domain when adding you
     After installing the SDK, Formo automatically tracks [pageviews](/data/events/page), sessions, [wallet connections](/data/events/connect), [disconnections](/data/events/disconnect), [chain switches](/data/events/chain), [transactions](/data/events/transaction), and [signatures](/data/events/signature). You can also define [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
   </Accordion>
   <Accordion title="Can I track users across my marketing site and my dApp?">
-    Yes. Formo supports cross-subdomain analytics out of the box. Use your root domain when adding your project in the dashboard, and the SDK handles identity resolution and session management across subdomains. You can track the user journey from visits to your marketing site and activity on your dApp.
+    Yes. Cross-subdomain tracking is enabled by default (`crossSubdomainCookies: true`), so visitor identity is shared across all subdomains of your root domain out of the box. See the [Web SDK documentation](/sdks/web#cross-subdomain-tracking) for details.
   </Accordion>
   <Accordion title="How does Formo count unique visitors?">
     Formo generates an anonymous visitor ID (UUID) stored in a first-party cookie on your domain. This ID is not linked to any personal information — no IP addresses or device fingerprints are used. A server-side daily-rotating hash is also used for session deduplication. See [what we collect](/data/what-we-collect) for details.

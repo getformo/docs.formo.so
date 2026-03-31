@@ -21,9 +21,9 @@ There are several ways to install the Formo SDK:
 - [HTML Snippet](#html-snippet) is recommended for static websites
 - [React & Next.js (without Wagmi)](#react-&-next-js-without-wagmi)
 
-> For best results, install Formo on both your website (example.com) and your app (app.example.com) using the same project/SDK write key.
->
-> The standard setup is to use the HTML snippet on your website and Wagmi on your app.
+We recommend installing Formo on **both your website (example.com) and your app (app.example.com)** on the same project with the same SDK write key. 
+
+The standard setup is to use the HTML snippet on your website and Wagmi on your app, with [cross-subdomain tracking](#cross-subdomain-tracking) enabled.
 
 ### Wagmi
 
@@ -260,86 +260,100 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
   <Card
     title="Privy"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/privy"
+    href="https://github.com/getformo/examples/tree/main/with-privy"
   >
-    examples/privy
+    examples/with-privy
   </Card>
   <Card
     title="Dynamic"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/dynamic"
+    href="https://github.com/getformo/examples/tree/main/with-dynamic"
   >
-    examples/dynamic
+    examples/with-dynamic
+  </Card>
+  <Card
+    title="Turnkey"
+    icon="file-code"
+    href="https://github.com/getformo/examples/tree/main/with-turnkey"
+  >
+    examples/with-turnkey
   </Card>
   <Card
     title="React"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/react"
+    href="https://github.com/getformo/examples/tree/main/with-react"
   >
-    examples/react
+    examples/with-react
   </Card>
   <Card
     title="Next.js (app router)"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/next-app-router"
+    href="https://github.com/getformo/examples/tree/main/with-next-app-router"
   >
-    examples/next-app-router
+    examples/with-next-app-router
   </Card>
   <Card
     title="Next.js (pages router)"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/next-page-router"
+    href="https://github.com/getformo/examples/tree/main/with-next-page-router"
   >
-    examples/next-page-router
+    examples/with-next-page-router
   </Card>
   <Card
     title="MetaMask SDK"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/metamask"
+    href="https://github.com/getformo/examples/tree/main/with-metamask"
   >
-    examples/metamask
+    examples/with-metamask
   </Card>
   <Card
     title="Blocknative"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/web3-onboard"
+    href="https://github.com/getformo/examples/tree/main/with-web3-onboard"
   >
-    examples/web3-onboard
+    examples/with-web3-onboard
   </Card>
   <Card
     title="Thirdweb"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/thirdweb"
+    href="https://github.com/getformo/examples/tree/main/with-thirdweb"
   >
-    examples/thirdweb
+    examples/with-thirdweb
   </Card>
   <Card
     title="Reown"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/reown"
+    href="https://github.com/getformo/examples/tree/main/with-reown"
   >
-    examples/reown
+    examples/with-reown
   </Card>
   <Card
     title="Porto"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/porto"
+    href="https://github.com/getformo/examples/tree/main/with-porto"
   >
-    examples/porto
+    examples/with-porto
   </Card>
   <Card
     title="Farcaster Mini App"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/farcaster"
+    href="https://github.com/getformo/examples/tree/main/with-farcaster"
   >
-    examples/farcaster
+    examples/with-farcaster
   </Card>
   <Card
     title="Solana"
     icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/solana"
+    href="https://github.com/getformo/examples/tree/main/with-solana"
   >
-    examples/solana
+    examples/with-solana
+  </Card>
+  <Card
+    title="React Native"
+    icon="file-code"
+    href="https://github.com/getformo/examples/tree/main/with-react-native"
+  >
+    examples/with-react-native
   </Card>
 </CardGroup>
 
@@ -382,6 +396,33 @@ Control the level of logs the SDK prints to the console with the following logLe
 | info | Shows informative messages about normal application operation. |
 | warn | Default. Shows error and warning messages. |
 | error | Shows error messages only. |
+
+### Autocapture
+
+You can configure which wallet events are automatically captured by the SDK:
+
+```javascript
+// Enable full autocapture (default)
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: true
+});
+
+// Disable autocapture for signature and transaction events
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: {
+    connect: true,
+    disconnect: true,
+    signature: false,    // Disable signature tracking
+    transaction: false,  // Disable transaction tracking
+    chain: true
+  }
+});
+
+// Disable all autocapture
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: false
+});
+```
 
 ### Batching
 
@@ -491,32 +532,50 @@ window.formo.optOutTracking();
 window.formo.optInTracking();
 ```
 
-### Autocapture
+### Cross subdomain tracking
 
-You can configure which wallet events are automatically captured by the SDK:
+By default, Formo sets identity cookies on the root domain, sharing visitor identity across all subdomains. This ensures accurate visitor counts and consistent attribution across your subdomains out of the box.
 
+| Value | Behavior |
+|-------|----------|
+| `true` (default) | Cookies are set on the root domain (e.g. `.example.com`), sharing visitor identity across all subdomains. |
+| `false` | Cookies are scoped to the current hostname only. A cookie set on `app.example.com` is **not** visible from `www.example.com`. |
+
+With the default `crossSubdomainCookies` setting:
+
+- **Cross subdomain tracking**: track users as they move between your marketing site, app, docs, and other subdomains.
+- **Accurate attribution**: attribute conversions to the correct channel, even when users cross subdomains.
+- **Automatic migration**: the SDK migrates existing host-scoped cookies to the apex domain so visitors are not double-counted.
+
+To disable cross-subdomain tracking and scope cookies to the current hostname only, set `crossSubdomainCookies` to `false`:
+
+<Tabs>
+  <Tab title="HTML Snippet">
+```html
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer onload="window.formofy('WRITE_KEY', { crossSubdomainCookies: false });"
+></script>
+```
+  </Tab>
+  <Tab title="React / Next.js">
+```tsx
+<FormoAnalyticsProvider
+  writeKey="WRITE_KEY"
+  options={{
+    crossSubdomainCookies: false
+  }}
+>
+```
+  </Tab>
+  <Tab title="JavaScript">
 ```javascript
-// Enable full autocapture (default)
 const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
-  autocapture: true
-});
-
-// Disable autocapture for signature and transaction events
-const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
-  autocapture: {
-    connect: true,
-    disconnect: true,
-    signature: false,    // Disable signature tracking
-    transaction: false,  // Disable transaction tracking
-    chain: true
-  }
-});
-
-// Disable all autocapture
-const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
-  autocapture: false
+  crossSubdomainCookies: false
 });
 ```
+  </Tab>
+</Tabs>
 
 ### Wagmi integration
 
@@ -557,9 +616,11 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 
 ### Solana integration
 
-The Formo Web SDK supports Solana wallet tracking via the Solana Wallet Adapter ecosystem. Solana tracking works alongside EVM tracking — you can track both EVM and Solana wallets in the same app.
+The Formo Web SDK supports Solana. Solana tracking works alongside EVM tracking — you can track both EVM and Solana wallets in the same app.
 
-See the full [Solana example app](https://github.com/getformo/examples/tree/main/solana) for a working implementation.
+You need to use the [React/Next.js (without Wagmi)](#react-%26-next-js-without-wagmi) installation method to enable tracking of Solana wallets.
+
+See the full [Solana example app](https://github.com/getformo/examples/tree/main/with-solana) for a working implementation.
 
 <Tabs>
   <Tab title="React useWallet (Recommended)">

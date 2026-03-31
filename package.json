@@ -1,0 +1,10 @@
+{
+  "name": "docs.formo.so",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Formo documentation site",
+  "scripts": {
+    "dev": "npx mintlify dev",
+    "validate": "npx mintlify validate"
+  }
+}

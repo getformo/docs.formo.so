@@ -1,26 +1,35 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.1.0",
   "info": {
-    "title": "Formo API",
-    "version": "1.0.0",
-    "description": "API for event tracking, querying data, and managing wallet profiles"
+    "title": "Formo Public API",
+    "version": "0.1.0",
+    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat. All endpoints require a workspace API key with the appropriate scopes.",
+    "contact": {
+      "name": "Formo",
+      "url": "https://formo.so"
+    }
   },
   "servers": [
     {
-      "url": "https://events.formo.so",
-      "description": "Events API (separate service from api.formo.so)"
+      "url": "https://api.formo.so",
+      "description": "API Server (boards, alerts, contracts, segments, profiles, query, import)"
     },
     {
-      "url": "https://api.formo.so",
-      "description": "Query and Profiles API"
+      "url": "https://events.formo.so",
+      "description": "Events Server (event ingestion)"
+    }
+  ],
+  "security": [
+    {
+      "WorkspaceApiKey": []
     }
   ],
   "components": {
     "securitySchemes": {
-      "BearerAuth": {
+      "WorkspaceApiKey": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Bearer token for authentication. Use an SDK Write Key for the Events API, or a Workspace API Key for the Query and Profiles APIs. Format: 'Bearer <token>'"
+        "description": "Workspace API key (e.g. `formo_xxx`). Create one in the Formo dashboard under Team Settings > API Keys."
       }
     },
     "schemas": {
@@ -72,13 +81,29 @@
             "type": "string",
             "description": "UTM term parameter"
           },
+          "page_url": {
+            "type": "string",
+            "description": "Full URL of the current page"
+          },
+          "page_path": {
+            "type": "string",
+            "description": "Path portion of the current page URL"
+          },
           "page_title": {
             "type": "string",
             "description": "Title of the current page"
           },
-          "page_url": {
+          "page_query": {
             "type": "string",
-            "description": "Full URL of the current page"
+            "description": "Query string of the current page URL"
+          },
+          "page_hash": {
+            "type": "string",
+            "description": "Hash fragment of the current page URL"
+          },
+          "referrer_url": {
+            "type": "string",
+            "description": "Full referrer URL"
           },
           "library_name": {
             "type": "string",
@@ -91,6 +116,19 @@
           "browser": {
             "type": "string",
             "description": "Name of the browser (e.g., chrome, firefox, safari)"
+          },
+          "device": {
+            "type": "string",
+            "enum": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ],
+            "description": "Device type"
+          },
+          "os": {
+            "type": "string",
+            "description": "Operating system (e.g., macOS, Windows, iOS, Android)"
           },
           "screen_width": {
             "type": "integer",
@@ -121,26 +159,31 @@
       },
       "Event": {
         "type": "object",
+        "required": [
+          "type",
+          "anonymous_id"
+        ],
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "identify",
-              "track",
               "page",
+              "screen",
               "connect",
               "disconnect",
-              "detect",
               "chain",
               "signature",
-              "transaction"
+              "transaction",
+              "track",
+              "decoded_log",
+              "detect",
+              "identify"
             ],
             "description": "Type of the event"
           },
           "channel": {
             "type": "string",
-            "enum": ["web", "mobile", "server"],
-            "description": "Channel/source of the event"
+            "description": "Event channel (e.g. client, server, import)"
           },
           "version": {
             "type": "string",
@@ -162,6 +205,7 @@
           },
           "event": {
             "type": "string",
+            "nullable": true,
             "description": "Name of the event (for track events)"
           },
           "context": {
@@ -603,7 +647,13 @@
           "lifecycle": {
             "type": "string",
             "nullable": true,
-            "enum": ["Churned", "New", "Power user", "Resurrected", "Returning"],
+            "enum": [
+              "Churned",
+              "New",
+              "Power user",
+              "Resurrected",
+              "Returning"
+            ],
             "description": "User lifecycle stage based on activity patterns. Only returned by the Search Profiles endpoint."
           },
           "chains": {
@@ -669,10 +719,17 @@
                 "description": "Number of profiles skipped (for pagination)"
               }
             },
-            "required": ["total", "limit", "offset"]
+            "required": [
+              "total",
+              "limit",
+              "offset"
+            ]
           }
         },
-        "required": ["data", "meta"]
+        "required": [
+          "data",
+          "meta"
+        ]
       },
       "PerformSqlQueryPublicResponse": {
         "type": "object",
@@ -701,10 +758,17 @@
                 "description": "Offset inferred from the query"
               }
             },
-            "required": ["total", "limit", "offset"]
+            "required": [
+              "total",
+              "limit",
+              "offset"
+            ]
           }
         },
-        "required": ["data", "meta"]
+        "required": [
+          "data",
+          "meta"
+        ]
       },
       "RestApiErrorResponse": {
         "type": "object",
@@ -721,10 +785,15 @@
                 "description": "Error message"
               }
             },
-            "required": ["code", "message"]
+            "required": [
+              "code",
+              "message"
+            ]
           }
         },
-        "required": ["error"]
+        "required": [
+          "error"
+        ]
       },
       "ErrorWithCode": {
         "type": "object",
@@ -747,7 +816,11 @@
             ]
           }
         },
-        "required": ["isSuccess", "message", "code"]
+        "required": [
+          "isSuccess",
+          "message",
+          "code"
+        ]
       },
       "FilterCondition": {
         "type": "object",
@@ -759,20 +832,39 @@
           },
           "op": {
             "type": "string",
-            "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "in", "nin"],
+            "enum": [
+              "eq",
+              "neq",
+              "gt",
+              "gte",
+              "lt",
+              "lte",
+              "in",
+              "nin"
+            ],
             "description": "The comparison operator:\n- `eq`: Equals\n- `neq`: Not equals\n- `gt`: Greater than\n- `gte`: Greater than or equal\n- `lt`: Less than\n- `lte`: Less than or equal\n- `in`: Value is in array\n- `nin`: Value is not in array"
           },
           "value": {
             "oneOf": [
-              { "type": "string" },
-              { "type": "number" },
-              { "type": "boolean" },
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
               {
                 "type": "array",
                 "items": {
                   "oneOf": [
-                    { "type": "string" },
-                    { "type": "number" }
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
                   ]
                 }
               }
@@ -781,7 +873,10 @@
           },
           "scope": {
             "type": "string",
-            "enum": ["any", "protocol"],
+            "enum": [
+              "any",
+              "protocol"
+            ],
             "description": "Only for token filters. `any` (default) matches holdings in wallet or any protocol. `protocol` matches only tokens deposited in DeFi protocols (use with `appId` to target a specific protocol)."
           },
           "appId": {
@@ -789,7 +884,11 @@
             "description": "Only for token filters with `scope: \"protocol\"`. The DeFi protocol ID to filter by (e.g., `aave-v3`, `compound-v3`, `uniswap-v3`, `lido`)."
           }
         },
-        "required": ["field", "op", "value"]
+        "required": [
+          "field",
+          "op",
+          "value"
+        ]
       },
       "ProfileFilter": {
         "type": "object",
@@ -804,11 +903,311 @@
           },
           "logic": {
             "type": "string",
-            "enum": ["and", "or"],
+            "enum": [
+              "and",
+              "or"
+            ],
             "default": "and",
             "description": "How to combine multiple conditions: `and` (all must match) or `or` (any must match)"
           }
         }
+      },
+      "BaseResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "isSuccess"
+        ]
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "trigger_type": {
+            "type": "string",
+            "enum": [
+              "event",
+              "user"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          },
+          "trigger_filters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "operator": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "numericThreshold": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          },
+          "recipient": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "email",
+                    "slack",
+                    "webhook"
+                  ]
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "type",
+                "value"
+              ]
+            }
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "has_secret": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "trigger_type",
+          "status",
+          "project_id"
+        ]
+      },
+      "Board": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the board is publicly accessible"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "enabled"
+        ]
+      },
+      "Chart": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "chart_type": {
+            "type": "string",
+            "enum": [
+              "table",
+              "number",
+              "funnel",
+              "bar",
+              "line",
+              "pie",
+              "stacked",
+              "user_paths",
+              "retention"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "query": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "board_id": {
+            "type": "string"
+          },
+          "x_axis": {
+            "type": "string",
+            "nullable": true
+          },
+          "y_axis": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "group_by": {
+            "type": "string",
+            "nullable": true
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "chart_type",
+          "title",
+          "query"
+        ]
+      },
+      "Contract": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "integer"
+          },
+          "address": {
+            "type": "string"
+          },
+          "start_block": {
+            "type": "integer"
+          },
+          "abi": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "anonymous": {
+                  "type": "boolean"
+                },
+                "inputs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "anonymous",
+                "inputs",
+                "name",
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "name",
+          "chain",
+          "address",
+          "abi",
+          "events"
+        ]
+      },
+      "Segment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "filterSet": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ]
+      },
+      "Profile": {
+        "type": "object",
+        "description": "Wallet profile data"
       }
     }
   },
@@ -817,17 +1216,19 @@
       "post": {
         "summary": "Track Event",
         "description": "Sends an event to the Formo Events API. Use the SDK Write Key from your project settings as the Bearer token for authentication.",
-        "operationId": "trackEvent",
-        "tags": ["Events API"],
+        "operationId": "ingestEvents",
+        "tags": [
+          "Events"
+        ],
         "servers": [
           {
             "url": "https://events.formo.so",
-            "description": "Events API"
+            "description": "Events"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "requestBody": {
@@ -835,49 +1236,57 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Event"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Event"
+                }
               },
-              "example": {
-                "type": "page",
-                "channel": "web",
-                "version": "0",
-                "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
-                "user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
-                "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
-                "event": "",
-                "context": {
-                  "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
-                  "locale": "en-GB",
-                  "timezone": "Africa/Lagos",
-                  "location": "NG",
-                  "ref": "",
-                  "referrer": "",
-                  "utm_campaign": "",
-                  "utm_content": "",
-                  "utm_medium": "",
-                  "utm_source": "",
-                  "utm_term": "",
-                  "page_title": "WalletConnect Content Cabal",
-                  "page_url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
-                  "library_name": "Formo Web SDK",
-                  "library_version": "1.25.0",
-                  "browser": "chrome",
-                  "screen_width": 393,
-                  "screen_height": 873,
-                  "screen_density": 2.75,
-                  "viewport_width": 392,
-                  "viewport_height": 735
-                },
-                "properties": {
-                  "url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
-                  "path": "/lByfTbeUSL_mxy_TN2m3d",
-                  "hash": "",
-                  "query": ""
-                },
-                "original_timestamp": "2025-04-23T13:15:17.000Z",
-                "sent_at": "2025-04-23T13:15:18.000Z",
-                "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
-              }
+              "example": [
+                {
+                  "type": "page",
+                  "channel": "client",
+                  "version": "0",
+                  "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
+                  "user_id": "a46e6878-1ed5-4a81-9185-83608df2fcb6",
+                  "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+                  "event": "",
+                  "context": {
+                    "user_agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+                    "locale": "en-GB",
+                    "timezone": "Africa/Lagos",
+                    "location": "NG",
+                    "ref": "",
+                    "referrer": "",
+                    "utm_campaign": "",
+                    "utm_content": "",
+                    "utm_medium": "",
+                    "utm_source": "",
+                    "utm_term": "",
+                    "page_title": "WalletConnect Content Cabal",
+                    "page_url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+                    "page_path": "/lByfTbeUSL_mxy_TN2m3d",
+                    "library_name": "Formo Web SDK",
+                    "library_version": "1.25.0",
+                    "browser": "chrome",
+                    "device": "mobile",
+                    "os": "Android",
+                    "screen_width": 393,
+                    "screen_height": 873,
+                    "screen_density": 2.75,
+                    "viewport_width": 392,
+                    "viewport_height": 735
+                  },
+                  "properties": {
+                    "url": "https://app.formo.so/lByfTbeUSL_mxy_TN2m3d",
+                    "path": "/lByfTbeUSL_mxy_TN2m3d",
+                    "hash": "",
+                    "query": ""
+                  },
+                  "original_timestamp": "2025-04-23T13:15:17.000Z",
+                  "sent_at": "2025-04-23T13:15:18.000Z",
+                  "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f"
+                }
+              ]
             }
           }
         },
@@ -923,18 +1332,21 @@
     "/v0/query": {
       "post": {
         "summary": "Run SQL query",
-        "description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements, and must include a LIMIT that is less than or equal to 1000.",
-        "operationId": "performSqlQueryPublic",
-        "tags": ["Query API"],
+        "description": "Executes a read-only SQL query against your project data. Requires a Workspace API Key with `query:read` permission. The API key must be included in the Authorization header as a Bearer token. Queries must be single SELECT/WITH statements, without comments or multiple statements. LIMIT is capped at 1,000,000.",
+        "operationId": "executeQuery",
+        "tags": [
+          "Query"
+        ],
+        "x-required-scope": "query:read",
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Query API"
+            "description": "Query"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "requestBody": {
@@ -946,10 +1358,26 @@
                 "properties": {
                   "query": {
                     "type": "string",
-                    "description": "SQL query to execute. Must be read-only (SELECT/WITH), single statement, no comments, and include LIMIT <= 1000."
+                    "description": "SQL query to execute. Must be read-only (SELECT/WITH), single statement, no comments. LIMIT is capped at 1,000,000."
                   }
                 },
-                "required": ["query"]
+                "required": [
+                  "query"
+                ],
+                "x-examples": {
+                  "dailyActiveUsers": {
+                    "summary": "Daily active users over last 30 days",
+                    "value": {
+                      "query": "SELECT toDate(timestamp) as date, uniq(anonymous_id) as dau FROM analytics_events WHERE timestamp >= now() - interval 30 day GROUP BY date ORDER BY date"
+                    }
+                  },
+                  "topEvents": {
+                    "summary": "Top 10 events by count",
+                    "value": {
+                      "query": "SELECT event, count() as total FROM analytics_events WHERE timestamp >= now() - interval 7 day GROUP BY event ORDER BY total DESC LIMIT 10"
+                    }
+                  }
+                }
               },
               "example": {
                 "query": "SELECT * FROM events LIMIT 100"
@@ -963,27 +1391,38 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PerformSqlQueryPublicResponse"
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PerformSqlQueryPublicResponse"
+                    }
+                  }
                 },
                 "example": {
-                  "data": [
-                    {
-                      "event": "page",
-                      "address": "0x123...",
-                      "timestamp": "2025-01-20T10:00:00Z"
+                  "isSuccess": true,
+                  "data": {
+                    "data": [
+                      {
+                        "event": "page",
+                        "address": "0x123...",
+                        "timestamp": "2025-01-20T10:00:00Z"
+                      }
+                    ],
+                    "meta": {
+                      "total": 120,
+                      "limit": 100,
+                      "offset": 0
                     }
-                  ],
-                  "meta": {
-                    "total": 120,
-                    "limit": 100,
-                    "offset": 0
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Bad Request - Query missing/invalid or limit over 1000",
+            "description": "Bad Request - Query missing/invalid or limit over 1,000,000",
             "content": {
               "application/json": {
                 "schema": {
@@ -1064,20 +1503,23 @@
       }
     },
     "/v0/profiles": {
-      "post": {
+      "get": {
         "summary": "Search Wallet Profiles",
         "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports advanced filtering by user data, on-chain activity, chains, apps, tokens, labels, and lifecycle. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
-        "operationId": "searchWalletProfiles",
-        "tags": ["Profiles API"],
+        "operationId": "searchProfiles",
+        "tags": [
+          "Profiles"
+        ],
+        "x-required-scope": "profiles:read",
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Profiles API"
+            "description": "Profiles"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "parameters": [
@@ -1105,7 +1547,19 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["last_onchain", "first_onchain", "net_worth_usd", "updated_at", "tx_count", "first_seen", "last_seen", "num_sessions", "revenue", "volume", "points"]
+              "enum": [
+                "last_onchain",
+                "first_onchain",
+                "net_worth_usd",
+                "updated_at",
+                "tx_count",
+                "first_seen",
+                "last_seen",
+                "num_sessions",
+                "revenue",
+                "volume",
+                "points"
+              ]
             },
             "description": "Field to sort results by. Default: last_onchain"
           },
@@ -1115,7 +1569,10 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"]
+              "enum": [
+                "asc",
+                "desc"
+              ]
             },
             "description": "Sort direction. Default: desc"
           },
@@ -1155,7 +1612,11 @@
                   "summary": "Find high net worth users",
                   "value": {
                     "conditions": [
-                      { "field": "users.net_worth_usd", "op": "gt", "value": 10000 }
+                      {
+                        "field": "users.net_worth_usd",
+                        "op": "gt",
+                        "value": 10000
+                      }
                     ],
                     "logic": "and"
                   }
@@ -1164,7 +1625,11 @@
                   "summary": "Find users with >$5,000 on Ethereum",
                   "value": {
                     "conditions": [
-                      { "field": "chains.1.balance", "op": "gt", "value": 5000 }
+                      {
+                        "field": "chains.1.balance",
+                        "op": "gt",
+                        "value": 5000
+                      }
                     ],
                     "logic": "and"
                   }
@@ -1173,8 +1638,16 @@
                   "summary": "Find power users with ENS",
                   "value": {
                     "conditions": [
-                      { "field": "users.lifecycle", "op": "eq", "value": "Power user" },
-                      { "field": "users.ens", "op": "eq", "value": true }
+                      {
+                        "field": "users.lifecycle",
+                        "op": "eq",
+                        "value": "Power user"
+                      },
+                      {
+                        "field": "users.ens",
+                        "op": "eq",
+                        "value": true
+                      }
                     ],
                     "logic": "and"
                   }
@@ -1183,7 +1656,11 @@
                   "summary": "Find Coinbase verified users",
                   "value": {
                     "conditions": [
-                      { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" }
+                      {
+                        "field": "labels.coinbase.verified_account",
+                        "op": "eq",
+                        "value": "true"
+                      }
                     ],
                     "logic": "and"
                   }
@@ -1192,8 +1669,16 @@
                   "summary": "Find users with Uniswap or Aave activity",
                   "value": {
                     "conditions": [
-                      { "field": "apps.uniswap.balance", "op": "gt", "value": 0 },
-                      { "field": "apps.aave.balance", "op": "gt", "value": 0 }
+                      {
+                        "field": "apps.uniswap.balance",
+                        "op": "gt",
+                        "value": 0
+                      },
+                      {
+                        "field": "apps.aave.balance",
+                        "op": "gt",
+                        "value": 0
+                      }
                     ],
                     "logic": "or"
                   }
@@ -1223,9 +1708,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SearchProfileResponse"
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SearchProfileResponse"
+                    }
+                  }
                 },
                 "example": {
+                  "isSuccess": true,
+                  "data": {
                   "data": [
                     {
                       "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
@@ -1261,6 +1756,7 @@
                     "total": 150,
                     "limit": 100,
                     "offset": 0
+                  }
                   }
                 }
               }
@@ -1379,17 +1875,20 @@
       "get": {
         "summary": "Get Wallet Profile",
         "description": "Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
-        "operationId": "getWalletProfile",
-        "tags": ["Profiles API"],
+        "operationId": "getProfile",
+        "tags": [
+          "Profiles"
+        ],
+        "x-required-scope": "profiles:read",
         "servers": [
           {
             "url": "https://api.formo.so",
-            "description": "Profiles API"
+            "description": "Profiles"
           }
         ],
         "security": [
           {
-            "BearerAuth": []
+            "WorkspaceApiKey": []
           }
         ],
         "parameters": [
@@ -1418,9 +1917,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProfileResponse"
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProfileResponse"
+                    }
+                  }
                 },
                 "example": {
+                  "isSuccess": true,
+                  "data": {
                   "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
                   "net_worth_usd": 125000.5,
                   "ens": "vitalik.eth",
@@ -1474,13 +1983,17 @@
                   "last_properties": "{\"page\":\"/home\"}",
                   "num_sessions": 45,
                   "revenue": 1500.75,
-                  "volume": 50000.0,
+                  "volume": 50000,
                   "points": 2500,
-                  "activity_dates": ["2024-01-15", "2024-01-16", "2024-01-20"],
+                  "activity_dates": [
+                    "2024-01-15",
+                    "2024-01-16",
+                    "2024-01-20"
+                  ],
                   "chains": [
                     {
                       "chain_id": "1",
-                      "net_worth_usd": 100000.0,
+                      "net_worth_usd": 100000,
                       "tx_count": 1000,
                       "first_onchain": "2024-01-15T10:30:00Z",
                       "last_onchain": "2025-01-20T14:22:00Z"
@@ -1508,7 +2021,7 @@
                       "name": "Uniswap",
                       "img": "https://example.com/uniswap.png",
                       "url": "https://uniswap.org",
-                      "balance_usd": 50000.0
+                      "balance_usd": 50000
                     }
                   ],
                   "tokens": [
@@ -1520,11 +2033,12 @@
                       "symbol": "USDC",
                       "img": "https://example.com/usdc.png",
                       "decimals": 6,
-                      "price": 1.0,
+                      "price": 1,
                       "balance": "1000000000",
-                      "balance_usd": 1000.0
+                      "balance_usd": 1000
                     }
                   ]
+                  }
                 }
               }
             }
@@ -1630,6 +2144,2155 @@
           }
         }
       }
+    },
+    "/v0/alerts": {
+      "get": {
+        "operationId": "listAlerts",
+        "summary": "List alerts",
+        "description": "List all alerts for the project scoped to the API key.",
+        "tags": [
+          "Alerts"
+        ],
+        "x-required-scope": "alerts:read",
+        "responses": {
+          "200": {
+            "description": "List of alerts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Alert"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Alerts"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createAlert",
+        "summary": "Create alert",
+        "description": "Create a new alert for the project.",
+        "tags": [
+          "Alerts"
+        ],
+        "x-required-scope": "alerts:write",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "trigger_type": {
+                    "type": "string",
+                    "enum": [
+                      "event",
+                      "user"
+                    ]
+                  },
+                  "trigger_filters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "operator": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        },
+                        "numericThreshold": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value"
+                      ]
+                    }
+                  },
+                  "recipient": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "email",
+                            "slack",
+                            "webhook"
+                          ]
+                        },
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "secret": {
+                    "type": "string",
+                    "description": "Webhook signing secret"
+                  }
+                },
+                "required": [
+                  "name",
+                  "trigger_type",
+                  "trigger_filters"
+                ],
+                "x-examples": {
+                  "eventAlertWithWebhook": {
+                    "summary": "Alert on swap events from mobile devices with webhook",
+                    "value": {
+                      "name": "Mobile swap alert",
+                      "trigger_type": "event",
+                      "trigger_filters": [
+                        {
+                          "name": "type",
+                          "value": "swap",
+                          "operator": "equals"
+                        },
+                        {
+                          "name": "device",
+                          "value": "mobile",
+                          "operator": "equals"
+                        },
+                        {
+                          "name": "volume",
+                          "value": "1000",
+                          "operator": "greater",
+                          "numericThreshold": "1000"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "webhook",
+                          "value": [
+                            "https://hooks.myapp.com/formo-alerts"
+                          ]
+                        },
+                        {
+                          "type": "email",
+                          "value": [
+                            "alerts@myapp.com"
+                          ]
+                        }
+                      ],
+                      "secret": "whsec_mysigningsecret123"
+                    }
+                  },
+                  "eventAlertWithUtmFilter": {
+                    "summary": "Alert on events from specific UTM campaigns",
+                    "value": {
+                      "name": "Paid campaign activity",
+                      "trigger_type": "event",
+                      "trigger_filters": [
+                        {
+                          "name": "type",
+                          "value": "purchase"
+                        },
+                        {
+                          "name": "utm_source",
+                          "value": "google",
+                          "operator": "equals"
+                        },
+                        {
+                          "name": "utm_medium",
+                          "value": "cpc",
+                          "operator": "equals"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "slack",
+                          "value": [
+                            "#marketing-alerts|https://hooks.slack.com/services/T00/B00/xxx"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "userAlertWithLocationFilter": {
+                    "summary": "Alert when new users spike from a specific country",
+                    "value": {
+                      "name": "US user spike",
+                      "trigger_type": "user",
+                      "trigger_filters": [
+                        {
+                          "name": "location",
+                          "value": "US",
+                          "operator": "equals"
+                        },
+                        {
+                          "name": "net_worth_usd",
+                          "value": "10000",
+                          "operator": "greaterOrEqual",
+                          "numericThreshold": "10000"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "email",
+                          "value": [
+                            "team@myapp.com"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "eventAlertWithNumericThreshold": {
+                    "summary": "Alert when users hold >5 tokens in a specific app",
+                    "value": {
+                      "name": "High token holder alert",
+                      "trigger_type": "event",
+                      "trigger_filters": [
+                        {
+                          "name": "apps",
+                          "value": "uniswap",
+                          "operator": "greater",
+                          "numericThreshold": "5"
+                        },
+                        {
+                          "name": "chains",
+                          "value": "1",
+                          "operator": "greaterOrEqual",
+                          "numericThreshold": "3"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "webhook",
+                          "value": [
+                            "https://hooks.myapp.com/token-alerts"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Alert created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Alert"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Alerts"
+          }
+        ]
+      }
+    },
+    "/v0/alerts/{alertId}": {
+      "get": {
+        "operationId": "getAlert",
+        "summary": "Get alert",
+        "tags": [
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Alert"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "alerts:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Alerts"
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateAlert",
+        "summary": "Update alert",
+        "tags": [
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "trigger_type": {
+                    "type": "string",
+                    "enum": [
+                      "event",
+                      "user"
+                    ]
+                  },
+                  "trigger_filters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "recipient": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "secret": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "trigger_type",
+                  "trigger_filters"
+                ],
+                "x-examples": {
+                  "updateRecipients": {
+                    "summary": "Update alert recipients",
+                    "value": {
+                      "name": "Mobile swap alert (updated)",
+                      "trigger_type": "event",
+                      "trigger_filters": [
+                        {
+                          "name": "type",
+                          "value": "swap"
+                        },
+                        {
+                          "name": "device",
+                          "value": "mobile"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "webhook",
+                          "value": [
+                            "https://hooks.myapp.com/v2/alerts"
+                          ]
+                        },
+                        {
+                          "type": "slack",
+                          "value": [
+                            "#alerts|https://hooks.slack.com/services/T00/B00/new"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Alert"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "alerts:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Alerts"
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAlert",
+        "summary": "Delete alert",
+        "tags": [
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "alerts:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Alerts"
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "toggleAlertStatus",
+        "summary": "Toggle alert status",
+        "tags": [
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "inactive"
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "x-examples": {
+                  "activate": {
+                    "summary": "Activate alert",
+                    "value": {
+                      "status": "active"
+                    }
+                  },
+                  "deactivate": {
+                    "summary": "Deactivate alert",
+                    "value": {
+                      "status": "inactive"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert status updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Alert"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "alerts:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Alerts"
+          }
+        ]
+      }
+    },
+    "/v0/boards": {
+      "get": {
+        "operationId": "listBoards",
+        "summary": "List boards",
+        "tags": [
+          "Boards"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of boards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Board"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Boards"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createBoard",
+        "summary": "Create board",
+        "description": "Create a new empty board.",
+        "tags": [
+          "Boards"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Board created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Board"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Boards"
+          }
+        ]
+      }
+    },
+    "/v0/boards/{boardId}": {
+      "get": {
+        "operationId": "getBoard",
+        "summary": "Get board",
+        "tags": [
+          "Boards"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Board details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Board"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Boards"
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateBoard",
+        "summary": "Update board",
+        "tags": [
+          "Boards"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "isPublic": {
+                    "type": "boolean",
+                    "description": "Whether the board is publicly accessible"
+                  }
+                },
+                "x-examples": {
+                  "updateTitle": {
+                    "summary": "Update board title",
+                    "value": {
+                      "title": "Weekly Dashboard"
+                    }
+                  },
+                  "makePublic": {
+                    "summary": "Make board publicly accessible",
+                    "value": {
+                      "isPublic": true
+                    }
+                  },
+                  "fullUpdate": {
+                    "summary": "Update all fields",
+                    "value": {
+                      "title": "Revenue Dashboard",
+                      "description": "Weekly revenue metrics and KPIs",
+                      "isPublic": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Board updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Board"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:write",
+        "description": "Update board title, description, and/or public visibility.",
+        "x-examples": {
+          "updateTitle": {
+            "summary": "Update board title",
+            "value": {
+              "title": "Weekly Dashboard"
+            }
+          },
+          "makePublic": {
+            "summary": "Make board public",
+            "value": {
+              "isPublic": true
+            }
+          },
+          "fullUpdate": {
+            "summary": "Update all fields",
+            "value": {
+              "title": "Revenue Dashboard",
+              "description": "Weekly revenue metrics",
+              "isPublic": true
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Boards"
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteBoard",
+        "summary": "Delete board",
+        "description": "Delete a board and all its charts.",
+        "tags": [
+          "Boards"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Board deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Board"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Boards"
+          }
+        ]
+      }
+    },
+    "/v0/boards/{boardId}/charts": {
+      "get": {
+        "operationId": "listCharts",
+        "summary": "List charts for a board",
+        "tags": [
+          "Charts"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Charts with executed query results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "charts": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Chart"
+                          }
+                        },
+                        "board": {
+                          "$ref": "#/components/schemas/Board"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Charts"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createChart",
+        "summary": "Create chart",
+        "tags": [
+          "Charts"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "SQL query for the chart"
+                  },
+                  "chart_type": {
+                    "type": "string",
+                    "enum": [
+                      "table",
+                      "number",
+                      "funnel",
+                      "bar",
+                      "line",
+                      "pie",
+                      "stacked",
+                      "user_paths",
+                      "retention"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "x_axis": {
+                    "type": "string"
+                  },
+                  "y_axis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "group_by": {
+                    "type": "string"
+                  },
+                  "steps": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "settings": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "query",
+                  "chart_type",
+                  "title"
+                ],
+                "x-examples": {
+                  "barChart": {
+                    "summary": "Daily active users bar chart",
+                    "value": {
+                      "query": "SELECT toDate(timestamp) as date, uniq(anonymous_id) as users FROM analytics_events WHERE timestamp >= now() - interval 30 day GROUP BY date ORDER BY date",
+                      "chart_type": "bar",
+                      "title": "Daily Active Users",
+                      "x_axis": "date",
+                      "y_axis": [
+                        "users"
+                      ]
+                    }
+                  },
+                  "pieChart": {
+                    "summary": "Traffic by device type",
+                    "value": {
+                      "query": "SELECT device, count() as visits FROM analytics_events WHERE timestamp >= now() - interval 7 day GROUP BY device ORDER BY visits DESC LIMIT 5",
+                      "chart_type": "pie",
+                      "title": "Traffic by Device",
+                      "y_axis": [
+                        "visits"
+                      ]
+                    }
+                  },
+                  "numberChart": {
+                    "summary": "Total revenue KPI",
+                    "value": {
+                      "query": "SELECT sum(value) as total_revenue FROM analytics_events WHERE event = 'purchase' AND timestamp >= now() - interval 30 day",
+                      "chart_type": "number",
+                      "title": "Monthly Revenue"
+                    }
+                  },
+                  "funnelChart": {
+                    "summary": "Funnel with event property filters (e.g. rdns = metamask)",
+                    "value": {
+                      "query": "SELECT 1",
+                      "chart_type": "funnel",
+                      "title": "MetaMask Conversion Funnel",
+                      "steps": [
+                        {
+                          "type": "event",
+                          "event": "page"
+                        },
+                        {
+                          "type": "event",
+                          "event": "connect",
+                          "rdns": {
+                            "op": "equals",
+                            "value": "io.metamask"
+                          },
+                          "chain_id": {
+                            "op": "equals",
+                            "value": "1"
+                          }
+                        },
+                        {
+                          "type": "event",
+                          "event": "transaction"
+                        }
+                      ],
+                      "settings": {
+                        "funnelType": "closed",
+                        "conversionWindow": {
+                          "value": 7,
+                          "unit": "day"
+                        }
+                      }
+                    }
+                  },
+                  "funnelWithBreakdown": {
+                    "summary": "3-step funnel with device breakdown",
+                    "value": {
+                      "query": "SELECT 1",
+                      "chart_type": "funnel",
+                      "title": "Onboarding Funnel by Device",
+                      "steps": [
+                        {
+                          "type": "event",
+                          "event": "page"
+                        },
+                        {
+                          "type": "event",
+                          "event": "connect"
+                        },
+                        {
+                          "type": "event",
+                          "event": "signature"
+                        }
+                      ],
+                      "settings": {
+                        "funnelType": "closed",
+                        "conversionWindow": {
+                          "value": 30,
+                          "unit": "day"
+                        },
+                        "breakdown": "device"
+                      }
+                    }
+                  },
+                  "stackedChart": {
+                    "summary": "Revenue by UTM campaign over time",
+                    "value": {
+                      "query": "SELECT toDate(timestamp) as date, utm_campaign, sum(value) as revenue FROM analytics_events WHERE event = 'purchase' AND timestamp >= now() - interval 30 day GROUP BY date, utm_campaign ORDER BY date",
+                      "chart_type": "stacked",
+                      "title": "Revenue by Campaign",
+                      "x_axis": "date",
+                      "y_axis": [
+                        "revenue"
+                      ],
+                      "group_by": "utm_campaign"
+                    }
+                  },
+                  "retentionChart": {
+                    "summary": "Weekly retention filtered to transaction events on desktop",
+                    "value": {
+                      "query": "",
+                      "chart_type": "retention",
+                      "title": "Weekly User Retention",
+                      "settings": {
+                        "retentionFilter": {
+                          "type": "event",
+                          "event": "transaction"
+                        },
+                        "retentionUserFilters": [
+                          {
+                            "operand": "device",
+                            "operator": "equals",
+                            "value": "desktop"
+                          },
+                          {
+                            "operand": "utm_source",
+                            "operator": "notEquals",
+                            "value": "direct"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "retentionChartUnfiltered": {
+                    "summary": "Basic retention (all users, no filters)",
+                    "value": {
+                      "query": "",
+                      "chart_type": "retention",
+                      "title": "Overall Retention"
+                    }
+                  },
+                  "userPathsChart": {
+                    "summary": "User flow from connect with max 5 steps",
+                    "value": {
+                      "query": "SELECT anonymous_id, event, timestamp FROM analytics_events WHERE timestamp >= now() - interval 30 day ORDER BY anonymous_id, timestamp",
+                      "chart_type": "user_paths",
+                      "title": "Post-Connect User Flow",
+                      "settings": {
+                        "startStep": {
+                          "type": "event",
+                          "event": "connect"
+                        },
+                        "endStep": {
+                          "type": "event",
+                          "event": "transaction"
+                        },
+                        "maxSteps": 5
+                      }
+                    }
+                  },
+                  "userPathsOpenEnded": {
+                    "summary": "Open-ended user flow from page view",
+                    "value": {
+                      "query": "SELECT anonymous_id, event, timestamp FROM analytics_events WHERE timestamp >= now() - interval 14 day ORDER BY anonymous_id, timestamp",
+                      "chart_type": "user_paths",
+                      "title": "User Discovery Paths",
+                      "settings": {
+                        "startStep": {
+                          "type": "event",
+                          "event": "page"
+                        },
+                        "maxSteps": 8,
+                        "nodesPerStep": 10
+                      }
+                    }
+                  },
+                  "tableChart": {
+                    "summary": "Top pages by unique visitors",
+                    "value": {
+                      "query": "SELECT pathname, uniq(anonymous_id) as visitors, count() as pageviews FROM analytics_events WHERE event = 'page_view' AND timestamp >= now() - interval 7 day GROUP BY pathname ORDER BY visitors DESC LIMIT 20",
+                      "chart_type": "table",
+                      "title": "Top Pages This Week"
+                    }
+                  },
+                  "funnelWithMultiplePropertyFilters": {
+                    "summary": "Funnel with device/country filters on steps",
+                    "value": {
+                      "query": "SELECT 1",
+                      "chart_type": "funnel",
+                      "title": "Mobile Onboarding Funnel",
+                      "steps": [
+                        {
+                          "type": "event",
+                          "event": "page",
+                          "device": {
+                            "op": "equals",
+                            "value": "mobile"
+                          },
+                          "country": {
+                            "op": "notEquals",
+                            "value": "CN"
+                          }
+                        },
+                        {
+                          "type": "event",
+                          "event": "connect",
+                          "provider_name": {
+                            "op": "in",
+                            "value": "metamask|rainbow|coinbase"
+                          }
+                        },
+                        {
+                          "type": "event",
+                          "event": "transaction"
+                        }
+                      ],
+                      "settings": {
+                        "funnelType": "open",
+                        "conversionWindow": {
+                          "value": 30,
+                          "unit": "day"
+                        },
+                        "breakdown": "device"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Chart created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "string",
+                      "description": "Chart ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Charts"
+          }
+        ]
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}": {
+      "get": {
+        "operationId": "getChart",
+        "summary": "Get chart",
+        "tags": [
+          "Charts"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chart details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Chart"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Charts"
+          }
+        ]
+      },
+      "put": {
+        "operationId": "editChart",
+        "summary": "Edit chart",
+        "tags": [
+          "Charts"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  },
+                  "chart_type": {
+                    "type": "string",
+                    "enum": [
+                      "table",
+                      "number",
+                      "funnel",
+                      "bar",
+                      "line",
+                      "pie",
+                      "stacked",
+                      "user_paths",
+                      "retention"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "x_axis": {
+                    "type": "string"
+                  },
+                  "y_axis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "group_by": {
+                    "type": "string"
+                  },
+                  "steps": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "settings": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "query",
+                  "chart_type",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chart updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "string",
+                      "description": "Chart ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Charts"
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteChart",
+        "summary": "Delete chart",
+        "tags": [
+          "Charts"
+        ],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chart deleted"
+          }
+        },
+        "x-required-scope": "boards:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Charts"
+          }
+        ]
+      }
+    },
+    "/v0/contracts": {
+      "get": {
+        "operationId": "listContracts",
+        "summary": "List contracts",
+        "tags": [
+          "Contracts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Contracts with deployment diff info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "contracts": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Contract"
+                          }
+                        },
+                        "deployAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true
+                        },
+                        "deployDiff": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "contracts:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Contracts"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createContract",
+        "summary": "Create contract",
+        "description": "Add a blockchain contract to monitor.",
+        "tags": [
+          "Contracts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "description": "EVM contract address"
+                  },
+                  "chain": {
+                    "type": "integer",
+                    "description": "Chain ID"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "abi": {
+                    "type": "string",
+                    "description": "JSON-stringified ABI"
+                  },
+                  "events": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "anonymous": {
+                          "type": "boolean"
+                        },
+                        "inputs": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "anonymous",
+                        "inputs",
+                        "name",
+                        "type"
+                      ]
+                    }
+                  },
+                  "start_block": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "address",
+                  "chain",
+                  "name",
+                  "abi",
+                  "events"
+                ],
+                "x-examples": {
+                  "erc20Token": {
+                    "summary": "Monitor ERC-20 Transfer events",
+                    "value": {
+                      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                      "chain": 1,
+                      "name": "USDC",
+                      "abi": "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"}]",
+                      "events": [
+                        {
+                          "anonymous": false,
+                          "inputs": [
+                            {
+                              "indexed": true,
+                              "internalType": "address",
+                              "name": "from",
+                              "type": "address"
+                            },
+                            {
+                              "indexed": true,
+                              "internalType": "address",
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "indexed": false,
+                              "internalType": "uint256",
+                              "name": "value",
+                              "type": "uint256"
+                            }
+                          ],
+                          "name": "Transfer",
+                          "type": "event"
+                        }
+                      ],
+                      "start_block": 18000000
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Contract created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Contract"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "contracts:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Contracts"
+          }
+        ]
+      }
+    },
+    "/v0/contracts/{chain}/{address}": {
+      "put": {
+        "operationId": "updateContract",
+        "summary": "Update contract",
+        "tags": [
+          "Contracts"
+        ],
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string"
+                  },
+                  "chain": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "abi": {
+                    "type": "string"
+                  },
+                  "events": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "start_block": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "address",
+                  "chain",
+                  "name",
+                  "abi",
+                  "events"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contract updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Contract"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "contracts:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Contracts"
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteContract",
+        "summary": "Delete contract",
+        "tags": [
+          "Contracts"
+        ],
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contract deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "contracts:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Contracts"
+          }
+        ]
+      }
+    },
+    "/v0/segments": {
+      "get": {
+        "operationId": "listSegments",
+        "summary": "List segments",
+        "tags": [
+          "Segments"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of segments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Segment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "segments:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Segments"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createSegment",
+        "summary": "Create segment",
+        "tags": [
+          "Segments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "filterSets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "title",
+                  "filterSets"
+                ],
+                "x-examples": {
+                  "highValueMobileUsers": {
+                    "summary": "High-value mobile users from paid campaigns",
+                    "value": {
+                      "title": "High-value mobile users",
+                      "filterSets": [
+                        "device::equals::mobile",
+                        "net_worth_usd::greaterOrEqual::10000",
+                        "utm_source::equals::paid_ads"
+                      ]
+                    }
+                  },
+                  "multiDeviceChromeSafari": {
+                    "summary": "Chrome or Safari users (multi-value filter)",
+                    "value": {
+                      "title": "Chrome/Safari users",
+                      "filterSets": [
+                        "browser::in::Chrome|Safari"
+                      ]
+                    }
+                  },
+                  "excludeUSUsers": {
+                    "summary": "All users except from the US",
+                    "value": {
+                      "title": "Non-US users",
+                      "filterSets": [
+                        "location::notEquals::US"
+                      ]
+                    }
+                  },
+                  "powerUsers": {
+                    "summary": "Power users with high transaction count from organic traffic",
+                    "value": {
+                      "title": "Organic power users",
+                      "filterSets": [
+                        "tx_count::greater::100",
+                        "utm_source::notIn::google_ads|facebook_ads",
+                        "lifecycle::equals::power"
+                      ]
+                    }
+                  },
+                  "multiChainWhaleUsers": {
+                    "summary": "Users active on 3+ chains with high net worth",
+                    "value": {
+                      "title": "Multi-chain whales",
+                      "filterSets": [
+                        "chains::greaterOrEqual::3",
+                        "net_worth_usd::greater::100000",
+                        "apps::greater::5"
+                      ]
+                    }
+                  },
+                  "behavioralFilterSimple": {
+                    "summary": "Users who performed 'signature' event at least once in last 30 days",
+                    "description": "Behavioural filters use the 'events' operand with a base64-encoded JSON array as the value.",
+                    "value": {
+                      "title": "Recent signers",
+                      "filterSets": [
+                        "events::equals::W3siZXZlbnQiOiAic2lnbmF0dXJlIiwgIm9wZXJhdG9yIjogImdyZWF0ZXJPckVxdWFsIiwgInRpbWVzIjogMSwgInByZXNldCI6ICJsYXN0XzMwZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0wOS0xOSIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifV0="
+                      ]
+                    }
+                  },
+                  "behavioralFilterWithProperties": {
+                    "summary": "Users who connected via MetaMask on Ethereum mainnet + from India",
+                    "description": "Combines a behavioural filter and a demographic filter.",
+                    "value": {
+                      "title": "Indian MetaMask users",
+                      "filterSets": [
+                        "events::equals::W3siZXZlbnQiOiAiY29ubmVjdCIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5IiwgInJkbnMiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICJpby5tZXRhbWFzayJ9LCAiY2hhaW5faWQiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICIxIn19XQ==",
+                        "location::equals::IN"
+                      ]
+                    }
+                  },
+                  "behavioralFilterMultipleEvents": {
+                    "summary": "Users with 5+ page views last week AND at least 1 transaction last month",
+                    "description": "Multiple behavioural events in a single filter. Valid event types: page, screen, connect, disconnect, chain, signature, transaction, track, decoded_log, detect, identify.",
+                    "value": {
+                      "title": "Active transactors",
+                      "filterSets": [
+                        "events::equals::W3siZXZlbnQiOiAicGFnZSIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDUsICJwcmVzZXQiOiAibGFzdF83ZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0xMC0xMiIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifSwgeyJldmVudCI6ICJ0cmFuc2FjdGlvbiIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5In1d",
+                        "device::equals::desktop"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Segment created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Segment"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "segments:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Segments"
+          }
+        ]
+      }
+    },
+    "/v0/segments/{segmentId}": {
+      "delete": {
+        "operationId": "deleteSegment",
+        "summary": "Delete segment",
+        "tags": [
+          "Segments"
+        ],
+        "parameters": [
+          {
+            "name": "segmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Segment deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "segments:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Segments"
+          }
+        ]
+      }
+    },
+    "/v0/import": {
+      "post": {
+        "operationId": "importWallets",
+        "summary": "Import wallet addresses",
+        "description": "Import wallet addresses into the project. Requires profiles:write scope and Scale/Enterprise plan.",
+        "tags": [
+          "Profiles"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "addresses": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Wallet addresses to import"
+                  },
+                  "writeKey": {
+                    "type": "string",
+                    "description": "SDK write key"
+                  }
+                },
+                "required": [
+                  "addresses",
+                  "writeKey"
+                ],
+                "x-examples": {
+                  "importWallets": {
+                    "summary": "Import wallet addresses",
+                    "value": {
+                      "addresses": [
+                        "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                        "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+                      ],
+                      "writeKey": "sk_write_xxxxx"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Wallets imported successfully"
+          }
+        },
+        "x-required-scope": "profiles:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Profiles"
+          }
+        ]
+      }
     }
-  }
+  },
+  "x-api-scopes": {
+    "description": "API key scopes control access to endpoints. Create keys with the required scopes in Team Settings > API Keys.",
+    "scopes": {
+      "alerts:read": "List and get alerts",
+      "alerts:write": "Create, update, delete alerts (requires alerts:read)",
+      "boards:read": "List and get boards and charts",
+      "boards:write": "Create, update, delete boards and charts (requires boards:read)",
+      "contracts:read": "List contracts",
+      "contracts:write": "Create, update, delete contracts (requires contracts:read)",
+      "segments:read": "List segments",
+      "segments:write": "Create and delete segments (requires segments:read)",
+      "profiles:read": "Search and get wallet profiles",
+      "profiles:write": "Import wallet addresses (requires profiles:read)",
+      "query:read": "Execute SQL analytics queries",
+      "mcp:read": "MCP protocol access (analytics tools + management tools based on other scopes)"
+    }
+  },
+  "tags": [
+    {
+      "name": "Alerts",
+      "description": "Manage project alerts and notifications"
+    },
+    {
+      "name": "Boards",
+      "description": "Manage dashboard boards"
+    },
+    {
+      "name": "Charts",
+      "description": "Manage charts within boards"
+    },
+    {
+      "name": "Contracts",
+      "description": "Manage blockchain contract monitoring"
+    },
+    {
+      "name": "Segments",
+      "description": "Manage user segments"
+    },
+    {
+      "name": "Profiles",
+      "description": "Wallet profiles and import"
+    },
+    {
+      "name": "Query",
+      "description": "Execute SQL analytics queries"
+    },
+    {
+      "name": "Events",
+      "description": "Event ingestion API (events.formo.so)"
+    }
+  ]
 }
