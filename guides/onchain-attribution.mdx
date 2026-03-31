@@ -1,5 +1,6 @@
 ---
-title: 'Attribution for Crypto Marketing'
+title: 'How to Set Up Marketing Attribution'
+sidebarTitle: 'How to Set Up Attribution'
 description: 'Track the complete user journey from first touch to onchain conversion with multi-touch attribution for crypto marketing campaigns.'
 ---
 
@@ -11,13 +12,6 @@ Understand which marketing channels actually drive onchain conversions, not just
 - Understand first-touch vs. last-touch attribution
 - Measure true ROI by channel (to the transaction level)
 - Optimize budget allocation based on conversion data
-
-## Prerequisites
-
-- Formo SDK installed ([Installation Guide](/install))
-- Active marketing campaigns to track
-
----
 
 ## Part 1: The Attribution Challenge in Crypto
 
@@ -44,7 +38,6 @@ A typical onchain user touches multiple channels:
 
 Each touchpoint matters. The question is: which one gets credit?
 
----
 
 ## Part 2: How to Set Up UTM Tracking
 
@@ -103,9 +96,66 @@ Use consistent naming to make analysis easier:
 - Underscores for spaces
 - Include date/month for campaigns: `campaign_name_mmyy`
 
----
 
-## Part 3: Understand Attribution Models
+## Part 3: How to Set Up Referral Tracking
+
+Referral programs are a powerful growth channel for crypto apps. Formo automatically captures referral codes alongside UTM parameters.
+
+### Referral code basics
+
+Add a `ref` parameter to your referral links:
+
+```
+https://yourapp.xyz/?ref=alice
+```
+
+When a user lands with a `ref` parameter, Formo captures it and associates it with the user's session. You can then attribute wallet connects and transactions back to the referrer.
+
+### Where to add referral codes
+
+**User-generated referral links:**
+```
+https://yourapp.xyz/?ref=0x1234...abcd
+```
+
+**Partner referral links:**
+```
+https://yourapp.xyz/?ref=partner_name
+```
+
+**Influencer referral links (combine with UTMs for full attribution):**
+```
+https://yourapp.xyz/?ref=influencer_handle&utm_source=twitter&utm_medium=social&utm_campaign=influencer_jan
+```
+
+### Referral naming conventions
+
+| Bad | Good |
+|-----|------|
+| Mixed case (`Alice`, `alice`, `ALICE`) | Always lowercase (`alice`) |
+| Spaces or special characters (`my ref`) | Underscores only (`my_ref`) |
+| Generic names (`partner1`) | Descriptive names (`uniswap_collab`) |
+
+### Analyze referral performance
+
+Use **Ask AI** or the **Explorer** to query referral data:
+
+> "Show me wallet connects and transactions grouped by ref parameter for the last 30 days"
+
+```sql
+SELECT
+  JSONExtractString(properties, 'ref') AS referrer,
+  countDistinct(address) AS wallets,
+  count(*) AS transactions
+FROM events
+WHERE JSONExtractString(properties, 'ref') != ''
+  AND timestamp >= now() - INTERVAL 30 DAY
+GROUP BY referrer
+ORDER BY wallets DESC
+```
+
+
+## Part 4: Understand Attribution Models
 
 Formo supports multiple attribution models. Each gives credit differently.
 
@@ -156,9 +206,8 @@ Formo supports multiple attribution models. Each gives credit differently.
 | Optimize conversions | Last-touch | Shows what pushes users to convert |
 | Balanced view | Linear | Values the full journey |
 
----
 
-## Part 4: How to Analyze Attribution in Formo
+## Part 5: How to Analyze Attribution in Formo
 
 ### View attribution in Overview
 
@@ -201,9 +250,8 @@ Cost per Transaction = Campaign Spend / Transactions from Campaign
 
 In this example, Twitter Ads has the best ROI.
 
----
 
-## Part 5: How to Create Attribution Reports
+## Part 6: How to Create Attribution Reports
 
 ### Using Ask AI for attribution analysis
 
@@ -237,15 +285,14 @@ Create a dedicated attribution dashboard:
 Create funnels filtered by source:
 
 <Steps>
-  <Step title="Go to Funnels > Create Funnel" />
+  <Step title="Go to Dashboards, click Create Chart, and select the Funnel chart type" />
   <Step title="Add steps: Visit → Connect → Transaction" />
   <Step title="Add breakdown by UTM Source" />
   <Step title="Compare conversion rates across channels" />
 </Steps>
 
----
 
-## Part 6: How to Optimize Your Marketing
+## Part 7: How to Optimize Your Marketing
 
 ### Identify your best channels
 
@@ -296,9 +343,8 @@ Twitter (awareness) → DeFiLlama (research) → Direct (conversion)
 
 All three channels contributed. Cutting Twitter would reduce DeFiLlama traffic.
 
----
 
-## Part 7: Advanced Attribution Tactics
+## Part 8: Advanced Attribution Tactics
 
 ### Cross-channel attribution
 
@@ -307,16 +353,6 @@ Track users across marketing channels:
 - Use consistent UTM naming
 - Track first-touch and last-touch separately
 - Analyze common paths with Flows
-
-### Referral program tracking
-
-For referral programs:
-
-```
-?ref=referrer_username
-```
-
-The `ref` parameter is automatically captured by Formo alongside UTM parameters.
 
 ### Cohort-based attribution
 
@@ -333,43 +369,49 @@ Compare user quality by acquisition cohort:
 | Discord | 25% | $120 |
 | DeFiLlama | 35% | $200 |
 
----
+
+## Attribution checklist
+
+- [ ] UTM parameters on all social links
+- [ ] UTM parameters on all email links
+- [ ] UTM parameters on all partner links
+- [ ] UTM parameters on all paid ads
+- [ ] Referral codes on all partner and influencer links
+- [ ] Consistent naming conventions
+- [ ] Attribution dashboard created
+- [ ] Weekly review of channel performance
+
 
 ## Summary
 
 You've learned how to:
 
 1. **Set up UTM tracking** across all marketing channels
-2. **Understand attribution models** and when to use each
-3. **Analyze attribution** in Formo with Overview
-4. **Calculate true ROI** including conversion and user quality
-5. **Optimize budget allocation** based on data
+2. **Set up referral tracking** with ref codes
+3. **Understand attribution models** and when to use each
+4. **Analyze attribution** in Formo with Overview
+5. **Calculate true ROI** including conversion and user quality
+6. **Optimize budget allocation** based on data
 
-## Attribution checklist
+## Next Steps
 
-<Checklist>
-  <ChecklistItem>UTM parameters on all social links</ChecklistItem>
-  <ChecklistItem>UTM parameters on all email links</ChecklistItem>
-  <ChecklistItem>UTM parameters on all partner links</ChecklistItem>
-  <ChecklistItem>UTM parameters on all paid ads</ChecklistItem>
-  <ChecklistItem>Consistent naming conventions</ChecklistItem>
-  <ChecklistItem>Attribution dashboard created</ChecklistItem>
-  <ChecklistItem>Weekly review of channel performance</ChecklistItem>
-</Checklist>
+- **[Key Metrics](/features/product-analytics/key-metrics)**: Deep dive on traffic analysis.
+- **[Build Funnels](/guides/funnels)**: Build conversion funnels by source.
+- **[Segment Wallets](/guides/wallet-segmentation)**: Target high-value user segments.
+- **[Attribution Methodology](/data/attribution)**: Technical attribution details.
 
-## Next steps
+## FAQ
 
-<CardGroup cols={2}>
-  <Card title="Key Metrics" icon="chart-simple" href="/features/product-analytics/key-metrics">
-    Deep dive on traffic analysis
-  </Card>
-  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
-    Build conversion funnels by source
-  </Card>
-  <Card title="Wallet Targeting" icon="bullseye" href="/guides/use-cases/wallet-targeting">
-    Target high-value user segments
-  </Card>
-  <Card title="Attribution Methodology" icon="route" href="/data/attribution">
-    Technical attribution details
-  </Card>
-</CardGroup>
+<AccordionGroup>
+<Accordion title="Does Formo capture UTM parameters automatically?">
+Yes. When a user lands on your app with UTM parameters in the URL, Formo captures them automatically and associates them with the user's session and wallet.
+</Accordion>
+
+<Accordion title="What happens if a user visits from multiple sources before converting?">
+Formo records both first-touch and last-touch attribution. You can view either model in the Overview page to understand the full user journey.
+</Accordion>
+
+<Accordion title="Can I use both UTM parameters and ref codes on the same link?">
+Yes. Combine them for full attribution: `?ref=alice&utm_source=twitter&utm_medium=social`. Both are captured independently.
+</Accordion>
+</AccordionGroup>

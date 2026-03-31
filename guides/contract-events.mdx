@@ -1,0 +1,227 @@
+---
+title: "How to Track Smart Contract Events in Real Time"
+sidebarTitle: "How to Track Contract Events"
+description: "Monitor smart contract activity by adding contract addresses, tracking events like swaps and transfers, and using onchain data in funnels and dashboards."
+keywords: ["smart contract analytics", "contract event tracking", "onchain event monitoring", "DeFi contract events", "blockchain event tracking"]
+---
+
+Frontend analytics only tell half the story. Contract events complete it.
+
+A user might visit your dapp 10 times but never make a transaction. Or they might spend 2 minutes on your site and execute a $50k swap. Frontend events alone miss the onchain reality. Smart contract event tracking bridges that gap.
+
+With Formo, you can monitor contract activity in real time, link it to your users, and use it in funnels, flows, and dashboards.
+
+## Part 1: Navigate to Project Settings > Contracts
+
+In the Formo dashboard, click the gear icon (settings) in the top right. Click **Contracts**.
+
+You'll see a list of contracts you're already tracking (if any) and an **Add Contract** button.
+
+<Frame>
+  <img src="/images/contract-events.png" alt="Contract settings page showing list of tracked contracts and add button" />
+</Frame>
+
+## Part 2: Add a Contract
+
+Click **Add Contract**. A modal opens.
+
+1. Paste your **contract address** (e.g., `0x6B175474E89094C44Da98b954EedeAC495271d0F` for DAI on Ethereum)
+2. Select the **chain** from the dropdown (Ethereum, Polygon, Arbitrum, Optimism, Base, etc.)
+3. Click **Auto-Detect ABI**
+
+Formo fetches the contract's ABI from Etherscan (or equivalent block explorer). If successful, you'll see a list of all events in the contract.
+
+If auto-detection fails, paste the ABI manually (copy from Etherscan, Hardhat build output, or your IDE).
+
+## Part 3: Select Events to Track
+
+The ABI reveals all events defined in the contract. Formo shows checkboxes for each.
+
+Common events to track:
+
+- **Swap**: When a user executes a trade (typically includes `amount_in`, `amount_out`, `user`)
+- **Transfer**: When tokens move (includes `from`, `to`, `value`)
+- **Approval**: When user approves a spender
+- **Deposit / Withdraw**: For lending/staking protocols
+- **Mint / Burn**: For token creation/destruction
+
+Check the events you want to track. You don't need to track every event, only the ones relevant to your analytics.
+
+Example: For a DEX, track Swap. For a token, track Transfer and Approval.
+
+## Part 4: Deploy the Pipeline
+
+Once events are selected, click **Deploy**. Formo provisions the pipeline in the background.
+
+Pipeline states progress as: **Draft** > **Initializing** > **Active**
+
+This typically takes 30-120 seconds. Monitor the status in the Project Settings > Contracts panel.
+
+Once **Active**, contract events start flowing into Formo.
+
+<Tip>
+You don't need to redeploy if you add more contracts later. Just select events and deploy the new contract. The pipeline updates automatically.
+</Tip>
+
+## Part 5: See Contract Events in Activity Feed
+
+Navigate to **Activity** in the sidebar. You'll see a mixed feed of frontend events (page views) and contract events (swaps, transfers).
+
+Scroll through to verify events are being captured. Look for events like "Swap" or "Transfer" with details like amount, token, and timestamp.
+
+Each contract event is linked to a wallet address, so Formo associates it with the user who executed the transaction.
+
+## Part 6: Use Contract Events as Funnel Steps
+
+Now that contract events are flowing, use them in funnels.
+
+Click **Dashboards** > **Create Chart** > **Conversion Funnel**.
+
+In the funnel builder, you'll see both frontend events (page views) and contract events (swaps, transfers) in the step selector.
+
+Example funnel:
+1. "Wallet Connected" (frontend event with type `connect`)
+2. "Approved Spend" (contract event: Approval)
+3. "Swap" (contract event: Swap)
+
+This funnel measures: Of users who connected a wallet, how many approved spending, and of those, how many executed a swap?
+
+<Frame>
+  <img src="/images/product-analytics-contract-events.png" alt="Funnel builder showing mix of frontend and contract events" />
+</Frame>
+
+## Part 7: Query Contract Events with SQL
+
+For advanced analysis, use the **Explorer** (SQL editor).
+
+Navigate to **Explore** in the sidebar. The schema browser on the left shows available tables: `events`, `users`, `anonymous_users`.
+
+The `events` table includes contract events with columns like:
+- `type`: Event type (e.g., `decoded_log` for contract events, `connect` for wallet connections)
+- `event`: Specific event name like "Swap", "Transfer", etc. (populated for `decoded_log` and `track` events)
+- `address`: User's wallet address
+- `timestamp`: When the event occurred
+- `properties`: Event-specific data stored as JSON string (includes contract address, amounts, tokens, etc.)
+
+### Essential Contract Event Queries
+
+**Query 1: Daily Swap Volume**
+
+```sql
+SELECT 
+  toDate(timestamp) as date,
+  sum(JSONExtractFloat(properties, 'amount_out')) as total_volume
+FROM events
+WHERE type = 'decoded_log' AND event = 'Swap' AND JSONExtractString(properties, 'contract_address') = '0x...'
+GROUP BY date
+ORDER BY date DESC
+```
+
+**Query 2: Top Swappers (By Transaction Count)**
+
+```sql
+SELECT 
+  address,
+  count(*) as swap_count,
+  sum(JSONExtractFloat(properties, 'amount_out')) as total_volume
+FROM events
+WHERE type = 'decoded_log' AND event = 'Swap'
+GROUP BY address
+ORDER BY swap_count DESC
+LIMIT 10
+```
+
+**Query 3: Time to First Swap (After Wallet Connect)**
+
+```sql
+SELECT 
+  avg(dateDiff('minute',
+    first_connect_time,
+    first_swap_time)) as avg_minutes_to_swap
+FROM (
+  SELECT 
+    address,
+    min(if(type = 'connect', timestamp, null)) as first_connect_time,
+    min(if(type = 'decoded_log' AND event = 'Swap', timestamp, null)) as first_swap_time
+  FROM events
+  GROUP BY address
+)
+WHERE first_swap_time IS NOT NULL
+```
+
+## Part 8: Build Dashboard Charts from Contract Events
+
+In **Dashboards**, create charts filtered to contract events.
+
+Example charts:
+- **Line Chart**: Daily swap volume over time
+- **Bar Chart**: Top 5 tokens swapped
+- **Pie Chart**: Swap size distribution (small, medium, large)
+- **Number Card**: Total transactions, unique swappers, total volume
+
+Contract event data is as queryable as frontend events. Use it to build your on-chain analytics dashboard.
+
+## Part 9: Set Up Alerts for Contract Events
+
+Navigate to **Project Settings** > **Alerts**.
+
+Create alerts for important contract events:
+
+- "Alert me when a high-net-worth wallet connects"
+- "Alert me when a whale executes a swap"
+- "Alert me when a specific contract event fires"
+
+Alerts notify you in real time or on a daily digest, keeping you informed of important onchain activity.
+
+## Pipeline Management
+
+### Check Pipeline Status
+
+In Project Settings > Contracts, each contract shows its pipeline state:
+- **Draft**: Not yet deployed
+- **Active**: Live and ingesting events
+- **Paused**: Temporarily disabled
+- **Error**: Pipeline failed (check logs)
+
+### Pause a Pipeline
+
+If you need to stop tracking a contract, click **Pause** next to its name. Events stop being ingested. You can resume anytime.
+
+### Redeploy After Changes
+
+If you add new events or update your contract, deploy again. The pipeline seamlessly updates.
+
+## Next Steps
+
+Once contract events are flowing, explore advanced use cases:
+
+- See [How to Build Funnels](/guides/funnels) to measure onchain conversion
+- Learn [SQL Explorer](/guides/sql-explorer) for custom queries
+- Check [Ask AI](/guides/ask-ai) to generate queries from natural language
+- Build a [Custom Dashboard](/guides/custom-dashboard) to visualize contract event data
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="What blockchains does Formo support for contract events?">
+Formo supports Ethereum, Polygon, Arbitrum, Optimism, Base, BNB Chain, Avalanche, Linea, Scroll, zkSync, Blast, and more. Full list at [Supported Chains](/chains/overview).
+</Accordion>
+
+<Accordion title="How does Formo detect contract ABIs automatically?">
+Formo queries Etherscan, Polygonscan, and other block explorers. If your contract is verified on the explorer, the ABI is detected instantly. If not, paste the ABI manually.
+</Accordion>
+
+<Accordion title="What happens if I add a contract that's not verified on Etherscan?">
+You can paste the ABI manually. Formo will use it to decode transactions and events.
+</Accordion>
+
+<Accordion title="Can I track events from multiple contracts in a single funnel?">
+Yes. For example, swap on Contract A, then bridge to Contract B. Both appear as funnel steps. Formo links them by wallet address and timestamp.
+</Accordion>
+
+<Accordion title="Do contract events count toward my event quota?">
+Yes. Each contract event counts as 1 event in your plan. For high-volume contracts (millions of events daily), consider filtering or segmenting.
+</Accordion>
+
+</AccordionGroup>

@@ -18,13 +18,50 @@ Data is the lifeblood of any business. It helps you understand your customers, m
 
 <Steps>
   <Step title="Get started for free">
-    [Sign up](https://app.formo.so) to create your workspace.
+    [Sign up](https://app.formo.so) and create your workspace.
   </Step>
   <Step title="Install Formo">
     [Install Formo](/install) on your website and app.
   </Step>
   <Step title="Success!">
+    Explore the [How-To Guides](/guides/onchain-attribution) to get the most out of Formo.
   </Step>
+</Steps>
+
+Once the SDK is installed and events are flowing, explore your data:
+
+<Steps>
+<Step>
+Open the **[Overview](/features/product-analytics/overview)** page. You'll see key metrics like total sessions, unique wallets, and transaction count.
+</Step>
+
+<Step>
+Click **[Activity](/features/product-analytics/activity)** in the sidebar to see your event feed, broken down by event type, country, device, and referrer source.
+</Step>
+
+<Step>
+Click **[Users](/features/wallet-intelligence/wallet-profiles)** to browse connected wallets with their lifecycle stage, net worth, labels, and activity history.
+</Step>
+
+<Step>
+**[Build a Funnel](/guides/funnels)**: Track conversion rates from landing page to first transaction.
+</Step>
+
+<Step>
+**[Measure Retention](/guides/retention)**: Understand which cohorts stick around and why.
+</Step>
+
+<Step>
+**[Ask AI](/guides/ask-ai)**: Ask questions like "Why did swap volume drop 20% yesterday?"
+</Step>
+
+<Step>
+**[Set Up Alerts](/features/product-analytics/alerts)**: Get notified when high-value users and key events happen.
+</Step>
+
+<Step>
+Use **[Explore](/features/product-analytics/explore)** to write custom SQL queries against your raw events data.
+</Step>
 </Steps>
 
 ## Key Features
@@ -86,7 +123,7 @@ The Formo SDK is fully [open source](https://github.com/getformo/sdk). Contribut
     Formo is purpose-built for onchain apps. Unlike Google Analytics, Formo natively tracks wallet connections, transactions, and signatures alongside traditional web analytics like pageviews and sessions. It also provides [onchain attribution](/data/attribution), [wallet intelligence](/features/wallet-intelligence/overview), and [token-gated forms](/features/token-gated-forms/form-builder) — features that general-purpose analytics tools don't offer.
   </Accordion>
   <Accordion title="Does Formo work with Solana, or only EVM chains?">
-    Formo supports both EVM and non-EVM chains including Solana. See the full list of [supported chains](/chains/overview).
+    Formo supports both EVM and Solana. See the full list of [supported chains](/chains/overview).
   </Accordion>
   <Accordion title="Is Formo GDPR-compliant? Do I need a cookie consent banner?">
     Yes, Formo is GDPR-compliant by default. We do not collect IP addresses, use device fingerprinting, or set third-party cookies — so you do not need a cookie consent banner. See [what we collect](/data/what-we-collect) for details.
@@ -96,6 +133,15 @@ The Formo SDK is fully [open source](https://github.com/getformo/sdk). Contribut
   </Accordion>
   <Accordion title="How much does Formo cost?">
     Formo offers a free tier to get started. Visit [Pricing](https://formo.so/pricing) for additional pricing tiers.
+  </Accordion>
+  <Accordion title="Which frameworks does Formo support?">
+    Formo works with any JavaScript framework: React, Vue, Svelte, Next.js, Remix, Astro, and vanilla JavaScript. We have optimized integration guides for wagmi and RainbowKit. See [SDKs](/sdks/web) for framework-specific examples.
+  </Accordion>
+  <Accordion title="Can I track events from my backend?">
+    Yes. Formo provides a [Server SDK](/sdks/server) for backend tracking. Use it to send custom events, identify users, or batch track historical data.
+  </Accordion>
+  <Accordion title="How often is my data updated?">
+    All data is ingested and displayed in real time.
   </Accordion>
 </AccordionGroup>
 
