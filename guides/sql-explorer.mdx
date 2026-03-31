@@ -83,7 +83,7 @@ SELECT
   count(*) as event_count,
   count(DISTINCT address) as unique_wallets
 FROM events
-WHERE timestamp >= now() - interval '7 days'
+WHERE timestamp >= now() - INTERVAL 7 DAY
 ```
 
 Click **Run Query** or press Cmd+Enter. Results appear in the bottom panel.
@@ -93,7 +93,7 @@ This query shows: How many events and unique wallets in the last 7 days?
 ClickHouse basics:
 - `count(*)`: Total rows
 - `count(DISTINCT column)`: Unique values
-- `interval '7 days'`: Time span
+- `INTERVAL 7 DAY`: Time span
 - `WHERE`: Filter rows
 - `GROUP BY`: Aggregate by column
 - `ORDER BY`: Sort results
@@ -109,7 +109,7 @@ SELECT
   toDate(timestamp) as date,
   count(DISTINCT address) as daily_active_users
 FROM events
-WHERE timestamp >= now() - interval '30 days'
+WHERE timestamp >= now() - INTERVAL 30 DAY
 GROUP BY date
 ORDER BY date DESC
 ```
@@ -209,14 +209,20 @@ What's your retention?
 
 ```sql
 SELECT 
-  case 
-    when uniqMerge(num_sessions) = 1 then 'New'
-    when uniqMerge(num_sessions) <= 10 then 'Returning'
-    else 'Power User'
-  end as user_type,
+  user_type,
   count(*) as count
-FROM users
-WHERE first_seen >= now() - interval '30 days'
+FROM (
+  SELECT 
+    address,
+    case 
+      when uniqMerge(num_sessions) = 1 then 'New'
+      when uniqMerge(num_sessions) <= 10 then 'Returning'
+      else 'Power User'
+    end as user_type
+  FROM users
+  WHERE first_seen >= now() - INTERVAL 30 DAY
+  GROUP BY address
+)
 GROUP BY user_type
 ```
 
@@ -265,7 +271,7 @@ SELECT
   count(*) as events,
   count(DISTINCT address) as active_wallets
 FROM events
-WHERE timestamp >= now() - interval '7 days'
+WHERE timestamp >= now() - INTERVAL 7 DAY
 GROUP BY hour_of_day
 ORDER BY hour_of_day
 ```

@@ -246,8 +246,8 @@ Use this SQL to calculate month-over-month churn:
 SELECT
   toStartOfMonth(first_seen) as cohort_month,
   count(*) as total_users,
-  countIf(last_seen < now() - interval '30 days') as churned_users,
-  round(countIf(last_seen < now() - interval '30 days') / count(*) * 100, 2) as churn_rate_pct
+  countIf(last_seen < now() - INTERVAL 30 DAY) as churned_users,
+  round(countIf(last_seen < now() - INTERVAL 30 DAY) / count(*) * 100, 2) as churn_rate_pct
 FROM users
 GROUP BY cohort_month
 ORDER BY cohort_month DESC
