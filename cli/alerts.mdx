@@ -1,0 +1,120 @@
+---
+title: 'Alerts'
+description: 'Create, manage, and monitor project alerts from the Formo CLI. Set up event-based triggers with webhook recipients and filter configurations.'
+icon: bell
+---
+
+The `alerts` command group lets you manage project alerts from the terminal. Alerts notify you when specific events or thresholds are triggered in your project, and can send webhooks to external services like Slack.
+
+Read operations require the `alerts:read` scope. Create, update, delete, and toggle operations require `alerts:write`.
+
+## List alerts
+
+List all alerts configured for the project.
+
+```bash
+formo alerts list
+```
+
+## Get an alert
+
+Fetch details for a single alert by its ID.
+
+```bash
+formo alerts get <alertId>
+```
+
+| Argument | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `alertId` | string | Yes | The alert ID |
+
+```bash
+formo alerts get alert_abc123
+```
+
+## Create an alert
+
+Create a new alert with a trigger type and optional filters, recipients, and webhook secret.
+
+```bash
+formo alerts create [options]
+```
+
+### Options
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--name` | string | Yes | Alert name |
+| `--triggerType` | string | Yes | Trigger type (e.g. `event`, `threshold`) |
+| `--triggerFilters` | string | No | JSON array of trigger filter objects |
+| `--recipient` | string | No | JSON array of recipient objects |
+| `--secret` | string | No | Webhook secret for HMAC signing |
+
+### Examples
+
+```bash
+# Create a basic event alert
+formo alerts create --name "High value tx" --triggerType event
+
+# Create an alert with trigger filters and a webhook recipient
+formo alerts create \
+  --name "Whale alert" \
+  --triggerType event \
+  --triggerFilters '[{"field":"value_usd","op":"gt","value":100000}]' \
+  --recipient '[{"type":"webhook","url":"https://hooks.slack.com/services/xxx"}]' \
+  --secret "my_webhook_secret"
+```
+
+## Update an alert
+
+Update an existing alert's configuration.
+
+```bash
+formo alerts update <alertId> [options]
+```
+
+| Argument | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `alertId` | string | Yes | The alert ID to update |
+
+The options are the same as `create`: `--name`, `--triggerType`, `--triggerFilters`, `--recipient`, `--secret`.
+
+```bash
+formo alerts update alert_abc123 --name "Renamed alert" --triggerType event
+```
+
+## Delete an alert
+
+Permanently delete an alert.
+
+```bash
+formo alerts delete <alertId>
+```
+
+```bash
+formo alerts delete alert_abc123
+```
+
+## Toggle alert status
+
+Pause or resume an alert without deleting it.
+
+```bash
+formo alerts toggle <alertId> --status <active|paused>
+```
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--status` | `active` \| `paused` | Yes | New alert status |
+
+```bash
+# Pause an alert
+formo alerts toggle alert_abc123 --status paused
+
+# Resume an alert
+formo alerts toggle alert_abc123 --status active
+```
+
+<Tip>
+Use `toggle` to temporarily silence alerts during maintenance windows instead of deleting and recreating them.
+</Tip>

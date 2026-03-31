@@ -1,0 +1,147 @@
+---
+title: 'CLI Overview'
+description: 'Install and use the Formo CLI to manage your Web3 analytics from the terminal. Query wallet profiles, run SQL analytics, manage alerts, dashboards, contracts, and more.'
+icon: terminal
+---
+
+The Formo CLI (`@formo/cli`) lets you interact with the Formo platform directly from your terminal. Query wallet profiles, run SQL analytics, manage alerts, dashboards, smart contracts, and segments — all without leaving the command line.
+
+The CLI is built on the [incur](https://github.com/tryincur/incur) framework, which means it also works as an AI agent tool server out of the box.
+
+## Installation
+
+Install the CLI globally from npm:
+
+```bash
+npm install -g @formo/cli
+```
+
+Once installed, the `formo` command is available globally:
+
+```bash
+formo --help
+```
+
+<Note>
+Requires Node.js 18 or later.
+</Note>
+
+## Authentication
+
+The CLI authenticates via a Formo API key. You can get your key from the [Formo Dashboard](https://app.formo.so) under **Settings > API Keys**.
+
+<Steps>
+  <Step title="Get your API key">
+    Go to [app.formo.so](https://app.formo.so), navigate to **Settings > API Keys**, and click **Create API Key**. Copy the key (it starts with `formo_`).
+  </Step>
+  <Step title="Log in">
+    ```bash
+    formo login formo_your_api_key_here
+    ```
+    The CLI validates the key against the Formo API and saves it to `~/.config/formo/config.json` (file permissions `0600`).
+  </Step>
+  <Step title="Verify">
+    ```bash
+    formo status
+    ```
+    This shows your authentication status, workspace name, and project ID.
+  </Step>
+</Steps>
+
+### Environment variable
+
+You can also authenticate by setting the `FORMO_API_KEY` environment variable. When set, the environment variable takes precedence over the config file.
+
+```bash
+export FORMO_API_KEY=formo_your_api_key_here
+formo profiles get 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+```
+
+### Logging out
+
+```bash
+formo logout
+```
+
+This removes the saved API key from the config file. If `FORMO_API_KEY` is set, the CLI will warn you to unset it as well.
+
+## Quick start
+
+After authenticating, try a few commands to explore your data:
+
+```bash
+# Get a wallet profile
+formo profiles get 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+
+# Search top wallets by net worth
+formo profiles search --orderBy net_worth_usd --orderDir desc --limit 5
+
+# Run a SQL query
+formo query run "SELECT count(*) FROM events"
+
+# List all project alerts
+formo alerts list
+
+# List dashboard boards
+formo boards list
+```
+
+## Command groups
+
+The CLI is organized into command groups, each requiring specific [API key scopes](/api-reference/authentication):
+
+| Command group | Description | Read scope | Write scope |
+| :--- | :--- | :--- | :--- |
+| `profiles` | Query wallet profiles | `profiles:read` | — |
+| `query` | Run SQL analytics queries | `query:read` | — |
+| `alerts` | Manage project alerts | `alerts:read` | `alerts:write` |
+| `boards` | Manage dashboard boards | `boards:read` | `boards:write` |
+| `charts` | Manage charts within boards | `boards:read` | `boards:write` |
+| `contracts` | Track smart contracts | `contracts:read` | `contracts:write` |
+| `segments` | Manage user segments | `segments:read` | `segments:write` |
+| `import` | Bulk import wallets | — | `profiles:write` |
+
+## Configuration
+
+The CLI stores configuration in `~/.config/formo/config.json`. The file is created with mode `0600` (owner read/write only) and contains:
+
+```json
+{
+  "apiKey": "formo_your_api_key",
+  "workspace": "Your Workspace Name",
+  "projectId": "your_project_id"
+}
+```
+
+The `workspace` and `projectId` fields are populated automatically during login when the API key is validated.
+
+## Output format
+
+The CLI outputs structured JSON to `stdout`, making it easy to pipe into other tools like `jq`:
+
+```bash
+formo profiles get vitalik.eth | jq '.net_worth_usd'
+```
+
+Status messages (success, error, warnings) are written to `stderr` so they don't interfere with piped output. Colors are automatically disabled when output is piped or the `NO_COLOR` environment variable is set.
+
+## AI agent mode
+
+The Formo CLI can also run as an AI agent tool server via the incur framework's `sync` interface. This lets AI agents (such as Claude, GPT, or custom agents) discover and invoke CLI commands programmatically. See the [MCP documentation](/features/mcp/overview) for more on integrating Formo with AI tools.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Profiles" icon="user" href="/cli/profiles">
+    Query and search wallet profiles
+  </Card>
+  <Card title="SQL Queries" icon="database" href="/cli/query">
+    Run analytics queries from the terminal
+  </Card>
+  <Card title="Alerts" icon="bell" href="/cli/alerts">
+    Manage project alerts
+  </Card>
+  <Card title="Best Practices" icon="lightbulb" href="/cli/best-practices">
+    Tips for getting the most out of the CLI
+  </Card>
+</CardGroup>

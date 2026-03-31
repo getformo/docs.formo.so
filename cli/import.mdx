@@ -1,0 +1,53 @@
+---
+title: 'Import'
+description: 'Bulk import wallet addresses into your Formo project using the CLI. Available on Scale and Enterprise plans.'
+icon: cloud-arrow-up
+---
+
+The `import` command group lets you bulk import wallet addresses into your project. Once imported, Formo enriches these wallets with onchain profile data.
+
+<Warning>
+Wallet import is only available on **Scale** and **Enterprise** plans. The command requires the `profiles:write` scope on your API key.
+</Warning>
+
+## Import wallets
+
+Bulk import wallet addresses into the project.
+
+```bash
+formo import wallets [options]
+```
+
+### Options
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--addresses` | string | Yes | JSON array of wallet address strings to import |
+| `--writeKey` | string | Yes | Project SDK write key |
+
+### Examples
+
+```bash
+# Import two wallet addresses
+formo import wallets \
+  --addresses '["0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045","0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"]' \
+  --writeKey write_key_xxx
+```
+
+<Tip>
+For large imports, build the address array from a file:
+
+```bash
+formo import wallets \
+  --addresses "$(cat addresses.json)" \
+  --writeKey write_key_xxx
+```
+
+Where `addresses.json` is a JSON array of address strings:
+```json
+[
+  "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+  "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+]
+```
+</Tip>

@@ -1,0 +1,58 @@
+---
+title: 'Segments'
+description: 'Create and manage user segments from the Formo CLI. Define audience groups with filter sets to target specific wallet populations.'
+icon: filter
+---
+
+The `segments` command group lets you manage user segments (audience groups). Segments define subsets of your user base based on filter criteria and are used for targeting and analysis in the Formo dashboard.
+
+Read operations require the `segments:read` scope. Write operations require `segments:write`.
+
+## List segments
+
+List all user segments for the project.
+
+```bash
+formo segments list
+```
+
+## Create a segment
+
+Create a new user segment with a title and filter set configuration.
+
+```bash
+formo segments create [options]
+```
+
+### Options
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--title` | string | Yes | Segment title |
+| `--filterSets` | string | Yes | JSON array of filter set strings defining the segment |
+
+### Examples
+
+```bash
+# Create a high-value wallet segment
+formo segments create --title "Whales" --filterSets '["net_worth_usd > 100000"]'
+
+# Create a segment for active users
+formo segments create --title "Active traders" --filterSets '["tx_count > 50"]'
+```
+
+## Delete a segment
+
+Delete a user segment by its ID.
+
+```bash
+formo segments delete <segmentId>
+```
+
+```bash
+formo segments delete seg_abc123
+```
+
+<Note>
+Segments created via the CLI are the same segments visible in the [Wallet Intelligence > Segments](/features/wallet-intelligence/segments) section of the dashboard.
+</Note>

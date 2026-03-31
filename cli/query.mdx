@@ -1,0 +1,67 @@
+---
+title: 'Query'
+description: 'Run SQL queries against your Formo analytics data directly from the terminal using the Formo CLI.'
+icon: database
+---
+
+The `query` command group lets you run SQL queries against your Formo analytics data directly from the terminal. This is the same query engine available via the [Query API](/api-reference/query) and [BI integration](/data/bi).
+
+All query commands require the `query:read` scope on your API key.
+
+## Run a query
+
+Execute a SQL query against your analytics data.
+
+```bash
+formo query run "<sql>"
+```
+
+### Arguments
+
+| Argument | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `sql` | string | Yes | SQL query string to execute |
+
+### Examples
+
+```bash
+# Count all events
+formo query run "SELECT count(*) FROM events"
+
+# Top 10 wallets by net worth
+formo query run "SELECT address, net_worth_usd FROM wallet_profiles ORDER BY net_worth_usd DESC LIMIT 10"
+
+# Daily active users over the past week
+formo query run "SELECT date, count(DISTINCT address) as dau FROM events WHERE date >= now() - INTERVAL 7 DAY GROUP BY date ORDER BY date"
+
+# Event breakdown by type
+formo query run "SELECT event_type, count(*) as total FROM events GROUP BY event_type ORDER BY total DESC"
+```
+
+<Tip>
+Wrap your SQL in double quotes to prevent shell interpretation of special characters. For complex queries with single quotes inside, use escaped quotes or a heredoc:
+
+```bash
+formo query run "SELECT * FROM events WHERE event_type = 'page' LIMIT 10"
+```
+</Tip>
+
+## Working with results
+
+Query results are returned as JSON to `stdout`. Combine with `jq` for quick analysis:
+
+```bash
+# Pretty-print results
+formo query run "SELECT count(*) as total FROM events" | jq .
+
+# Extract a single value
+formo query run "SELECT count(*) as total FROM events" | jq '.[0].total'
+
+# Export to CSV with jq
+formo query run "SELECT address, net_worth_usd FROM wallet_profiles LIMIT 100" \
+  | jq -r '(.[0] | keys_unsorted) as $keys | $keys, (.[] | [.[$keys[]]] | @csv)' > wallets.csv
+```
+
+<Note>
+For connecting BI tools like Metabase or Grafana directly to your Formo data, see the [BI integration guide](/data/bi).
+</Note>

@@ -1,0 +1,120 @@
+---
+title: 'Best Practices'
+description: 'Tips, workflows, and best practices for using the Formo CLI effectively in development, CI/CD, and scripting environments.'
+icon: lightbulb
+---
+
+## Use environment variables in CI/CD
+
+In automated environments, set the API key via the `FORMO_API_KEY` environment variable instead of running `formo login`. This avoids writing credentials to disk and works cleanly in CI pipelines:
+
+```bash
+export FORMO_API_KEY=formo_your_api_key
+formo profiles search --limit 10
+```
+
+The environment variable always takes precedence over the config file, so you can override a local login for specific runs.
+
+## Pipe output to jq
+
+All CLI commands output structured JSON to `stdout`. Use `jq` for filtering, formatting, and extracting fields:
+
+```bash
+# Pretty-print any command output
+formo alerts list | jq .
+
+# Extract just wallet addresses from a search
+formo profiles search --limit 20 | jq '.[].address'
+
+# Count results
+formo contracts list | jq 'length'
+```
+
+## Script dashboard replication
+
+Replicate a dashboard setup across projects by exporting and replaying board/chart configurations:
+
+```bash
+# Export charts from a board
+formo charts list --boardId board_source > charts.json
+
+# Create the same board in another project (switch API key)
+export FORMO_API_KEY=formo_other_project_key
+formo boards create --name "Replicated Dashboard"
+# Then create each chart from the exported config
+```
+
+## Use shell substitution for large JSON
+
+For commands that accept JSON strings (like `--abi`, `--conditions`, `--filterSets`), store the JSON in files and use shell substitution:
+
+```bash
+# Contract ABI from file
+formo contracts create \
+  --address 0x1234... \
+  --chain 1 \
+  --name "My Token" \
+  --abi "$(cat abi.json)" \
+  --events '{"Transfer":true}'
+
+# Complex filter conditions from file
+formo profiles search --conditions "$(cat filters.json)" --limit 50
+```
+
+## Scope API keys appropriately
+
+Create API keys with only the scopes your workflow needs. For read-only dashboards or monitoring scripts, use a key with only `read` scopes. Reserve `write` scopes for administrative scripts.
+
+| Use case | Recommended scopes |
+| :--- | :--- |
+| Monitoring & reporting | `profiles:read`, `query:read`, `alerts:read`, `boards:read` |
+| Alert management | `alerts:read`, `alerts:write` |
+| Contract indexing setup | `contracts:read`, `contracts:write` |
+| Full administration | All scopes |
+
+## Handle errors gracefully in scripts
+
+The CLI returns structured JSON errors and uses non-zero exit codes on failure. Check exit codes in scripts:
+
+```bash
+if formo profiles get 0xabc123 > /dev/null 2>&1; then
+  echo "Profile found"
+else
+  echo "Profile not found or API error"
+fi
+```
+
+## Disable colors in scripts
+
+When piping output or running in non-TTY environments, colors are automatically disabled. You can also explicitly disable them with the `NO_COLOR` environment variable:
+
+```bash
+NO_COLOR=1 formo status
+```
+
+## Check authentication before running commands
+
+Use `formo status` at the start of scripts to verify authentication is configured:
+
+```bash
+#!/bin/bash
+set -e
+
+# Verify authentication
+formo status > /dev/null 2>&1 || {
+  echo "Error: Not authenticated. Run 'formo login' or set FORMO_API_KEY."
+  exit 1
+}
+
+# Proceed with commands
+formo profiles search --orderBy last_seen --orderDir desc --limit 10
+```
+
+<CardGroup cols={2}>
+  <Card title="API Authentication" icon="key" href="/api-reference/authentication">
+    Learn about API key scopes and rate limits
+  </Card>
+  <Card title="CLI Overview" icon="terminal" href="/cli/overview">
+    Installation and getting started
+  </Card>
+</CardGroup>

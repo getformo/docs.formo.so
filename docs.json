@@ -147,6 +147,31 @@
         ]
       },
       {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["cli/overview"]
+          },
+          {
+            "group": "Commands",
+            "pages": [
+              "cli/profiles",
+              "cli/query",
+              "cli/alerts",
+              "cli/boards",
+              "cli/contracts",
+              "cli/segments",
+              "cli/import"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": ["cli/best-practices"]
+          }
+        ]
+      },
+      {
         "tab": "Integrations",
         "groups": [
           {

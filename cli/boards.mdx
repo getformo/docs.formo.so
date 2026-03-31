@@ -1,0 +1,155 @@
+---
+title: 'Boards & Charts'
+description: 'Create and manage dashboard boards and charts from the Formo CLI. Organize your analytics visualizations programmatically.'
+icon: chart-line
+---
+
+The `boards` and `charts` command groups let you manage dashboard boards and the charts within them. Boards are containers for charts — create a board first, then add charts to it.
+
+Board and chart read operations require the `boards:read` scope. Write operations require `boards:write`.
+
+## Boards
+
+### List boards
+
+List all boards in the project.
+
+```bash
+formo boards list
+```
+
+### Get a board
+
+Fetch a single board by ID.
+
+```bash
+formo boards get <boardId>
+```
+
+```bash
+formo boards get board_abc123
+```
+
+### Create a board
+
+```bash
+formo boards create [options]
+```
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--name` | string | Yes | Board name |
+| `--description` | string | No | Board description |
+
+```bash
+# Create a basic board
+formo boards create --name "KPI Dashboard"
+
+# Create a board with a description
+formo boards create --name "Revenue Metrics" --description "Weekly revenue tracking"
+```
+
+### Update a board
+
+```bash
+formo boards update <boardId> [options]
+```
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--name` | string | No | New board name |
+| `--description` | string | No | New board description |
+
+```bash
+formo boards update board_abc123 --name "Renamed Board"
+```
+
+### Delete a board
+
+```bash
+formo boards delete <boardId>
+```
+
+```bash
+formo boards delete board_abc123
+```
+
+---
+
+## Charts
+
+Charts belong to a board and are always referenced together with their parent board ID.
+
+### List charts
+
+List all charts in a specific board.
+
+```bash
+formo charts list --boardId <boardId>
+```
+
+```bash
+formo charts list --boardId board_abc123
+```
+
+### Get a chart
+
+Fetch a single chart by ID from a board.
+
+```bash
+formo charts get <chartId> --boardId <boardId>
+```
+
+```bash
+formo charts get chart_abc123 --boardId board_abc123
+```
+
+### Create a chart
+
+Create a new chart in a board. The chart configuration is passed as a JSON string via the `--body` option.
+
+```bash
+formo charts create --boardId <boardId> --body '<json>'
+```
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--boardId` | string | Yes | Board ID to add the chart to |
+| `--body` | string | Yes | JSON string with chart configuration |
+
+```bash
+formo charts create \
+  --boardId board_abc123 \
+  --body '{"name":"Daily active users","chartType":"line"}'
+```
+
+### Update a chart
+
+```bash
+formo charts update <chartId> --boardId <boardId> --body '<json>'
+```
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--boardId` | string | Yes | Board ID the chart belongs to |
+| `--body` | string | Yes | JSON string with updated chart configuration |
+
+```bash
+formo charts update chart_abc123 \
+  --boardId board_abc123 \
+  --body '{"name":"Updated chart name"}'
+```
+
+### Delete a chart
+
+```bash
+formo charts delete <chartId> --boardId <boardId>
+```
+
+```bash
+formo charts delete chart_abc123 --boardId board_abc123
+```
+
+<Tip>
+You can script board and chart creation to replicate dashboard setups across projects. Export a board's charts with `formo charts list`, then replay them with `formo charts create`.
+</Tip>

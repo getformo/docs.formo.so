@@ -1,0 +1,106 @@
+---
+title: 'Contracts'
+description: 'Register and manage tracked smart contracts from the Formo CLI. Index contract events by providing the contract address, chain, ABI, and events configuration.'
+icon: file-contract
+---
+
+The `contracts` command group lets you register and manage tracked smart contracts. When you register a contract, Formo indexes its events based on the ABI and events configuration you provide.
+
+Read operations require the `contracts:read` scope. Write operations require `contracts:write`.
+
+## List contracts
+
+List all tracked contracts for the project.
+
+```bash
+formo contracts list
+```
+
+## Create a contract
+
+Register a new smart contract to track.
+
+```bash
+formo contracts create [options]
+```
+
+### Options
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--address` | string | Yes | Contract address (`0x...`) |
+| `--chain` | number | Yes | Chain ID (e.g. `1` for Ethereum, `137` for Polygon, `8453` for Base) |
+| `--name` | string | Yes | Human-readable contract name |
+| `--abi` | string | Yes | Contract ABI as a JSON string |
+| `--events` | string | Yes | Events configuration as a JSON string |
+
+### Examples
+
+```bash
+# Register an ERC-20 contract on Ethereum
+formo contracts create \
+  --address 0x1234567890abcdef1234567890abcdef12345678 \
+  --chain 1 \
+  --name "My Token" \
+  --abi '[{"type":"event","name":"Transfer","inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}]}]' \
+  --events '{"Transfer":true}'
+```
+
+<Note>
+The `--abi` must be a valid JSON array representing the contract's ABI. You only need to include the event definitions you want to track, not the entire ABI.
+</Note>
+
+## Update a contract
+
+Update a tracked contract's name, ABI, or events configuration. Contracts are identified by their chain ID and address.
+
+```bash
+formo contracts update <chain> <address> [options]
+```
+
+### Arguments
+
+| Argument | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `chain` | string | Yes | Chain ID |
+| `address` | string | Yes | Contract address (`0x...`) |
+
+### Options
+
+| Option | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `--name` | string | Yes | Updated contract name |
+| `--abi` | string | Yes | Updated ABI as a JSON string |
+| `--events` | string | Yes | Updated events configuration as a JSON string |
+
+```bash
+formo contracts update 1 0x1234567890abcdef1234567890abcdef12345678 \
+  --name "Renamed Token" \
+  --abi '[{"type":"event","name":"Transfer","inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}]}]' \
+  --events '{"Transfer":true}'
+```
+
+## Delete a contract
+
+Remove a tracked contract. This stops event indexing for the contract.
+
+```bash
+formo contracts delete <chain> <address>
+```
+
+```bash
+formo contracts delete 1 0x1234567890abcdef1234567890abcdef12345678
+```
+
+<Tip>
+Store your ABI JSON in a file and pass it via shell substitution for easier management:
+
+```bash
+formo contracts create \
+  --address 0x1234... \
+  --chain 1 \
+  --name "My Token" \
+  --abi "$(cat abi.json)" \
+  --events '{"Transfer":true}'
+```
+</Tip>
