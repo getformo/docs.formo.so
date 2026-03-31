@@ -9,12 +9,6 @@ The first 5 minutes decide everything for new users.
 
 User flows reveal exactly how people navigate your dapp after they land. With Formo's flow visualization, you can see where users drop off, which paths convert to transactions, and how to optimize onboarding.
 
-## Prerequisites
-
-- Formo is installed and tracking page views and key events
-- You have user events like connect wallet and transaction completion events
-- Basic understanding of your onboarding funnel (signup > wallet connect > first transaction)
-
 ## Part 1: Navigate to Dashboards and Create a Flow
 
 In the Formo dashboard, click **Dashboards** in the sidebar. Click **Create Chart** in the top right.
@@ -104,7 +98,7 @@ Once your flow analysis is complete, click **Save to Dashboard**. Choose an exis
 
 Name the chart clearly: "New User Onboarding Flow" or "Post-Swap User Paths".
 
-Saved flows refresh daily, so you can track onboarding improvements over time as you ship fixes.
+Saved flows update in real time, so you can track onboarding improvements over time as you ship fixes.
 
 ## Real-World Analysis Walkthrough
 
@@ -197,15 +191,15 @@ When you ship changes to improve onboarding:
 
 This lets you measure whether each change actually moved the needle.
 
-## What's Next?
+## Next Steps
 
 Combine flow analysis with conversion funnels for deeper insights:
 
-- See [How to Build Conversion Funnels](/guides/conversion-funnel) to measure step-by-step conversion
-- Use [SQL Explorer](/guides/sql-explorer) to query average time spent in each step
-- Set up dashboards to track onboarding KPIs weekly
+- [Build Conversion Funnels](/guides/funnels) to measure step-by-step conversion
+- [Explore with SQL](/guides/sql-explorer) to query average time spent in each step
+- [Build a Dashboard](/guides/custom-dashboard) to track onboarding KPIs weekly
 
----
+## FAQ
 
 <AccordionGroup>
 
@@ -217,20 +211,12 @@ User Paths (flows) show all possible routes users take, including dropoffs. Funn
 Yes. In the flow filter, add a condition like "Time Since Starting Event: < 24 hours" to see only the first day of user behavior.
 </Accordion>
 
-<Accordion title="Why is my flow showing circular paths (loops)?">
-Loops mean users revisit pages. For example, users might visit Swap > Portfolio > Swap again. This is normal and shows exploration behavior. Filter to first-visit-only if you want linear paths.
-</Accordion>
-
 <Accordion title="What's the maximum number of steps a flow can show?">
 Flows can show up to 20 steps deep, though clarity typically degrades after 7-8 steps. If your flow is too complex, filter to new users only or segment by user property.
 </Accordion>
 
 <Accordion title="Can I export flow data as a CSV or JSON?">
 Yes. Click Export in the chart menu to download node and path data. Useful for reporting to stakeholders or further analysis in Excel.
-</Accordion>
-
-<Accordion title="How often do flows update?">
-Flows update in real time as new user sessions are recorded. Historical flows (from past dates) refresh daily.
 </Accordion>
 
 </AccordionGroup>

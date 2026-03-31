@@ -9,12 +9,6 @@ Dashboards show what builders thought you'd want. SQL lets you ask anything.
 
 The SQL Explorer is your direct line to Formo's analytics database. Write custom queries in ClickHouse SQL, visualize results, export as CSV, and connect external BI tools. If dashboards don't have what you need, SQL does.
 
-## Prerequisites
-
-- Formo is installed and collecting data
-- Basic familiarity with SQL syntax (SELECT, WHERE, GROUP BY)
-- Access to the Explore section (all plans)
-
 ## Part 1: Navigate to Explore
 
 Click **Explore** in the sidebar. You'll see:
@@ -142,10 +136,15 @@ What % of visitors connect a wallet?
 
 ```sql
 SELECT 
-  count(DISTINCT case when type = 'connect' then address end) as connected_wallets,
-  count(DISTINCT anonymous_id) as total_visitors,
+  connected_wallets,
+  total_visitors,
   round(100.0 * connected_wallets / total_visitors, 2) as connect_rate_percent
-FROM events
+FROM (
+  SELECT 
+    count(DISTINCT case when type = 'connect' then address end) as connected_wallets,
+    count(DISTINCT anonymous_id) as total_visitors
+  FROM events
+)
 ```
 
 ### Query 4: Transaction Volume by Day
@@ -169,12 +168,17 @@ Where do your best users come from?
 
 ```sql
 SELECT
-  argMaxMerge(last_utm_source) as utm_source,
-  count(DISTINCT address) as users,
-  avg(uniqMerge(num_sessions)) as avg_sessions
-FROM users
+  utm_source,
+  count(*) as users
+FROM (
+  SELECT
+    address,
+    argMaxMerge(last_utm_source) as utm_source
+  FROM users
+  GROUP BY address
+)
+WHERE utm_source != ''
 GROUP BY utm_source
-HAVING utm_source IS NOT NULL
 ORDER BY users DESC
 ```
 
@@ -184,12 +188,18 @@ How many visits before users buy?
 
 ```sql
 SELECT 
-  avg(uniqMerge(num_sessions)) as avg_sessions
-FROM users
-WHERE address IN (
-  SELECT DISTINCT address 
-  FROM events 
-  WHERE type = 'decoded_log' AND event IN ('Swap', 'Transfer')
+  avg(sessions) as avg_sessions
+FROM (
+  SELECT
+    address,
+    uniqMerge(num_sessions) as sessions
+  FROM users
+  WHERE address IN (
+    SELECT DISTINCT address 
+    FROM events 
+    WHERE type = 'decoded_log' AND event IN ('Swap', 'Transfer')
+  )
+  GROUP BY address
 )
 ```
 
@@ -320,7 +330,7 @@ Example Metabase connection:
 
 Your BI tool becomes another analytics interface alongside Formo dashboards.
 
-## Pro Tips
+## Best Practices
 
 ### Click Schema Columns to Insert
 
@@ -352,23 +362,23 @@ Start typing a column name and press Ctrl+Space. Formo suggests matching columns
 
 ### Save Query Results as Charts
 
-After running a query, click **Save as Chart**. Add to a dashboard. The chart refreshes daily with fresh data.
+After running a query, click **Save as Chart**. Add to a dashboard. The chart updates in real time with new data.
 
 ### Filter for Performance
 
 Large queries over 1 year of data can slow down. Always add `WHERE timestamp >= ...` to limit the range.
 
-## What's Next?
+## Next Steps
 
 SQL opens doors to custom analysis:
 
-- See [How to Build a Protocol Dashboard](/guides/protocol-dashboard) for dashboard best practices
-- Learn [How to Analyze Conversion Funnels](/guides/conversion-funnel) for funnels
-- Explore [Attribution Guide](/guides/attribution-guide) for UTM analysis
+- See [How to Build a Custom Dashboard](/guides/custom-dashboard) for dashboard best practices
+- Learn [How to Analyze Conversion Funnels](/guides/funnels) for funnels
+- Explore [Attribution Guide](/guides/onchain-attribution) for UTM analysis
 
 For SQL syntax help, see [ClickHouse Documentation](https://clickhouse.com/docs/en/intro).
 
----
+## FAQ
 
 <AccordionGroup>
 
@@ -382,10 +392,6 @@ No. Each project has its own isolated database. Write queries for one project at
 
 <Accordion title="What's the maximum query runtime?">
 Queries timeout after 120 seconds. Most queries finish in seconds. If yours is slow, add a `WHERE timestamp >= ...` filter to reduce the dataset.
-</Accordion>
-
-<Accordion title="Is there a query rate limit?">
-Free and Pro plans can run up to 100 queries/day. Growth+ plans have unlimited queries. Each query counts once, regardless of size.
 </Accordion>
 
 <Accordion title="Can I join events and users tables?">

@@ -72,17 +72,16 @@
           {
             "group": "How-To Guides",
             "pages": [
+              "guides/onchain-attribution",
               "guides/dau-tracking",
-              "guides/attribution-guide",
               "guides/contract-events",
-              "guides/conversion-funnel",
+              "guides/funnels",
               "guides/flows",
-              "guides/protocol-dashboard",
+              "guides/custom-dashboard",
               "guides/sql-explorer",
               "guides/ask-ai",
               "guides/wallet-segmentation",
-              "guides/retention",
-              "guides/token-gated-forms"
+              "guides/retention"
             ]
           }
         ]

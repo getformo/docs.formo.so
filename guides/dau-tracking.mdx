@@ -15,13 +15,6 @@ Unlike traditional analytics that count page views, Formo tracks actual wallet e
 - Create custom dashboards for user engagement
 - Analyze active user trends over time
 
-## Prerequisites
-
-- Formo SDK installed ([Installation Guide](/install))
-- At least 7 days of data collection (for meaningful WAU metrics)
-
----
-
 ## Part 1: Understanding Crypto App User Metrics
 
 ### What is a user?
@@ -47,8 +40,6 @@ Traditional web analytics count "active users" by sessions or page views. For cr
 | **Power users** | Active 5+ days in last 30 days | Core engaged users |
 | **Volume/Revenue** | Total transaction value | Economic activity |
 | **Retention** | % of users returning over time | Long-term engagement |
-
----
 
 ## Part 2: How to View Core Metrics
 
@@ -87,7 +78,6 @@ The overview chart shows daily unique wallets over time. Look for:
 - **Weekly patterns**: Which days have highest engagement?
 - **Anomalies**: Sudden spikes or drops to investigate
 
----
 
 ## Part 3: How to Create a Custom DAU Dashboard
 
@@ -148,7 +138,6 @@ ORDER BY date
 
 <Note>For a true rolling 7-day WAU, you'll need a window function. The Ask AI feature can help generate this query.</Note>
 
----
 
 ## Part 4: How to Segment Active Users
 
@@ -191,7 +180,6 @@ Track which channels drive the most engaged users:
   <Step title="Compare conversion rates across sources" />
 </Steps>
 
----
 
 ## Part 5: How to Track Active Users Over Time
 
@@ -226,7 +214,6 @@ A healthy pattern:
 - Stabilization in weeks 2-4
 - Consistent long-term retention
 
----
 
 ## Part 6: Example DAU Dashboard
 
@@ -243,7 +230,6 @@ Here's a complete dashboard setup for tracking active users:
 | **Active by Referrer** | Bar | DAU breakdown by traffic source |
 | **Active by Country** | Pie | Geographic distribution |
 
----
 
 ## Summary
 
@@ -254,30 +240,27 @@ You've learned how to:
 3. **Create custom dashboards** with SQL or Ask AI
 4. **Segment active users** by lifecycle and engagement
 5. **Track trends** with week-over-week comparisons
-6. **Set up alerts** for metric changes
+6. **Set up alerts** for high-value user activity and key events
 
-## Benchmarks for crypto app DAU
+## Next Steps
 
-| App Type | Typical DAU/MAU | Notes |
-|-----------|-----------------|-------|
-| DEX | 15-25% | High-frequency usage |
-| Lending | 5-10% | Less frequent interactions |
-| Gaming | 20-40% | Daily engagement loops |
-| Bridge | 3-5% | Infrequent, high-value |
+- **[Measure Retention](/guides/retention)**: Track week-over-week retention.
+- **[Segment Wallets](/guides/wallet-segmentation)**: Create behavioral segments.
+- **[Build a Dashboard](/guides/custom-dashboard)**: Build a complete metrics dashboard.
+- **[Explore with SQL](/guides/sql-explorer)**: Run custom SQL queries.
 
-## Next steps
+## FAQ
 
-<CardGroup cols={2}>
-  <Card title="Retention Analysis" icon="calendar" href="/guides/retention">
-    Measure week-over-week retention
-  </Card>
-  <Card title="Wallet Segmentation" icon="users" href="/guides/wallet-segmentation">
-    Create behavioral segments
-  </Card>
-  <Card title="Protocol Dashboard" icon="chart-line" href="/guides/protocol-dashboard">
-    Build a complete metrics dashboard
-  </Card>
-  <Card title="SQL Explorer" icon="compass" href="/guides/sql-explorer">
-    Run custom SQL queries
-  </Card>
-</CardGroup>
+<AccordionGroup>
+<Accordion title="What counts as an active user in Formo?">
+A user who connected a wallet or completed a transaction within the time period. Page-only visitors are counted separately as visitors.
+</Accordion>
+
+<Accordion title="What's the difference between visitors and wallets?">
+Visitors are anonymous page views tracked by session. Wallets are unique addresses that connected to your app. A single visitor can connect multiple wallets.
+</Accordion>
+
+<Accordion title="Can I track DAU across multiple chains?">
+Yes. Formo tracks wallet connections across all supported chains. A user connecting on Ethereum and Polygon counts as one unique wallet address.
+</Accordion>
+</AccordionGroup>

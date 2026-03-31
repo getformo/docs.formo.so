@@ -11,12 +11,6 @@ A user might visit your dapp 10 times but never make a transaction. Or they migh
 
 With Formo, you can monitor contract activity in real time, link it to your users, and use it in funnels, flows, and dashboards.
 
-## Prerequisites
-
-- You have a deployed smart contract (ERC-20, DEX, lending, etc.)
-- Contract address and chain are known
-- Formo is installed on your dapp
-
 ## Part 1: Navigate to Project Settings > Contracts
 
 In the Formo dashboard, click the gear icon (settings) in the top right. Click **Contracts**.
@@ -173,9 +167,9 @@ Navigate to **Project Settings** > **Alerts**.
 
 Create alerts for important contract events:
 
-- "Alert me when daily swap volume drops below $10k"
-- "Alert me when high-net-worth wallet connects"
-- "Alert me when contract receives >100 transfers in 1 hour"
+- "Alert me when a high-net-worth wallet connects"
+- "Alert me when a whale executes a swap"
+- "Alert me when a specific contract event fires"
 
 Alerts notify you in real time or on a daily digest, keeping you informed of important onchain activity.
 
@@ -197,17 +191,16 @@ If you need to stop tracking a contract, click **Pause** next to its name. Event
 
 If you add new events or update your contract, deploy again. The pipeline seamlessly updates.
 
-## What's Next?
+## Next Steps
 
 Once contract events are flowing, explore advanced use cases:
 
-- See [How to Build Conversion Funnels](/guides/conversion-funnel) to measure onchain conversion
+- See [How to Build Funnels](/guides/funnels) to measure onchain conversion
 - Learn [SQL Explorer](/guides/sql-explorer) for custom queries
 - Check [Ask AI](/guides/ask-ai) to generate queries from natural language
+- Build a [Custom Dashboard](/guides/custom-dashboard) to visualize contract event data
 
-For protocol-specific dashboards, see [How to Build a Protocol Dashboard](/guides/protocol-dashboard).
-
----
+## FAQ
 
 <AccordionGroup>
 
@@ -220,11 +213,7 @@ Formo queries Etherscan, Polygonscan, and other block explorers. If your contrac
 </Accordion>
 
 <Accordion title="What happens if I add a contract that's not verified on Etherscan?">
-You can paste the ABI manually. Grab it from your Hardhat build, Foundry output, or contract IDE. Formo will use it to decode events.
-</Accordion>
-
-<Accordion title="Is there a delay between contract event execution and visibility in Formo?">
-Typical latency is 10-30 seconds. Events appear in Activity and Explore shortly after they're mined onchain. Some chains may have higher latency.
+You can paste the ABI manually. Formo will use it to decode transactions and events.
 </Accordion>
 
 <Accordion title="Can I track events from multiple contracts in a single funnel?">
