@@ -1,0 +1,196 @@
+---
+title: "How to Use Ask AI to Surface Growth Insights"
+sidebarTitle: "How to Ask AI"
+description: "Use Formo's AI assistant to explore analytics data with natural language questions, generate SQL queries automatically, and uncover hidden growth insights."
+keywords: ["AI analytics", "natural language analytics", "crypto data AI", "DeFi insights AI", "formo ask AI", "text to SQL"]
+---
+
+What if you could just ask your data a question? No SQL, no dashboard hunting, no waiting for an analyst. With Ask AI, you can.
+
+Ask natural language questions about your protocol and get instant answers. The AI generates SQL queries, runs them, and shows you charts and summaries. It's like having a data analyst on call.
+
+## Part 1: Open Ask AI
+
+You can access Ask AI in two ways:
+
+1. **Click "Ask AI"** in the left sidebar (chat bubble icon)
+2. **Click the chat bubble** in the bottom right corner of any page
+
+Both open the same chat interface. You'll see your conversation history on the left and the chat window on the right.
+
+<Frame>
+  <img src="/images/ai.png" alt="Ask AI interface with chat history" />
+</Frame>
+
+## Part 2: Ask Your First Question
+
+Start with something straightforward. Click in the message box and type a question:
+
+**Example:** "How many unique wallets connected this week?"
+
+Hit enter. The AI will:
+
+1. Parse your question
+2. Generate a SQL query from it
+3. Run the query against your data
+4. Return a summary, a chart, and the generated SQL
+
+You'll see the answer instantly. No waiting for a data analyst.
+
+<Frame>
+  <img src="/images/text-to-sql.png" alt="AI generates SQL and shows chart result" />
+</Frame>
+
+## Part 3: Understand the Response
+
+Each Ask AI response includes:
+
+- **Summary:** A plain English explanation of what the data shows
+- **Chart:** A visualization of the results (line, bar, pie, etc.)
+- **SQL:** The exact query the AI ran (you can copy and edit it)
+
+You can click "View in Explorer" to open the SQL editor if you want to tweak the query or save it as a chart.
+
+## Part 4: Ask Follow-Up Questions
+
+This is where Ask AI gets powerful. Ask follow-ups without repeating context:
+
+**You:** "How many unique wallets connected this week?"
+**AI:** [Shows 12,453 wallets]
+
+**You:** "How many of those were new?"
+**AI:** [Filters to new wallets. Understands "those" = the wallets from last question]
+
+**You:** "What were their top referral sources?"
+**AI:** [Breaks down new wallets by referrer. Still understands the context]
+
+The AI maintains conversation memory, so each question builds on the previous one. No need to re-ask context.
+
+## Part 5: Use the Insights Page for Automated Analysis
+
+Beyond Ask AI, visit **Insights** in the sidebar for AI-generated analysis of your entire protocol:
+
+
+<Frame>
+  <img src="/images/insights.png" alt="AI-generated insights page" />
+</Frame>
+
+### Wins
+Positive trends the AI detected (e.g., "DAU up 25% this week")
+
+### Issues
+Problems worth investigating (e.g., "Retention dropped below historical average")
+
+### Opportunities
+Actionable insights (e.g., "Traffic from Twitter is converting 3x better than Discord")
+
+### Actions
+Recommended next steps based on your data
+
+### Acquisition Quality
+Which channels bring the best LTV users?
+
+### Activation
+Which cohorts complete key actions fastest?
+
+### Revenue
+Which cohorts spend the most onchain?
+
+### Churn Prediction
+Which users are at risk of churning?
+
+### Behavioral Insights
+Common patterns in high-value users
+
+## Part 6: Save Your Questions as Dashboards
+
+Found a question you want to check weekly? Save it:
+
+1. Ask your question in Ask AI
+2. Click **Save as Chart**
+3. Name it and choose your board
+4. It's now on your dashboard, auto-updating with new data
+
+Now your whole team sees those insights every time they open your dashboard.
+
+## Questions to Ask
+
+<Note>
+Be specific with dates and metrics. Instead of "How are we doing?" try "What's my DAU compared to last week?" or "Show me conversion by traffic source for the last 30 days."
+</Note>
+
+1. **"What are my top referral sources by transaction count?"**
+   Find which channels drive the most revenue-generating traffic.
+
+2. **"Which pages have the highest bounce rate?"**
+   Identify where users drop off and where to improve UX.
+
+3. **"Show me daily active wallets for the last 30 days"**
+   Track your DAU trend and spot seasonal patterns.
+
+4. **"What's the conversion rate from wallet connect to transaction?"**
+   Understand your core funnel health.
+
+5. **"Which UTM campaigns drove the most revenue this month?"**
+   Measure marketing ROI and double down on winners.
+
+6. **"How does mobile vs desktop conversion compare?"**
+   Identify platform-specific opportunities.
+
+7. **"What's the average time between first visit and first transaction?"**
+   Measure your sales cycle and where to optimize.
+
+8. **"Show me my top 10 users by transaction count"**
+   Find your whales and high-value cohorts.
+
+9. **"Which wallet labels are most common in my user base?"**
+   Understand if you're attracting bots, institutions, or retail.
+
+10. **"Compare this week's metrics to last week"**
+    Spot trends and anomalies at a glance.
+
+## Best Practices
+
+<Tip>
+**Be specific with time ranges.** Instead of "How many transactions?" say "How many transactions in the last 7 days?" The AI will ask if you're unclear.
+</Tip>
+
+<Tip>
+**Use follow-ups to drill deeper.** Don't try to ask everything in one question. Start broad, then ask follow-ups to explore specific angles.
+</Tip>
+
+<Tip>
+**Ask about wallet labels.** If you've set up [wallet intelligence](/guides/wallet-segmentation), ask the AI to segment by label. "Show me DAU by wallet label" reveals which user types drive value.
+</Tip>
+
+<Tip>
+**Copy SQL for custom charts.** If the AI generates a query you love, copy it and paste it into the Explorer or a SQL chart on your dashboard. Now you have a reusable analysis.
+</Tip>
+
+<Tip>
+**Check Insights daily.** The Insights page updates automatically. Make it part of your morning routine to spot issues before they become crises.
+</Tip>
+
+## Next Steps
+
+- [Create a custom dashboard](/guides/custom-dashboard) to visualize key metrics
+- [Build a funnel](/guides/funnels) to understand your acquisition flow
+- [Use the Explorer](/guides/sql-explorer) to write custom SQL queries for deeper analysis
+- [Set up wallet segmentation](/guides/wallet-segmentation) to analyze user cohorts
+- [See AI prompts for DeFi marketers](https://formo.so/blog/ai-prompts-defi-marketers) for more question ideas
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does the AI have access to all my data?">
+    Yes, Ask AI can query all events, properties, and custom SQL tables in your project schema. It respects your project's permissions, so team members only see data they have access to.
+  </Accordion>
+
+  <Accordion title="How far back can I ask about historical data?">
+    You can query as far back as your project has data (usually from your first SDK install, months to years ago). Ask away: "Show me DAU for the last 6 months."
+  </Accordion>
+
+  <Accordion title="Can I ask the AI to create a new event or property?">
+    No, Ask AI only reads and analyzes data. To create new events or properties, configure them in your SDK or contract events setup.
+  </Accordion>
+</AccordionGroup>

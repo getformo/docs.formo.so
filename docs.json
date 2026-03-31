@@ -11,7 +11,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Overview",
         "groups": [
           {
             "group": "Getting started",
@@ -63,17 +63,25 @@
               },
               "features/mcp/overview"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
           {
-            "group": "Use Cases",
+            "group": "How-To Guides",
             "pages": [
-              "guides/use-cases/dau-tracking",
-              "guides/use-cases/defi-conversions",
-              "guides/use-cases/wallet-targeting",
-              "guides/use-cases/attribution-guide",
-              "guides/use-cases/onboarding-analysis",
-              "guides/use-cases/churn-prevention",
-              "guides/use-cases/protocol-dashboard"
+              "guides/onchain-attribution",
+              "guides/dau-tracking",
+              "guides/contract-events",
+              "guides/funnels",
+              "guides/flows",
+              "guides/custom-dashboard",
+              "guides/sql-explorer",
+              "guides/ask-ai",
+              "guides/wallet-segmentation",
+              "guides/retention"
             ]
           }
         ]
