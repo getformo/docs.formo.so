@@ -291,6 +291,11 @@
     "default": "light"
   },
   "description": "Guides and API documentation for the Formo data platform.",
+  "seo": {
+    "metatags": {
+      "msvalidate.01": "71E42B1EAE01EE25D08368832DB15087"
+    }
+  },
   "background": {
     "decoration": "gradient"
   },
