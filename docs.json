@@ -61,7 +61,9 @@
                   "features/token-gated-forms/world-id"
                 ]
               },
-              "features/mcp/overview"
+              "features/mcp/overview",
+              "integrations/overview",
+              "chains/overview"
             ]
           }
         ]
@@ -196,24 +198,6 @@
               "api-reference/alerts/delete",
               "api-reference/alerts/toggle"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "Integrations",
-        "groups": [
-          {
-            "group": "Integrations",
-            "pages": ["integrations/overview"]
-          }
-        ]
-      },
-      {
-        "tab": "Chains",
-        "groups": [
-          {
-            "group": "Chains",
-            "pages": ["chains/overview"]
           }
         ]
       },
