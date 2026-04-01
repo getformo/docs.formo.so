@@ -248,15 +248,17 @@ The webhook payload uses the `alert.event.triggered` event type and contains raw
 
 #### Slack payload
 
-For Slack incoming webhooks (`hooks.slack.com`), Formo formats events as a Slack Block Kit table instead of raw data.
+For Slack incoming webhooks (`hooks.slack.com`), Formo formats each event as an individual Slack Block Kit card message.
 
-The Slack message includes:
-- A header with the alert name
-- A table with columns: **Time**, **User** (clickable link to Formo profile), **[dynamic property columns]**, **Country**, **Device**, **Browser**, **OS**, **Referrer**
-- Property columns are collected dynamically from all events in the batch
-- Up to **50 events** are shown per message, with a truncation note if more were found
+Each message includes:
+- A **header** with the alert name
+- A **user** link (clickable link to Formo profile)
+- **Event properties** (key-value pairs from the event, up to 10 properties)
+- **Metadata fields**: Country, Device, Browser, OS, Referrer, Referral, UTM Source, UTM Medium, UTM Campaign, UTM Term, UTM Content — only shown when non-empty
+- A **timestamp** and **View User** button
+- Up to **25 events** per batch, with an overflow summary if more were found
 
-**Sample Slack Block Kit payload:**
+**Sample Slack Block Kit payload (one event = one message):**
 
 ```json
 {
@@ -270,28 +272,41 @@ The Slack message includes:
       }
     },
     {
-      "type": "table",
-      "rows": [
-        [
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Time", "style": { "bold": true } }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "User", "style": { "bold": true } }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "chain_id", "style": { "bold": true } }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Country", "style": { "bold": true } }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Device", "style": { "bold": true } }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Browser", "style": { "bold": true } }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "OS", "style": { "bold": true } }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Referrer", "style": { "bold": true } }] }] }
-        ],
-        [
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Feb 9, 06:42 AM" }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "link", "url": "https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8...E26bdc", "text": "0xF04bC8...E26bdc" }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "84532" }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Vietnam" }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Desktop" }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "Chrome" }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "MacOS" }] }] },
-          { "type": "rich_text", "elements": [{ "type": "rich_text_section", "elements": [{ "type": "text", "text": "google.com" }] }] }
-        ]
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "<https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc|0xF04bC8...E26bdc>"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*chain_id:* 84532\n*net_worth:* 250000"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Country:* Vietnam\n*Device:* Desktop\n*Browser:* Chrome\n*OS:* MacOS\n*Referrer:* google.com\n*UTM Source:* google\n*UTM Medium:* cpc\n*UTM Campaign:* whale-acquisition"
+      }
+    },
+    {
+      "type": "context",
+      "elements": [
+        { "type": "mrkdwn", "text": ":clock1: Feb 9, 06:42 AM" }
+      ]
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": { "type": "plain_text", "emoji": true, "text": "View User" },
+          "style": "primary",
+          "url": "https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc"
+        }
       ]
     }
   ]
