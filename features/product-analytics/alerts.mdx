@@ -480,11 +480,11 @@ The webhook payload uses the `alert.user.triggered` event type:
 
 For Slack incoming webhooks, Formo formats user profiles as a rich card layout:
 
-- A header with the alert name
-- Per user: a clickable address header, a **field grid** with key profile data, an avatar image (if available), and a **View Profile** button
-- Up to **10 users** per message, with a truncation note if more were found
+- A **header** with the alert name
+- Per user: a clickable address header with avatar image (if available), a **field grid** with key profile data, and a **View Profile** button
+- Up to **25 users** per batch, with an overflow summary if more were found
 
-**Fields displayed:**
+**Default fields displayed:**
 
 | Field | Source | Conditional |
 |-------|--------|-------------|
@@ -492,12 +492,12 @@ For Slack incoming webhooks, Formo formats user profiles as a rich card layout:
 | Net Worth | `net_worth_usd` (formatted as `$1,234`) | No — always shown |
 | First Seen | `first_seen` (formatted date) | No — always shown |
 | Location | `location` | Yes — only shown when non-empty |
-| Referrer | `first_referrer` or `last_referrer` | Yes — only shown when non-empty |
-| Referral | `first_ref` or `last_ref` | Yes — only shown when non-empty |
-| UTM | `first_utm_*` or `last_utm_*` (comma-joined) | Yes — only shown when non-empty |
 | Browser | `browser` | Yes — only shown when non-empty |
 | Device | `device` | Yes — only shown when non-empty |
 | OS | `os` | Yes — only shown when non-empty |
+| Referrer | `first_referrer` or `last_referrer` | Yes — only shown when non-empty |
+| Referral | `first_ref` or `last_ref` | Yes — only shown when non-empty |
+| UTM | `first_utm_*` or `last_utm_*` (comma-joined) | Yes — only shown when non-empty |
 
 **Sample Slack Block Kit payload:**
 
@@ -517,6 +517,11 @@ For Slack incoming webhooks, Formo formats user profiles as a rich card layout:
       "text": {
         "type": "mrkdwn",
         "text": "*<https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc|0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc>*"
+      },
+      "accessory": {
+        "type": "image",
+        "image_url": "https://euc.li/whale.eth",
+        "alt_text": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc"
       }
     },
     {
@@ -526,17 +531,12 @@ For Slack incoming webhooks, Formo formats user profiles as a rich card layout:
         { "type": "mrkdwn", "text": "*Net Worth:* $250,000" },
         { "type": "mrkdwn", "text": "*First Seen:* Nov 15, 2025" },
         { "type": "mrkdwn", "text": "*Location:* VN" },
-        { "type": "mrkdwn", "text": "*Referrer:* google.com" },
-        { "type": "mrkdwn", "text": "*UTM:* google, cpc, whale-acquisition" },
         { "type": "mrkdwn", "text": "*Browser:* Chrome" },
         { "type": "mrkdwn", "text": "*Device:* desktop" },
-        { "type": "mrkdwn", "text": "*OS:* MacOS" }
-      ],
-      "accessory": {
-        "type": "image",
-        "image_url": "https://euc.li/vitalik.eth",
-        "alt_text": "0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc"
-      }
+        { "type": "mrkdwn", "text": "*OS:* MacOS" },
+        { "type": "mrkdwn", "text": "*Referrer:* google.com" },
+        { "type": "mrkdwn", "text": "*UTM:* google, cpc, whale-acquisition" }
+      ]
     },
     {
       "type": "actions",
