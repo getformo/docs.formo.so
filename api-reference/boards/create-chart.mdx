@@ -2,3 +2,479 @@
 title: 'Create Chart'
 openapi: 'POST /v0/boards/{boardId}/charts'
 ---
+
+## Overview
+
+Creates a new chart and attaches it to a board. The chart type determines which fields are required. For funnel charts specifically, the SQL query is auto-generated from the `steps` array — pass `"SELECT 1"` as the `query` placeholder.
+
+---
+
+## Request Body Fields
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `projectId` | string | Yes | The project the chart belongs to |
+| `boardId` | string | Yes | The board to attach the chart to (also in path) |
+| `query` | string | Yes | SQL query for the chart. For `funnel` and `retention` charts, pass `"SELECT 1"` as a placeholder |
+| `chart_type` | string | Yes | One of `table`, `number`, `bar`, `line`, `pie`, `stacked`, `funnel`, `user_paths`, `retention` |
+| `title` | string | Yes | Display title for the chart (1–100 characters) |
+| `description` | string | No | Optional description (up to 255 characters) |
+| `x_axis` | string | No | Column name for the X axis. Required for `bar`, `line`, and `stacked` |
+| `y_axis` | string[] | No | Column name(s) for the Y axis. Required for `bar`, `line`, `pie`, and `stacked` |
+| `group_by` | string | No | Column to group series by. Required for `stacked` charts |
+| `steps` | object[] | No | Array of funnel steps. Required for `funnel` charts (minimum 2 steps) |
+| `settings` | object | No | Chart-type-specific configuration (see per-type details below) |
+
+---
+
+## Chart Types
+
+### `table`
+
+Renders raw query results in a paginated table. No axis configuration needed.
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
+  "chart_type": "table",
+  "title": "Recent Events"
+}
+```
+
+---
+
+### `number`
+
+Renders a single scalar value (KPI card). The query **must** return exactly one row with exactly one column.
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
+  "chart_type": "number",
+  "title": "Total Connected Wallets"
+}
+```
+
+---
+
+### `bar` and `line`
+
+Both require `x_axis` and at least one value in `y_axis`.
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT toDate(timestamp) AS date, COUNT(DISTINCT address) AS users FROM events GROUP BY date ORDER BY date",
+  "chart_type": "line",
+  "title": "Daily Active Users",
+  "x_axis": "date",
+  "y_axis": ["users"]
+}
+```
+
+---
+
+### `pie`
+
+Requires exactly **one** column in `y_axis`. The `x_axis` field identifies the label column.
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
+  "chart_type": "pie",
+  "title": "Sessions by Device",
+  "x_axis": "device",
+  "y_axis": ["session_count"]
+}
+```
+
+---
+
+### `stacked`
+
+Requires `x_axis`, exactly **one** column in `y_axis`, and a `group_by` column.
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
+  "chart_type": "stacked",
+  "title": "Sessions by Device and Browser",
+  "x_axis": "device",
+  "y_axis": ["session_count"],
+  "group_by": "browser"
+}
+```
+
+---
+
+## Funnel Charts
+
+Funnel charts visualize step-by-step user conversion. The SQL query is **auto-generated** from the `steps` array, so pass `"SELECT 1"` for `query`. You must provide at least **2 steps**.
+
+### `steps` Array
+
+Each step is an object with the following required fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `type` | string | Event type: `"event"` (built-in), `"track"` (custom), or `"decoded_log"` (contract event) |
+| `event` | string | The event name (e.g., `"page"`, `"connect"`, `"transaction"`) |
+
+Steps can also include **property filter conditions** as additional fields. Each filter has the shape:
+
+```json
+{
+  "<property_name>": {
+    "op": "<operator>",
+    "value": "<value>"
+  }
+}
+```
+
+#### Supported Operators
+
+| Operator | Description |
+|---|---|
+| `equals` | Exact match |
+| `notEquals` | Does not match |
+| `in` | Matches any of a set of values (pipe-separated, e.g., `"metamask\|rainbow"`) |
+| `notIn` | Does not match any of a set of values |
+| `startsWith` | String starts with the value |
+| `endsWith` | String ends with the value |
+| `includes` | String contains the value |
+| `gt` | Greater than |
+| `gte` | Greater than or equal |
+| `lt` | Less than |
+| `lte` | Less than or equal |
+
+### `settings` for Funnel Charts
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `funnelType` | `"closed"` \| `"open"` | `"closed"` | Controls whether users must convert without interruption |
+| `conversionWindow` | `{ value: number, unit: string }` | 1 day | Maximum time window for a user to complete all steps |
+| `breakdown` | string | — | Optional dimension to split funnel bars by |
+
+#### `funnelType`
+
+- **`closed`** — Users must complete each step in sequence, with no other tracked events between steps (strict ordering, no interruptions).
+- **`open`** — Users must complete each step in order, but other events may occur in between (more lenient).
+
+#### `conversionWindow`
+
+The conversion window is the maximum amount of time a user has to complete all funnel steps from step 1. After this window, a user who hasn't completed the remaining steps is counted as dropped off.
+
+The `unit` must be one of:
+
+| Unit | Description |
+|---|---|
+| `minute` | Minutes |
+| `hour` | Hours |
+| `day` | Days |
+| `week` | Weeks (7 days) |
+| `month` | Months (30 days) |
+
+```json
+"conversionWindow": {
+  "value": 7,
+  "unit": "day"
+}
+```
+
+#### `breakdown`
+
+Adding a breakdown splits each funnel step into groups by the chosen dimension. The top categories are shown individually; the rest are collapsed into an "Others" bucket.
+
+Allowed breakdown dimensions:
+
+| Value | Description |
+|---|---|
+| `device` | User device type (desktop, mobile, tablet) |
+| `browser` | Browser name |
+| `os` | Operating system |
+| `referrer` | Full referrer URL |
+| `ref` | Referral code / ref parameter |
+| `utm_source` | UTM source parameter |
+| `utm_medium` | UTM medium parameter |
+| `utm_campaign` | UTM campaign parameter |
+| `utm_term` | UTM term parameter |
+| `utm_content` | UTM content parameter |
+
+---
+
+### Funnel Examples
+
+#### Basic 3-step funnel (closed, 7-day window)
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT 1",
+  "chart_type": "funnel",
+  "title": "Onboarding Funnel",
+  "steps": [
+    { "type": "event", "event": "page" },
+    { "type": "event", "event": "connect" },
+    { "type": "event", "event": "transaction" }
+  ],
+  "settings": {
+    "funnelType": "closed",
+    "conversionWindow": {
+      "value": 7,
+      "unit": "day"
+    }
+  }
+}
+```
+
+#### Funnel with property filter on a step
+
+Filter step 2 to only count users who connected via MetaMask on Ethereum mainnet:
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT 1",
+  "chart_type": "funnel",
+  "title": "MetaMask Conversion Funnel",
+  "steps": [
+    {
+      "type": "event",
+      "event": "page"
+    },
+    {
+      "type": "event",
+      "event": "connect",
+      "rdns": {
+        "op": "equals",
+        "value": "io.metamask"
+      },
+      "chain_id": {
+        "op": "equals",
+        "value": "1"
+      }
+    },
+    {
+      "type": "event",
+      "event": "transaction"
+    }
+  ],
+  "settings": {
+    "funnelType": "closed",
+    "conversionWindow": {
+      "value": 7,
+      "unit": "day"
+    }
+  }
+}
+```
+
+#### Funnel with breakdown by device
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT 1",
+  "chart_type": "funnel",
+  "title": "Onboarding Funnel by Device",
+  "steps": [
+    { "type": "event", "event": "page" },
+    { "type": "event", "event": "connect" },
+    { "type": "event", "event": "signature" }
+  ],
+  "settings": {
+    "funnelType": "closed",
+    "conversionWindow": {
+      "value": 30,
+      "unit": "day"
+    },
+    "breakdown": "device"
+  }
+}
+```
+
+#### Open funnel with multi-value filter and breakdown
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT 1",
+  "chart_type": "funnel",
+  "title": "Mobile Onboarding Funnel",
+  "steps": [
+    {
+      "type": "event",
+      "event": "page",
+      "device": {
+        "op": "equals",
+        "value": "mobile"
+      }
+    },
+    {
+      "type": "event",
+      "event": "connect",
+      "provider_name": {
+        "op": "in",
+        "value": "metamask|rainbow|coinbase"
+      }
+    },
+    {
+      "type": "event",
+      "event": "transaction"
+    }
+  ],
+  "settings": {
+    "funnelType": "open",
+    "conversionWindow": {
+      "value": 30,
+      "unit": "day"
+    },
+    "breakdown": "device"
+  }
+}
+```
+
+---
+
+## Retention Charts
+
+Retention charts measure how often users return over time. The query is managed internally — pass an empty string or a placeholder for `query`.
+
+### `settings` for Retention Charts
+
+| Field | Type | Description |
+|---|---|---|
+| `retentionFilter` | object \| null | Optional event filter. Users are counted as "retained" when they perform this event. If `null`, any event counts |
+| `retentionUserFilters` | object[] | Optional list of user-segment filters (by device, OS, UTM, etc.) |
+
+The `retentionFilter` uses the same step object shape as funnel steps (`type` + `event`).
+
+Each `retentionUserFilters` entry has:
+
+| Field | Type | Description |
+|---|---|---|
+| `operand` | string | The property to filter on (e.g., `"device"`, `"utm_source"`, `"browser"`) |
+| `operator` | string | The comparison operator (e.g., `"equals"`, `"notEquals"`) |
+| `value` | string \| number | The value to compare against |
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "",
+  "chart_type": "retention",
+  "title": "Weekly Retention — Desktop Users",
+  "settings": {
+    "retentionFilter": {
+      "type": "event",
+      "event": "transaction"
+    },
+    "retentionUserFilters": [
+      {
+        "operand": "device",
+        "operator": "equals",
+        "value": "desktop"
+      }
+    ]
+  }
+}
+```
+
+For unfiltered, all-users retention, omit `settings` entirely:
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "",
+  "chart_type": "retention",
+  "title": "Overall Retention"
+}
+```
+
+---
+
+## User Paths Charts
+
+User Paths (Flow) charts visualize how users navigate through your app after a starting event.
+
+### `settings` for User Paths Charts
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `startStep` | object | — | **Required.** The event where the flow begins |
+| `endStep` | object \| null | `null` | Optional ending event. If `null`, the flow is open-ended |
+| `maxSteps` | number | 3 | Maximum number of steps to show in the flow |
+| `nodesPerStep` | number | — | Maximum number of unique event nodes visible per step |
+| `conversionWindow` | object | — | Time window to group the flow |
+
+Both `startStep` and `endStep` use the same step object shape as funnel steps (`type` + `event`).
+
+```json
+{
+  "projectId": "proj_abc",
+  "boardId": "board_xyz",
+  "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
+  "chart_type": "user_paths",
+  "title": "Post-Connect User Flow",
+  "settings": {
+    "startStep": {
+      "type": "event",
+      "event": "connect"
+    },
+    "endStep": {
+      "type": "event",
+      "event": "transaction"
+    },
+    "maxSteps": 5,
+    "conversionWindow": {
+      "value": 2,
+      "unit": "week"
+    }
+  }
+}
+```
+
+---
+
+## Validation Rules Summary
+
+| Chart Type | Required Fields |
+|---|---|
+| `table` | `query` |
+| `number` | `query` (must return exactly 1 row × 1 column) |
+| `bar` | `query`, `x_axis`, `y_axis` (≥ 1 element) |
+| `line` | `query`, `x_axis`, `y_axis` (≥ 1 element) |
+| `pie` | `query`, `y_axis` (exactly 1 element) |
+| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1 element), `group_by` |
+| `funnel` | `steps` (≥ 2 steps), `query` placeholder (`"SELECT 1"`) |
+| `user_paths` | `query`, `settings.startStep` |
+| `retention` | `query` placeholder (can be empty string) |
+
+---
+
+## Response
+
+Returns `201 Created` with the new chart's ID:
+
+```json
+{
+  "isSuccess": true,
+  "data": "chart_1a2b3c4d"
+}
+```
+
+Use the returned chart ID to retrieve, update, or delete the chart via the other board chart endpoints.
