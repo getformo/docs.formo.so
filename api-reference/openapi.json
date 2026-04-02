@@ -1113,6 +1113,28 @@
             "type": "string",
             "nullable": true
           },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Type of the event, e.g. 'event', 'track', or 'decoded_log'."
+                },
+                "event": {
+                  "type": "string",
+                  "description": "Name of the event."
+                }
+              },
+              "required": [
+                "type",
+                "event"
+              ]
+            },
+            "nullable": true,
+            "description": "Array of funnel steps. Used when chart_type is funnel."
+          },
           "settings": {
             "type": "object",
             "nullable": true
@@ -3123,8 +3145,23 @@
                   },
                   "steps": {
                     "type": "array",
+                    "description": "Array of funnel steps. Required when chart_type is 'funnel'.",
                     "items": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Type of the event, e.g. 'event', 'track', or 'decoded_log'."
+                        },
+                        "event": {
+                          "type": "string",
+                          "description": "Name of the event."
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "event"
+                      ]
                     }
                   },
                   "settings": {
