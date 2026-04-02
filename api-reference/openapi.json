@@ -4049,11 +4049,11 @@
                     }
                   },
                   "powerUsers": {
-                    "summary": "Power users with high transaction count from organic traffic",
+                    "summary": "Power users with high net worth from organic traffic",
                     "value": {
                       "title": "Organic power users",
                       "filterSets": [
-                        "tx_count::greater::100",
+                        "net_worth_usd::greater::1000",
                         "utm_source::notIn::google_ads|facebook_ads",
                         "lifecycle::equals::power"
                       ]
