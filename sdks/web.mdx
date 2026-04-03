@@ -626,37 +626,70 @@ npm install @formo/analytics @solana/client @solana/react-hooks
 ```
 
 <Tabs>
-  <Tab title="Init with store (Recommended)">
-    Pass `client.store` from framework-kit during initialization. The SDK automatically tracks wallet connects, disconnects, account switches, and network changes.
+  <Tab title="React (Recommended)">
+    Wrap your app with `FormoAnalyticsProvider` and pass `client.store` in the solana options. The SDK automatically tracks wallet connects, disconnects, account switches, and network changes.
 
     ```tsx
     import { createClient, autoDiscover } from '@solana/client';
     import { SolanaProvider } from '@solana/react-hooks';
-    import { FormoAnalytics } from '@formo/analytics';
+    import { FormoAnalyticsProvider } from '@formo/analytics';
 
-    // Create the framework-kit client
     const client = createClient({
       cluster: 'devnet',
       walletConnectors: autoDiscover(),
     });
 
-    // Initialize Formo with the client store
+    function App() {
+      return (
+        <SolanaProvider client={client}>
+          <FormoAnalyticsProvider
+            writeKey="<YOUR_WRITE_KEY>"
+            options={{
+              evm: false, // Optional: disable EVM tracking for Solana-only apps
+              solana: {
+                store: client.store,
+              },
+            }}
+          >
+            <YourApp />
+          </FormoAnalyticsProvider>
+        </SolanaProvider>
+      );
+    }
+    ```
+
+    Then use the `useFormo` hook in any component:
+
+    ```tsx
+    import { useFormo } from '@formo/analytics';
+
+    function MyComponent() {
+      const formo = useFormo();
+
+      const handleClick = () => {
+        formo.track('button_click', { page: 'home' });
+      };
+    }
+    ```
+  </Tab>
+  <Tab title="Without React">
+    If you're not using React or need manual control, call `FormoAnalytics.init()` directly:
+
+    ```tsx
+    import { createClient, autoDiscover } from '@solana/client';
+    import { FormoAnalytics } from '@formo/analytics';
+
+    const client = createClient({
+      cluster: 'devnet',
+      walletConnectors: autoDiscover(),
+    });
+
     const formo = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
-      evm: false, // Optional: disable EVM tracking for Solana-only apps
+      evm: false,
       solana: {
         store: client.store,
       },
     });
-    ```
-  </Tab>
-  <Tab title="Lazy setup">
-    If the store isn't available at init time, set it later:
-
-    ```tsx
-    const formo = await FormoAnalytics.init('<YOUR_WRITE_KEY>');
-
-    // Later, when the client is ready:
-    formo.solana.setStore(client.store);
     ```
   </Tab>
 </Tabs>
@@ -672,7 +705,9 @@ npm install @formo/analytics @solana/client @solana/react-hooks
 **Manual tracking** — framework-kit's React hooks (`useSolTransfer`, `useSendTransaction`, `useTransactionPool`) manage transaction state locally and don't write to the store. Transaction and signature events must be tracked explicitly:
 
 ```tsx
-import { TransactionStatus, SignatureStatus, SOLANA_CHAIN_IDS } from '@formo/analytics';
+import { useFormo, TransactionStatus, SignatureStatus, SOLANA_CHAIN_IDS } from '@formo/analytics';
+
+const formo = useFormo();
 
 // Transactions
 formo.transaction({ status: TransactionStatus.STARTED, chainId: SOLANA_CHAIN_IDS['devnet'], address });
