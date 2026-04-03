@@ -17,7 +17,8 @@ Use this pre-built prompt to get started faster: [Install Formo with AI](/instal
 </Tip>
 
 There are several ways to install the Formo SDK:
-- [Wagmi](#wagmi) is recommended for apps with wallet connection
+- [Wagmi](#wagmi) is recommended for EVM apps with wallet connection
+- [Solana](#solana-integration) for Solana apps using framework-kit
 - [HTML Snippet](#html-snippet) is recommended for static websites
 - [React & Next.js (without Wagmi)](#react-&-next-js-without-wagmi)
 
@@ -616,59 +617,77 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 
 ### Solana integration
 
-The Formo Web SDK supports Solana. Solana tracking works alongside EVM tracking — you can track both EVM and Solana wallets in the same app.
-
-You need to use the [React/Next.js (without Wagmi)](#react-%26-next-js-without-wagmi) installation method to enable tracking of Solana wallets.
+The Formo Web SDK supports Solana via [framework-kit](https://github.com/solana-foundation/framework-kit) (`@solana/client` + `@solana/react-hooks`). The SDK subscribes to framework-kit's zustand store as a read-only observer — it never wraps or intercepts wallet methods.
 
 See the full [Solana example app](https://github.com/getformo/examples/tree/main/with-solana) for a working implementation.
 
+```bash
+npm install @formo/analytics @solana/client @solana/react-hooks
+```
+
 <Tabs>
-  <Tab title="React useWallet (Recommended)">
-    Pass the `useWallet()` context and connection to the SDK. This is the recommended approach for React apps — the SDK automatically tracks wallet lifecycle changes (connects, disconnects, wallet switches).
+  <Tab title="Init with store (Recommended)">
+    Pass `client.store` from framework-kit during initialization. The SDK automatically tracks wallet connects, disconnects, account switches, and network changes.
 
     ```tsx
-    import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-    import { useFormo } from '@formo/analytics';
-    import { useEffect } from 'react';
+    import { createClient, autoDiscover } from '@solana/client';
+    import { SolanaProvider } from '@solana/react-hooks';
+    import { FormoAnalytics } from '@formo/analytics';
 
-    function SolanaTracker() {
-      const wallet = useWallet();
-      const { connection } = useConnection();
-      const analytics = useFormo();
+    // Create the framework-kit client
+    const client = createClient({
+      cluster: 'devnet',
+      walletConnectors: autoDiscover(),
+    });
 
-      useEffect(() => {
-        if (analytics) {
-          analytics.setSolanaWallet(wallet);
-          analytics.setSolanaConnection(connection);
-        }
-      }, [analytics, wallet, connection]);
-
-      return null;
-    }
-    ```
-
-    Place `<SolanaTracker />` inside both `WalletProvider` and `FormoAnalyticsProvider`.
-  </Tab>
-  <Tab title="Init options">
-    Pass Solana options directly during initialization. Use this for non-React setups or when you manage the wallet adapter instance directly.
-
-    ```tsx
-    const analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
+    // Initialize Formo with the client store
+    const formo = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
+      evm: false, // Optional: disable EVM tracking for Solana-only apps
       solana: {
-        wallet: wallet,
-        connection: connection,
-        cluster: 'mainnet-beta', // Optional. 'mainnet-beta' (default) | 'devnet'
+        store: client.store,
       },
     });
     ```
   </Tab>
+  <Tab title="Lazy setup">
+    If the store isn't available at init time, set it later:
+
+    ```tsx
+    const formo = await FormoAnalytics.init('<YOUR_WRITE_KEY>');
+
+    // Later, when the client is ready:
+    formo.solana.setStore(client.store);
+    ```
+  </Tab>
 </Tabs>
 
-The SDK defaults to Solana mainnet-beta. To track on devnet, set the cluster:
+**Autocaptured events** (via store subscription):
+
+| Event | Trigger |
+|-------|---------|
+| Connect | Wallet connects via `useWalletConnection().connect()` |
+| Disconnect | Wallet disconnects |
+| Chain change | Cluster/network switches via `setCluster()` |
+
+**Manual tracking** — framework-kit's React hooks (`useSolTransfer`, `useSendTransaction`, `useTransactionPool`) manage transaction state locally and don't write to the store. Transaction and signature events must be tracked explicitly:
 
 ```tsx
-analytics.setSolanaCluster('devnet');
+import { TransactionStatus, SignatureStatus, SOLANA_CHAIN_IDS } from '@formo/analytics';
+
+// Transactions
+formo.transaction({ status: TransactionStatus.STARTED, chainId: SOLANA_CHAIN_IDS['devnet'], address });
+const sig = await solTransfer.send({ destination, amount });
+formo.transaction({ status: TransactionStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['devnet'], address, transactionHash: sig });
+
+// Signatures (signMessage / signTransaction)
+formo.signature({ status: SignatureStatus.REQUESTED, chainId: SOLANA_CHAIN_IDS['devnet'], address, message });
+const result = await session.signMessage(encoded);
+formo.signature({ status: SignatureStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['devnet'], address, message, signatureHash });
 ```
+
+<Note>
+For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-1193 / EIP-6963). This prevents unnecessary tracking of injected EVM wallets like MetaMask.
+</Note>
 
 ### Referrals
 
