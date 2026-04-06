@@ -21,6 +21,42 @@ Specify a conversion window for your funnels to control the time period during w
 
 The default conversion window is 2 weeks, meaning all steps must be completed within that time. Longer windows will include more event completions.
 
+## Step Order
+
+Control whether funnel steps must be completed in sequence or in any order. This setting changes how Formo counts conversions and can significantly affect your reported numbers.
+
+### Sequential (Closed Funnel)
+
+Step B must happen after Step A, but any number of events can happen between A and B.
+
+This is the default and most common mode. Users must progress through your defined steps in order, but they can perform other actions in between. For example, in a funnel of **Page View → Wallet Connect → Swap**, a user who visits the page, browses other pages, connects their wallet, checks token prices, and then swaps would still count as converted.
+
+<Note>
+**Seeing less than expected counts in the sequential funnel?** Users likely:
+- Skipped steps in your defined funnel
+- Completed steps in a different order
+- Had multiple wallets/sessions where they completed different parts of the funnel
+
+Consider making the funnel less strict by removing some intermediate steps, or use an open funnel.
+</Note>
+
+### Any Order (Open Funnel)
+
+Counts users who performed each event, regardless of sequence or timing.
+
+In this mode, users must complete all defined steps within the conversion window, but the order does not matter. The first step in your funnel could be the last action the user takes. This is useful when your funnel steps represent a set of actions rather than a linear journey.
+
+**When to use each mode:**
+
+| Mode | Best for | Example |
+|------|----------|---------|
+| **Sequential** | Linear user journeys where order matters | Page view → Wallet connect → Swap |
+| **Any order** | Feature adoption or non-linear flows | Deposit, Borrow, and Swap in any sequence |
+
+<Tip>
+Start with **Sequential** (the default). Switch to **Any order** only if your funnel represents actions that genuinely happen in variable order — such as multi-step DeFi flows where users may borrow before swapping, or complete approvals in any sequence.
+</Tip>
+
 ## Funnel Breakdowns
 
 Break down funnel steps by key dimensions to understand how different user segments convert:
@@ -102,7 +138,7 @@ Define the user journey you want to track. Click **Add Step** for each action:
 | 2 | Wallet connect | User connects wallet |
 | 3 | Transaction | User submits transaction |
 
-<Tip>Steps must happen in order. Formo tracks users who complete step 1, then step 2, then step 3 (in sequence).</Tip>
+<Tip>By default, steps must happen in order (Sequential mode). Formo tracks users who complete step 1, then step 2, then step 3 in sequence. You can change this to **Any order** in the [Step Order](#step-order) settings.</Tip>
 
 ### Step 3: Configure each step
 
