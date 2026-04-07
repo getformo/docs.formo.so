@@ -63,8 +63,8 @@ The core event log. Contains all user interaction events — page views, custom 
 | `user_id` | String | Optional user identifier |
 | `address` | String | Wallet address (empty if not connected) |
 | `event` | String | Specific event name for `track` events |
-| `context` | String | JSON metadata: user_agent, page info, referrer |
-| `properties` | String | JSON with event-specific custom properties |
+| `context` | String | JSON metadata: user_agent, page info, referrer. See [contextual fields](/data/events/common#contextual-fields) |
+| `properties` | String | JSON with event-specific custom properties. See [event spec](/data/events/overview) |
 | `version` | String | SDK version |
 | `timestamp` | DateTime | Event timestamp |
 | `message_id` | String | Unique event ID for deduplication |
