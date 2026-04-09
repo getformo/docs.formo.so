@@ -1,0 +1,120 @@
+---
+title: "Contracts"
+sidebarTitle: "Contracts"
+icon: file-contract
+description: "Register, list, update, and remove tracked smart contracts from the command line."
+---
+
+The `formo contracts` command group lets you manage the smart contracts tracked by your project. Register new contracts, update their ABIs and event configurations, and remove contracts you no longer need.
+
+## `formo contracts list`
+
+List all tracked contracts for the project.
+
+<Note>
+Requires `contracts:read` scope on your API key.
+</Note>
+
+```bash
+formo contracts list
+```
+
+---
+
+## `formo contracts create`
+
+Register a new smart contract to track.
+
+<Note>
+Requires `contracts:write` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--address` | `string` | ✅ | Contract address (`0x…`) |
+| `--chain` | `number` | ✅ | Chain ID (e.g. `1` for Ethereum, `137` for Polygon) |
+| `--name` | `string` | ✅ | Human-readable contract name |
+| `--abi` | `string` | ✅ | Contract ABI as a JSON string |
+| `--events` | `string` | ✅ | Events configuration as a JSON string |
+
+### Examples
+
+```bash
+# Register an ERC-20 contract on Ethereum
+formo contracts create \
+  --address 0x1234567890abcdef1234567890abcdef12345678 \
+  --chain 1 \
+  --name "My Token" \
+  --abi '[{"type":"event","name":"Transfer","inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}]}]' \
+  --events '{"Transfer":true}'
+
+# Register a contract on Polygon
+formo contracts create \
+  --address 0xabcdefabcdefabcdefabcdefabcdefabcdefabcd \
+  --chain 137 \
+  --name "Polygon DEX" \
+  --abi '[{"type":"event","name":"Swap"}]' \
+  --events '{"Swap":true}'
+```
+
+---
+
+## `formo contracts update`
+
+Update a tracked contract. The contract is identified by chain ID and address.
+
+<Note>
+Requires `contracts:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `chain` | `string` | ✅ | Chain ID |
+| `address` | `string` | ✅ | Contract address (`0x…`) |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--name` | `string` | ✅ | Updated contract name |
+| `--abi` | `string` | ✅ | Updated ABI as a JSON string |
+| `--events` | `string` | ✅ | Updated events configuration as a JSON string |
+
+### Examples
+
+```bash
+# Update a contract's name and events
+formo contracts update 1 0x1234567890abcdef1234567890abcdef12345678 \
+  --name "Renamed Token" \
+  --abi '[{"type":"event","name":"Transfer"}]' \
+  --events '{"Transfer":true}'
+```
+
+---
+
+## `formo contracts delete`
+
+Remove a tracked contract. The contract is identified by chain ID and address.
+
+<Note>
+Requires `contracts:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `chain` | `string` | ✅ | Chain ID |
+| `address` | `string` | ✅ | Contract address (`0x…`) |
+
+```bash
+formo contracts delete 1 0x1234567890abcdef1234567890abcdef12345678
+```
+
+<Warning>
+Removing a tracked contract is permanent. Historical events already captured are not deleted, but new events will no longer be tracked.
+</Warning>

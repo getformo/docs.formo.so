@@ -1,0 +1,140 @@
+---
+title: "Profiles"
+sidebarTitle: "Profiles"
+icon: user
+description: "Fetch and search wallet profiles from the command line."
+---
+
+The `formo profiles` command group lets you look up individual wallet profiles and search across your entire user base with filters, sorting, and pagination.
+
+## `formo profiles get`
+
+Fetch a single wallet profile by address or ENS name.
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--expand` | `string` | ❌ | Comma-separated list of fields to expand: `apps`, `chains`, `tokens`, `labels` |
+
+### Examples
+
+```bash
+# Get a wallet profile by address
+formo profiles get 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+
+# Get a profile by ENS name
+formo profiles get vitalik.eth
+
+# Get profile with expanded labels and chains
+formo profiles get vitalik.eth --expand labels,chains
+
+# Get profile with all expanded fields
+formo profiles get 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --expand apps,chains,tokens,labels
+```
+
+### Expand fields
+
+| Field | Description |
+|-------|-------------|
+| `apps` | DApps the wallet has interacted with |
+| `chains` | Blockchain networks the wallet is active on |
+| `tokens` | Token holdings for the wallet |
+| `labels` | Wallet labels and tags |
+
+---
+
+## `formo profiles search`
+
+Search wallet profiles with optional filters, sorting, and pagination.
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--address` | `string` | ❌ | Filter by wallet address |
+| `--limit` | `number` | ❌ | Max results to return |
+| `--offset` | `number` | ❌ | Pagination offset |
+| `--orderBy` | `enum` | ❌ | Field to sort by (see values below) |
+| `--orderDir` | `enum` | ❌ | Sort direction: `asc` or `desc` |
+| `--expand` | `string` | ❌ | Comma-separated fields to expand |
+| `--conditions` | `string` | ❌ | JSON array of `FilterCondition` objects for advanced filtering |
+| `--logic` | `enum` | ❌ | Logic operator for combining conditions: `and` (default) or `or` |
+
+### `--orderBy` values
+
+| Value | Description |
+|-------|-------------|
+| `last_onchain` | Last on-chain activity timestamp |
+| `first_onchain` | First on-chain activity timestamp |
+| `net_worth_usd` | Total net worth in USD |
+| `updated_at` | Profile last updated |
+| `tx_count` | Total transaction count |
+| `first_seen` | First seen by Formo |
+| `last_seen` | Last seen by Formo |
+| `num_sessions` | Number of sessions |
+| `revenue` | Revenue attributed |
+| `volume` | Volume attributed |
+| `points` | Points attributed |
+
+### Examples
+
+```bash
+# List first 10 profiles
+formo profiles search --limit 10
+
+# Top 5 profiles by net worth
+formo profiles search --orderBy net_worth_usd --orderDir desc --limit 5
+
+# Search with a filter condition
+formo profiles search \
+  --conditions '[{"field":"net_worth_usd","op":"gt","value":10000}]' \
+  --limit 20
+
+# Search profiles matching either condition (OR logic)
+formo profiles search \
+  --conditions '[{"field":"net_worth_usd","op":"gt","value":10000},{"field":"tx_count","op":"gt","value":50}]' \
+  --logic or \
+  --limit 20
+
+# Paginate through results
+formo profiles search --limit 50 --offset 100
+```
+
+### FilterCondition reference
+
+The `--conditions` option accepts a JSON array of filter condition objects:
+
+```json
+[
+  { "field": "net_worth_usd", "op": "gt", "value": 10000 },
+  { "field": "tx_count", "op": "gte", "value": 5 }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `field` | `string` | Profile field to filter on |
+| `op` | `string` | Operator (see table below) |
+| `value` | `any` | Value to compare against |
+
+### Filter operators
+
+| Operator | Description |
+|----------|-------------|
+| `eq` | Equal to |
+| `neq` | Not equal to |
+| `gt` | Greater than |
+| `gte` | Greater than or equal to |
+| `lt` | Less than |
+| `lte` | Less than or equal to |
+| `in` | In a set of values |
+| `nin` | Not in a set of values |
+
+By default, multiple conditions are combined with `AND` logic. Use `--logic or` to combine with `OR` logic instead.

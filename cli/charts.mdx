@@ -1,0 +1,150 @@
+---
+title: "Charts"
+sidebarTitle: "Charts"
+icon: chart-line
+description: "Create, list, update, and delete charts within dashboard boards from the command line."
+---
+
+The `formo charts` command group lets you manage charts within dashboard boards. Charts are always scoped to a specific board.
+
+## `formo charts list`
+
+List all charts for a board.
+
+<Note>
+Requires `boards:read` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--boardId` | `string` | ✅ | Board ID to list charts from |
+
+```bash
+formo charts list --boardId board_abc123
+```
+
+---
+
+## `formo charts get`
+
+Get a single chart by ID.
+
+<Note>
+Requires `boards:read` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `chartId` | `string` | ✅ | Chart ID |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--boardId` | `string` | ✅ | Board ID the chart belongs to |
+
+```bash
+formo charts get chart_abc123 --boardId board_abc123
+```
+
+---
+
+## `formo charts create`
+
+Create a new chart in a board.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--boardId` | `string` | ✅ | Board ID to add the chart to |
+| `--body` | `string` | ✅ | JSON string with the chart configuration |
+
+### Examples
+
+```bash
+# Create a line chart
+formo charts create \
+  --boardId board_abc123 \
+  --body '{"name":"Daily active users","chartType":"line"}'
+
+# Create a bar chart with a SQL query
+formo charts create \
+  --boardId board_abc123 \
+  --body '{"name":"Top chains","chartType":"bar","query":"SELECT chain, count(*) as cnt FROM events GROUP BY chain ORDER BY cnt DESC LIMIT 10"}'
+```
+
+---
+
+## `formo charts update`
+
+Update an existing chart.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `chartId` | `string` | ✅ | Chart ID to update |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--boardId` | `string` | ✅ | Board ID the chart belongs to |
+| `--body` | `string` | ✅ | JSON string with updated chart configuration |
+
+### Examples
+
+```bash
+# Update a chart name
+formo charts update chart_abc123 \
+  --boardId board_abc123 \
+  --body '{"name":"Updated chart name"}'
+
+# Update chart type and query
+formo charts update chart_abc123 \
+  --boardId board_abc123 \
+  --body '{"name":"Revenue","chartType":"area","query":"SELECT DATE(timestamp) as day, SUM(revenue) as rev FROM events GROUP BY day"}'
+```
+
+---
+
+## `formo charts delete`
+
+Delete a chart.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `chartId` | `string` | ✅ | Chart ID to delete |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--boardId` | `string` | ✅ | Board ID the chart belongs to |
+
+```bash
+formo charts delete chart_abc123 --boardId board_abc123
+```
+
+<Warning>
+Deleting a chart is permanent.
+</Warning>

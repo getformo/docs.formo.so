@@ -1,0 +1,75 @@
+---
+title: "Segments"
+sidebarTitle: "Segments"
+icon: users
+description: "Create, list, and delete audience segments from the command line."
+---
+
+The `formo segments` command group lets you manage user segments. Segments are saved audience filter sets that you can use throughout the Formo platform.
+
+## `formo segments list`
+
+List all user segments for the project.
+
+<Note>
+Requires `segments:read` scope on your API key.
+</Note>
+
+```bash
+formo segments list
+```
+
+---
+
+## `formo segments create`
+
+Create a new user segment.
+
+<Note>
+Requires `segments:write` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--title` | `string` | ✅ | Segment title |
+| `--filterSets` | `string` | ✅ | JSON array of filter set strings defining the segment |
+
+### Examples
+
+```bash
+# Create a high-value segment
+formo segments create \
+  --title "Whales" \
+  --filterSets '["net_worth_usd > 100000"]'
+
+# Create a power-user segment
+formo segments create \
+  --title "Power Users" \
+  --filterSets '["tx_count > 100", "num_sessions > 10"]'
+```
+
+---
+
+## `formo segments delete`
+
+Delete a user segment.
+
+<Note>
+Requires `segments:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `segmentId` | `string` | ✅ | Segment ID to delete |
+
+```bash
+formo segments delete seg_abc123
+```
+
+<Warning>
+Deleting a segment is permanent.
+</Warning>

@@ -1,0 +1,175 @@
+---
+title: "CLI Overview"
+sidebarTitle: "Overview"
+icon: terminal
+description: "Query wallet profiles, run SQL analytics, manage dashboards, alerts, contracts, segments, and more — directly from your terminal or via AI agents."
+---
+
+The Formo CLI (`@formo/cli`) gives you full access to the Formo API from the command line. Use it interactively in your terminal, in shell scripts, or as a tool for AI agents.
+
+<CardGroup cols={2}>
+  <Card title="Profiles" icon="user" href="/cli/profiles">
+    Fetch and search wallet profiles
+  </Card>
+  <Card title="Query" icon="database" href="/cli/query">
+    Run SQL queries on analytics data
+  </Card>
+  <Card title="Boards" icon="table-columns" href="/cli/boards">
+    Manage dashboard boards
+  </Card>
+  <Card title="Charts" icon="chart-line" href="/cli/charts">
+    Create and manage charts within boards
+  </Card>
+  <Card title="Alerts" icon="bell" href="/cli/alerts">
+    Configure project alerts
+  </Card>
+  <Card title="Contracts" icon="file-contract" href="/cli/contracts">
+    Register and manage tracked smart contracts
+  </Card>
+  <Card title="Segments" icon="users" href="/cli/segments">
+    Create and manage audience segments
+  </Card>
+  <Card title="Import" icon="file-import" href="/cli/import">
+    Bulk import wallet addresses
+  </Card>
+</CardGroup>
+
+## Installation
+
+Install the CLI globally via npm:
+
+```bash
+npm install -g @formo/cli
+```
+
+Or run without installing using `npx`:
+
+```bash
+npx @formo/cli
+```
+
+## Quick start
+
+```bash
+# 1. Authenticate with your API key
+formo login formo_abc123
+
+# 2. Get a wallet profile
+formo profiles get vitalik.eth
+
+# 3. Run a SQL query
+formo query run "SELECT count(*) FROM events"
+
+# 4. List your dashboard boards
+formo boards list
+```
+
+## Authentication
+
+The CLI supports two authentication methods. The environment variable takes precedence over the saved config file.
+
+<Tabs>
+  <Tab title="Login command">
+    Save your API key to the local config file (`~/.config/formo/config.json`):
+
+    ```bash
+    formo login formo_abc123
+    ```
+
+    The CLI validates your key against the API, saves the key along with your workspace and project info, and confirms that you're authenticated.
+  </Tab>
+  <Tab title="Environment variable">
+    Set the `FORMO_API_KEY` environment variable:
+
+    ```bash
+    export FORMO_API_KEY=formo_abc123
+    ```
+
+    This takes precedence over a saved config file and is useful for CI/CD pipelines and scripts.
+  </Tab>
+</Tabs>
+
+<Info>
+Get your API key from **Settings → API Keys** in the [Formo dashboard](https://app.formo.so).
+</Info>
+
+## Global commands
+
+### `formo login`
+
+Authenticate with your Formo API key. Validates the key against the API and saves it locally.
+
+| Argument | Description |
+|----------|-------------|
+| `apiKey` | Your `formo_` API key (optional — shows a setup guide if omitted) |
+
+```bash
+formo login formo_abc123
+```
+
+---
+
+### `formo logout`
+
+Remove saved API key and clear authentication from `~/.config/formo/config.json`.
+
+```bash
+formo logout
+```
+
+<Note>
+If the `FORMO_API_KEY` environment variable is set, `logout` will warn you to also run `unset FORMO_API_KEY`.
+</Note>
+
+---
+
+### `formo status`
+
+Show the current authentication and CLI status, including the active API key source, workspace, and project ID.
+
+```bash
+formo status
+```
+
+**Output includes:**
+- Whether you are authenticated
+- API key source (`config file` or `FORMO_API_KEY env var`)
+- Workspace name
+- Project ID
+
+## Configuration
+
+The CLI stores configuration at `~/.config/formo/config.json` with restricted permissions (`600`). The config file contains:
+
+| Field | Description |
+|-------|-------------|
+| `apiKey` | Your Formo API key |
+| `workspace` | Workspace name (set automatically on login) |
+| `projectId` | Project ID (set automatically on login) |
+
+## Output format
+
+- **Interactive mode (TTY):** The CLI displays colored, human-readable output with status icons and formatting.
+- **Piped/scripted mode:** The CLI outputs raw JSON, making it easy to pipe into `jq` or other tools.
+
+```bash
+# Human-friendly output
+formo profiles get vitalik.eth
+
+# Pipe JSON to jq
+formo profiles get vitalik.eth | jq '.net_worth_usd'
+```
+
+## AI agent usage
+
+The CLI is designed to work as a tool for AI agents. It includes built-in suggestions for natural language queries:
+
+- "get the profile for wallet 0xabc"
+- "search profiles with net worth > 10000"
+- "run a SQL query on my analytics data"
+- "list all project alerts"
+- "list all dashboard boards"
+- "list charts in a board"
+- "list all tracked contracts"
+- "list user segments"
+- "import wallet addresses"
