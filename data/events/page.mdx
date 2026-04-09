@@ -21,28 +21,28 @@ Apart from the [common fields](/data/events/common), the `page` call accepts the
 | `category` | String | Category of the page or screen. |
 | `title` | String | Title of the page. |
 
-## Properties by SDK
+## Properties
 
 The following table shows which properties are automatically set by each SDK:
 
-| Property | Web SDK | Mobile SDK | Source |
-|:---------|:--------|:-----------|:-------|
-| `properties.url` | `window.location.href` | Not set | Browser |
-| `properties.path` | `window.location.pathname` | Not set | Browser |
-| `properties.hash` | `window.location.hash` | Not set | Browser |
-| `properties.query` | `window.location.search` | Not set | Browser |
-| `properties.name` | Caller-provided | Screen name (required) | SDK method argument |
-| `properties.category` | Caller-provided | Caller-provided | SDK method argument |
-| `context.page_url` | `window.location.href` | `app://{screenName}` | Auto-generated |
-| `context.page_title` | `document.title` | Screen name | Auto-generated |
-| `context.page_path` | Derived from URL | `/{screenName}` | Auto-generated |
-| `context.referrer` | `document.referrer` | From deep link (if set) | Auto-detected |
-| `context.user_agent` | Browser user agent | Device user agent (if available) | Auto-detected |
-| `context.os_name` | Not set | `iOS` or `Android` | Mobile only |
-| `context.device_type` | Not set | `mobile` or `tablet` | Mobile only |
-| `context.app_name` | Not set | From native config or options | Mobile only |
-| `context.app_version` | Not set | From native config or options | Mobile only |
-| `channel` | `"web"` | `"mobile"` | SDK constant |
+| Property | Web SDK | Mobile SDK |
+|:---------|:--------|:-----------|
+| `properties.url` | `window.location.href` | Not set |
+| `properties.path` | `window.location.pathname` | Not set |
+| `properties.hash` | `window.location.hash` | Not set |
+| `properties.query` | `window.location.search` | Not set |
+| `properties.name` | Caller-provided | Screen name (required) |
+| `properties.category` | Caller-provided | Caller-provided |
+| `context.page_url` | `window.location.href` | `app://{screenName}` |
+| `context.page_title` | `document.title` | Screen name |
+| `context.page_path` | Not set (derived in backend) | `/{screenName}` |
+| `context.referrer` | `document.referrer` | From deep link (if set) |
+| `context.user_agent` | Browser user agent | Device user agent (if available) |
+| `context.os_name` | Not set | `iOS` or `Android` |
+| `context.device_type` | Not set | `mobile` or `tablet` |
+| `context.app_name` | Not set | From native config or options |
+| `context.app_version` | Not set | From native config or options |
+| `channel` | `"web"` | `"mobile"` |
 
 ## Sample Payload (Web)
 
