@@ -1,9 +1,11 @@
 ---
 title: 'Spec: Page'
-description: 'Get started with the Page view event.'
+description: 'Get started with the Page view event for web and mobile.'
 ---
 
-The `page` event records whenever a user views a page of your website.
+The `page` event records whenever a user views a page on your website or a screen in your mobile app. Both the [web SDK](/sdks/web) and [mobile SDK](/sdks/mobile) emit `page` events with `channel` set to `"web"` or `"mobile"` respectively.
+
+On web, page properties are automatically collected from the browser. On mobile, the screen name is mapped to page-equivalent fields (`page_title`, `page_path`, `page_url`) so that web and mobile views are processed through the same analytics pipeline.
 
 ## Fields
 
@@ -15,17 +17,39 @@ Apart from the [common fields](/data/events/common), the `page` call accepts the
 | `path` | String | Path component of the URL (without query string or hash). |
 | `hash` | String | Hash fragment of the URL (e.g., `#section`). |
 | `query` | String | Query string of the URL (without the leading `?`). |
-| `name` | String | Name of the page. |
-| `category` | String | Category of the page. |
+| `name` | String | Name of the page or screen. |
+| `category` | String | Category of the page or screen. |
 | `title` | String | Title of the page. |
 
-## Sample Payload
+## Properties by SDK
 
-Here's the payload of a typical call with most common fields removed:
+The following table shows which properties are automatically set by each SDK:
+
+| Property | Web SDK | Mobile SDK | Source |
+|:---------|:--------|:-----------|:-------|
+| `properties.url` | `window.location.href` | Not set | Browser |
+| `properties.path` | `window.location.pathname` | Not set | Browser |
+| `properties.hash` | `window.location.hash` | Not set | Browser |
+| `properties.query` | `window.location.search` | Not set | Browser |
+| `properties.name` | Caller-provided | Screen name (required) | SDK method argument |
+| `properties.category` | Caller-provided | Caller-provided | SDK method argument |
+| `context.page_url` | `window.location.href` | `app://{screenName}` | Auto-generated |
+| `context.page_title` | `document.title` | Screen name | Auto-generated |
+| `context.page_path` | Derived from URL | `/{screenName}` | Auto-generated |
+| `context.referrer` | `document.referrer` | From deep link (if set) | Auto-detected |
+| `context.user_agent` | Browser user agent | Device user agent (if available) | Auto-detected |
+| `context.os_name` | Not set | `iOS` or `Android` | Mobile only |
+| `context.device_type` | Not set | `mobile` or `tablet` | Mobile only |
+| `context.app_name` | Not set | From native config or options | Mobile only |
+| `context.app_version` | Not set | From native config or options | Mobile only |
+| `channel` | `"web"` | `"mobile"` | SDK constant |
+
+## Sample Payload (Web)
 
 ```json
 {
     "type": "page",
+    "channel": "web",
     "properties": {
         "url": "https://formo.so/faucets?utm_source=chatgpt.com",
         "path": "/faucets",
@@ -37,3 +61,123 @@ Here's the payload of a typical call with most common fields removed:
     }
 }
 ```
+
+## Sample Payload (Mobile)
+
+Screen events from the [mobile SDK](/sdks/mobile) are sent as `page` events with `channel: "mobile"`:
+
+```json
+{
+    "type": "page",
+    "channel": "mobile",
+    "version": "1",
+    "session_id": "117b982a451dc22edea6413b8e20958216c0a5b3baaa1d90699c42dbf4e74e33",
+    "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
+    "context": {
+        "library_name": "Formo React Native SDK",
+        "library_version": "1.0.0",
+        "page_title": "Wallet",
+        "page_path": "/Wallet",
+        "page_url": "app://Wallet",
+        "locale": "en-US",
+        "timezone": "America/New_York",
+        "location": "US",
+        "os_name": "iOS",
+        "os_version": "17.0",
+        "device_model": "iPhone 14 Pro",
+        "device_manufacturer": "Apple",
+        "device_type": "mobile",
+        "app_name": "MyDeFiApp",
+        "app_version": "2.1.0",
+        "app_build": "42",
+        "network_wifi": true,
+        "network_cellular": false
+    },
+    "properties": {
+        "name": "Wallet",
+        "category": "Main"
+    }
+}
+```
+
+## Usage
+
+### Web
+
+```tsx
+import { useFormo } from '@formo/analytics';
+
+function FaucetsPage() {
+  const analytics = useFormo();
+
+  useEffect(() => {
+    analytics.page('Tools', 'Faucets');
+  }, []);
+
+  return <div>...</div>;
+}
+```
+
+### Mobile
+
+Use the `screen()` method in the mobile SDK. It sends a `page` event internally:
+
+```tsx
+import { useFormo } from '@formo/analytics-react-native';
+
+function WalletScreen() {
+  const analytics = useFormo();
+
+  useEffect(() => {
+    analytics.screen('Wallet', 'Main');
+  }, [analytics]);
+
+  return <View>...</View>;
+}
+```
+
+### With React Navigation
+
+Automatically track all screen transitions:
+
+```tsx
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { useFormo } from '@formo/analytics-react-native';
+import { useRef } from 'react';
+
+function App() {
+  const analytics = useFormo();
+  const navigationRef = useNavigationContainerRef();
+  const routeNameRef = useRef<string>();
+
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        routeNameRef.current = navigationRef.getCurrentRoute()?.name;
+      }}
+      onStateChange={() => {
+        const previousRouteName = routeNameRef.current;
+        const currentRouteName = navigationRef.getCurrentRoute()?.name;
+
+        if (previousRouteName !== currentRouteName && currentRouteName) {
+          analytics.screen(currentRouteName);
+        }
+        routeNameRef.current = currentRouteName;
+      }}
+    >
+      {/* Your navigation stack */}
+    </NavigationContainer>
+  );
+}
+```
+
+## Best Practices
+
+1. **Use consistent naming**: Establish a naming convention for screens (e.g., PascalCase: `WalletDetails`, `SwapConfirmation`).
+
+2. **Add categories**: Group related pages/screens together using the `category` property for better analysis.
+
+3. **Track on mount**: Call `page()` or `screen()` in a `useEffect` hook when the component mounts.
+
+4. **Include relevant properties**: Add custom properties that help segment views (e.g., `token_symbol`, `network`).
