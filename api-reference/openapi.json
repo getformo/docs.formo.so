@@ -1062,8 +1062,374 @@
           "enabled"
         ]
       },
+      "StepFilterCondition": {
+        "type": "object",
+        "description": "A filter condition for an event property on a funnel step. The `op` field specifies the comparison operator and `value` is the value to compare against. For `in` and `notIn` operators the value is a pipe-delimited string (e.g. `\"metamask|rainbow|coinbase\"`).",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "equals",
+              "notEquals",
+              "in",
+              "notIn",
+              "gt",
+              "gte",
+              "lt",
+              "lte",
+              "startsWith",
+              "endsWith",
+              "includes"
+            ],
+            "description": "Comparison operator. Use `in` / `notIn` for multi-value matching (pipe-delimited value string)."
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "The comparison value. For `in` / `notIn`, use a pipe-delimited string: `\"metamask|rainbow|coinbase\"`."
+          }
+        },
+        "required": [
+          "op",
+          "value"
+        ]
+      },
+      "FunnelStep": {
+        "type": "object",
+        "description": "A single step in a funnel or user-path flow.\n\n`type` and `event` are required. Any additional property key becomes a filter condition using the `StepFilterCondition` schema (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`).\n\nStandard filterable columns: `origin`, `device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`. Any other key is treated as a JSON event property and extracted via `JSONExtractString(properties, '<key>')`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "event",
+              "track",
+              "decoded_log"
+            ],
+            "description": "`event` \u2014 built-in page/connect/transaction events; `track` \u2014 custom tracked events; `decoded_log` \u2014 decoded smart-contract events."
+          },
+          "event": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Event name (e.g. `page`, `connect`, `transaction`, or a custom track event name)."
+          }
+        },
+        "required": [
+          "type",
+          "event"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/StepFilterCondition"
+        }
+      },
+      "ConversionWindow": {
+        "type": "object",
+        "description": "Time window within which a user must complete all funnel steps (measured from Step 1). Defaults to 1 day if omitted.",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of time units."
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "minute",
+              "hour",
+              "day",
+              "week",
+              "month"
+            ],
+            "description": "Time unit. `month` = 30 days, `week` = 7 days."
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ]
+      },
+      "RetentionUserFilter": {
+        "type": "object",
+        "description": "A user-level segment filter applied to the retention chart cohort.",
+        "properties": {
+          "operand": {
+            "type": "string",
+            "description": "The user property to filter on (e.g. `device`, `browser`, `os`, `location`, `utm_source`, `utm_medium`, `utm_campaign`)."
+          },
+          "operator": {
+            "type": "string",
+            "enum": [
+              "equals",
+              "notEquals",
+              "in",
+              "notIn",
+              "gt",
+              "gte",
+              "lt",
+              "lte",
+              "startsWith",
+              "endsWith",
+              "includes"
+            ],
+            "description": "Comparison operator."
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "The value to compare against."
+          }
+        },
+        "required": [
+          "operand",
+          "operator",
+          "value"
+        ]
+      },
+      "ChartSettings": {
+        "type": "object",
+        "description": "Chart-type-specific configuration. The fields that apply depend on `chart_type`:\n\n- **funnel**: `funnelType`, `conversionWindow`, `breakdown`\n- **user_paths**: `startStep`, `endStep`, `maxSteps`, `nodesPerStep`, `conversionWindow`, `filters`\n- **retention**: `retentionFilter`, `retentionUserFilters`\n\nAll fields are optional at the schema level; see per-type validation rules for which are functionally required.",
+        "properties": {
+          "funnelType": {
+            "type": "string",
+            "enum": [
+              "closed",
+              "open"
+            ],
+            "default": "closed",
+            "description": "**Funnel only.** `closed` \u2014 users must complete steps in strict order with no intervening events. `open` \u2014 users may complete steps in order but other events may occur between steps."
+          },
+          "conversionWindow": {
+            "$ref": "#/components/schemas/ConversionWindow",
+            "description": "**Funnel & user_paths.** Maximum time from Step 1 for a user to complete all steps."
+          },
+          "breakdown": {
+            "type": "string",
+            "enum": [
+              "device",
+              "browser",
+              "os",
+              "referrer",
+              "ref",
+              "utm_source",
+              "utm_medium",
+              "utm_campaign",
+              "utm_term",
+              "utm_content"
+            ],
+            "description": "**Funnel only.** Split each funnel bar by this dimension. The top categories are shown individually; the rest are collapsed into 'Others'."
+          },
+          "startStep": {
+            "$ref": "#/components/schemas/FunnelStep",
+            "description": "**user_paths \u2014 required.** The event where the user flow begins."
+          },
+          "endStep": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FunnelStep"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "**user_paths \u2014 optional.** The event where the user flow ends. If `null` the flow is open-ended."
+          },
+          "maxSteps": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 10,
+            "default": 3,
+            "description": "**user_paths.** Maximum number of steps to show in the flow (2\u201310). Values above 10 are clamped to 10."
+          },
+          "nodesPerStep": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 10,
+            "default": 5,
+            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2\u201310). Values above 10 are clamped to 10."
+          },
+          "filters": {
+            "type": "string",
+            "description": "**user_paths.** JSON-encoded string of additional filters applied to the path query."
+          },
+          "retentionFilter": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FunnelStep"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "**retention.** Event that qualifies a returning visit as 'retained'. If `null`, any event counts as a return."
+          },
+          "retentionUserFilters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RetentionUserFilter"
+            },
+            "description": "**retention.** Zero or more user-segment filters that narrow the cohort (e.g. only desktop users, only users from a specific UTM source)."
+          }
+        }
+      },
+      "CreateChartRequest": {
+        "type": "object",
+        "description": "Request body for creating a chart.",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project the chart belongs to."
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "SQL query that powers the chart.\n\n- **`funnel`** \u2014 pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** \u2014 can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** \u2014 required; must be a valid SQL string."
+          },
+          "chart_type": {
+            "type": "string",
+            "enum": [
+              "table",
+              "number",
+              "funnel",
+              "bar",
+              "line",
+              "pie",
+              "stacked",
+              "user_paths",
+              "retention"
+            ],
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name shown on the chart and board."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description."
+          },
+          "x_axis": {
+            "type": "string",
+            "description": "Column name for the X axis. Required for `bar`, `line`, and `stacked`."
+          },
+          "y_axis": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` \u2014 at least 1 element required.\n- `pie` / `stacked` \u2014 exactly 1 element required."
+          },
+          "group_by": {
+            "type": "string",
+            "description": "Column to group / stack series by. Required for `stacked`."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FunnelStep"
+            },
+            "minItems": 2,
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` \u2014 add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ChartSettings"
+          }
+        },
+        "required": [
+          "projectId",
+          "chart_type",
+          "title"
+        ]
+      },
+      "UpdateChartRequest": {
+        "type": "object",
+        "description": "Request body for updating an existing chart.",
+        "properties": {
+          "chartId": {
+            "type": "string",
+            "description": "ID of the chart to update."
+          },
+          "projectId": {
+            "type": "string",
+            "description": "Project the chart belongs to."
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "SQL query that powers the chart.\n\n- **`funnel`** \u2014 pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** \u2014 can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** \u2014 required; must be a valid SQL string."
+          },
+          "chart_type": {
+            "type": "string",
+            "enum": [
+              "table",
+              "number",
+              "funnel",
+              "bar",
+              "line",
+              "pie",
+              "stacked",
+              "user_paths",
+              "retention"
+            ],
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name shown on the chart and board."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description."
+          },
+          "x_axis": {
+            "type": "string",
+            "description": "Column name for the X axis. Required for `bar`, `line`, and `stacked`."
+          },
+          "y_axis": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` \u2014 at least 1 element required.\n- `pie` / `stacked` \u2014 exactly 1 element required."
+          },
+          "group_by": {
+            "type": "string",
+            "description": "Column to group / stack series by. Required for `stacked`."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FunnelStep"
+            },
+            "minItems": 2,
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` \u2014 add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ChartSettings"
+          }
+        },
+        "required": [
+          "chartId",
+          "projectId",
+          "chart_type",
+          "title"
+        ]
+      },
       "Chart": {
         "type": "object",
+        "description": "A saved chart attached to a board.",
         "properties": {
           "id": {
             "type": "string"
@@ -1080,7 +1446,8 @@
               "stacked",
               "user_paths",
               "retention"
-            ]
+            ],
+            "description": "Visualization type."
           },
           "title": {
             "type": "string"
@@ -1090,7 +1457,8 @@
             "nullable": true
           },
           "query": {
-            "type": "string"
+            "type": "string",
+            "description": "SQL query powering the chart. For `funnel` and `retention` charts this is a system-managed placeholder."
           },
           "project_id": {
             "type": "string"
@@ -1100,29 +1468,49 @@
           },
           "x_axis": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "description": "Column used as the X axis."
           },
           "y_axis": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "nullable": true
+            "nullable": true,
+            "description": "Column(s) used as Y axis metric(s)."
           },
           "group_by": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "description": "Column used to group/stack series."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FunnelStep"
+            },
+            "nullable": true,
+            "description": "Ordered list of funnel steps. Only present when `chart_type` is `funnel`."
           },
           "settings": {
-            "type": "object",
-            "nullable": true
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ChartSettings"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Type-specific configuration. See `ChartSettings` for all fields."
           }
         },
         "required": [
           "id",
           "chart_type",
           "title",
-          "query"
+          "query",
+          "project_id",
+          "board_id"
         ]
       },
       "Contract": {
@@ -1721,42 +2109,42 @@
                 "example": {
                   "isSuccess": true,
                   "data": {
-                  "data": [
-                    {
-                      "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
-                      "net_worth_usd": 125000.5,
-                      "ens": "vitalik.eth",
-                      "farcaster": null,
-                      "lens": null,
-                      "basenames": null,
-                      "linea": null,
-                      "discord": null,
-                      "telegram": null,
-                      "website": "https://example.com",
-                      "github": "username",
-                      "twitter": "username",
-                      "linkedin": null,
-                      "email": null,
-                      "instagram": null,
-                      "facebook": null,
-                      "tiktok": null,
-                      "youtube": null,
-                      "reddit": null,
-                      "avatar": "https://example.com/avatar.png",
-                      "description": "Wallet description",
-                      "display_name": "Display Name",
-                      "updated_at": "2025-01-20T14:22:00Z",
-                      "tx_count": 1234,
-                      "first_onchain": "2024-01-15T10:30:00Z",
-                      "last_onchain": "2025-01-20T14:22:00Z",
-                      "lifecycle": "Returning"
+                    "data": [
+                      {
+                        "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+                        "net_worth_usd": 125000.5,
+                        "ens": "vitalik.eth",
+                        "farcaster": null,
+                        "lens": null,
+                        "basenames": null,
+                        "linea": null,
+                        "discord": null,
+                        "telegram": null,
+                        "website": "https://example.com",
+                        "github": "username",
+                        "twitter": "username",
+                        "linkedin": null,
+                        "email": null,
+                        "instagram": null,
+                        "facebook": null,
+                        "tiktok": null,
+                        "youtube": null,
+                        "reddit": null,
+                        "avatar": "https://example.com/avatar.png",
+                        "description": "Wallet description",
+                        "display_name": "Display Name",
+                        "updated_at": "2025-01-20T14:22:00Z",
+                        "tx_count": 1234,
+                        "first_onchain": "2024-01-15T10:30:00Z",
+                        "last_onchain": "2025-01-20T14:22:00Z",
+                        "lifecycle": "Returning"
+                      }
+                    ],
+                    "meta": {
+                      "total": 150,
+                      "limit": 100,
+                      "offset": 0
                     }
-                  ],
-                  "meta": {
-                    "total": 150,
-                    "limit": 100,
-                    "offset": 0
-                  }
                   }
                 }
               }
@@ -1930,114 +2318,114 @@
                 "example": {
                   "isSuccess": true,
                   "data": {
-                  "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
-                  "net_worth_usd": 125000.5,
-                  "ens": "vitalik.eth",
-                  "farcaster": null,
-                  "lens": null,
-                  "basenames": null,
-                  "linea": null,
-                  "discord": null,
-                  "telegram": null,
-                  "website": "https://example.com",
-                  "github": "github.com/username",
-                  "twitter": "@username",
-                  "linkedin": null,
-                  "email": null,
-                  "instagram": null,
-                  "facebook": null,
-                  "tiktok": null,
-                  "youtube": null,
-                  "reddit": null,
-                  "avatar": "https://example.com/avatar.png",
-                  "description": "Wallet description",
-                  "display_name": "Display Name",
-                  "updated_at": "2025-01-20T14:22:00Z",
-                  "tx_count": 1234,
-                  "first_onchain": "2024-01-15T10:30:00Z",
-                  "last_onchain": "2025-01-20T14:22:00Z",
-                  "first_seen": "2024-01-15T10:30:00Z",
-                  "last_seen": "2025-01-20T14:22:00Z",
-                  "first_utm_source": "google",
-                  "last_utm_source": "direct",
-                  "first_utm_medium": "cpc",
-                  "last_utm_medium": null,
-                  "first_utm_campaign": "summer_sale",
-                  "last_utm_campaign": null,
-                  "first_utm_content": null,
-                  "last_utm_content": null,
-                  "first_utm_term": null,
-                  "last_utm_term": null,
-                  "first_referrer": "example.com",
-                  "last_referrer": null,
-                  "first_referrer_url": "https://example.com/page",
-                  "last_referrer_url": null,
-                  "first_ref": "ref123",
-                  "last_ref": null,
-                  "location": "US",
-                  "device": "Desktop",
-                  "browser": "Chrome",
-                  "os": "macOS",
-                  "last_type": "track",
-                  "last_event": "Page Viewed",
-                  "last_properties": "{\"page\":\"/home\"}",
-                  "num_sessions": 45,
-                  "revenue": 1500.75,
-                  "volume": 50000,
-                  "points": 2500,
-                  "activity_dates": [
-                    "2024-01-15",
-                    "2024-01-16",
-                    "2024-01-20"
-                  ],
-                  "chains": [
-                    {
-                      "chain_id": "1",
-                      "net_worth_usd": 100000,
-                      "tx_count": 1000,
-                      "first_onchain": "2024-01-15T10:30:00Z",
-                      "last_onchain": "2025-01-20T14:22:00Z"
-                    },
-                    {
-                      "chain_id": "137",
-                      "net_worth_usd": 25000.5,
-                      "tx_count": 234,
-                      "first_onchain": "2024-03-01T08:00:00Z",
-                      "last_onchain": "2025-01-18T12:00:00Z"
-                    }
-                  ],
-                  "labels": [
-                    {
-                      "id": "label_123",
-                      "value": "Whale",
-                      "chain_id": "1",
-                      "source": "manual"
-                    }
-                  ],
-                  "apps": [
-                    {
-                      "chain_id": "1",
-                      "id": "uniswap",
-                      "name": "Uniswap",
-                      "img": "https://example.com/uniswap.png",
-                      "url": "https://uniswap.org",
-                      "balance_usd": 50000
-                    }
-                  ],
-                  "tokens": [
-                    {
-                      "chain_id": "1",
-                      "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                      "app_id": "usdc",
-                      "name": "USD Coin",
-                      "symbol": "USDC",
-                      "img": "https://example.com/usdc.png",
-                      "decimals": 6,
-                      "price": 1,
-                      "balance": "1000000000",
-                      "balance_usd": 1000
-                    }
-                  ]
+                    "address": "0x9CC3cB28cd94eB4423B15cdA73346e204f59a407",
+                    "net_worth_usd": 125000.5,
+                    "ens": "vitalik.eth",
+                    "farcaster": null,
+                    "lens": null,
+                    "basenames": null,
+                    "linea": null,
+                    "discord": null,
+                    "telegram": null,
+                    "website": "https://example.com",
+                    "github": "github.com/username",
+                    "twitter": "@username",
+                    "linkedin": null,
+                    "email": null,
+                    "instagram": null,
+                    "facebook": null,
+                    "tiktok": null,
+                    "youtube": null,
+                    "reddit": null,
+                    "avatar": "https://example.com/avatar.png",
+                    "description": "Wallet description",
+                    "display_name": "Display Name",
+                    "updated_at": "2025-01-20T14:22:00Z",
+                    "tx_count": 1234,
+                    "first_onchain": "2024-01-15T10:30:00Z",
+                    "last_onchain": "2025-01-20T14:22:00Z",
+                    "first_seen": "2024-01-15T10:30:00Z",
+                    "last_seen": "2025-01-20T14:22:00Z",
+                    "first_utm_source": "google",
+                    "last_utm_source": "direct",
+                    "first_utm_medium": "cpc",
+                    "last_utm_medium": null,
+                    "first_utm_campaign": "summer_sale",
+                    "last_utm_campaign": null,
+                    "first_utm_content": null,
+                    "last_utm_content": null,
+                    "first_utm_term": null,
+                    "last_utm_term": null,
+                    "first_referrer": "example.com",
+                    "last_referrer": null,
+                    "first_referrer_url": "https://example.com/page",
+                    "last_referrer_url": null,
+                    "first_ref": "ref123",
+                    "last_ref": null,
+                    "location": "US",
+                    "device": "Desktop",
+                    "browser": "Chrome",
+                    "os": "macOS",
+                    "last_type": "track",
+                    "last_event": "Page Viewed",
+                    "last_properties": "{\"page\":\"/home\"}",
+                    "num_sessions": 45,
+                    "revenue": 1500.75,
+                    "volume": 50000,
+                    "points": 2500,
+                    "activity_dates": [
+                      "2024-01-15",
+                      "2024-01-16",
+                      "2024-01-20"
+                    ],
+                    "chains": [
+                      {
+                        "chain_id": "1",
+                        "net_worth_usd": 100000,
+                        "tx_count": 1000,
+                        "first_onchain": "2024-01-15T10:30:00Z",
+                        "last_onchain": "2025-01-20T14:22:00Z"
+                      },
+                      {
+                        "chain_id": "137",
+                        "net_worth_usd": 25000.5,
+                        "tx_count": 234,
+                        "first_onchain": "2024-03-01T08:00:00Z",
+                        "last_onchain": "2025-01-18T12:00:00Z"
+                      }
+                    ],
+                    "labels": [
+                      {
+                        "id": "label_123",
+                        "value": "Whale",
+                        "chain_id": "1",
+                        "source": "manual"
+                      }
+                    ],
+                    "apps": [
+                      {
+                        "chain_id": "1",
+                        "id": "uniswap",
+                        "name": "Uniswap",
+                        "img": "https://example.com/uniswap.png",
+                        "url": "https://uniswap.org",
+                        "balance_usd": 50000
+                      }
+                    ],
+                    "tokens": [
+                      {
+                        "chain_id": "1",
+                        "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                        "app_id": "usdc",
+                        "name": "USD Coin",
+                        "symbol": "USDC",
+                        "img": "https://example.com/usdc.png",
+                        "decimals": 6,
+                        "price": 1,
+                        "balance": "1000000000",
+                        "balance_usd": 1000
+                      }
+                    ]
                   }
                 }
               }
@@ -3082,290 +3470,288 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "query": {
-                    "type": "string",
-                    "description": "SQL query for the chart"
-                  },
-                  "chart_type": {
-                    "type": "string",
-                    "enum": [
-                      "table",
-                      "number",
-                      "funnel",
-                      "bar",
-                      "line",
-                      "pie",
-                      "stacked",
-                      "user_paths",
-                      "retention"
-                    ]
-                  },
-                  "title": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "x_axis": {
-                    "type": "string"
-                  },
-                  "y_axis": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
+                "$ref": "#/components/schemas/CreateChartRequest"
+              },
+              "examples": {
+                "funnelBasic": {
+                  "summary": "3-step closed funnel (7-day window)",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT 1",
+                    "chart_type": "funnel",
+                    "title": "Onboarding Funnel",
+                    "steps": [
+                      {
+                        "type": "event",
+                        "event": "page"
+                      },
+                      {
+                        "type": "event",
+                        "event": "connect"
+                      },
+                      {
+                        "type": "event",
+                        "event": "transaction"
+                      }
+                    ],
+                    "settings": {
+                      "funnelType": "closed",
+                      "conversionWindow": {
+                        "value": 7,
+                        "unit": "day"
+                      }
                     }
-                  },
-                  "group_by": {
-                    "type": "string"
-                  },
-                  "steps": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    }
-                  },
-                  "settings": {
-                    "type": "object"
                   }
                 },
-                "required": [
-                  "query",
-                  "chart_type",
-                  "title"
-                ],
-                "x-examples": {
-                  "barChart": {
-                    "summary": "Daily active users bar chart",
-                    "value": {
-                      "query": "SELECT toDate(timestamp) as date, uniq(anonymous_id) as users FROM analytics_events WHERE timestamp >= now() - interval 30 day GROUP BY date ORDER BY date",
-                      "chart_type": "bar",
-                      "title": "Daily Active Users",
-                      "x_axis": "date",
-                      "y_axis": [
-                        "users"
+                "funnelWithPropertyFilters": {
+                  "summary": "Funnel with per-step property filters (MetaMask on mainnet)",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT 1",
+                    "chart_type": "funnel",
+                    "title": "MetaMask Conversion Funnel",
+                    "steps": [
+                      {
+                        "type": "event",
+                        "event": "page"
+                      },
+                      {
+                        "type": "event",
+                        "event": "connect",
+                        "rdns": {
+                          "op": "equals",
+                          "value": "io.metamask"
+                        },
+                        "chain_id": {
+                          "op": "equals",
+                          "value": "1"
+                        }
+                      },
+                      {
+                        "type": "event",
+                        "event": "transaction"
+                      }
+                    ],
+                    "settings": {
+                      "funnelType": "closed",
+                      "conversionWindow": {
+                        "value": 7,
+                        "unit": "day"
+                      }
+                    }
+                  }
+                },
+                "funnelWithBreakdown": {
+                  "summary": "Funnel with device breakdown",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT 1",
+                    "chart_type": "funnel",
+                    "title": "Onboarding Funnel by Device",
+                    "steps": [
+                      {
+                        "type": "event",
+                        "event": "page"
+                      },
+                      {
+                        "type": "event",
+                        "event": "connect"
+                      },
+                      {
+                        "type": "event",
+                        "event": "signature"
+                      }
+                    ],
+                    "settings": {
+                      "funnelType": "closed",
+                      "conversionWindow": {
+                        "value": 30,
+                        "unit": "day"
+                      },
+                      "breakdown": "device"
+                    }
+                  }
+                },
+                "funnelOpenMultiValue": {
+                  "summary": "Open funnel with multi-value `in` filter and breakdown",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT 1",
+                    "chart_type": "funnel",
+                    "title": "Mobile Onboarding Funnel",
+                    "steps": [
+                      {
+                        "type": "event",
+                        "event": "page",
+                        "device": {
+                          "op": "equals",
+                          "value": "mobile"
+                        }
+                      },
+                      {
+                        "type": "event",
+                        "event": "connect",
+                        "provider_name": {
+                          "op": "in",
+                          "value": "metamask|rainbow|coinbase"
+                        }
+                      },
+                      {
+                        "type": "event",
+                        "event": "transaction"
+                      }
+                    ],
+                    "settings": {
+                      "funnelType": "open",
+                      "conversionWindow": {
+                        "value": 30,
+                        "unit": "day"
+                      },
+                      "breakdown": "device"
+                    }
+                  }
+                },
+                "barChart": {
+                  "summary": "Daily active users \u2014 bar chart",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date",
+                    "chart_type": "bar",
+                    "title": "Daily Active Users",
+                    "x_axis": "date",
+                    "y_axis": [
+                      "users"
+                    ]
+                  }
+                },
+                "lineChart": {
+                  "summary": "DAU last 30 days \u2014 line chart",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS daily_active_users FROM events GROUP BY date ORDER BY date DESC LIMIT 30",
+                    "chart_type": "line",
+                    "title": "Daily Active Users",
+                    "x_axis": "date",
+                    "y_axis": [
+                      "daily_active_users"
+                    ]
+                  }
+                },
+                "pieChart": {
+                  "summary": "Sessions by device \u2014 pie chart",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
+                    "chart_type": "pie",
+                    "title": "Sessions by Device",
+                    "x_axis": "device",
+                    "y_axis": [
+                      "session_count"
+                    ]
+                  }
+                },
+                "stackedChart": {
+                  "summary": "Sessions by device grouped by browser \u2014 stacked chart",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
+                    "chart_type": "stacked",
+                    "title": "Sessions by Device and Browser",
+                    "x_axis": "device",
+                    "y_axis": [
+                      "session_count"
+                    ],
+                    "group_by": "browser"
+                  }
+                },
+                "numberChart": {
+                  "summary": "Total connected wallets \u2014 number / KPI card",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
+                    "chart_type": "number",
+                    "title": "Total Connected Wallets"
+                  }
+                },
+                "tableChart": {
+                  "summary": "Recent events \u2014 table",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
+                    "chart_type": "table",
+                    "title": "Recent Events"
+                  }
+                },
+                "userPathsChart": {
+                  "summary": "User flow from connect \u2014 max 5 steps",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
+                    "chart_type": "user_paths",
+                    "title": "Post-Connect User Flow",
+                    "settings": {
+                      "startStep": {
+                        "type": "event",
+                        "event": "connect"
+                      },
+                      "endStep": {
+                        "type": "event",
+                        "event": "transaction"
+                      },
+                      "maxSteps": 5,
+                      "conversionWindow": {
+                        "value": 2,
+                        "unit": "week"
+                      }
+                    }
+                  }
+                },
+                "userPathsOpenEnded": {
+                  "summary": "Open-ended user flow from page view",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 14 DAY ORDER BY anonymous_id, timestamp",
+                    "chart_type": "user_paths",
+                    "title": "User Discovery Paths",
+                    "settings": {
+                      "startStep": {
+                        "type": "event",
+                        "event": "page"
+                      },
+                      "maxSteps": 8,
+                      "nodesPerStep": 10
+                    }
+                  }
+                },
+                "retentionFiltered": {
+                  "summary": "Weekly retention \u2014 desktop users, transaction event",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "",
+                    "chart_type": "retention",
+                    "title": "Weekly Retention \u2014 Desktop",
+                    "settings": {
+                      "retentionFilter": {
+                        "type": "event",
+                        "event": "transaction"
+                      },
+                      "retentionUserFilters": [
+                        {
+                          "operand": "device",
+                          "operator": "equals",
+                          "value": "desktop"
+                        }
                       ]
                     }
-                  },
-                  "pieChart": {
-                    "summary": "Traffic by device type",
-                    "value": {
-                      "query": "SELECT device, count() as visits FROM analytics_events WHERE timestamp >= now() - interval 7 day GROUP BY device ORDER BY visits DESC LIMIT 5",
-                      "chart_type": "pie",
-                      "title": "Traffic by Device",
-                      "y_axis": [
-                        "visits"
-                      ]
-                    }
-                  },
-                  "numberChart": {
-                    "summary": "Total revenue KPI",
-                    "value": {
-                      "query": "SELECT sum(value) as total_revenue FROM analytics_events WHERE event = 'purchase' AND timestamp >= now() - interval 30 day",
-                      "chart_type": "number",
-                      "title": "Monthly Revenue"
-                    }
-                  },
-                  "funnelChart": {
-                    "summary": "Funnel with event property filters (e.g. rdns = metamask)",
-                    "value": {
-                      "query": "SELECT 1",
-                      "chart_type": "funnel",
-                      "title": "MetaMask Conversion Funnel",
-                      "steps": [
-                        {
-                          "type": "event",
-                          "event": "page"
-                        },
-                        {
-                          "type": "event",
-                          "event": "connect",
-                          "rdns": {
-                            "op": "equals",
-                            "value": "io.metamask"
-                          },
-                          "chain_id": {
-                            "op": "equals",
-                            "value": "1"
-                          }
-                        },
-                        {
-                          "type": "event",
-                          "event": "transaction"
-                        }
-                      ],
-                      "settings": {
-                        "funnelType": "closed",
-                        "conversionWindow": {
-                          "value": 7,
-                          "unit": "day"
-                        }
-                      }
-                    }
-                  },
-                  "funnelWithBreakdown": {
-                    "summary": "3-step funnel with device breakdown",
-                    "value": {
-                      "query": "SELECT 1",
-                      "chart_type": "funnel",
-                      "title": "Onboarding Funnel by Device",
-                      "steps": [
-                        {
-                          "type": "event",
-                          "event": "page"
-                        },
-                        {
-                          "type": "event",
-                          "event": "connect"
-                        },
-                        {
-                          "type": "event",
-                          "event": "signature"
-                        }
-                      ],
-                      "settings": {
-                        "funnelType": "closed",
-                        "conversionWindow": {
-                          "value": 30,
-                          "unit": "day"
-                        },
-                        "breakdown": "device"
-                      }
-                    }
-                  },
-                  "stackedChart": {
-                    "summary": "Revenue by UTM campaign over time",
-                    "value": {
-                      "query": "SELECT toDate(timestamp) as date, utm_campaign, sum(value) as revenue FROM analytics_events WHERE event = 'purchase' AND timestamp >= now() - interval 30 day GROUP BY date, utm_campaign ORDER BY date",
-                      "chart_type": "stacked",
-                      "title": "Revenue by Campaign",
-                      "x_axis": "date",
-                      "y_axis": [
-                        "revenue"
-                      ],
-                      "group_by": "utm_campaign"
-                    }
-                  },
-                  "retentionChart": {
-                    "summary": "Weekly retention filtered to transaction events on desktop",
-                    "value": {
-                      "query": "",
-                      "chart_type": "retention",
-                      "title": "Weekly User Retention",
-                      "settings": {
-                        "retentionFilter": {
-                          "type": "event",
-                          "event": "transaction"
-                        },
-                        "retentionUserFilters": [
-                          {
-                            "operand": "device",
-                            "operator": "equals",
-                            "value": "desktop"
-                          },
-                          {
-                            "operand": "utm_source",
-                            "operator": "notEquals",
-                            "value": "direct"
-                          }
-                        ]
-                      }
-                    }
-                  },
-                  "retentionChartUnfiltered": {
-                    "summary": "Basic retention (all users, no filters)",
-                    "value": {
-                      "query": "",
-                      "chart_type": "retention",
-                      "title": "Overall Retention"
-                    }
-                  },
-                  "userPathsChart": {
-                    "summary": "User flow from connect with max 5 steps",
-                    "value": {
-                      "query": "SELECT anonymous_id, event, timestamp FROM analytics_events WHERE timestamp >= now() - interval 30 day ORDER BY anonymous_id, timestamp",
-                      "chart_type": "user_paths",
-                      "title": "Post-Connect User Flow",
-                      "settings": {
-                        "startStep": {
-                          "type": "event",
-                          "event": "connect"
-                        },
-                        "endStep": {
-                          "type": "event",
-                          "event": "transaction"
-                        },
-                        "maxSteps": 5
-                      }
-                    }
-                  },
-                  "userPathsOpenEnded": {
-                    "summary": "Open-ended user flow from page view",
-                    "value": {
-                      "query": "SELECT anonymous_id, event, timestamp FROM analytics_events WHERE timestamp >= now() - interval 14 day ORDER BY anonymous_id, timestamp",
-                      "chart_type": "user_paths",
-                      "title": "User Discovery Paths",
-                      "settings": {
-                        "startStep": {
-                          "type": "event",
-                          "event": "page"
-                        },
-                        "maxSteps": 8,
-                        "nodesPerStep": 10
-                      }
-                    }
-                  },
-                  "tableChart": {
-                    "summary": "Top pages by unique visitors",
-                    "value": {
-                      "query": "SELECT pathname, uniq(anonymous_id) as visitors, count() as pageviews FROM analytics_events WHERE event = 'page_view' AND timestamp >= now() - interval 7 day GROUP BY pathname ORDER BY visitors DESC LIMIT 20",
-                      "chart_type": "table",
-                      "title": "Top Pages This Week"
-                    }
-                  },
-                  "funnelWithMultiplePropertyFilters": {
-                    "summary": "Funnel with device/country filters on steps",
-                    "value": {
-                      "query": "SELECT 1",
-                      "chart_type": "funnel",
-                      "title": "Mobile Onboarding Funnel",
-                      "steps": [
-                        {
-                          "type": "event",
-                          "event": "page",
-                          "device": {
-                            "op": "equals",
-                            "value": "mobile"
-                          },
-                          "country": {
-                            "op": "notEquals",
-                            "value": "CN"
-                          }
-                        },
-                        {
-                          "type": "event",
-                          "event": "connect",
-                          "provider_name": {
-                            "op": "in",
-                            "value": "metamask|rainbow|coinbase"
-                          }
-                        },
-                        {
-                          "type": "event",
-                          "event": "transaction"
-                        }
-                      ],
-                      "settings": {
-                        "funnelType": "open",
-                        "conversionWindow": {
-                          "value": 30,
-                          "unit": "day"
-                        },
-                        "breakdown": "device"
-                      }
-                    }
+                  }
+                },
+                "retentionUnfiltered": {
+                  "summary": "Overall retention (no filters)",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "query": "",
+                    "chart_type": "retention",
+                    "title": "Overall Retention"
                   }
                 }
               }
@@ -3484,59 +3870,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "query": {
-                    "type": "string"
-                  },
-                  "chart_type": {
-                    "type": "string",
-                    "enum": [
-                      "table",
-                      "number",
-                      "funnel",
-                      "bar",
-                      "line",
-                      "pie",
-                      "stacked",
-                      "user_paths",
-                      "retention"
-                    ]
-                  },
-                  "title": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "x_axis": {
-                    "type": "string"
-                  },
-                  "y_axis": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "group_by": {
-                    "type": "string"
-                  },
-                  "steps": {
-                    "type": "array",
-                    "items": {
-                      "type": "object"
-                    }
-                  },
-                  "settings": {
-                    "type": "object"
-                  }
-                },
-                "required": [
-                  "query",
-                  "chart_type",
-                  "title"
-                ]
+                "$ref": "#/components/schemas/UpdateChartRequest"
               }
             }
           }
