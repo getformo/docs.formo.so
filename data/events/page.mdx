@@ -35,7 +35,7 @@ The following table shows which properties are automatically set by each SDK:
 | `properties.category` | Caller-provided | Caller-provided |
 | `context.page_url` | `window.location.href` | `app://{screenName}` |
 | `context.page_title` | `document.title` | Screen name |
-| `context.page_path` | Not set (derived in backend) | `/{screenName}` |
+| `context.page_path` | Not set (derived in backend) | Not set (derived in backend) |
 | `context.referrer` | `document.referrer` | From deep link (if set) |
 | `context.user_agent` | Browser user agent | Device user agent (if available) |
 | `context.os_name` | Not set | `iOS` or `Android` |
@@ -77,7 +77,6 @@ Screen events from the [mobile SDK](/sdks/mobile) are sent as `page` events with
         "library_name": "Formo React Native SDK",
         "library_version": "1.0.0",
         "page_title": "Wallet",
-        "page_path": "/Wallet",
         "page_url": "app://Wallet",
         "locale": "en-US",
         "timezone": "America/New_York",
