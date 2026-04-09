@@ -1,6 +1,6 @@
 ---
-title: 'Create Chart'
-openapi: 'POST /v0/boards/{boardId}/charts'
+title: "Create Chart"
+openapi: "POST /v0/boards/{boardId}/charts"
 ---
 
 ## Overview
@@ -13,18 +13,18 @@ The `chart_type` field controls which other request body fields are required or 
 
 ## Request Fields
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `projectId` | string | Yes | Project the chart belongs to |
-| `query` | string | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"` |
-| `chart_type` | string | Yes | `table` · `number` · `bar` · `line` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
-| `title` | string | Yes | Display name (minimum 1 character) |
-| `description` | string | No | Optional description |
-| `x_axis` | string | Conditional | Column for the X axis. Required for `bar`, `line`, `stacked` |
-| `y_axis` | string[] | Conditional | Column(s) for Y axis metrics. See per-type rules below |
-| `group_by` | string | Conditional | Column to group/stack series by. Required for `stacked` |
-| `steps` | FunnelStep[] | Conditional | Ordered funnel steps. Required for `funnel` (minimum 2) |
-| `settings` | ChartSettings | No | Type-specific configuration object |
+| Field         | Type          | Required    | Description                                                                                     |
+| ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
+| `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
+| `query`       | string        | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"`           |
+| `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
+| `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
+| `description` | string        | No          | Optional description                                                                            |
+| `x_axis`      | string        | Conditional | Column for the X axis. Required for `bar`, `line`, `stacked`                                    |
+| `y_axis`      | string[]      | Conditional | Column(s) for Y axis metrics. See per-type rules below                                          |
+| `group_by`    | string        | Conditional | Column to group/stack series by. Required for `stacked`                                         |
+| `steps`       | FunnelStep[]  | Conditional | Ordered funnel steps. Required for `funnel` (minimum 2)                                         |
+| `settings`    | ChartSettings | No          | Type-specific configuration object                                                              |
 
 ---
 
@@ -128,11 +128,11 @@ Each step in the `steps` array has the following shape:
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `type` | string | Yes | `event` — built-in events (page, connect, transaction); `track` — custom tracked events; `decoded_log` — decoded smart-contract events |
-| `event` | string | Yes | Event name (e.g. `page`, `connect`, `transaction`) |
-| `<propertyKey>` | `StepFilterCondition` | No | One or more property filters. Any extra key on the step object is treated as a filter. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_*`) are filtered directly; all other keys are extracted from `properties` via `JSONExtractString` |
+| Field           | Type                  | Required | Description                                                                                                                                                                                                                                                               |
+| --------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`          | string                | Yes      | `event` — built-in events (page, connect, transaction); `track` — custom tracked events; `decoded_log` — decoded smart-contract events                                                                                                                                    |
+| `event`         | string                | Yes      | Event name (e.g. `page`, `connect`, `transaction`)                                                                                                                                                                                                                        |
+| `<propertyKey>` | `StepFilterCondition` | No       | One or more property filters. Any extra key on the step object is treated as a filter. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_*`) are filtered directly; all other keys are extracted from `properties` via `JSONExtractString` |
 
 ### Filter Operators (`StepFilterCondition`)
 
@@ -140,31 +140,32 @@ Each step in the `steps` array has the following shape:
 { "op": "<operator>", "value": "<value>" }
 ```
 
-| `op` | SQL equivalent | Notes |
-|---|---|---|
-| `equals` | `= 'value'` | Exact match |
-| `notEquals` | `!= 'value'` | Inverse match |
-| `in` | `IN (...)` | Pipe-delimited value: `"metamask\|rainbow\|coinbase"` |
-| `notIn` | `NOT IN (...)` | Pipe-delimited value |
-| `gt` | `> value` | Numeric comparison |
-| `gte` | `>= value` | Numeric comparison |
-| `lt` | `< value` | Numeric comparison |
-| `lte` | `<= value` | Numeric comparison |
-| `startsWith` | `startsWith(col, 'v')` | String prefix |
-| `endsWith` | `endsWith(col, 'v')` | String suffix |
-| `includes` | `like '%v%'` | Substring match |
+| `op`         | SQL equivalent         | Notes                                                 |
+| ------------ | ---------------------- | ----------------------------------------------------- |
+| `equals`     | `= 'value'`            | Exact match                                           |
+| `notEquals`  | `!= 'value'`           | Inverse match                                         |
+| `in`         | `IN (...)`             | Pipe-delimited value: `"metamask\|rainbow\|coinbase"` |
+| `notIn`      | `NOT IN (...)`         | Pipe-delimited value                                  |
+| `gt`         | `> value`              | Numeric comparison                                    |
+| `gte`        | `>= value`             | Numeric comparison                                    |
+| `lt`         | `< value`              | Numeric comparison                                    |
+| `lte`        | `<= value`             | Numeric comparison                                    |
+| `startsWith` | `startsWith(col, 'v')` | String prefix                                         |
+| `endsWith`   | `endsWith(col, 'v')`   | String suffix                                         |
+| `includes`   | `like '%v%'`           | Substring match                                       |
 
 <Tip>
-For `in` and `notIn`, join multiple values with a pipe `|`. Escape a literal pipe with `\|` and a literal backslash with `\\`.
+  For `in` and `notIn`, join multiple values with a pipe `|`. Escape a literal
+  pipe with `\|` and a literal backslash with `\\`.
 </Tip>
 
 ### `settings` for Funnel Charts
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `funnelType` | `"closed"` \| `"open"` | `"closed"` | `closed` — strict ordering, no events between steps; `open` — ordered but other events may occur between steps |
-| `conversionWindow` | `ConversionWindow` | 1 day | Max time from Step 1 for a user to complete all steps |
-| `breakdown` | string | — | Split each funnel bar by this dimension |
+| Field              | Type                   | Default    | Description                                                                                                    |
+| ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
+| `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` — strict ordering, no events between steps; `open` — ordered but other events may occur between steps |
+| `conversionWindow` | `ConversionWindow`     | 1 day      | Max time from Step 1 for a user to complete all steps                                                          |
+| `breakdown`        | string                 | —          | Split each funnel bar by this dimension                                                                        |
 
 #### `ConversionWindow`
 
@@ -289,14 +290,14 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 
 ### `settings` for User Paths Charts
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `startStep` | `FunnelStep` | — | **Required.** Event where the flow begins |
-| `endStep` | `FunnelStep` \| `null` | `null` | Optional ending event. `null` = open-ended |
-| `maxSteps` | integer (2–10) | `3` | Max steps to show in the flow. Values above 10 are clamped to 10 |
-| `nodesPerStep` | integer (2–10) | `5` | Max unique event nodes per step. Values above 10 are clamped to 10 |
-| `conversionWindow` | `ConversionWindow` | — | Time window to group the flow |
-| `filters` | string | — | JSON-encoded string of additional path filters |
+| Field              | Type                   | Default | Description                                                        |
+| ------------------ | ---------------------- | ------- | ------------------------------------------------------------------ |
+| `startStep`        | `FunnelStep`           | —       | **Required.** Event where the flow begins                          |
+| `endStep`          | `FunnelStep` \| `null` | `null`  | Optional ending event. `null` = open-ended                         |
+| `maxSteps`         | integer (2–10)         | `3`     | Max steps to show in the flow. Values above 10 are clamped to 10   |
+| `nodesPerStep`     | integer (2–10)         | `5`     | Max unique event nodes per step. Values above 10 are clamped to 10 |
+| `conversionWindow` | `ConversionWindow`     | —       | Time window to group the flow                                      |
+| `filters`          | string                 | —       | JSON-encoded string of additional path filters                     |
 
 ```json
 {
@@ -321,18 +322,18 @@ Measures how often users return over time. The `query` field is not used — pas
 
 ### `settings` for Retention Charts
 
-| Field | Type | Description |
-|---|---|---|
-| `retentionFilter` | `FunnelStep` \| `null` | Event that qualifies a returning visit as "retained". `null` = any event counts |
-| `retentionUserFilters` | `RetentionUserFilter[]` | User-segment filters that narrow the retention cohort |
+| Field                  | Type                    | Description                                                                     |
+| ---------------------- | ----------------------- | ------------------------------------------------------------------------------- |
+| `retentionFilter`      | `FunnelStep` \| `null`  | Event that qualifies a returning visit as "retained". `null` = any event counts |
+| `retentionUserFilters` | `RetentionUserFilter[]` | User-segment filters that narrow the retention cohort                           |
 
 Each `RetentionUserFilter`:
 
-| Field | Type | Description |
-|---|---|---|
-| `operand` | string | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
-| `operator` | string | Comparison operator (same set as `StepFilterCondition.op`) |
-| `value` | string \| number | Value to compare against |
+| Field      | Type             | Description                                                              |
+| ---------- | ---------------- | ------------------------------------------------------------------------ |
+| `operand`  | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
+| `operator` | string           | Comparison operator (same set as `StepFilterCondition.op`)               |
+| `value`    | string \| number | Value to compare against                                                 |
 
 ```json
 {
@@ -365,17 +366,17 @@ For all-user retention with no filters, omit `settings`:
 
 ## Validation Reference
 
-| Chart Type | Validation Rule |
-|---|---|
-| `table` | `query` must execute successfully |
-| `number` | `query` must return exactly 1 row × 1 column |
-| `bar` | `x_axis` required; `y_axis` requires ≥ 1 element |
-| `line` | `x_axis` required; `y_axis` requires ≥ 1 element |
-| `pie` | `y_axis` requires exactly 1 element |
-| `stacked` | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required |
-| `funnel` | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL |
-| `user_paths` | `settings.startStep` required; `query` must execute and return valid path data |
-| `retention` | No query validation — `query` is ignored |
+| Chart Type   | Validation Rule                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| `table`      | `query` must execute successfully                                                        |
+| `number`     | `query` must return exactly 1 row × 1 column                                             |
+| `bar`        | `x_axis` required; `y_axis` requires ≥ 1 element                                         |
+| `line`       | `x_axis` required; `y_axis` requires ≥ 1 element                                         |
+| `pie`        | `y_axis` requires exactly 1 element                                                      |
+| `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required              |
+| `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL |
+| `user_paths` | `settings.startStep` required; `query` must execute and return valid path data           |
+| `retention`  | No query validation — `query` is ignored                                                 |
 
 ---
 
