@@ -52,6 +52,8 @@ ORDER BY date
 
 ## Available tables
 
+See the [Data Catalog](/data/schema) for full column definitions, query patterns, and example queries for each table.
+
 | Table | Description |
 |-------|-------------|
 | `events` | All user interaction events (page views, wallet events, custom events, contract events) |
@@ -67,7 +69,7 @@ ORDER BY date
 | `wallet_profiles_chains_tokens_mv` | Wallet token holdings data broken down by blockchain |
 | `wallet_profiles_events` | Timestamped wallet profiling events from external offchain and onchain analysis |
 
-## Tips
+## Best practices
 
 - Use `LIMIT` to control result size. Default is 1,000 rows; maximum is 1,000,000 rows
 - Use date filters to improve query performance
@@ -97,7 +99,7 @@ Your query becomes a reusable chart on your dashboard that you can share with yo
   <Card title="AI Assistant" icon="sparkles" href="/features/product-analytics/ai">
     Let AI help write queries
   </Card>
-  <Card title="Data Schema" icon="database" href="/data/schema">
-    Full data warehouse schema
+  <Card title="Data Catalog" icon="database" href="/data/schema">
+    Full data warehouse catalog
   </Card>
 </CardGroup>
