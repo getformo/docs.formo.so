@@ -125,7 +125,7 @@ Each condition in the `conditions` array has:
 | `eq` | Equals | `{"field": "users.device", "op": "eq", "value": "Desktop"}` |
 | `neq` | Not equals | `{"field": "users.os", "op": "neq", "value": "Windows"}` |
 | `gt` | Greater than | `{"field": "users.net_worth_usd", "op": "gt", "value": 1000}` |
-| `gte` | Greater than or equal | `{"field": "users.tx_count", "op": "gte", "value": 100}` |
+| `gte` | Greater than or equal | `{"field": "users.volume", "op": "gte", "value": 100}` |
 | `lt` | Less than | `{"field": "users.net_worth_usd", "op": "lt", "value": 50000}` |
 | `lte` | Less than or equal | `{"field": "chains.1.balance", "op": "lte", "value": 10000}` |
 | `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
@@ -144,7 +144,9 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 | Field | Type | Description |
 |-------|------|-------------|
 | `users.net_worth_usd` | number | Total net worth in USD |
-| `users.tx_count` | number | Total transaction count |
+| `users.volume` | number | Total trading volume |
+| `users.revenue` | number | Total revenue |
+| `users.points` | number | Total points |
 
 **Example - Find users with net worth > $10,000:**
 
@@ -152,6 +154,17 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 {
   "conditions": [
     { "field": "users.net_worth_usd", "op": "gt", "value": 10000 }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find high-volume users:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.volume", "op": "gt", "value": 5000 }
   ],
   "logic": "and"
 }

@@ -1,16 +1,731 @@
 ---
-title: 'Data schema'
+title: Data schema
 icon: database
-description: 'Own your data. Explore the full data schema of the Formo data warehouse, including events, users, and wallet profiles. Query data however you like and build custom reports.'
+description: Full data schema reference for the Formo data warehouse. Query events, users, sessions, revenue, wallet profiles, and more using ClickHouse SQL in the Explorer.
 ---
 
-Formo’s extensive data catalog provides detailed insights on events, users, and wallet profiles across chains. 
+Formo’s data warehouse gives you direct SQL access to events, users, sessions, revenue, and wallet profiles across chains.
 
-- **Events** and **Users** are first-party data. Access is restricted to each workspace. 
-- **Wallet Profiles** include public onchain data (net worth, apps, tokens, chains, labels, etc.). Globally accessible across all workspaces.
+- **Events**, **Users**, **Sessions**, **Revenue**, and **Sources** are first-party data scoped to your project.
+- **Wallet Profiles** include public onchain data (net worth, apps, tokens, chains, social profiles, etc.) and are globally accessible across all workspaces.
 
-<img src="/images/explore.png" alt="Data schema" />
+<Frame caption="Browse the schema and run SQL queries in the Explorer.">
+  <img src="/images/explore.png" alt="Data schema" />
+</Frame>
 
-Sign in and go to the [Explorer](/features/product-analytics/explore) to view the Formo data schema.
+**Key details:**
+- **SQL dialect**: [ClickHouse SQL](https://clickhouse.com/docs/en/sql-reference) (not standard SQL)
+- **Default row limit**: 100 rows (add your own `LIMIT` clause to override)
+- **Project scoping**: All queries are automatically filtered to your project — you never need to add `WHERE project_id = ...`
+- **Aggregate tables**: Several tables use ClickHouse `AggregateFunction` types that require `-Merge` suffix functions (see [Working with Aggregate Tables](#working-with-aggregate-tables))
 
-Query data with the [Query API](/api-reference/overview#query-api) and [Profiles API](/api-reference/overview#profiles-api)., explore with the [BI integration](/data/bi), and export data with [Data Sync](/data/data-sync).
+Query data with the [Query API](/api-reference/overview#query-api) and [Profiles API](/api-reference/overview#profiles-api), explore with the [BI integration](/data/bi), export with [Data Sync](/data/data-sync), or write SQL directly in the [Explorer](/features/product-analytics/explore).
+
+## Data flow
+
+```
+raw_events (landing zone)
+    │
+    ▼
+events (deduplicated + parsed)
+    │
+    ├──▶ users (wallet-identified profiles)
+    ├──▶ anonymous_users (pre-wallet profiles)
+    ├──▶ sessions (session-level engagement)
+    ├──▶ sources (traffic attribution)
+    ├──▶ revenue (financial metrics)
+    └──▶ identities (anonymous ↔ wallet mapping)
+
+wallet_profiles_events (blockchain data)
+    │
+    ├──▶ wallet_profiles_mv (global wallet profiles)
+    ├──▶ wallet_profiles_chains_mv (per-chain data)
+    ├──▶ wallet_profiles_chains_tokens_mv (token holdings)
+    └──▶ wallet_profiles_chains_apps_mv (DeFi app usage)
+```
+
+---
+
+## Table reference
+
+### events
+
+The core event log. Contains all user interaction events — page views, custom events, wallet connects, and onchain contract events (`decoded_log`).
+
+**Use cases:** Event-level analysis, user journey tracking, custom event queries, debugging
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `session_id` | String | User session identifier |
+| `channel` | String | Event channel |
+| `type` | String | Event category: `page`, `track`, `identify`, `connect`, `decoded_log` |
+| `anonymous_id` | String | Auto-generated anonymous user ID |
+| `user_id` | String | Optional user identifier |
+| `address` | String | Wallet address (empty if not connected) |
+| `event` | String | Specific event name for `track` events |
+| `context` | String | JSON metadata: user_agent, page info, referrer. See [contextual fields](/data/events/common#contextual-fields) |
+| `properties` | String | JSON with event-specific custom properties. See [event spec](/data/events/overview) |
+| `version` | String | SDK version |
+| `timestamp` | DateTime | Event timestamp |
+| `message_id` | String | Unique event ID for deduplication |
+| `origin` | String | Domain (without www) |
+| `locale` | String | User locale |
+| `location` | String | Country code (e.g., `US`, `DE`) |
+| `timezone` | String | User timezone |
+| `page_path` | String | URL path |
+| `page_title` | String | Page title |
+| `page_url` | String | Full page URL |
+| `page_query` | String | URL query string |
+| `page_hash` | String | URL hash fragment |
+| `library_name` | String | SDK library name |
+| `library_version` | String | SDK library version |
+| `referrer_url` | String | Full referrer URL |
+| `referrer` | String | Referrer domain (without www) |
+| `ref` | String | Ref parameter |
+| `utm_source` | String | UTM source |
+| `utm_medium` | String | UTM medium |
+| `utm_campaign` | String | UTM campaign |
+| `utm_term` | String | UTM term |
+| `utm_content` | String | UTM content |
+| `user_agent` | String | Raw user agent string |
+| `device` | String | Device type: `desktop`, `mobile-ios`, `mobile-android`, `tablet`, `bot` |
+| `browser` | String | Browser: `chrome`, `safari`, `firefox`, or Web3 wallets |
+| `os` | String | OS: `windows`, `ios`, `android`, `macos`, `linux` |
+
+**Example:**
+
+```sql
+SELECT *
+FROM events
+ORDER BY timestamp DESC
+LIMIT 10
+```
+
+---
+
+### users
+
+Aggregated wallet user profiles with attribution, engagement, and revenue metrics. Each row represents one wallet address.
+
+**Use cases:** User segmentation, attribution analysis, lifecycle tracking, wallet analytics
+
+<Warning>
+This is an **aggregate table**. Most columns require `-Merge` functions. Always `GROUP BY address`. Never use `SELECT *`. See [Working with Aggregate Tables](#working-with-aggregate-tables).
+</Warning>
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `address` | String | Direct access |
+| `first_seen` | SimpleAggregateFunction(min, DateTime) | `min(first_seen)` |
+| `last_seen` | SimpleAggregateFunction(max, DateTime) | `max(last_seen)` |
+| `first_utm_source` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_utm_source)` |
+| `last_utm_source` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_utm_source)` |
+| `first_utm_medium` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_utm_medium)` |
+| `last_utm_medium` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_utm_medium)` |
+| `first_utm_campaign` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_utm_campaign)` |
+| `last_utm_campaign` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_utm_campaign)` |
+| `first_utm_content` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_utm_content)` |
+| `last_utm_content` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_utm_content)` |
+| `first_utm_term` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_utm_term)` |
+| `last_utm_term` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_utm_term)` |
+| `first_referrer` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_referrer)` |
+| `last_referrer` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_referrer)` |
+| `first_referrer_url` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_referrer_url)` |
+| `last_referrer_url` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_referrer_url)` |
+| `first_ref` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_ref)` |
+| `last_ref` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_ref)` |
+| `num_sessions` | AggregateFunction(uniq, String) | `uniqMerge(num_sessions)` |
+| `revenue` | SimpleAggregateFunction(sum, Float64) | `sum(revenue)` |
+| `volume` | SimpleAggregateFunction(sum, Float64) | `sum(volume)` |
+| `points` | SimpleAggregateFunction(sum, Float64) | `sum(points)` |
+| `wallets_state` | AggregateFunction(groupUniqArray, String) | `groupUniqArrayMerge(wallets_state)` |
+| `last_type` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_type)` |
+| `last_event` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_event)` |
+| `last_properties` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_properties)` |
+| `location` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(location)` |
+| `device` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(device)` |
+| `browser` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(browser)` |
+| `os` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(os)` |
+| `activity_dates` | AggregateFunction(groupUniqArray, Date) | `groupUniqArrayMerge(activity_dates)` |
+
+**Lifecycle definitions** (based on `activity_dates`):
+- **New**: `first_seen` within 30 days
+- **Churned**: `last_seen` >= 30 days ago
+- **Power**: 5+ unique active days in last 30 days
+- **Resurrected**: had 30+ day gap but returned
+- **Returning**: default
+
+**Example:**
+
+```sql
+SELECT
+    address,
+    min(first_seen) AS first_seen,
+    max(last_seen) AS last_seen,
+    argMinMerge(first_utm_source) AS first_utm_source,
+    argMaxMerge(last_utm_source) AS last_utm_source,
+    uniqMerge(num_sessions) AS num_sessions,
+    sum(revenue) AS revenue,
+    sum(volume) AS volume,
+    argMaxMerge(location) AS location,
+    argMaxMerge(device) AS device,
+    argMaxMerge(browser) AS browser
+FROM users
+GROUP BY address
+LIMIT 10
+```
+
+---
+
+### anonymous_users
+
+Profiles for users who haven’t connected a wallet yet. Same structure as `users` but keyed by `anonymous_id` instead of `address`.
+
+**Use cases:** Pre-wallet user analysis, conversion funnel tracking, anonymous visitor segmentation
+
+<Note>Total users = `users` (wallet-connected) + `anonymous_users` (pre-wallet)</Note>
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `anonymous_id` | String | Direct access |
+
+All other columns are identical to the [users](#users) table, with `anonymous_id` replacing `address` as the primary key.
+
+---
+
+### sessions
+
+Aggregated session data with engagement metrics and attribution. Each row represents one session on a given date.
+
+**Use cases:** Session analysis, bounce rate calculations, session duration, user attribution
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `origin` | String | Direct access |
+| `session_id` | String | Direct access |
+| `date` | Date | Direct access |
+| `device` | SimpleAggregateFunction(any, String) | Direct access |
+| `browser` | SimpleAggregateFunction(any, String) | Direct access |
+| `os` | SimpleAggregateFunction(any, String) | Direct access |
+| `location` | SimpleAggregateFunction(any, String) | Direct access |
+| `referrer` | SimpleAggregateFunction(any, String) | Direct access |
+| `ref` | SimpleAggregateFunction(any, String) | Direct access |
+| `utm_medium` | SimpleAggregateFunction(any, String) | Direct access |
+| `utm_source` | SimpleAggregateFunction(any, String) | Direct access |
+| `utm_campaign` | SimpleAggregateFunction(any, String) | Direct access |
+| `utm_content` | SimpleAggregateFunction(any, String) | Direct access |
+| `utm_term` | SimpleAggregateFunction(any, String) | Direct access |
+| `first_hit` | SimpleAggregateFunction(min, DateTime) | Direct access |
+| `latest_hit` | SimpleAggregateFunction(max, DateTime) | Direct access |
+| `hits` | AggregateFunction(count) | `countMerge(hits)` |
+
+**Example:**
+
+```sql
+SELECT AVG(latest_hit - first_hit) AS avg_session_length
+FROM sessions
+```
+
+---
+
+### sources
+
+Daily aggregated traffic source metrics and attribution data. Each row represents one day of activity from a specific referrer/UTM combination.
+
+**Use cases:** Marketing attribution, referrer performance, traffic source analysis, campaign ROI
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `date` | Date | Activity date |
+| `origin` | String | Site domain |
+| `referrer` | String | Referrer domain |
+| `referrer_url` | String | Full referrer URL |
+| `device` | String | Device type |
+| `browser` | String | Browser |
+| `os` | String | Operating system |
+| `location` | String | Country code |
+| `ref` | String | Ref parameter |
+| `utm_medium` | String | UTM medium |
+| `utm_source` | String | UTM source |
+| `utm_campaign` | String | UTM campaign |
+| `utm_content` | String | UTM content |
+| `utm_term` | String | UTM term |
+| `visits` | AggregateFunction(uniq, String) | Unique sessions — use `uniqMerge(visits)` |
+| `users` | AggregateFunction(uniq, String) | Unique anonymous users — use `uniqMerge(users)` |
+| `hits` | AggregateFunction(count) | Page views — use `countMerge(hits)` |
+
+---
+
+### revenue
+
+Financial metrics with full attribution context. Tracks revenue, transaction volume, and points.
+
+**Use cases:** Revenue attribution, ROI analysis, financial performance by source/campaign
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `origin` | String | Site domain |
+| `pathname` | String | Page path |
+| `date` | Date | Transaction date |
+| `device` | String | Device type |
+| `browser` | String | Browser |
+| `os` | String | Operating system |
+| `location` | String | Country code |
+| `referrer_url` | String | Full referrer URL |
+| `referrer` | String | Referrer domain |
+| `ref` | String | Ref parameter |
+| `utm_medium` | String | UTM medium |
+| `utm_source` | String | UTM source |
+| `utm_campaign` | String | UTM campaign |
+| `utm_content` | String | UTM content |
+| `utm_term` | String | UTM term |
+| `event` | String | Revenue-generating event name |
+| `rdns` | String | Wallet RDNS identifier |
+| `provider_name` | String | Wallet provider name |
+| `chain_id` | String | Blockchain chain ID |
+| `volume` | Float32 | Transaction volume (capped at 1B) |
+| `revenue` | Float32 | Revenue value (capped at 1B) |
+| `points` | Float32 | Points value (capped at 1B) |
+
+**Example:**
+
+```sql
+SELECT utm_campaign, SUM(revenue) AS total_revenue
+FROM revenue
+GROUP BY utm_campaign
+ORDER BY total_revenue DESC
+```
+
+---
+
+### identities
+
+Identity graph linking anonymous sessions to wallet addresses. Each row represents a connection between an anonymous user and a wallet.
+
+**Use cases:** Conversion tracking, user journey analysis, linking pre/post-wallet activity
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `session_id` | String | Direct access |
+| `anonymous_id` | String | Direct access |
+| `address` | String | Wallet address |
+| `user_id` | String | Optional user identifier |
+| `first_seen` | AggregateFunction(min, DateTime) | `minMerge(first_seen)` |
+
+**Example:**
+
+```sql
+SELECT
+    address,
+    anonymous_id,
+    session_id,
+    minMerge(first_seen) AS connected_at
+FROM identities
+GROUP BY address, anonymous_id, session_id
+ORDER BY connected_at DESC
+LIMIT 20
+```
+
+---
+
+### wallet_profiles_mv
+
+Global wallet profile data aggregated across all chains. One row per wallet address with social profiles, contact info, and net worth.
+
+**Use cases:** Wallet intelligence, social identity resolution, user enrichment, outreach
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `address` | String | Direct access |
+| `net_worth_usd` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(net_worth_usd)` |
+| `ens` | SimpleAggregateFunction(max, String) | Direct access |
+| `farcaster` | SimpleAggregateFunction(max, String) | Direct access |
+| `lens` | SimpleAggregateFunction(max, String) | Direct access |
+| `basenames` | SimpleAggregateFunction(max, String) | Direct access |
+| `linea` | SimpleAggregateFunction(max, String) | Direct access |
+| `discord` | SimpleAggregateFunction(max, String) | Direct access |
+| `telegram` | SimpleAggregateFunction(max, String) | Direct access |
+| `website` | SimpleAggregateFunction(max, String) | Direct access |
+| `github` | SimpleAggregateFunction(max, String) | Direct access |
+| `twitter` | SimpleAggregateFunction(max, String) | Direct access |
+| `linkedin` | SimpleAggregateFunction(max, String) | Direct access |
+| `email` | SimpleAggregateFunction(max, String) | Direct access |
+| `instagram` | SimpleAggregateFunction(max, String) | Direct access |
+| `facebook` | SimpleAggregateFunction(max, String) | Direct access |
+| `tiktok` | SimpleAggregateFunction(max, String) | Direct access |
+| `youtube` | SimpleAggregateFunction(max, String) | Direct access |
+| `reddit` | SimpleAggregateFunction(max, String) | Direct access |
+| `avatar` | SimpleAggregateFunction(max, String) | Direct access |
+| `description` | SimpleAggregateFunction(max, String) | Direct access |
+| `display_name` | SimpleAggregateFunction(max, String) | Direct access |
+| `location` | SimpleAggregateFunction(max, String) | Direct access |
+| `updated_at` | SimpleAggregateFunction(max, DateTime) | Direct access |
+
+---
+
+### wallet_profiles_chains_mv
+
+Wallet profile data broken down by blockchain network. Each row represents a wallet’s activity on a specific chain.
+
+**Use cases:** Chain-specific analysis, cross-chain behavior tracking, multi-chain user segmentation
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `address` | String | Direct access |
+| `chain_id` | String | Blockchain identifier |
+| `net_worth_usd` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(net_worth_usd)` |
+| `tx_count` | AggregateFunction(argMax, UInt64, DateTime) | `argMaxMerge(tx_count)` |
+| `first_onchain` | SimpleAggregateFunction(min, Nullable(DateTime)) | Direct access |
+| `last_onchain` | SimpleAggregateFunction(max, Nullable(DateTime)) | Direct access |
+| `updated_at` | SimpleAggregateFunction(max, DateTime) | Direct access |
+
+**Example:**
+
+```sql
+SELECT
+    address,
+    chain_id,
+    argMaxMerge(net_worth_usd) AS net_worth_usd,
+    argMaxMerge(tx_count) AS tx_count,
+    first_onchain,
+    last_onchain
+FROM wallet_profiles_chains_mv
+GROUP BY address, chain_id, first_onchain, last_onchain
+ORDER BY net_worth_usd DESC
+LIMIT 50
+```
+
+---
+
+### wallet_profiles_chains_tokens_mv
+
+Token holdings data per wallet per chain. Each row represents one token held by a wallet on a specific chain.
+
+**Use cases:** Token portfolio analysis, token-based segmentation, whale identification
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `address` | String | Direct access |
+| `chain_id` | String | Blockchain identifier |
+| `token_address` | String | Token contract address |
+| `app_id` | String | DeFi app ID (if token is in a protocol) |
+| `name` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(name)` |
+| `symbol` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(symbol)` |
+| `img` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(img)` |
+| `decimals` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(decimals)` |
+| `price` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(price)` |
+| `balance` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(balance)` |
+| `balance_usd` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(balance_usd)` |
+| `updated_at` | SimpleAggregateFunction(max, DateTime) | Direct access |
+
+---
+
+### wallet_profiles_chains_apps_mv
+
+DeFi app usage data per wallet per chain. Each row represents a wallet’s interaction with a specific DeFi protocol.
+
+**Use cases:** DeFi app adoption analysis, protocol usage tracking, user portfolio analysis
+
+| Column | Type | Query Function |
+|--------|------|---------------|
+| `address` | String | Direct access |
+| `chain_id` | String | Blockchain identifier |
+| `id` | String | Unique app identifier |
+| `name` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(name)` |
+| `img` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(img)` |
+| `url` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(url)` |
+| `balance_usd` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(balance_usd)` |
+| `updated_at` | SimpleAggregateFunction(max, DateTime) | Direct access |
+
+---
+
+### wallet_profiles_events
+
+Raw timestamped wallet profile data from blockchain analysis. Contains the unprocessed profile updates that feed into the `wallet_profiles_*` materialized views.
+
+**Use cases:** Debugging wallet profile data, historical profile snapshots, raw data access
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `address` | String | Wallet address |
+| `type` | String | Event type: `wallet_profile_set` or `wallet_profile_chain_set` |
+| `chain_id` | String | Blockchain identifier |
+| `version` | String | Profile data version |
+| `properties` | String | JSON with detailed profile data (tokens, balances, tx history) |
+| `timestamp` | DateTime | When the profile was captured |
+
+---
+
+### chains
+
+Derived view providing chain usage data with attribution context.
+
+**Use cases:** Chain adoption tracking, multi-chain user analysis
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `chain_id` | String | Blockchain identifier |
+| `date` | DateTime | Activity date |
+| `origin` | String | Site domain |
+| `device` | String | Device type |
+| `browser` | String | Browser |
+| `os` | String | Operating system |
+| `location` | String | Country code |
+| `referrer` | String | Referrer domain |
+| `ref` | String | Ref parameter |
+| `utm_medium` | String | UTM medium |
+| `utm_source` | String | UTM source |
+| `utm_campaign` | String | UTM campaign |
+| `utm_content` | String | UTM content |
+| `utm_term` | String | UTM term |
+| `visits` | String | Visit count |
+
+---
+
+### pages
+
+Derived view providing page-level analytics data.
+
+**Use cases:** Page performance analysis, content analytics, top pages
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `origin` | String | Site domain |
+| `pathname` | String | URL path |
+| `visits` | Number | Unique session count |
+| `hits` | Number | Total page views |
+
+---
+
+## Table relationships
+
+```
+events.anonymous_id  ──────▶  anonymous_users.anonymous_id
+events.address       ──────▶  users.address
+events.session_id    ──────▶  sessions.session_id
+                               identities.session_id
+
+identities.anonymous_id ───▶  anonymous_users.anonymous_id
+identities.address     ────▶  users.address
+
+users.address          ────▶  wallet_profiles_mv.address
+                               wallet_profiles_chains_mv.address
+                               wallet_profiles_chains_tokens_mv.address
+                               wallet_profiles_chains_apps_mv.address
+```
+
+The **identities** table is the bridge between anonymous and identified users. It links `anonymous_id` and `session_id` to `address`, enabling you to track user behavior before and after wallet connection.
+
+---
+
+## Working with aggregate tables
+
+Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`) use ClickHouse [AggregateFunction](https://clickhouse.com/docs/en/sql-reference/data-types/aggregatefunction) types. These store intermediate aggregation states, not final values.
+
+### Rules
+
+1. **Always `GROUP BY` the primary key** when querying aggregate tables
+2. **Use `-Merge` suffix** for `AggregateFunction` columns (e.g., `argMaxMerge(last_utm_source)`)
+3. **Use standard functions** for `SimpleAggregateFunction` columns (e.g., `min(first_seen)`, `max(last_seen)`)
+4. **Never `SELECT *`** on aggregate tables — it returns binary aggregate states, not readable values
+
+### Quick reference
+
+| Aggregate Type | Query Pattern | Example |
+|---------------|--------------|---------|
+| `AggregateFunction(argMax, T, DateTime)` | `argMaxMerge(col)` | `argMaxMerge(location)` |
+| `AggregateFunction(argMin, T, DateTime)` | `argMinMerge(col)` | `argMinMerge(first_utm_source)` |
+| `AggregateFunction(uniq, T)` | `uniqMerge(col)` | `uniqMerge(num_sessions)` |
+| `AggregateFunction(count)` | `countMerge(col)` | `countMerge(hits)` |
+| `AggregateFunction(groupUniqArray, T)` | `groupUniqArrayMerge(col)` | `groupUniqArrayMerge(wallets_state)` |
+| `AggregateFunction(min, T)` | `minMerge(col)` | `minMerge(first_seen)` |
+| `SimpleAggregateFunction(min, T)` | `min(col)` | `min(first_seen)` |
+| `SimpleAggregateFunction(max, T)` | `max(col)` | `max(last_seen)` |
+| `SimpleAggregateFunction(sum, T)` | `sum(col)` | `sum(revenue)` |
+| `SimpleAggregateFunction(any, T)` | Direct access | `device` |
+
+---
+
+## Example queries
+
+### Most active wallets
+
+```sql
+SELECT address, COUNT(*) AS event_count
+FROM events
+WHERE address != ‘’
+GROUP BY address
+ORDER BY event_count DESC
+LIMIT 10
+```
+
+### Daily active users
+
+```sql
+SELECT
+    toDate(timestamp) AS date,
+    COUNT(DISTINCT address) AS daily_active_users
+FROM events
+WHERE timestamp >= now() - INTERVAL 30 DAY
+GROUP BY date
+ORDER BY date DESC
+```
+
+### Average session duration
+
+```sql
+SELECT AVG(latest_hit - first_hit) AS avg_session_length
+FROM sessions
+```
+
+### Events by type
+
+```sql
+SELECT type, COUNT(*) AS event_count
+FROM events
+GROUP BY type
+ORDER BY event_count DESC
+```
+
+### Revenue by UTM campaign
+
+```sql
+SELECT utm_campaign, SUM(revenue) AS total_revenue
+FROM revenue
+GROUP BY utm_campaign
+ORDER BY total_revenue DESC
+```
+
+### Top countries by session count
+
+```sql
+SELECT location, COUNT(*) AS session_count
+FROM sessions
+GROUP BY location
+ORDER BY session_count DESC
+LIMIT 20
+```
+
+### Sessions by device and browser
+
+```sql
+WITH top_browsers AS (
+    SELECT browser
+    FROM sessions
+    GROUP BY browser
+    ORDER BY COUNT(*) DESC
+    LIMIT 10
+)
+SELECT device, browser, COUNT(*) AS session_count
+FROM sessions
+WHERE browser IN (SELECT browser FROM top_browsers)
+GROUP BY device, browser
+ORDER BY session_count DESC
+```
+
+### Enrich users with social profiles
+
+```sql
+SELECT
+    u.address,
+    min(u.first_seen) AS first_seen,
+    max(u.last_seen) AS last_seen,
+    argMaxMerge(u.location) AS location,
+    wp.ens,
+    wp.farcaster,
+    wp.twitter,
+    argMaxMerge(wp.net_worth_usd) AS net_worth_usd
+FROM users u
+LEFT JOIN wallet_profiles_mv wp ON u.address = wp.address
+GROUP BY u.address, wp.ens, wp.farcaster, wp.twitter
+ORDER BY net_worth_usd DESC
+LIMIT 20
+```
+
+### Top DeFi apps of US users
+
+```sql
+WITH user_locations AS (
+    SELECT
+        address,
+        argMaxMerge(location) AS location
+    FROM users
+    GROUP BY address
+),
+app_balances AS (
+    SELECT
+        id,
+        chain_id,
+        argMaxMerge(name) AS name,
+        argMaxMerge(url) AS url,
+        argMaxMerge(balance_usd) AS balance_usd,
+        address
+    FROM wallet_profiles_chains_apps_mv
+    WHERE address IN (
+        SELECT address
+        FROM user_locations
+        WHERE location = ‘US’
+    )
+    GROUP BY id, chain_id, address
+)
+SELECT
+    id,
+    chain_id,
+    any(name) AS name,
+    any(url) AS url,
+    sum(balance_usd) AS total_balance_usd,
+    count(DISTINCT address) AS user_count
+FROM app_balances
+GROUP BY id, chain_id
+ORDER BY total_balance_usd DESC
+LIMIT 20
+```
+
+### High net worth DeFi positions
+
+```sql
+SELECT
+    address,
+    id,
+    argMaxMerge(name) AS name,
+    chain_id,
+    argMaxMerge(balance_usd) AS balance_usd
+FROM wallet_profiles_chains_apps_mv
+GROUP BY address, chain_id, id
+HAVING balance_usd > 500
+ORDER BY balance_usd DESC
+LIMIT 100
+```
+
+### Track user journey across anonymous and wallet sessions
+
+```sql
+SELECT
+    i.address,
+    i.anonymous_id,
+    i.session_id,
+    minMerge(i.first_seen) AS connected_at
+FROM identities i
+GROUP BY i.address, i.anonymous_id, i.session_id
+ORDER BY connected_at DESC
+LIMIT 20
+```
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="SQL Explorer Guide" icon="terminal" href="/guides/sql-explorer">
+    Step-by-step guide to writing queries
+  </Card>
+  <Card title="Ask AI" icon="sparkles" href="/guides/ask-ai">
+    Generate SQL with natural language
+  </Card>
+  <Card title="BI Integration" icon="chart-mixed" href="/data/bi">
+    Connect Metabase, Grafana, and more
+  </Card>
+  <Card title="Query API" icon="code" href="/api-reference/query">
+    Query data programmatically
+  </Card>
+</CardGroup>

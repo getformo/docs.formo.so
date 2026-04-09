@@ -828,7 +828,7 @@
         "properties": {
           "field": {
             "type": "string",
-            "description": "The field path to filter on. Supported formats:\n- User fields: `users.{attribute}` (e.g., `users.net_worth_usd`, `users.device`, `users.lifecycle`)\n- Social fields: `users.{social}` (e.g., `users.ens`, `users.farcaster`)\n- Chain filters: `chains.balance` (any chain) or `chains.{chain_id}.balance` (specific chain)\n- App filters: `apps.{app_id}.balance` (any chain) or `apps.{chain_id}.{app_id}.balance` (specific chain)\n- Token filters: `tokens.{address}.balance` (any chain) or `tokens.{chain_id}.{address}.balance` (specific chain)\n- Label filters: `labels.{tag_id}` (e.g., `labels.coinbase.verified_account`)"
+            "description": "The field path to filter on. Supported formats:\n- Profile fields: `users.net_worth_usd`, `users.volume`, `users.revenue`, `users.points` (numeric comparisons)\n- Engagement fields: `users.device`, `users.browser`, `users.os`, `users.location` (string comparisons)\n- UTM/referral fields: `users.first_utm_source`, `users.last_utm_source`, `users.first_referrer`, etc.\n- Lifecycle: `users.lifecycle` (values: New, Returning, Power user, Resurrected, Churned)\n- Social fields: `users.ens`, `users.farcaster`, `users.twitter`, etc. (boolean presence check)\n- Chain filters: `chains.balance` (any chain) or `chains.{chain_id}.balance` (specific chain)\n- App filters: `apps.{app_id}.balance` (any chain) or `apps.{chain_id}.{app_id}.balance` (specific chain)\n- Token filters: `tokens.{address}.balance` (any chain) or `tokens.{chain_id}.{address}.balance` (specific chain)\n- Label filters: `labels.{tag_id}` (e.g., `labels.coinbase.verified_account`)"
           },
           "op": {
             "type": "string",
@@ -4383,11 +4383,11 @@
                     }
                   },
                   "powerUsers": {
-                    "summary": "Power users with high transaction count from organic traffic",
+                    "summary": "Power users with high net worth from organic traffic",
                     "value": {
                       "title": "Organic power users",
                       "filterSets": [
-                        "tx_count::greater::100",
+                        "net_worth_usd::greater::1000",
                         "utm_source::notIn::google_ads|facebook_ads",
                         "lifecycle::equals::power"
                       ]
