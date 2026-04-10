@@ -58,7 +58,7 @@ formo login formo_abc123
 formo profiles get vitalik.eth
 
 # 3. Run a SQL query
-formo query run "SELECT count(*) FROM events"
+formo query "SELECT count(*) FROM events"
 
 # 4. List your dashboard boards
 formo boards list
@@ -99,9 +99,9 @@ Get your API key from **Settings → API Keys** in the [Formo dashboard](https:/
 
 Authenticate with your Formo API key. Validates the key against the API and saves it locally.
 
-| Argument | Description |
-|----------|-------------|
-| `apiKey` | Your `formo_` API key (optional — shows a setup guide if omitted) |
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `apiKey` | `string` | ❌ | Your `formo_` API key (shows a setup guide if omitted) |
 
 ```bash
 formo login formo_abc123
@@ -167,9 +167,12 @@ The CLI is designed to work as a tool for AI agents. It includes built-in sugges
 - "get the profile for wallet 0xabc"
 - "search profiles with net worth > 10000"
 - "run a SQL query on my analytics data"
+- "search profiles ordered by last_onchain desc"
 - "list all project alerts"
+- "create an alert for high-value transactions"
 - "list all dashboard boards"
 - "list charts in a board"
 - "list all tracked contracts"
+- "register a new smart contract"
 - "list user segments"
 - "import wallet addresses"
