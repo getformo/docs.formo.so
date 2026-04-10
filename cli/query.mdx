@@ -5,9 +5,9 @@ icon: database
 description: "Run SQL queries against your Formo analytics data from the command line."
 ---
 
-The `formo query` command group lets you execute SQL queries against your Formo analytics data warehouse directly from the terminal.
+The `formo query` command lets you execute SQL queries against your Formo analytics data warehouse directly from the terminal.
 
-## `formo query run`
+## `formo query <sql>`
 
 Run a SQL query against your Formo analytics data.
 
@@ -25,16 +25,16 @@ Requires `query:read` scope on your API key.
 
 ```bash
 # Count all events
-formo query run "SELECT count(*) FROM events"
+formo query "SELECT count(*) FROM events"
 
 # Top 10 wallets by net worth
-formo query run "SELECT address, net_worth_usd FROM wallet_profiles ORDER BY net_worth_usd DESC LIMIT 10"
+formo query "SELECT address, net_worth_usd FROM wallet_profiles ORDER BY net_worth_usd DESC LIMIT 10"
 
 # Daily active users over the last 7 days
-formo query run "SELECT DATE(timestamp) as day, COUNT(DISTINCT address) as dau FROM events WHERE timestamp > now() - INTERVAL 7 DAY GROUP BY day ORDER BY day"
+formo query "SELECT DATE(timestamp) as day, COUNT(DISTINCT address) as dau FROM events WHERE timestamp > now() - INTERVAL 7 DAY GROUP BY day ORDER BY day"
 
 # Pipe results to jq for processing
-formo query run "SELECT count(*) as total FROM events" | jq '.data'
+formo query "SELECT count(*) as total FROM events" | jq '.data'
 ```
 
 ### Tips
