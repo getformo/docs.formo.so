@@ -1,0 +1,175 @@
+---
+title: "Alerts"
+sidebarTitle: "Alerts"
+icon: bell
+description: "Create, list, update, delete, and toggle project alerts from the command line."
+---
+
+The `formo alerts` command group lets you manage project alerts. Alerts notify you when specific events or thresholds are triggered.
+
+## `formo alerts list`
+
+List all alerts for the project.
+
+<Note>
+Requires `alerts:read` scope on your API key.
+</Note>
+
+```bash
+formo alerts list
+```
+
+---
+
+## `formo alerts get`
+
+Get a single alert by ID.
+
+<Note>
+Requires `alerts:read` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `alertId` | `string` | ✅ | Alert ID |
+
+```bash
+formo alerts get alert_abc123
+```
+
+---
+
+## `formo alerts create`
+
+Create a new project alert.
+
+<Note>
+Requires `alerts:write` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--name` | `string` | ✅ | Alert name |
+| `--triggerType` | `string` | ✅ | Trigger type (e.g. `event`, `threshold`) |
+| `--triggerFilters` | `string` | ❌ | JSON array of trigger filter objects |
+| `--recipient` | `string` | ❌ | JSON array of recipient objects |
+| `--secret` | `string` | ❌ | Webhook secret for the alert |
+
+### Examples
+
+```bash
+# Create a basic event alert
+formo alerts create --name "High value tx" --triggerType event
+
+# Create an alert with trigger filters and recipients
+formo alerts create \
+  --name "Whale activity" \
+  --triggerType threshold \
+  --triggerFilters '[{"field":"net_worth_usd","op":"gt","value":100000}]' \
+  --recipient '[{"type":"email","value":"team@example.com"}]'
+
+# Create an alert with a webhook secret
+formo alerts create \
+  --name "Transaction webhook" \
+  --triggerType event \
+  --secret "whsec_abc123"
+```
+
+---
+
+## `formo alerts update`
+
+Update an existing alert.
+
+<Note>
+Requires `alerts:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `alertId` | `string` | ✅ | Alert ID to update |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--name` | `string` | ❌ | Alert name |
+| `--triggerType` | `string` | ❌ | Trigger type |
+| `--triggerFilters` | `string` | ❌ | JSON array of trigger filter objects |
+| `--recipient` | `string` | ❌ | JSON array of recipient objects |
+| `--secret` | `string` | ❌ | Webhook secret for the alert |
+
+### Examples
+
+```bash
+# Update an alert name
+formo alerts update alert_abc123 --name "Renamed alert" --triggerType event
+
+# Update alert with new recipients
+formo alerts update alert_abc123 \
+  --name "Updated alert" \
+  --triggerType threshold \
+  --recipient '[{"type":"slack","value":"#alerts"}]'
+```
+
+---
+
+## `formo alerts delete`
+
+Delete an alert.
+
+<Note>
+Requires `alerts:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `alertId` | `string` | ✅ | Alert ID to delete |
+
+```bash
+formo alerts delete alert_abc123
+```
+
+<Warning>
+Deleting an alert is permanent.
+</Warning>
+
+---
+
+## `formo alerts toggle`
+
+Toggle an alert's status between `active` and `paused`.
+
+<Note>
+Requires `alerts:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `alertId` | `string` | ✅ | Alert ID to toggle |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--status` | `enum` | ✅ | New status: `active` or `paused` |
+
+### Examples
+
+```bash
+# Pause an alert
+formo alerts toggle alert_abc123 --status paused
+
+# Re-activate an alert
+formo alerts toggle alert_abc123 --status active
+```

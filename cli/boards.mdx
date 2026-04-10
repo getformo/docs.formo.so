@@ -1,0 +1,124 @@
+---
+title: "Boards"
+sidebarTitle: "Boards"
+icon: table-columns
+description: "Create, list, update, and delete dashboard boards from the command line."
+---
+
+The `formo boards` command group lets you manage dashboard boards for your project. Boards are containers for charts and can be used to organize your analytics dashboards.
+
+## `formo boards list`
+
+List all boards for the project.
+
+<Note>
+Requires `boards:read` scope on your API key.
+</Note>
+
+```bash
+formo boards list
+```
+
+---
+
+## `formo boards get`
+
+Get a single board by ID.
+
+<Note>
+Requires `boards:read` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `boardId` | `string` | ✅ | Board ID |
+
+```bash
+formo boards get board_abc123
+```
+
+---
+
+## `formo boards create`
+
+Create a new dashboard board.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--name` | `string` | ✅ | Board name |
+| `--description` | `string` | ❌ | Board description |
+
+### Examples
+
+```bash
+# Create a board
+formo boards create --name "KPI Dashboard"
+
+# Create a board with a description
+formo boards create --name "Revenue Metrics" --description "Weekly revenue tracking"
+```
+
+---
+
+## `formo boards update`
+
+Update an existing board.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `boardId` | `string` | ✅ | Board ID to update |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--name` | `string` | ❌ | New board name |
+| `--description` | `string` | ❌ | New board description |
+
+### Examples
+
+```bash
+# Rename a board
+formo boards update board_abc123 --name "Renamed Board"
+
+# Update description
+formo boards update board_abc123 --description "Updated weekly metrics"
+```
+
+---
+
+## `formo boards delete`
+
+Delete a board.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `boardId` | `string` | ✅ | Board ID to delete |
+
+```bash
+formo boards delete board_abc123
+```
+
+<Warning>
+Deleting a board is permanent and will also remove all charts associated with it.
+</Warning>

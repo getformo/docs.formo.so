@@ -134,6 +134,28 @@
         ]
       },
       {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["cli/overview"]
+          },
+          {
+            "group": "Commands",
+            "pages": [
+              "cli/profiles",
+              "cli/query",
+              "cli/boards",
+              "cli/charts",
+              "cli/alerts",
+              "cli/contracts",
+              "cli/segments",
+              "cli/import"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API",
         "groups": [
           {
