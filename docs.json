@@ -108,7 +108,6 @@
                   "data/events/detect",
                   "data/events/track",
                   "data/events/page",
-                  "data/events/screen",
                   "data/events/connect",
                   "data/events/disconnect",
                   "data/events/chain",
