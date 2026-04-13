@@ -657,7 +657,7 @@ You do not need to configure anything to track these events.
 
 To verify that the SDK is installed correctly, navigate to your site and open the network tab of the developer tools in your browser.
 
-Go to your browser's Network tab and and look for successful 'raw_events' request in the network console. Check that the request returns a 202 response status. (Note that it may take up to a minute due to the flush interval.)
+Go to your browser's Network tab and look for successful 'raw_events' request in the network console. Check that the request returns a 202 response status. (Note that it may take up to a minute due to the flush interval.)
 
 Events that are tracked correctly should also show up in the Activity page of your Formo workspace.
 
@@ -685,7 +685,7 @@ Events that are tracked correctly should also show up in the Activity page of yo
     When using the Wagmi integration, transaction and signature tracking requires your app to use the wagmi `useWriteContract` hooks. Contract calls via `@wagmi/core` or `viem` directly bypass the mutation cache and won’t be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.
   </Accordion>
   <Accordion title="How do I verify that the Formo SDK is installed correctly?">
-    After installing, visit your site and open [Live View](/features/product-analytics/live-view) in the Formo dashboard. You should see your pageview appear in real-time. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent succesfully.
+    After installing, visit your site and open [Live View](/features/product-analytics/live-view) in the Formo dashboard. You should see your pageview appear in real-time. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent successfully.
   </Accordion>
   <Accordion title="Does the Formo SDK work on localhost during development?">
     The SDK skips tracking in localhost by default. For testing, you can enable [local testing](/sdks/web#local-testing) and [logging](/sdks/web#logging) in the SDK configuration.
