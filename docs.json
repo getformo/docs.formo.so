@@ -133,37 +133,6 @@
         ]
       },
       {
-        "tab": "MCP",
-        "groups": [
-          {
-            "group": "MCP",
-            "pages": ["mcp/overview"]
-          }
-        ]
-      },
-      {
-        "tab": "CLI",
-        "groups": [
-          {
-            "group": "CLI",
-            "pages": ["cli/overview"]
-          },
-          {
-            "group": "Commands",
-            "pages": [
-              "cli/profiles",
-              "cli/query",
-              "cli/boards",
-              "cli/charts",
-              "cli/alerts",
-              "cli/contracts",
-              "cli/segments",
-              "cli/import"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "API",
         "groups": [
           {
@@ -230,6 +199,37 @@
           }
         ]
       },
+      {
+        "tab": "MCP",
+        "groups": [
+          {
+            "group": "MCP",
+            "pages": ["mcp/overview"]
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "CLI",
+            "pages": ["cli/overview"]
+          },
+          {
+            "group": "Commands",
+            "pages": [
+              "cli/profiles",
+              "cli/query",
+              "cli/boards",
+              "cli/charts",
+              "cli/alerts",
+              "cli/contracts",
+              "cli/segments",
+              "cli/import"
+            ]
+          }
+        ]
+      },      
       {
         "tab": "Security",
         "groups": [
