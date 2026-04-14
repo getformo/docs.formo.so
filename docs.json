@@ -61,7 +61,6 @@
                   "features/token-gated-forms/world-id"
                 ]
               },
-              "features/mcp/overview",
               "integrations/overview",
               "chains/overview"
             ]
@@ -134,10 +133,19 @@
         ]
       },
       {
+        "tab": "MCP",
+        "groups": [
+          {
+            "group": "MCP",
+            "pages": ["mcp/overview"]
+          }
+        ]
+      },
+      {
         "tab": "CLI",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "CLI",
             "pages": ["cli/overview"]
           },
           {
