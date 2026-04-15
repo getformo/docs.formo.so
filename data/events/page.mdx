@@ -50,6 +50,28 @@ The following table shows which properties are automatically set by each SDK:
 {
     "type": "page",
     "channel": "web",
+    "context": {
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+        "locale": "en-US",
+        "timezone": "Asia/Saigon",
+        "location": "ID",
+        "referrer": "https://chatgpt.com/",
+        "utm_source": "chatgpt.com",
+        "utm_medium": "",
+        "utm_campaign": "",
+        "utm_term": "",
+        "utm_content": "",
+        "page_url": "https://formo.so/faucets?utm_source=chatgpt.com",
+        "page_title": "Free testnet faucets",
+        "library_name": "Formo Web SDK",
+        "library_version": "1.25.0",
+        "browser": "chrome",
+        "screen_width": 1920,
+        "screen_height": 1080,
+        "screen_density": 1,
+        "viewport_width": 1920,
+        "viewport_height": 969
+    },
     "properties": {
         "url": "https://formo.so/faucets?utm_source=chatgpt.com",
         "path": "/faucets",
@@ -98,85 +120,3 @@ Screen events from the [mobile SDK](/sdks/mobile) are sent as `page` events with
     }
 }
 ```
-
-## Usage
-
-### Web
-
-```tsx
-import { useFormo } from '@formo/analytics';
-
-function FaucetsPage() {
-  const analytics = useFormo();
-
-  useEffect(() => {
-    analytics.page('Tools', 'Faucets');
-  }, []);
-
-  return <div>...</div>;
-}
-```
-
-### Mobile
-
-Use the `screen()` method in the mobile SDK. It sends a `page` event internally:
-
-```tsx
-import { useFormo } from '@formo/analytics-react-native';
-
-function WalletScreen() {
-  const analytics = useFormo();
-
-  useEffect(() => {
-    analytics.screen('Wallet', 'Main');
-  }, [analytics]);
-
-  return <View>...</View>;
-}
-```
-
-### With React Navigation
-
-Automatically track all screen transitions:
-
-```tsx
-import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
-import { useFormo } from '@formo/analytics-react-native';
-import { useRef } from 'react';
-
-function App() {
-  const analytics = useFormo();
-  const navigationRef = useNavigationContainerRef();
-  const routeNameRef = useRef<string>();
-
-  return (
-    <NavigationContainer
-      ref={navigationRef}
-      onReady={() => {
-        routeNameRef.current = navigationRef.getCurrentRoute()?.name;
-      }}
-      onStateChange={() => {
-        const previousRouteName = routeNameRef.current;
-        const currentRouteName = navigationRef.getCurrentRoute()?.name;
-
-        if (previousRouteName !== currentRouteName && currentRouteName) {
-          analytics.screen(currentRouteName);
-        }
-        routeNameRef.current = currentRouteName;
-      }}
-    >
-      {/* Your navigation stack */}
-    </NavigationContainer>
-  );
-}
-```
-
-## Best Practices
-
-1. **Use consistent naming**: Establish a naming convention for screens (e.g., PascalCase: `WalletDetails`, `SwapConfirmation`).
-
-2. **Add categories**: Group related pages/screens together using the `category` property for better analysis.
-
-3. **Track on mount**: Call `page()` or `screen()` in a `useEffect` hook when the component mounts.
-
-4. **Include relevant properties**: Add custom properties that help segment views (e.g., `token_symbol`, `network`).
