@@ -46,7 +46,7 @@ wallet_profiles_events (blockchain data)
 
 ---
 
-## Table reference
+## Tables
 
 ### events
 
@@ -515,6 +515,120 @@ users.address          ────▶  wallet_profiles_mv.address
 ```
 
 The **identities** table is the bridge between anonymous and identified users. It links `anonymous_id` and `session_id` to `address`, enabling you to track user behavior before and after wallet connection.
+
+---
+
+## Functions
+
+Custom SQL functions that resolve at query time. Functions use the `{{ function_name(...) }}` syntax — the macro is expanded into a numeric literal before your query runs, so results can be used anywhere a number would be (`SELECT`, `WHERE`, arithmetic, etc.).
+
+**Rules:**
+- Maximum 10 function calls per query
+- Results are cached for 15 minutes
+
+### Price oracle functions
+
+Fetch live token prices directly inside your SQL queries. Use these to convert token amounts to USD values without joining external price data manually.
+
+#### `alchemy.token_price`
+
+Get token price by contract address and chain ID from Alchemy.
+
+**Signature:** `{{ alchemy.token_price('ADDRESS', CHAIN_ID, 'CURRENCY') }}`
+
+**Parameters:**
+- `ADDRESS` — EVM contract address (0x-prefixed, 42 characters)
+- `CHAIN_ID` — Numeric chain ID (e.g., `1` for Ethereum, `8453` for Base, `42161` for Arbitrum)
+- `CURRENCY` — One of `usd`, `eur`, `eth`, `btc`
+
+**Example:**
+
+```sql
+SELECT
+    SUM(volume) * {{ alchemy.token_price('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 1, 'usd') }} AS volume_usd
+FROM revenue
+```
+
+See the [Alchemy Prices API — Get Token Prices by Address](https://www.alchemy.com/docs/data/prices-api/prices-api-endpoints/prices-api-endpoints/get-token-prices-by-address) reference.
+
+#### `alchemy.token_price_by_symbol`
+
+Get token price by symbol from Alchemy.
+
+**Signature:** `{{ alchemy.token_price_by_symbol('SYMBOL', 'CURRENCY') }}`
+
+**Parameters:**
+- `SYMBOL` — Token symbol (e.g., `ETH`, `BTC`, `SOL`)
+- `CURRENCY` — One of `usd`, `eur`, `eth`, `btc`
+
+**Example:**
+
+```sql
+SELECT
+    SUM(revenue) * {{ alchemy.token_price_by_symbol('ETH', 'usd') }} AS revenue_usd
+FROM revenue
+```
+
+See the [Alchemy Prices API — Get Token Prices by Symbol](https://www.alchemy.com/docs/data/prices-api/prices-api-endpoints/prices-api-endpoints/get-token-prices-by-symbol) reference.
+
+#### `pyth.token_price`
+
+Get token price by pair name from Pyth.
+
+**Signature:** `{{ pyth.token_price('BASE/QUOTE') }}`
+
+**Parameters:**
+- `BASE/QUOTE` — Price pair (e.g., `ETH/USD`, `BTC/USD`, `SOL/USD`)
+
+**Example:**
+
+```sql
+SELECT
+    SUM(revenue) * {{ pyth.token_price('ETH/USD') }} AS revenue_usd
+FROM revenue
+```
+
+See the [Pyth Hermes API — Latest Price Updates](https://hermes.pyth.network/docs/#/rest/latest_price_updates) reference.
+
+---
+
+## Variables
+
+Template variables are replaced with actual values at query time. Use them to build charts and dashboards that respond to a shared date picker instead of hardcoded ranges.
+
+### Date range variables
+
+#### `{{date_from}}`
+
+Start date of the selected date range. Replaced with a `YYYY-MM-DD` string at query time.
+
+**Example:**
+
+```sql
+WHERE timestamp >= '{{date_from}}'
+```
+
+#### `{{date_to}}`
+
+End date of the selected date range. Replaced with a `YYYY-MM-DD` string at query time.
+
+**Example:**
+
+```sql
+WHERE timestamp < '{{date_to}}'
+```
+
+**Combined example:**
+
+```sql
+SELECT
+    toDate(timestamp) AS date,
+    COUNT(*) AS events
+FROM events
+WHERE timestamp >= '{{date_from}}' AND timestamp < '{{date_to}}'
+GROUP BY date
+ORDER BY date
+```
 
 ---
 

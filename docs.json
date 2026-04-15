@@ -119,7 +119,7 @@
           },
           {
             "group": "Data Warehouse",
-            "pages": ["data/schema", "data/bi", "data/data-sync"]
+            "pages": ["data/catalog", "data/bi", "data/data-sync"]
           }
         ]
       },
