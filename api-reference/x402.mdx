@@ -1,0 +1,146 @@
+---
+title: 'Pay Per Request (x402)'
+description: 'Call the Profiles API with a crypto micropayment — no API key needed'
+icon: bolt
+iconType: solid
+---
+
+The Profiles API supports **x402**, an open HTTP payment protocol that lets you pay for individual API requests with a stablecoin microtransaction. No account, no API key, and no rate-limit tier required — just a wallet with USDC on Base.
+
+<Note>
+x402 is available on both the **Get Profile** and **Search Profiles** endpoints. If you send a `Bearer` token the API falls back to normal API key auth — x402 is only triggered when no `Authorization` header is present.
+</Note>
+
+## How it works
+
+x402 follows the standard HTTP `402 Payment Required` flow:
+
+<Steps>
+  <Step title="Probe — discover payment terms">
+    Make a normal request to the endpoint **without** any `Authorization` header. The server responds with `402 Payment Required` and a `PAYMENT-REQUIRED` header containing base64-encoded payment requirements (price, network, destination wallet).
+  </Step>
+  <Step title="Pay — sign and submit a transaction">
+    Your client signs a USDC transfer on Base and attaches the payment proof in an `X-PAYMENT` header.
+  </Step>
+  <Step title="Receive — server verifies and responds">
+    The server verifies the payment with the x402 facilitator and, on success, returns the normal `200` API response plus a `PAYMENT-RESPONSE` header with the on-chain transaction hash.
+  </Step>
+</Steps>
+
+## Pricing
+
+| | |
+|---|---|
+| **Price** | $0.05 USDC per request |
+| **Token** | USDC |
+| **Network** | Base (`eip155:84532`) |
+| **Receive wallet** | `0xb1308756E55924ADf96aeDf5093f805E71ABD421` |
+| **Facilitator** | `https://x402.org/facilitator` |
+
+## Quickstart with `@x402/fetch`
+
+The easiest path is the official `@x402/fetch` wrapper. It handles the full 402 → pay → retry cycle automatically.
+
+### 1. Install dependencies
+
+```bash
+npm install @x402/fetch @x402/core @x402/evm viem
+```
+
+### 2. Fetch a profile
+
+```typescript
+import { wrapFetchWithPayment } from '@x402/fetch';
+import { x402Client } from '@x402/core/client';
+import { registerExactEvmScheme } from '@x402/evm/exact/client';
+import { privateKeyToAccount } from 'viem/accounts';
+
+const account = privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`);
+
+const payingFetch = wrapFetchWithPayment(
+  fetch,
+  registerExactEvmScheme(new x402Client(), { signer: account }),
+);
+
+const res = await payingFetch(
+  'https://api.formo.so/v0/profiles/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045?expand=labels,tokens',
+);
+
+const profile = await res.json();
+console.log(profile);
+```
+
+That's it. `wrapFetchWithPayment` intercepts the `402`, pays, and retries — your code just sees a normal `200` response.
+
+### 3. Search profiles
+
+```typescript
+const res = await payingFetch(
+  'https://api.formo.so/v0/profiles?address=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+);
+const results = await res.json();
+```
+
+## Wallet requirements
+
+Your wallet needs two things before making a paid request:
+
+- **Base ETH** (gas) — get testnet ETH from [Alchemy Base Sepolia Faucet](https://www.alchemy.com/faucets/base-sepolia)
+- **USDC on Base** — get testnet USDC from [Circle Faucet](https://faucet.circle.com) (select *Base Sepolia*)
+
+For production, use real USDC on Base mainnet.
+
+## Manual flow (no SDK)
+
+If you prefer to handle the protocol yourself:
+
+```bash
+# Step 1 — probe for payment requirements
+curl -sI https://api.formo.so/v0/profiles/0xABC...
+
+# HTTP/1.1 402 Payment Required
+# PAYMENT-REQUIRED: <base64-encoded JSON>
+```
+
+Decode the header to read the payment terms:
+
+```js
+const raw = Buffer.from(paymentRequiredHeader, 'base64').toString('utf8');
+const terms = JSON.parse(raw);
+// { x402Version, accepts: [{ scheme, network, asset, amount, payTo, maxTimeoutSeconds }] }
+```
+
+Sign a USDC transfer to `terms.accepts[0].payTo` for `terms.accepts[0].amount` (denominated in USDC atomic units, 6 decimals), then attach the signed payload:
+
+```bash
+curl -s \
+  -H "X-PAYMENT: <base64-encoded-payment-proof>" \
+  "https://api.formo.so/v0/profiles/0xABC..."
+```
+
+On success you'll receive the profile JSON plus a `PAYMENT-RESPONSE` header containing the settlement details (including the transaction hash).
+
+## Response headers
+
+| Header | When present | Description |
+|--------|-------------|-------------|
+| `PAYMENT-REQUIRED` | `402` response | Base64 JSON with price, network, and destination wallet |
+| `PAYMENT-RESPONSE` | `200` response | Base64 JSON with settlement info and `txHash` |
+
+## Error codes
+
+| Status | Description |
+|--------|-------------|
+| `402 Payment Required` | No payment header — normal discovery response |
+| `400` | Payment header present but malformed or expired |
+| `401` | `Authorization` header was sent but used an unsupported scheme (use `Bearer` or omit entirely) |
+| `402` (with error body) | Payment verified but settlement failed |
+
+## When to use x402 vs API keys
+
+| | x402 | Workspace API Key |
+|---|---|---|
+| Setup required | Wallet + USDC only | Account + API key configuration |
+| Cost model | Pay per request ($0.05) | Subscription / rate-limited |
+| Best for | One-off lookups, agents, scripts | Production apps with sustained volume |
+| Rate limits | None (pay-as-you-go) | Based on your plan |
