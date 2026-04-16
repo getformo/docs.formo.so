@@ -204,7 +204,7 @@
         "groups": [
           {
             "group": "MCP",
-            "pages": ["mcp/overview"]
+            "pages": ["mcp/overview", "mcp/telegram-bot"]
           }
         ]
       },
