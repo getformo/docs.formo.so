@@ -3,7 +3,7 @@ title: 'Signature event'
 description: 'Reference for the signature event that tracks wallet message signing, including requested, rejected, and confirmed statuses with hash and chain data.'
 ---
 
-The `signature` event is emitted whenever the user's signs an message.
+The `signature` event is emitted whenever the user signs a message.
 It includes the signature status (requested, rejected, confirmed), message, signature hash, chain ID, and wallet address.
 
 ## Sample Payload
@@ -17,7 +17,7 @@ Here’s the payload of a typical call with most common fields removed:
         "status": "confirmed",
         "chain_id": 84532,
         "message": "{\"domain\":{\"name\":\"Example DApp\",\"version\":\"1\",\"chainId\":84532,\"verifyingContract\":\"0xcccccccccccccccccccccccccccccccccccccccc\"},\"message\":{\"from\":{\"name\":\"Alice\",\"wallet\":\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"},\"to\":{\"name\":\"Bob\",\"wallet\":\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"},\"content\":\"zcvzxcvzxvc\"},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallet\",\"type\":\"address\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person\"},{\"name\":\"content\",\"type\":\"string\"}]}}",
-        "signature_hash": "0x399754103c4a39c1228deaf0880a932d04a4fe906343de37f65a21aa2969400617cf5f7b134c81adbe0cf4f1ba93ad30597095c3c46434202911d321f98d8acb1c"
+        "signature_hash": "0x399754103c4a39c1228deaf0880a932d04a4fe906343de37f65a21aa2969400617cf5f7b134c81adbe0cf4f1ba93ad30597095c3c46434202911d321f98d8acb1c",
         "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154"
     }
 }
