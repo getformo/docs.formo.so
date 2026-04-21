@@ -138,63 +138,63 @@
           {
             "group": "API Documentation",
             "pages": [
-              "api-reference/overview",
-              "api-reference/authentication"
+              "api/overview",
+              "api/authentication"
             ]
           },
           {
             "group": "Events API",
-            "pages": ["api-reference/events/track"]
+            "pages": ["api/events/track"]
           },
           {
             "group": "Profiles API",
-            "pages": ["api-reference/profile", "api-reference/search-profiles", "api-reference/import"]
+            "pages": ["api/profile", "api/search-profiles", "api/import"]
           },
           {
             "group": "Query API",
-            "pages": ["api-reference/query"]
+            "pages": ["api/query"]
           },
           {
             "group": "Charts API",
             "pages": [
-              "api-reference/boards/list",
-              "api-reference/boards/get",
-              "api-reference/boards/create",
-              "api-reference/boards/update",
-              "api-reference/boards/delete",
-              "api-reference/boards/list-charts",
-              "api-reference/boards/get-chart",
-              "api-reference/boards/create-chart",
-              "api-reference/boards/update-chart",
-              "api-reference/boards/delete-chart"
+              "api/boards/list",
+              "api/boards/get",
+              "api/boards/create",
+              "api/boards/update",
+              "api/boards/delete",
+              "api/boards/list-charts",
+              "api/boards/get-chart",
+              "api/boards/create-chart",
+              "api/boards/update-chart",
+              "api/boards/delete-chart"
             ]
           },
           {
             "group": "Segments API",
             "pages": [
-              "api-reference/segments/list",
-              "api-reference/segments/create",
-              "api-reference/segments/delete"
+              "api/segments/list",
+              "api/segments/create",
+              "api/segments/delete"
             ]
           },
           {
             "group": "Contracts API",
             "pages": [
-              "api-reference/contracts/list",
-              "api-reference/contracts/create",
-              "api-reference/contracts/update",
-              "api-reference/contracts/delete"
+              "api/contracts/list",
+              "api/contracts/create",
+              "api/contracts/update",
+              "api/contracts/delete"
             ]
           },
           {
             "group": "Alerts API",
             "pages": [
-              "api-reference/alerts/list",
-              "api-reference/alerts/get",
-              "api-reference/alerts/create",
-              "api-reference/alerts/update",
-              "api-reference/alerts/delete",
-              "api-reference/alerts/toggle"
+              "api/alerts/list",
+              "api/alerts/get",
+              "api/alerts/create",
+              "api/alerts/update",
+              "api/alerts/delete",
+              "api/alerts/toggle"
             ]
           }
         ]
@@ -313,6 +313,6 @@
     "decoration": "gradient"
   },
   "apiReference": {
-    "spec": "api-reference/openapi.json"
+    "spec": "api/openapi.json"
   }
 }
