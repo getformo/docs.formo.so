@@ -111,7 +111,7 @@ Export this segment as CSV to run targeted re-engagement campaigns on social cha
     Wallet lifecycle stages (New, Returning, Power User, Churned, Resurrected) are calculated based on activity recency and frequency on your app. A wallet with no activity for 30+ days is classified as "Churned," while a wallet active 5+ days in the last 30 days is a "Power User." See [wallet profiles](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for details.
   </Accordion>
   <Accordion title="Can I export wallet profiles and segments for marketing campaigns?">
-    Yes. You can export any [segment](/features/wallet-intelligence/segments) as a CSV file for use in targeted re-engagement campaigns. You can also query profiles programmatically via the [Profiles API](/api/profile).
+    Yes. You can export any [segment](/features/wallet-intelligence/segments) as a CSV file for use in targeted re-engagement campaigns. You can also query profiles programmatically via the [Profiles API](/api/profiles/get).
   </Accordion>
   <Accordion title="Does Formo link multiple wallets belonging to the same user?">
     Formo tracks each wallet address as a separate profile. If a user connects multiple wallets in the same session, those events are linked to the same anonymous visitor. You can also use [formo.identify()](/data/events/identify) to associate wallets with a common user ID.
@@ -130,7 +130,7 @@ Export this segment as CSV to run targeted re-engagement campaigns on social cha
   <Card title="User Segments" icon="users" href="/features/wallet-intelligence/segments">
     Create segments based on wallet properties and behavior
   </Card>
-  <Card title="Profiles API" icon="code" href="/api/profile">
+  <Card title="Profiles API" icon="code" href="/api/profiles/get">
     Query wallet profiles programmatically
   </Card>
 </CardGroup>

@@ -148,7 +148,14 @@
           },
           {
             "group": "Profiles API",
-            "pages": ["api/profile", "api/search-profiles", "api/import"]
+            "pages": [
+              "api/profiles/get",
+              "api/profiles/search",
+              "api/profiles/import",
+              "api/profiles/update",
+              "api/profiles/create-label",
+              "api/profiles/delete-label"
+            ]
           },
           {
             "group": "Query API",

@@ -893,6 +893,30 @@
           "value"
         ]
       },
+      "UserLabelInput": {
+        "type": "object",
+        "required": [
+          "tag_id"
+        ],
+        "properties": {
+          "tag_id": {
+            "type": "string",
+            "description": "Label identifier (lowercased on write). e.g. vip, airdrop_eligible, coinbase.verified_account"
+          },
+          "value": {
+            "type": "string",
+            "description": "Optional label value (e.g. tier name, country code, points)"
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "Optional chain identifier the label applies to"
+          },
+          "source": {
+            "type": "string",
+            "description": "Optional label source (defaults to 'import')"
+          }
+        }
+      },
       "ProfileFilter": {
         "type": "object",
         "description": "Filter configuration for searching wallet profiles",
@@ -2528,6 +2552,517 @@
                   "error": {
                     "code": "INTERNAL_SERVER_ERROR",
                     "message": "Failed to fetch wallet profile data"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/profiles/{address}/properties": {
+      "put": {
+        "operationId": "updateUserProperties",
+        "summary": "Update Profile",
+        "description": "Set first-party properties for a wallet profile. Override display name, email, socials, avatar, location, and other identity fields.",
+        "tags": [
+          "Profiles"
+        ],
+        "x-required-scope": "profiles:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Profiles"
+          }
+        ],
+        "security": [
+          {
+            "WorkspaceApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address (EVM `0x...` or Solana base58)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Merge-update of profile properties. Only the listed keys are accepted; unknown keys are rejected. At least one key must be provided.",
+                "minProperties": 1,
+                "additionalProperties": false,
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "farcaster": {
+                    "type": "string"
+                  },
+                  "discord": {
+                    "type": "string"
+                  },
+                  "twitter": {
+                    "type": "string"
+                  },
+                  "telegram": {
+                    "type": "string"
+                  },
+                  "instagram": {
+                    "type": "string"
+                  },
+                  "website": {
+                    "type": "string"
+                  },
+                  "github": {
+                    "type": "string"
+                  },
+                  "linkedin": {
+                    "type": "string"
+                  },
+                  "facebook": {
+                    "type": "string"
+                  },
+                  "tiktok": {
+                    "type": "string"
+                  },
+                  "youtube": {
+                    "type": "string"
+                  },
+                  "reddit": {
+                    "type": "string"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "ens": {
+                    "type": "string"
+                  },
+                  "lens": {
+                    "type": "string"
+                  },
+                  "basenames": {
+                    "type": "string"
+                  },
+                  "linea": {
+                    "type": "string"
+                  }
+                },
+                "x-examples": {
+                  "updateProperties": {
+                    "summary": "Set display name, email, and twitter",
+                    "value": {
+                      "display_name": "alice.eth",
+                      "email": "alice@example.com",
+                      "twitter": "alice"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Properties updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid address, empty body, or no allowed keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "Invalid wallet address format"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorWithCode"
+                },
+                "example": {
+                  "isSuccess": false,
+                  "code": "UNAUTHORIZED",
+                  "message": "Invalid workspace API key"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have `profiles:write` permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorWithCode"
+                },
+                "example": {
+                  "isSuccess": false,
+                  "code": "FORBIDDEN",
+                  "message": "API key does not have profiles:write permission"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "PROJECT_NOT_FOUND",
+                    "message": "Project not found"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/profiles/{address}/labels": {
+      "post": {
+        "operationId": "upsertUserLabel",
+        "summary": "Create Label",
+        "description": "Upsert one or more labels for a wallet. Accepts either a single label object or an array of labels. Labels with the same `tag_id` (and `chain_id`, if provided) are overwritten. Requires a Workspace API Key with `profiles:write` permission.",
+        "tags": [
+          "Profiles"
+        ],
+        "x-required-scope": "profiles:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Profiles"
+          }
+        ],
+        "security": [
+          {
+            "WorkspaceApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address (EVM `0x...` or Solana base58)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UserLabelInput"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/UserLabelInput"
+                    },
+                    "minItems": 1
+                  }
+                ],
+                "x-examples": {
+                  "singleLabel": {
+                    "summary": "Upsert a single label",
+                    "value": {
+                      "tag_id": "vip",
+                      "value": "tier-1",
+                      "source": "api"
+                    }
+                  },
+                  "multipleLabels": {
+                    "summary": "Upsert multiple labels",
+                    "value": [
+                      {
+                        "tag_id": "vip",
+                        "value": "tier-1",
+                        "source": "api"
+                      },
+                      {
+                        "tag_id": "airdrop_eligible",
+                        "value": "season-2",
+                        "chain_id": "1"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Labels upserted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid address or missing `tag_id`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "tag_id is required and must be a non-empty string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorWithCode"
+                },
+                "example": {
+                  "isSuccess": false,
+                  "code": "UNAUTHORIZED",
+                  "message": "Invalid workspace API key"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have `profiles:write` permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorWithCode"
+                },
+                "example": {
+                  "isSuccess": false,
+                  "code": "FORBIDDEN",
+                  "message": "API key does not have profiles:write permission"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "PROJECT_NOT_FOUND",
+                    "message": "Project not found"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteUserLabel",
+        "summary": "Delete Label",
+        "description": "Delete a label from a wallet. Pass `chain_id` to scope the deletion to a specific chain; omit it to match labels without a chain scope. Requires a Workspace API Key with `profiles:write` permission.",
+        "tags": [
+          "Profiles"
+        ],
+        "x-required-scope": "profiles:write",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Profiles"
+          }
+        ],
+        "security": [
+          {
+            "WorkspaceApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address (EVM `0x...` or Solana base58)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tag_id"
+                ],
+                "properties": {
+                  "tag_id": {
+                    "type": "string",
+                    "description": "Label identifier to delete"
+                  },
+                  "chain_id": {
+                    "type": "string",
+                    "description": "Optional chain identifier to scope the deletion"
+                  }
+                },
+                "x-examples": {
+                  "deleteLabel": {
+                    "summary": "Delete a label",
+                    "value": {
+                      "tag_id": "vip"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Label deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid address or missing `tag_id`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "tag_id is required and must be a non-empty string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorWithCode"
+                },
+                "example": {
+                  "isSuccess": false,
+                  "code": "UNAUTHORIZED",
+                  "message": "Invalid workspace API key"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - API key does not have `profiles:write` permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorWithCode"
+                },
+                "example": {
+                  "isSuccess": false,
+                  "code": "FORBIDDEN",
+                  "message": "API key does not have profiles:write permission"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiErrorResponse"
+                },
+                "example": {
+                  "error": {
+                    "code": "PROJECT_NOT_FOUND",
+                    "message": "Project not found"
                   }
                 }
               }
