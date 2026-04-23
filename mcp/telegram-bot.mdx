@@ -1,0 +1,155 @@
+---
+title: 'Telegram Bot'
+icon: telegram
+description: 'Chat with your Formo analytics data directly in Telegram using the @formo_analytics_bot.'
+---
+
+## Overview
+
+The Formo Telegram Bot lets you query your analytics data through natural language conversations in Telegram. Ask questions about your users, events, and metrics — and get AI-powered answers right in your chat.
+
+Under the hood, the bot uses the same analytics tools as the [Formo MCP Server](/mcp/overview), including `explore_data`, `text_to_sql`, `execute_query`, and more. It's the fastest way to check your analytics on the go, without opening the dashboard or an IDE.
+
+## Prerequisites
+
+Before you start, you need:
+
+1. A **Formo workspace** with analytics data flowing
+2. A **Workspace API Key** with the **MCP** scope enabled
+3. A **Telegram** account
+
+<Warning>
+  Your API key **must** have the **MCP** scope (`mcp:read`) enabled. The bot will reject keys without this scope. The MCP scope is available on **Scale** and **Enterprise** plans.
+</Warning>
+
+## Getting started
+
+<Steps>
+  <Step title="Create your API key">
+    1. Go to your [Formo dashboard](https://app.formo.so)
+    2. Navigate to **Settings** → **API Keys**
+    3. Click **Create API Key**
+    4. Select a project
+    5. Enable the **MCP** scope
+    6. Copy the generated key — it is only shown once
+
+    See the [Authentication](/api-reference/authentication) docs for more details on API key scopes.
+  </Step>
+  <Step title="Find the bot on Telegram">
+    Open Telegram and search for [`@formo_analytics_bot`](https://t.me/formo_analytics_bot), or click the link to open the bot directly.
+
+    Tap **Start** to begin.
+  </Step>
+  <Step title="Authenticate">
+    Send the `/login` command with your API key:
+
+    ```
+    /login formo_YOUR_API_KEY
+    ```
+
+    On success, the bot confirms your project name and shows example queries you can try.
+
+    <Warning>
+      Always send the `/login` command in a **direct message** to the bot — never in a group chat. Your API key is a secret credential.
+    </Warning>
+  </Step>
+  <Step title="Start asking questions">
+    After authenticating, just type your question in natural language:
+
+    - "How many users did I have last week?"
+    - "What are my top events?"
+    - "Show me user retention"
+
+    The bot will query your analytics data and respond with the answer.
+  </Step>
+</Steps>
+
+## Bot commands
+
+| Command | Description |
+|:--------|:------------|
+| `/login formo_YOUR_API_KEY` | Authenticate with your Formo API key (requires MCP read scope) |
+| `/logout` | Remove your API key and end the session |
+| `/help` | Show available commands and usage instructions |
+| `/start` | Show the welcome message (same as `/help`) |
+
+After authenticating, you don't need any commands — just type your question in natural language.
+
+## Example queries
+
+Once authenticated, try these prompts:
+
+**Traffic & Events**
+- "What are my KPIs for the last 7 days?"
+- "What are my top traffic sources?"
+- "Which pages have the highest engagement?"
+- "Show me traffic by country"
+- "What are the most common events?"
+
+**Custom Queries**
+- "How many users signed up this week?"
+- "Show me daily active users for the past month"
+- "What's the conversion rate from page view to wallet connection?"
+
+**Web3 Analytics**
+- "Show me wallet profiles with their net worth"
+- "What tokens do my users hold?"
+
+## Available tools
+
+The Telegram bot has access to the same analytics tools as the MCP Server, including `explore_data`, `kpis`, `text_to_sql`, `execute_query`, and more. See the [MCP Server — Available tools](/mcp/overview#available-tools) for the full list.
+
+## Limitations
+
+<Info>
+  Telegram limits messages to **4,000 characters**. If a response exceeds this limit, it will be truncated. For full-length responses, use the [MCP Server](/mcp/overview) with an AI tool like Claude Desktop or Cursor.
+</Info>
+
+- **Conversation history:** The bot maintains the last 10 messages per session for context
+- **Non-streaming:** Responses are delivered as a single message (not streamed)
+- **Key re-validation:** Your API key is re-validated on every query to ensure it hasn't been revoked
+- **Text only:** The bot processes text messages only — images and files are not supported
+
+## Security
+
+<Warning>
+  Never share your API key in a group chat. Always send the `/login` command in a **private direct message** to the bot.
+</Warning>
+
+- **Encrypted at rest:** Your API key is encrypted with AES-256-GCM before being stored
+- **Re-validated per request:** The bot checks your key on every query — revoked keys are caught immediately
+- **Read-only access:** The bot provides read-only access to analytics data, matching the MCP Server's security model
+- **Logout anytime:** Use `/logout` to remove your stored API key
+- **Auto-logout on revocation:** If your API key is revoked while in use, the bot automatically ends your session and prompts you to re-authenticate
+
+## Troubleshooting
+
+**"Missing MCP scope" error:** Your API key doesn't have the MCP read permission. Create a new key in **Settings → API Keys** with the **MCP** scope enabled, then run `/login` again.
+
+**"Invalid key" error:** Check that your key starts with `formo_` and was copied correctly. Make sure the key is scoped to a project.
+
+**Bot stopped responding after working:** Your API key may have been revoked or rotated. The bot auto-logs you out when this happens. Re-authenticate with `/login` using a valid key.
+
+**Response seems incomplete:** Telegram limits messages to 4,000 characters. Try asking a more specific question to get a shorter response. For full-length answers, use the [MCP Server](/mcp/overview) with an AI tool.
+
+**Bot not found in Telegram:** Search for `@formo_analytics_bot` (with underscores). Make sure you're searching in the main Telegram search bar, not within a group.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is the Telegram bot free to use?">
+    The bot itself is free. You need a Formo workspace with an API key that has the MCP scope enabled, which is available on Scale and Enterprise plans.
+  </Accordion>
+  <Accordion title="Can I use the bot in a Telegram group?">
+    The bot works in direct messages only. For security, always send your `/login` command in a private chat with the bot, never in a group.
+  </Accordion>
+  <Accordion title="What happens if I revoke my API key?">
+    The bot detects revoked keys on the next query and automatically logs you out. Re-authenticate with a new key using `/login`.
+  </Accordion>
+  <Accordion title="Is my data secure when using the Telegram bot?">
+    Yes. API keys are encrypted at rest with AES-256-GCM, the bot provides read-only access, and keys are re-validated on every request. You can remove your key at any time with `/logout`.
+  </Accordion>
+  <Accordion title="How is this different from the MCP Server?">
+    The [MCP Server](/mcp/overview) connects AI tools like Claude Desktop or Cursor to your data for use in development workflows. The Telegram bot gives you the same analytics access in a chat interface — convenient for quick lookups on mobile or when you're away from your IDE.
+  </Accordion>
+</AccordionGroup>

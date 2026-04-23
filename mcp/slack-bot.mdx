@@ -1,0 +1,185 @@
+---
+title: 'Slack Bot'
+icon: slack
+description: 'Chat with your Formo analytics data directly in Slack using the Formo Analytics bot.'
+---
+
+## Overview
+
+The Formo Slack Bot lets you query your analytics data through natural language conversations in Slack. Ask questions about your users, events, and metrics — and get AI-powered answers right in any channel or direct message.
+
+Under the hood, the bot uses the same analytics tools as the [Formo MCP Server](/mcp/overview), including `explore_data`, `text_to_sql`, `execute_query`, and more. Authentication is **workspace-wide**: one admin connects the workspace once, and everyone on the team can query Formo data immediately.
+
+## Prerequisites
+
+Before you start, you need:
+
+1. A **Formo workspace** with analytics data flowing
+2. A **Workspace API Key** with the **MCP** scope enabled
+3. A **Slack workspace** where you have permission to add apps
+
+<Warning>
+  Your API key **must** have the **MCP** scope (`mcp:read`) enabled. The bot will reject keys without this scope. The MCP scope is available on **Scale** and **Enterprise** plans.
+</Warning>
+
+## Getting started
+
+<Steps>
+  <Step title="Create your API key">
+    1. Go to your [Formo dashboard](https://app.formo.so)
+    2. Navigate to **Settings** → **API Keys**
+    3. Click **Create API Key**
+    4. Select a project
+    5. Enable the **MCP** scope
+    6. Copy the generated key — it is only shown once
+
+    See the [Authentication](/api/authentication) docs for more details on API key scopes.
+  </Step>
+  <Step title="Add the bot to your Slack workspace">
+    Open Slack and search for **Formo Analytics** in the App Directory, or ask your Slack admin to install it.
+
+    Once installed, the bot appears in your Slack sidebar under **Apps**.
+  </Step>
+  <Step title="Authenticate your workspace">
+    Open a **direct message** with the Formo Analytics bot and send:
+
+    ```
+    login formo_YOUR_API_KEY
+    ```
+
+    On success, the bot confirms your project name and explains how your team can start using it.
+
+    <Warning>
+      Always send the `login` command in a **direct message** to the bot — never in a public channel. Your API key is a secret credential.
+    </Warning>
+
+    Authentication is **workspace-wide**: you only need to do this once. After you connect, every member of your Slack workspace can use the bot.
+  </Step>
+  <Step title="Start asking questions">
+    After authenticating, anyone in your workspace can ask questions in two ways:
+
+    **In any channel** — @mention the bot followed by your question:
+
+    ```
+    @Formo Analytics How many users did we have last week?
+    ```
+
+    **Via direct message** — just type your question directly in the DM:
+
+    ```
+    What are my top traffic sources?
+    ```
+
+    The bot queries your analytics data and replies with the answer in the same thread.
+  </Step>
+</Steps>
+
+## Commands
+
+Commands can be sent in a direct message to the bot, or in a channel by prefixing with `@Formo Analytics`. The `/` prefix is optional.
+
+| Command | Description |
+|:--------|:------------|
+| `login formo_YOUR_API_KEY` | Connect this Slack workspace to your Formo project (requires MCP read scope) |
+| `logout` | Disconnect the workspace and remove the stored API key |
+| `help` | Show available commands and usage instructions |
+
+After your workspace is connected, team members don't need any commands — they just type questions.
+
+## Example queries
+
+Once the workspace is connected, try these in any channel:
+
+**Traffic & Events**
+- `@Formo Analytics What are my KPIs for the last 7 days?`
+- `@Formo Analytics What are my top traffic sources?`
+- `@Formo Analytics Which pages have the highest engagement?`
+- `@Formo Analytics Show me traffic by country`
+- `@Formo Analytics What are the most common events?`
+
+**User Activity**
+- `@Formo Analytics How many users signed up this week?`
+- `@Formo Analytics Show me daily active users for the past month`
+- `@Formo Analytics What's the conversion rate from page view to wallet connection?`
+
+**Web3 Analytics**
+- `@Formo Analytics Show me wallet profiles with their net worth`
+- `@Formo Analytics What tokens do my users hold?`
+
+## How workspace authentication works
+
+The Formo Analytics bot uses a single workspace-level session:
+
+- A **workspace admin** authenticates once by sending `login formo_YOUR_API_KEY` in a DM to the bot.
+- All members of that Slack workspace can immediately query Formo data by @mentioning the bot in any channel, or by sending it a direct message.
+- The API key is **encrypted at rest** with AES-256-GCM before being stored — it is never stored in plaintext.
+- The key is **re-validated on every query** to ensure it hasn't been revoked.
+- Any team member can trigger a logout, which removes the stored key for the entire workspace.
+
+## Available tools
+
+The Slack bot has access to the same analytics tools as the MCP Server, including `explore_data`, `kpis`, `text_to_sql`, `execute_query`, and more. See [MCP Server — Available tools](/mcp/overview#available-tools) for the full list.
+
+## Limitations
+
+<Info>
+  Slack messages are capped at **3,000 characters**. If a response exceeds this limit, it will be truncated. For full-length responses, use the [MCP Server](/mcp/overview) with an AI tool like Claude Desktop or Cursor.
+</Info>
+
+- **Conversation history:** The bot maintains the last 10 messages per thread for context
+- **Non-streaming:** Responses are delivered as a single message (not streamed)
+- **Key re-validation:** The workspace API key is re-validated on every query
+- **Text only:** The bot processes text messages only — files and images are not supported
+- **One project per workspace:** Each Slack workspace is connected to a single Formo project at a time
+
+## Security
+
+<Warning>
+  Never share your API key in a public channel. Always send the `login` command in a **private direct message** to the bot.
+</Warning>
+
+- **Encrypted at rest:** Your API key is encrypted with AES-256-GCM before being stored
+- **Re-validated per request:** The bot checks your key on every query — revoked keys are caught immediately
+- **Read-only access:** The bot provides read-only access to analytics data, matching the MCP Server's security model
+- **Logout anytime:** Use `logout` (in a DM) to remove your workspace's stored API key
+- **Auto-logout on revocation:** If the API key is revoked while in use, the next query will automatically disconnect the workspace and prompt re-authentication
+
+## Troubleshooting
+
+**"Missing MCP scope" error:** Your API key doesn't have the MCP read permission. Create a new key in **Settings → API Keys** with the **MCP** scope enabled, then DM the bot `login formo_YOUR_API_KEY` again.
+
+**"Invalid API key" error:** Check that your key starts with `formo_` and was copied correctly. Make sure the key is scoped to a project.
+
+**Bot stopped responding after working:** The workspace API key may have been revoked or rotated. The bot auto-disconnects the workspace when this happens. Re-authenticate with `login formo_YOUR_API_KEY` using a valid key.
+
+**Response seems incomplete:** Slack limits bot messages to 3,000 characters. Try asking a more specific question to get a shorter response. For full-length answers, use the [MCP Server](/mcp/overview) with an AI tool.
+
+**"Workspace is not connected" in a channel:** An admin hasn't authenticated yet. They need to DM the bot with `login formo_YOUR_API_KEY` first.
+
+**Bot not visible in Slack:** Make sure the Formo Analytics app has been installed to your workspace. Contact your Slack admin if you don't have permission to add apps.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is the Slack bot free to use?">
+    The bot itself is free. You need a Formo workspace with an API key that has the MCP scope enabled, which is available on Scale and Enterprise plans.
+  </Accordion>
+  <Accordion title="Does every team member need to log in separately?">
+    No. Authentication is workspace-wide. Once an admin runs `login formo_YOUR_API_KEY` in a DM, the entire Slack workspace is connected and all members can use the bot.
+  </Accordion>
+  <Accordion title="Can I use the bot in a private channel?">
+    Yes. Invite the Formo Analytics bot to any channel (public or private) with `/invite @Formo Analytics`, then @mention it as usual.
+  </Accordion>
+  <Accordion title="What happens if I revoke my API key?">
+    The bot detects revoked keys on the next query and automatically disconnects the workspace. Re-authenticate with a new key using `login formo_YOUR_API_KEY` in a DM.
+  </Accordion>
+  <Accordion title="Is my data secure when using the Slack bot?">
+    Yes. API keys are encrypted at rest with AES-256-GCM, the bot provides read-only access, and keys are re-validated on every request. You can remove your workspace's key at any time with `logout`.
+  </Accordion>
+  <Accordion title="How is this different from the MCP Server?">
+    The [MCP Server](/mcp/overview) connects AI tools like Claude Desktop or Cursor to your data for use in development workflows. The Slack bot gives your whole team the same analytics access inside Slack — convenient for quick lookups without opening the dashboard.
+  </Accordion>
+  <Accordion title="How is this different from the Telegram bot?">
+    The [Telegram bot](/mcp/telegram-bot) authenticates per-user — each person logs in individually. The Slack bot authenticates per-workspace — one admin connects once and the whole team gets access.
+  </Accordion>
+</AccordionGroup>
