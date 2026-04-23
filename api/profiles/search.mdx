@@ -1,10 +1,10 @@
 ---
 title: "Search Profiles"
-description: "Search and filter wallet profiles with advanced filtering by labels, net worth, chain activity, and more. Returns paginated results with full profile data."
+description: "Search and filter wallet profiles by address, socials, labels, net worth, chain activity, and more. Returns paginated results with full profile data."
 openapi: "GET /v0/profiles"
 ---
 
-Search and filter wallet profiles across your project with advanced filtering capabilities. Returns a paginated list of wallet profiles matching the specified criteria.
+Search and filter wallet profiles across your project with advanced filtering capabilities. You can look up an exact wallet address, run a free-text search across addresses and social fields, and combine that with structured filters in the request body.
 
 ## Authentication
 
@@ -28,6 +28,16 @@ Filter by a specific wallet address (exact match).
 curl -sS -X GET \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   "https://api.formo.so/v0/profiles?address=0x1234..."
+```
+
+### `search`
+
+Case-insensitive free-text search across wallet addresses and all supported social fields. This includes values from both global wallet profiles and project-scoped identify overrides.
+
+```bash
+curl -sS -X GET \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  "https://api.formo.so/v0/profiles?search=bob_override"
 ```
 
 ### `expand`
@@ -130,6 +140,7 @@ Each condition in the `conditions` array has:
 | `lte` | Less than or equal | `{"field": "chains.1.balance", "op": "lte", "value": 10000}` |
 | `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
 | `nin` | Not in array | `{"field": "users.location", "op": "nin", "value": ["US", "UK"]}` |
+| `contains` | Case-insensitive substring match for social fields only | `{"field": "users.twitter", "op": "contains", "value": "vitalik"}` |
 
 ---
 
@@ -245,7 +256,10 @@ Filter by user lifecycle stage. Valid values: `Churned`, `New`, `Power user`, `R
 
 #### Social Fields
 
-Filter by presence of social identities. These check if the user has a non-empty value for the specified social field.
+Social fields support two modes:
+
+- Presence checks: use an empty string value to match profiles where the field is present.
+- Value matching: use `eq`, `neq`, or `contains` with a non-empty string to match the actual social value.
 
 | Field | Description |
 |-------|-------------|
@@ -256,29 +270,57 @@ Filter by presence of social identities. These check if the user has a non-empty
 | `users.linea` | Linea identifier |
 | `users.discord` | Discord username |
 | `users.telegram` | Telegram username |
+| `users.website` | Website URL |
 | `users.twitter` | Twitter/X handle |
 | `users.github` | GitHub username |
 | `users.linkedin` | LinkedIn profile |
 | `users.email` | Email address |
+| `users.instagram` | Instagram handle |
+| `users.facebook` | Facebook profile |
+| `users.tiktok` | TikTok handle |
+| `users.youtube` | YouTube channel or handle |
+| `users.reddit` | Reddit username |
 
-**Example - Find users with ENS names:**
+**Example - Find users with any email present:**
 
 ```json
 {
   "conditions": [
-    { "field": "users.ens", "op": "eq", "value": true }
+    { "field": "users.email", "op": "eq", "value": "" }
   ],
   "logic": "and"
 }
 ```
 
-**Example - Find users with both ENS and Farcaster:**
+**Example - Find users with both ENS and Farcaster present:**
 
 ```json
 {
   "conditions": [
-    { "field": "users.ens", "op": "eq", "value": true },
-    { "field": "users.farcaster", "op": "eq", "value": true }
+    { "field": "users.ens", "op": "eq", "value": "" },
+    { "field": "users.farcaster", "op": "eq", "value": "" }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find users whose Twitter contains `bob`:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.twitter", "op": "contains", "value": "bob" }
+  ],
+  "logic": "and"
+}
+```
+
+**Example - Find an exact email match:**
+
+```json
+{
+  "conditions": [
+    { "field": "users.email", "op": "eq", "value": "alice@formo.so" }
   ],
   "logic": "and"
 }

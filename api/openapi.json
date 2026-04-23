@@ -831,7 +831,7 @@
         "properties": {
           "field": {
             "type": "string",
-            "description": "The field path to filter on. Supported formats:\n- Profile fields: `users.net_worth_usd`, `users.volume`, `users.revenue`, `users.points` (numeric comparisons)\n- Engagement fields: `users.device`, `users.browser`, `users.os`, `users.location` (string comparisons)\n- UTM/referral fields: `users.first_utm_source`, `users.last_utm_source`, `users.first_referrer`, etc.\n- Lifecycle: `users.lifecycle` (values: New, Returning, Power user, Resurrected, Churned)\n- Social fields: `users.ens`, `users.farcaster`, `users.twitter`, etc. (boolean presence check)\n- Chain filters: `chains.balance` (any chain) or `chains.{chain_id}.balance` (specific chain)\n- App filters: `apps.{app_id}.balance` (any chain) or `apps.{chain_id}.{app_id}.balance` (specific chain)\n- Token filters: `tokens.{address}.balance` (any chain) or `tokens.{chain_id}.{address}.balance` (specific chain)\n- Label filters: `labels.{tag_id}` (e.g., `labels.coinbase.verified_account`)"
+            "description": "The field path to filter on. Supported formats:\n- Profile fields: `users.net_worth_usd`, `users.volume`, `users.revenue`, `users.points` (numeric comparisons)\n- Engagement fields: `users.device`, `users.browser`, `users.os`, `users.location` (string comparisons)\n- UTM/referral fields: `users.first_utm_source`, `users.last_utm_source`, `users.first_referrer`, etc.\n- Lifecycle: `users.lifecycle` (values: New, Returning, Power user, Resurrected, Churned)\n- Social fields: `users.ens`, `users.farcaster`, `users.twitter`, etc. Use an empty string value for presence checks, or a non-empty string with `eq`, `neq`, or `contains` for value matching.\n- Chain filters: `chains.balance` (any chain) or `chains.{chain_id}.balance` (specific chain)\n- App filters: `apps.{app_id}.balance` (any chain) or `apps.{chain_id}.{app_id}.balance` (specific chain)\n- Token filters: `tokens.{address}.balance` (any chain) or `tokens.{chain_id}.{address}.balance` (specific chain)\n- Label filters: `labels.{tag_id}` (e.g., `labels.coinbase.verified_account`)"
           },
           "op": {
             "type": "string",
@@ -843,9 +843,10 @@
               "lt",
               "lte",
               "in",
-              "nin"
+              "nin",
+              "contains"
             ],
-            "description": "The comparison operator:\n- `eq`: Equals\n- `neq`: Not equals\n- `gt`: Greater than\n- `gte`: Greater than or equal\n- `lt`: Less than\n- `lte`: Less than or equal\n- `in`: Value is in array\n- `nin`: Value is not in array"
+            "description": "The comparison operator:\n- `eq`: Equals\n- `neq`: Not equals\n- `gt`: Greater than\n- `gte`: Greater than or equal\n- `lt`: Less than\n- `lte`: Less than or equal\n- `in`: Value is in array\n- `nin`: Value is not in array\n- `contains`: Case-insensitive substring match for social fields only"
           },
           "value": {
             "oneOf": [
@@ -872,7 +873,7 @@
                 }
               }
             ],
-            "description": "The value to compare against. Use arrays for `in` and `nin` operators."
+            "description": "The value to compare against. Use arrays for `in` and `nin` operators. For social presence checks, pass an empty string value."
           },
           "scope": {
             "type": "string",
@@ -1920,7 +1921,7 @@
     "/v0/profiles": {
       "get": {
         "summary": "Search Wallet Profiles",
-        "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports advanced filtering by user data, on-chain activity, chains, apps, tokens, labels, and lifecycle. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
+        "description": "Search and filter wallet profiles with pagination support. Returns a paginated list of wallet profiles matching the specified criteria. Supports free-text search across wallet addresses and social fields, plus advanced filtering by user data, on-chain activity, chains, apps, tokens, labels, and lifecycle. Requires a Workspace API Key with `profiles:read` permission. The API key must be included in the Authorization header as a Bearer token.",
         "operationId": "searchProfiles",
         "tags": [
           "Profiles"
@@ -1946,6 +1947,15 @@
               "type": "string"
             },
             "description": "Filter by specific wallet address (exact match)"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Case-insensitive free-text search across wallet addresses and all supported social fields, including project-scoped identify overrides"
           },
           {
             "name": "expand",
@@ -2050,7 +2060,7 @@
                   }
                 },
                 "multipleConditions": {
-                  "summary": "Find power users with ENS",
+                  "summary": "Find power users with ENS present",
                   "value": {
                     "conditions": [
                       {
@@ -2061,7 +2071,20 @@
                       {
                         "field": "users.ens",
                         "op": "eq",
-                        "value": true
+                        "value": ""
+                      }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "socialContains": {
+                  "summary": "Find users whose Twitter handle contains a substring",
+                  "value": {
+                    "conditions": [
+                      {
+                        "field": "users.twitter",
+                        "op": "contains",
+                        "value": "bob"
                       }
                     ],
                     "logic": "and"
@@ -2208,7 +2231,16 @@
                     "value": {
                       "error": {
                         "code": "BAD_REQUEST",
-                        "message": "Invalid operator. Must be one of: eq, neq, gt, gte, lt, lte, in, nin"
+                        "message": "Invalid operator. Must be one of: eq, neq, gt, gte, lt, lte, in, nin, contains"
+                      }
+                    }
+                  },
+                  "invalidContainsTarget": {
+                    "summary": "Contains used on a non-social field",
+                    "value": {
+                      "error": {
+                        "code": "BAD_REQUEST",
+                        "message": "'contains' operator is only supported for social fields (e.g. user.twitter, user.email, user.farcaster)"
                       }
                     }
                   }
