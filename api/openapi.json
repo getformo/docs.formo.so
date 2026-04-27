@@ -1624,6 +1624,59 @@
       "Profile": {
         "type": "object",
         "description": "Wallet profile data"
+      },
+      "AnalyticsResponse": {
+        "type": "object",
+        "description": "Raw Tinybird pipe response. The `data` array contains the analytics rows; the exact row shape depends on the endpoint.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "meta": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string" }
+              }
+            }
+          },
+          "rows": {
+            "type": "integer"
+          },
+          "rows_before_limit_at_least": {
+            "type": "integer"
+          },
+          "statistics": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "parameters": {
+      "AnalyticsDateFrom": {
+        "name": "date_from",
+        "in": "query",
+        "schema": { "type": "string", "format": "date" },
+        "description": "Inclusive start date (YYYY-MM-DD). Defaults to 7 days before date_to."
+      },
+      "AnalyticsDateTo": {
+        "name": "date_to",
+        "in": "query",
+        "schema": { "type": "string", "format": "date" },
+        "description": "Inclusive end date (YYYY-MM-DD). Defaults to today."
+      },
+      "AnalyticsFilters": {
+        "name": "filters",
+        "in": "query",
+        "schema": { "type": "string" },
+        "description": "JSON-encoded array of filter conditions, e.g. `[{\"operand\":\"location\",\"operator\":\"equals\",\"value\":\"US\"}]`"
       }
     }
   },
@@ -5146,6 +5199,303 @@
           }
         ]
       }
+    },
+    "/v0/kpis": {
+      "get": {
+        "operationId": "getKpis",
+        "summary": "Get KPIs (visitors, pageviews, bounce rate, session duration)",
+        "description": "Time-series traffic KPIs with optional dimension breakdown. Returns visitors, pageviews, bounce rate and average session length.",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "group_by", "in": "query", "schema": { "type": "string", "enum": ["referrer","location","device","browser","os","utm_source","utm_medium","utm_campaign"] }, "description": "Dimension to break down by" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "include_previous_period", "in": "query", "schema": { "type": "string", "enum": ["true","false"] }, "description": "Return current and previous period for WoW comparison" }
+        ],
+        "responses": {
+          "200": { "description": "KPI time-series", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/user_lifecycle": {
+      "get": {
+        "operationId": "getUserLifecycle",
+        "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / Churned)",
+        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "lifecycle_filter", "in": "query", "schema": { "type": "string", "enum": ["New","Returning","Power user","Resurrected","Churned"] } },
+          { "name": "include_previous_period", "in": "query", "schema": { "type": "string", "enum": ["true","false"] } }
+        ],
+        "responses": {
+          "200": { "description": "Lifecycle counts", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/revenue_overview": {
+      "get": {
+        "operationId": "getRevenueOverview",
+        "summary": "Get revenue and transaction volume time-series",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "group_by", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "rank_by", "in": "query", "schema": { "type": "string" } },
+          { "name": "include_previous_period", "in": "query", "schema": { "type": "string", "enum": ["true","false"] } }
+        ],
+        "responses": {
+          "200": { "description": "Revenue and volume time-series", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/revenue_timeseries": {
+      "get": {
+        "operationId": "getRevenueTimeseries",
+        "summary": "Get revenue trend over time",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" }
+        ],
+        "responses": {
+          "200": { "description": "Revenue time-series", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/event_timeseries": {
+      "get": {
+        "operationId": "getEventTimeseries",
+        "summary": "Get event count time-series",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" }
+        ],
+        "responses": {
+          "200": { "description": "Event time-series", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/retention": {
+      "get": {
+        "operationId": "getRetention",
+        "summary": "Get user retention cohorts",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" }
+        ],
+        "responses": {
+          "200": { "description": "Retention cohorts", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/user_frequency": {
+      "get": {
+        "operationId": "getUserFrequency",
+        "summary": "Get visit-frequency distribution",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" }
+        ],
+        "responses": {
+          "200": { "description": "Visit frequency distribution", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/top_pages": {
+      "get": {
+        "operationId": "getTopPages",
+        "summary": "Get top pages by visits or users",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "skip", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Top pages", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/top_sources": {
+      "get": {
+        "operationId": "getTopSources",
+        "summary": "Get top traffic sources (referrers / utm)",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "metric_column", "in": "query", "schema": { "type": "string", "enum": ["referrer","utm_source","utm_medium","utm_campaign","utm_term","utm_content"] } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "skip", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Top sources", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/top_locations": {
+      "get": {
+        "operationId": "getTopLocations",
+        "summary": "Get top countries / regions / cities",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "skip", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Top locations", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/top_wallets": {
+      "get": {
+        "operationId": "getTopWallets",
+        "summary": "Get top wallet types",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Top wallets", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/top_chains": {
+      "get": {
+        "operationId": "getTopChains",
+        "summary": "Get top blockchain chains",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Top chains", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/top_events": {
+      "get": {
+        "operationId": "getTopEvents",
+        "summary": "Get top events by frequency",
+        "description": "Returns the most frequently fired events. Pass `type=custom` to restrict the result to custom events tracked via `formo.track(...)` (replaces the previous `top_custom_events` endpoint).",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["custom"] }, "description": "Filter to custom events only (events tracked via `formo.track(...)`). Omit to return all events." },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Top events", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/revenue_by_metric": {
+      "get": {
+        "operationId": "getRevenueByMetric",
+        "summary": "Get revenue grouped by a chosen column",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "metric_column", "in": "query", "required": true, "schema": { "type": "string" }, "description": "Column to group by (e.g. pathname, referrer)" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Revenue by metric", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
+    },
+    "/v0/volume_by_metric": {
+      "get": {
+        "operationId": "getVolumeByMetric",
+        "summary": "Get transaction volume grouped by a chosen column",
+        "tags": ["Query"],
+        "x-required-scope": "query:read",
+        "parameters": [
+          { "$ref": "#/components/parameters/AnalyticsDateFrom" },
+          { "$ref": "#/components/parameters/AnalyticsDateTo" },
+          { "$ref": "#/components/parameters/AnalyticsFilters" },
+          { "name": "metric_column", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Volume by metric", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } },
+          "403": { "description": "Insufficient permissions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestApiErrorResponse" } } } }
+        }
+      }
     }
   },
   "x-api-scopes": {
@@ -5161,7 +5511,7 @@
       "segments:write": "Create and delete segments (requires segments:read)",
       "profiles:read": "Search and get wallet profiles",
       "profiles:write": "Import wallet addresses (requires profiles:read)",
-      "query:read": "Execute SQL analytics queries",
+      "query:read": "Execute SQL analytics queries (POST /v0/query) and call pre-built analytics endpoints (/v0/kpis, /v0/top_pages, /v0/retention, etc.)",
       "mcp:read": "MCP protocol access (analytics tools + management tools based on other scopes)"
     }
   },
@@ -5192,7 +5542,7 @@
     },
     {
       "name": "Query",
-      "description": "Execute SQL analytics queries"
+      "description": "Execute SQL queries and call pre-built analytics endpoints (KPIs, top pages, lifecycle, retention, revenue) — call with the `query:read` scope"
     },
     {
       "name": "Events",
