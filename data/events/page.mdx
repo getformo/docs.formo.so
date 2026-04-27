@@ -38,10 +38,30 @@ The following table shows which properties are automatically set by each SDK:
 | `context.page_path` | Not set (derived in backend) | Not set (derived in backend) |
 | `context.referrer` | `document.referrer` | From deep link (if set) |
 | `context.user_agent` | Browser user agent | Device user agent (if available) |
+| `context.locale` | Browser language | Device locale |
+| `context.timezone` | Resolved IANA timezone | Resolved IANA timezone |
+| `context.location` | Country derived from timezone | Country derived from timezone |
+| `context.library_name` | `"Formo Web SDK"` | `"Formo React Native SDK"` |
+| `context.library_version` | SDK version | SDK version |
+| `context.browser` | Detected browser name | Not set |
+| `context.screen_width` | `window.screen.width` | `Dimensions.get("screen").width` |
+| `context.screen_height` | `window.screen.height` | `Dimensions.get("screen").height` |
+| `context.screen_density` | `window.devicePixelRatio` | `Dimensions.get("screen").scale` |
+| `context.viewport_width` | `window.innerWidth` | Not set |
+| `context.viewport_height` | `window.innerHeight` | Not set |
 | `context.os_name` | Not set | `iOS` or `Android` |
+| `context.os_version` | Not set | OS version string |
+| `context.device_model` | Not set | Device model (e.g., `iPhone 14 Pro`) |
+| `context.device_manufacturer` | Not set | Device manufacturer (e.g., `Apple`) |
+| `context.device_name` | Not set | Device name |
 | `context.device_type` | Not set | `mobile` or `tablet` |
 | `context.app_name` | Not set | From native config or options |
 | `context.app_version` | Not set | From native config or options |
+| `context.app_build` | Not set | From native config or options |
+| `context.app_bundle_id` | Not set | From native config or options |
+| `context.network_wifi` | Not set | `true` if connected via WiFi |
+| `context.network_cellular` | Not set | `true` if connected via cellular |
+| `context.network_carrier` | Not set | Cellular carrier name (when on cellular) |
 | `channel` | `"web"` | `"mobile"` |
 
 ## Sample Payload (Web)
@@ -107,12 +127,17 @@ Screen events from the [mobile SDK](/sdks/mobile) are sent as `page` events with
         "os_version": "17.0",
         "device_model": "iPhone 14 Pro",
         "device_manufacturer": "Apple",
+        "device_name": "Yos's iPhone",
         "device_type": "mobile",
         "app_name": "MyDeFiApp",
         "app_version": "2.1.0",
         "app_build": "42",
+        "app_bundle_id": "com.example.mydefiapp",
         "network_wifi": true,
-        "network_cellular": false
+        "network_cellular": false,
+        "screen_width": 393,
+        "screen_height": 852,
+        "screen_density": 3
     },
     "properties": {
         "name": "Wallet",
