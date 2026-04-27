@@ -1333,10 +1333,6 @@
           "chain_id": {
             "type": "string",
             "description": "Optional chain identifier the label applies to"
-          },
-          "source": {
-            "type": "string",
-            "description": "Optional label source (defaults to 'import')"
           }
         }
       },
@@ -3873,8 +3869,7 @@
                     "summary": "Upsert a single label",
                     "value": {
                       "tag_id": "vip",
-                      "value": "tier-1",
-                      "source": "api"
+                      "value": "tier-1"
                     }
                   },
                   "multipleLabels": {
@@ -3882,8 +3877,7 @@
                     "value": [
                       {
                         "tag_id": "vip",
-                        "value": "tier-1",
-                        "source": "api"
+                        "value": "tier-1"
                       },
                       {
                         "tag_id": "airdrop_eligible",
