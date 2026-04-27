@@ -1,0 +1,7 @@
+---
+title: "Get Volume by Metric"
+description: "Transaction volume grouped by a chosen column (e.g. pathname, referrer)."
+openapi: "GET /v0/volume_by_metric"
+---
+
+Returns total transaction volume broken down by `metric_column`. The required `metric_column` query parameter selects the dimension — for example `pathname`, `referrer`, `utm_source`, or `location`.
