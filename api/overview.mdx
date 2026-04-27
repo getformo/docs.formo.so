@@ -27,11 +27,12 @@ iconType: solid
 
   - **`skip` → `offset`.** The `skip` query param has been removed across `top_*`, `revenue_by_metric`, `volume_by_metric`, and related endpoints. Use `offset` everywhere. `limit` is bounded `1–1000` (default `50`); `offset` is bounded `0–100000` (default `0`).
 
-  - **`metric_column` allowlist.** `revenue_by_metric`, `volume_by_metric`, and `top_sources` now silently return zero rows for `metric_column` values outside this allowlist:
+  - **`metric_column` allowlist.** `revenue_by_metric`, `volume_by_metric`, and `top_sources` now silently return zero rows for `metric_column` values outside their allowlists. The endpoints share an overlapping but not identical set:
 
-    `pathname`, `origin`, `channel`, `referrer`, `referrer_url`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `location`, `device`, `browser`, `os`, `rdns`, `provider_name`, `chain_id`, `event`.
+    - `revenue_by_metric` and `volume_by_metric` (20 values): `pathname`, `origin`, `channel`, `referrer`, `referrer_url`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `location`, `device`, `browser`, `os`, `rdns`, `provider_name`, `chain_id`, `event`.
+    - `top_sources` (13 values): `referrer`, `referrer_url`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `origin`, `device`, `browser`, `os`, `channel`.
 
-    The empty-result schema is `{ "project_id": "", "metric_value": "", "sum_revenue": 0 }` (or `sum_volume`) — handle that case in clients.
+    The empty-result schema for `revenue_by_metric` / `volume_by_metric` is `{ "project_id": "", "metric_value": "", "sum_revenue": 0 }` (or `sum_volume`) — handle that case in clients.
 </Warning>
 
 ## Events API
