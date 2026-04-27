@@ -5207,11 +5207,17 @@
         "description": "Time-series traffic KPIs with optional dimension breakdown. Returns visitors, pageviews, bounce rate and average session length.",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
           { "$ref": "#/components/parameters/AnalyticsFilters" },
-          { "name": "group_by", "in": "query", "schema": { "type": "string", "enum": ["referrer","location","device","browser","os","utm_source","utm_medium","utm_campaign"] }, "description": "Dimension to break down by" },
+          { "name": "group_by", "in": "query", "schema": { "type": "string", "enum": ["referrer","ref","location","device","browser","os","utm_source","utm_medium","utm_campaign","utm_term","utm_content"] }, "description": "Dimension to break down by" },
           { "name": "limit", "in": "query", "schema": { "type": "integer" } },
           { "name": "include_previous_period", "in": "query", "schema": { "type": "string", "enum": ["true","false"] }, "description": "Return current and previous period for WoW comparison" }
         ],
@@ -5229,6 +5235,12 @@
         "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5249,6 +5261,12 @@
         "summary": "Get revenue and transaction volume time-series",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5271,6 +5289,12 @@
         "summary": "Get revenue trend over time",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5289,6 +5313,12 @@
         "summary": "Get event count time-series",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5307,6 +5337,12 @@
         "summary": "Get user retention cohorts",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5325,6 +5361,12 @@
         "summary": "Get visit-frequency distribution",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5343,12 +5385,18 @@
         "summary": "Get top pages by visits or users",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
           { "$ref": "#/components/parameters/AnalyticsFilters" },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
-          { "name": "skip", "in": "query", "schema": { "type": "integer" } }
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 10 }, "description": "Maximum number of results to return" },
+          { "name": "skip", "in": "query", "schema": { "type": "integer", "minimum": 0, "default": 0 }, "description": "Number of results to skip for pagination" }
         ],
         "responses": {
           "200": { "description": "Top pages", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
@@ -5363,13 +5411,19 @@
         "summary": "Get top traffic sources (referrers / utm)",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
           { "$ref": "#/components/parameters/AnalyticsFilters" },
-          { "name": "metric_column", "in": "query", "schema": { "type": "string", "enum": ["referrer","utm_source","utm_medium","utm_campaign","utm_term","utm_content"] } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
-          { "name": "skip", "in": "query", "schema": { "type": "integer" } }
+          { "name": "metric_column", "in": "query", "schema": { "type": "string", "enum": ["referrer","referrer_url","ref","utm_source","utm_medium","utm_campaign","utm_term","utm_content","origin","device","browser","os","channel"] }, "description": "Column to analyze. `channel` groups traffic into 12 acquisition channels (Direct, Paid Search, Organic Social, etc.)." },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 10 }, "description": "Maximum number of results to return" },
+          { "name": "skip", "in": "query", "schema": { "type": "integer", "minimum": 0, "default": 0 }, "description": "Number of results to skip for pagination" }
         ],
         "responses": {
           "200": { "description": "Top sources", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
@@ -5384,12 +5438,18 @@
         "summary": "Get top countries / regions / cities",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
           { "$ref": "#/components/parameters/AnalyticsFilters" },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
-          { "name": "skip", "in": "query", "schema": { "type": "integer" } }
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 10 }, "description": "Maximum number of results to return" },
+          { "name": "skip", "in": "query", "schema": { "type": "integer", "minimum": 0, "default": 0 }, "description": "Number of results to skip for pagination" }
         ],
         "responses": {
           "200": { "description": "Top locations", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
@@ -5404,6 +5464,12 @@
         "summary": "Get top wallet types",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5423,6 +5489,12 @@
         "summary": "Get top blockchain chains",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5443,6 +5515,12 @@
         "description": "Returns the most frequently fired events. Pass `type=custom` to restrict the result to custom events tracked via `formo.track(...)` (replaces the previous `top_custom_events` endpoint).",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
@@ -5463,12 +5541,18 @@
         "summary": "Get revenue grouped by a chosen column",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
           { "$ref": "#/components/parameters/AnalyticsFilters" },
-          { "name": "metric_column", "in": "query", "required": true, "schema": { "type": "string" }, "description": "Column to group by (e.g. pathname, referrer)" },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+          { "name": "metric_column", "in": "query", "required": true, "schema": { "type": "string" }, "description": "Column to group revenue by. Common values: `pathname`, `utm_source`, `utm_medium`, `utm_campaign`, `device`, `browser`, `os`, `location`, `referrer`, `channel`. When `channel`, revenue is grouped into 12 acquisition channels using the same classifier as `top_sources`." },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 10 }, "description": "Maximum number of results to return" }
         ],
         "responses": {
           "200": { "description": "Revenue by metric", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
@@ -5483,12 +5567,18 @@
         "summary": "Get transaction volume grouped by a chosen column",
         "tags": ["Query"],
         "x-required-scope": "query:read",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Query"
+          }
+        ],
         "parameters": [
           { "$ref": "#/components/parameters/AnalyticsDateFrom" },
           { "$ref": "#/components/parameters/AnalyticsDateTo" },
           { "$ref": "#/components/parameters/AnalyticsFilters" },
-          { "name": "metric_column", "in": "query", "required": true, "schema": { "type": "string" } },
-          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+          { "name": "metric_column", "in": "query", "required": true, "schema": { "type": "string" }, "description": "Column to group transaction volume by. Common values: `pathname`, `utm_source`, `utm_medium`, `utm_campaign`, `device`, `browser`, `os`, `location`, `referrer`, `channel`. When `channel`, volume is grouped into 12 acquisition channels using the same classifier as `top_sources`." },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 10 }, "description": "Maximum number of results to return" }
         ],
         "responses": {
           "200": { "description": "Volume by metric", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } } } },
