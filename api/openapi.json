@@ -911,10 +911,6 @@
           "chain_id": {
             "type": "string",
             "description": "Optional chain identifier the label applies to"
-          },
-          "source": {
-            "type": "string",
-            "description": "Optional label source (defaults to 'import')"
           }
         }
       },
