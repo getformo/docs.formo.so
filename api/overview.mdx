@@ -10,6 +10,30 @@ iconType: solid
   <img src="/images/intro2.png" alt="Formo" />
 </Frame>
 
+<Warning>
+  **Migrating Query API filters and pagination (breaking).** The analytics endpoints under `/v0/*` (`kpis`, `top_*`, `revenue_*`, `volume_*`, `retention`, `user_*`, `event_timeseries`) recently unified their filter shape and pagination params. The Profiles, Charts, Segments, Alerts, and Contracts APIs are unchanged.
+
+  - **Filter keys renamed.** In the JSON-encoded `filters` array (and in `profile_filters`, `user_filters`, `channel_filter`, and `retentionUserFilters`), `operand` → `field`, `operands` → `fields`, and `operator` → `op`. `value` is unchanged.
+
+    ```json
+    // Before
+    [{ "operand": "location", "operator": "equals", "value": "US" }]
+
+    // After
+    [{ "field": "location", "op": "equals", "value": "US" }]
+    ```
+
+    For `op: "in" | "notIn"`, `value` is still a pipe-delimited string (e.g. `"chrome|firefox"`).
+
+  - **`skip` → `offset`.** The `skip` query param has been removed across `top_*`, `revenue_by_metric`, `volume_by_metric`, and related endpoints. Use `offset` everywhere. `limit` is bounded `1–1000` (default `50`); `offset` is bounded `0–100000` (default `0`).
+
+  - **`metric_column` allowlist.** `revenue_by_metric`, `volume_by_metric`, and `top_sources` now silently return zero rows for `metric_column` values outside this allowlist:
+
+    `pathname`, `origin`, `channel`, `referrer`, `referrer_url`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `location`, `device`, `browser`, `os`, `rdns`, `provider_name`, `chain_id`, `event`.
+
+    The empty-result schema is `{ "project_id": "", "metric_value": "", "sum_revenue": 0 }` (or `sum_volume`) — handle that case in clients.
+</Warning>
+
 ## Events API
 
 - Send individual or batches of events via `events.formo.so` to Formo.

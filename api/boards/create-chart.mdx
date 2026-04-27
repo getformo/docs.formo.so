@@ -330,11 +330,11 @@ Measures how often users return over time. The `query` field is not used — pas
 
 Each `RetentionUserFilter`:
 
-| Field      | Type             | Description                                                              |
-| ---------- | ---------------- | ------------------------------------------------------------------------ |
-| `operand`  | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
-| `operator` | string           | Comparison operator (same set as `StepFilterCondition.op`)               |
-| `value`    | string \| number | Value to compare against                                                 |
+| Field   | Type             | Description                                                              |
+| ------- | ---------------- | ------------------------------------------------------------------------ |
+| `field` | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
+| `op`    | string           | Comparison operator (same set as `StepFilterCondition.op`)               |
+| `value` | string \| number | Value to compare against                                                 |
 
 ```json
 {
@@ -345,8 +345,8 @@ Each `RetentionUserFilter`:
   "settings": {
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
-      { "operand": "device", "operator": "equals", "value": "desktop" },
-      { "operand": "utm_source", "operator": "notEquals", "value": "direct" }
+      { "field": "device", "op": "equals", "value": "desktop" },
+      { "field": "utm_source", "op": "notEquals", "value": "direct" }
     ]
   }
 }
@@ -729,11 +729,11 @@ Measures how often users return over time. The `query` field is not used — pas
 
 Each `RetentionUserFilter`:
 
-| Field      | Type             | Description                                                              |
-| ---------- | ---------------- | ------------------------------------------------------------------------ |
-| `operand`  | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
-| `operator` | string           | Comparison operator (same set as `StepFilterCondition.op`)               |
-| `value`    | string \| number | Value to compare against                                                 |
+| Field   | Type             | Description                                                              |
+| ------- | ---------------- | ------------------------------------------------------------------------ |
+| `field` | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
+| `op`    | string           | Comparison operator (same set as `StepFilterCondition.op`)               |
+| `value` | string \| number | Value to compare against                                                 |
 
 ```json
 {
@@ -744,8 +744,8 @@ Each `RetentionUserFilter`:
   "settings": {
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
-      { "operand": "device", "operator": "equals", "value": "desktop" },
-      { "operand": "utm_source", "operator": "notEquals", "value": "direct" }
+      { "field": "device", "op": "equals", "value": "desktop" },
+      { "field": "utm_source", "op": "notEquals", "value": "direct" }
     ]
   }
 }
