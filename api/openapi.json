@@ -1587,25 +1587,38 @@
                   "data": [
                     {
                       "id": "alrt_4f8e2c1a9b3d4e5f",
+                      "project_id": "proj_abc123",
                       "name": "Daily revenue drop",
-                      "description": "Alert when daily revenue drops more than 20% week-over-week.",
-                      "type": "event",
-                      "event": "transaction",
-                      "metric": "sum",
-                      "metric_property": "revenue",
-                      "comparison": "less_than",
-                      "threshold_value": 1000,
-                      "threshold_unit": "absolute",
-                      "time_window": "1d",
-                      "filters": [],
-                      "recipients": [
-                        "alerts@myapp.com"
-                      ],
-                      "channels": [
-                        "email",
-                        "slack"
-                      ],
+                      "trigger_type": "event",
                       "status": "active",
+                      "trigger_filters": [
+                        {
+                          "name": "event",
+                          "operator": "equals",
+                          "value": "transaction"
+                        },
+                        {
+                          "name": "revenue",
+                          "operator": "less_than",
+                          "value": "1000",
+                          "numericThreshold": "sum"
+                        }
+                      ],
+                      "recipient": [
+                        {
+                          "type": "email",
+                          "value": [
+                            "alerts@myapp.com"
+                          ]
+                        },
+                        {
+                          "type": "slack",
+                          "value": [
+                            "C0123456789"
+                          ]
+                        }
+                      ],
+                      "has_secret": false,
                       "created_at": "2026-04-12T09:32:18.000Z",
                       "updated_at": "2026-04-25T14:01:55.000Z"
                     }
@@ -1894,25 +1907,38 @@
                 },
                 "example": {
                   "id": "alrt_4f8e2c1a9b3d4e5f",
+                  "project_id": "proj_abc123",
                   "name": "Daily revenue drop",
-                  "description": "Alert when daily revenue drops more than 20% week-over-week.",
-                  "type": "event",
-                  "event": "transaction",
-                  "metric": "sum",
-                  "metric_property": "revenue",
-                  "comparison": "less_than",
-                  "threshold_value": 1000,
-                  "threshold_unit": "absolute",
-                  "time_window": "1d",
-                  "filters": [],
-                  "recipients": [
-                    "alerts@myapp.com"
-                  ],
-                  "channels": [
-                    "email",
-                    "slack"
-                  ],
+                  "trigger_type": "event",
                   "status": "active",
+                  "trigger_filters": [
+                    {
+                      "name": "event",
+                      "operator": "equals",
+                      "value": "transaction"
+                    },
+                    {
+                      "name": "revenue",
+                      "operator": "less_than",
+                      "value": "1000",
+                      "numericThreshold": "sum"
+                    }
+                  ],
+                  "recipient": [
+                    {
+                      "type": "email",
+                      "value": [
+                        "alerts@myapp.com"
+                      ]
+                    },
+                    {
+                      "type": "slack",
+                      "value": [
+                        "C0123456789"
+                      ]
+                    }
+                  ],
+                  "has_secret": false,
                   "created_at": "2026-04-12T09:32:18.000Z",
                   "updated_at": "2026-04-25T14:01:55.000Z"
                 }
@@ -2179,17 +2205,19 @@
                   "data": [
                     {
                       "id": "brd_a1b2c3d4e5f6",
+                      "project_id": "proj_abc123",
                       "title": "Revenue Dashboard",
                       "description": "Weekly revenue, conversion, and retention metrics.",
-                      "isPublic": false,
+                      "enabled": false,
                       "created_at": "2026-03-04T11:22:08.000Z",
                       "updated_at": "2026-04-22T08:14:31.000Z"
                     },
                     {
                       "id": "brd_g7h8i9j0k1l2",
+                      "project_id": "proj_abc123",
                       "title": "Marketing Funnel",
                       "description": "Acquisition channel performance.",
-                      "isPublic": true,
+                      "enabled": true,
                       "created_at": "2026-02-18T16:09:44.000Z",
                       "updated_at": "2026-04-19T10:55:02.000Z"
                     }
@@ -2282,9 +2310,10 @@
                 },
                 "example": {
                   "id": "brd_a1b2c3d4e5f6",
+                  "project_id": "proj_abc123",
                   "title": "Revenue Dashboard",
                   "description": "Weekly revenue, conversion, and retention metrics.",
-                  "isPublic": false,
+                  "enabled": false,
                   "created_at": "2026-03-04T11:22:08.000Z",
                   "updated_at": "2026-04-22T08:14:31.000Z"
                 }
@@ -2465,16 +2494,19 @@
                   "data": [
                     {
                       "id": "cht_x1y2z3a4b5c6",
-                      "boardId": "brd_a1b2c3d4e5f6",
-                      "title": "Daily revenue (last 30 days)",
+                      "project_id": "proj_abc123",
+                      "board_id": "brd_a1b2c3d4e5f6",
                       "chart_type": "line",
+                      "title": "Daily revenue (last 30 days)",
+                      "description": null,
                       "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
                       "x_axis": "day",
                       "y_axis": [
                         "revenue"
                       ],
-                      "created_at": "2026-04-02T13:00:00.000Z",
-                      "updated_at": "2026-04-22T08:14:31.000Z"
+                      "group_by": null,
+                      "steps": null,
+                      "settings": null
                     }
                   ],
                   "meta": {
@@ -2865,16 +2897,19 @@
                 },
                 "example": {
                   "id": "cht_x1y2z3a4b5c6",
-                  "boardId": "brd_a1b2c3d4e5f6",
-                  "title": "Daily revenue (last 30 days)",
+                  "project_id": "proj_abc123",
+                  "board_id": "brd_a1b2c3d4e5f6",
                   "chart_type": "line",
+                  "title": "Daily revenue (last 30 days)",
+                  "description": null,
                   "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
                   "x_axis": "day",
                   "y_axis": [
                     "revenue"
                   ],
-                  "created_at": "2026-04-02T13:00:00.000Z",
-                  "updated_at": "2026-04-22T08:14:31.000Z"
+                  "group_by": null,
+                  "steps": null,
+                  "settings": null
                 }
               }
             }
@@ -3016,18 +3051,66 @@
                 "example": {
                   "data": [
                     {
-                      "chain_id": "1",
-                      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
                       "name": "USD Coin",
-                      "abi_type": "erc20",
-                      "created_at": "2026-01-15T10:00:00.000Z"
+                      "chain": 1,
+                      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                      "start_block": 6082465,
+                      "abi": "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"}]",
+                      "events": [
+                        {
+                          "anonymous": false,
+                          "name": "Transfer",
+                          "type": "event",
+                          "inputs": [
+                            {
+                              "indexed": true,
+                              "name": "from",
+                              "type": "address"
+                            },
+                            {
+                              "indexed": true,
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "indexed": false,
+                              "name": "value",
+                              "type": "uint256"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "chain_id": "8453",
-                      "address": "0x4200000000000000000000000000000000000006",
                       "name": "WETH (Base)",
-                      "abi_type": "erc20",
-                      "created_at": "2026-02-08T14:32:51.000Z"
+                      "chain": 8453,
+                      "address": "0x4200000000000000000000000000000000000006",
+                      "start_block": 1,
+                      "abi": "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"}]",
+                      "events": [
+                        {
+                          "anonymous": false,
+                          "name": "Transfer",
+                          "type": "event",
+                          "inputs": [
+                            {
+                              "indexed": true,
+                              "name": "from",
+                              "type": "address"
+                            },
+                            {
+                              "indexed": true,
+                              "name": "to",
+                              "type": "address"
+                            },
+                            {
+                              "indexed": false,
+                              "name": "value",
+                              "type": "uint256"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "meta": {
@@ -3343,23 +3426,12 @@
                   "data": [
                     {
                       "id": "seg_e3f4g5h6i7j8",
-                      "name": "High net worth desktop users",
-                      "description": "Wallets with > $100k net worth on desktop devices.",
-                      "filters": [
-                        {
-                          "field": "device",
-                          "op": "equals",
-                          "value": "desktop"
-                        }
-                      ],
-                      "profile_filters": [
-                        {
-                          "field": "net_worth_usd",
-                          "op": "greaterOrEqual",
-                          "value": 100000
-                        }
-                      ],
-                      "created_at": "2026-04-10T12:00:00.000Z"
+                      "projectId": "proj_abc123",
+                      "title": "High net worth desktop users",
+                      "filterSet": [
+                        "{\"field\":\"device\",\"op\":\"equals\",\"value\":\"desktop\"}",
+                        "{\"field\":\"net_worth_usd\",\"op\":\"greaterOrEqual\",\"value\":100000}"
+                      ]
                     }
                   ],
                   "meta": {
