@@ -99,6 +99,27 @@ How many users come to your site or app from a particular source. We track these
 
 To minimize the amount of traffic that falls within the "Direct / None" category, you can add special query parameters (UTMs) to your links.
 
+### Channel
+
+The acquisition channel that brought a session to your app. Every session is assigned to exactly one of 12 channels at query time, using a priority-ordered ladder over referrer domain, `utm_medium`, and 8 ad-platform click IDs (`gclid`, `gad_source`, `fbclid`, `msclkid`, `ttclid`, `twclid`, `li_fat_id`, `rdt_cid`).
+
+| # | Channel | Definition |
+|---|---------|------------|
+| 1 | Paid Search | Paid signal + referrer is a search engine (Google, Bing, DuckDuckGo, Yahoo, Yandex, Baidu, Brave, Kagi, Naver, ...) |
+| 2 | Paid Video | Paid signal + referrer is a video platform (YouTube, Vimeo, Twitch, Dailymotion, Loom, Wistia) |
+| 3 | Paid Social | Paid signal + referrer is a social platform (Meta, X, LinkedIn, Reddit, TikTok, Pinterest, Snapchat, Threads, Discord, Telegram, Farcaster, ...) |
+| 4 | Email | `utm_medium` ∈ \{`email`, `e-mail`, `e_mail`, `newsletter`\} |
+| 5 | Affiliates | `utm_medium=affiliate` or non-empty `ref` query parameter |
+| 6 | Display | `utm_medium` ∈ \{`display`, `banner`, `expandable`, `interstitial`\} |
+| 7 | AI | Referrer is an AI assistant domain (ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, Phind, Poe, Mistral Chat, Meta AI, You.com, Pi) |
+| 8 | Organic Search | `utm_medium=organic` or referrer is a search engine with no paid signal |
+| 9 | Organic Social | `utm_medium` ∈ \{`social`, `social-network`, `social-media`, `sm`\} or referrer is a social platform with no paid signal |
+| 10 | Organic Video | Referrer is a video platform with no paid signal |
+| 11 | Referrers | Any other non-empty referrer not matched by the rules above |
+| 12 | Direct | No referrer, no UTM, no click ID (typed URL, bookmark, or stripped referrer) |
+
+A session has a **paid signal** when any of the following is true: `utm_medium` is one of `cpc`, `cpm`, `cpv`, `cpa`, `ppc`, `paidsearch`, `paidsocial`, `sem`, `retargeting`; `utm_medium` starts with `paid`; or any of the 8 click IDs above is non-empty. Same-domain referrers (e.g. `blog.example.com` referred from `app.example.com`) are stripped before classification so internal navigation rolls up to **Direct** instead of **Referrers**.
+
 ### Referrals
 
 How many users are referred to your site or app by a particular user. We use the `ref` query parameters to track referrals.
@@ -199,7 +220,7 @@ How many users are using a particular app such as Uniswap, OpenSea, etc.
 
 How many users hold a particular token such as USDC, USDT, etc.
 
-### Feature Usage / Adoption Rate
+### Feature Usage Rate
 The percentage of users or wallets who have used a specific feature of your app, helping you measure adoption and engagement for key functionalities.
 
 ### Conversion Rate

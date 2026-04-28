@@ -50,9 +50,30 @@ View Entry and Exit page analytics for your site and app.
 
 Understanding both gives you a clear window into how people interact with your site and where you might be losing them.
 
-## Referrers, UTM, referrals
+## Channels, Referrers, UTM, referrals
 
-See where your users are coming from by referrer, UTM parameters, and referrals.
+See where your users are coming from by acquisition channel, referrer, UTM parameters, and referrals.
+
+### Channels
+
+Formo automatically classifies every session into one of 12 acquisition channels using a priority-ordered ladder over the referrer domain, `utm_medium`, and 8 ad-platform click IDs (`gclid`, `gad_source`, `fbclid`, `msclkid`, `ttclid`, `twclid`, `li_fat_id`, `rdt_cid`). Classification happens at query time, so rule changes apply retroactively without backfills.
+
+The 12 channels (first match wins):
+
+1. **Paid Search** — paid traffic from Google, Bing, DuckDuckGo, Yahoo, Yandex, Baidu, Brave, Kagi, Naver, etc.
+2. **Paid Video** — paid traffic from YouTube, Vimeo, Twitch, Dailymotion, Loom, Wistia.
+3. **Paid Social** — paid traffic from Meta, X/Twitter, LinkedIn, Reddit, TikTok, Pinterest, Snapchat, Threads, Discord, Telegram, Farcaster, etc.
+4. **Email** — `utm_medium` of `email`, `e-mail`, `e_mail`, or `newsletter`.
+5. **Affiliates** — `utm_medium=affiliate` or any non-empty `ref` query parameter.
+6. **Display** — `utm_medium` of `display`, `banner`, `expandable`, or `interstitial`.
+7. **AI** — traffic from ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, Phind, Poe, Mistral Chat, Meta AI, You.com, Pi. (No other analytics tool surfaces this yet.)
+8. **Organic Search** — unpaid traffic from search engines (`utm_medium=organic` or referrer matches a search domain with no paid signal).
+9. **Organic Social** — unpaid traffic from social platforms.
+10. **Organic Video** — unpaid traffic from video platforms.
+11. **Referrers** — any other non-empty referrer not matched above.
+12. **Direct** — no referrer, no UTM, no click ID (typed URL, bookmark, or stripped referrer).
+
+Paid is detected from any of: paid pricing mediums (`cpc`, `cpm`, `cpv`, `cpa`, `ppc`, `paidsearch`, `paidsocial`, `sem`, `retargeting`), any `utm_medium` starting with `paid`, or any of the 8 click IDs above. Sub-classification (Search vs Social vs Video) uses the referrer domain.
 
 <Frame caption="Understand where your users are coming from.">
   <img
