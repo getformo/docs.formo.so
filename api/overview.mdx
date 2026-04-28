@@ -11,7 +11,7 @@ iconType: solid
 </Frame>
 
 <Warning>
-  **Migrating Query API filters and pagination (breaking).** The analytics endpoints under `/v0/*` (`kpis`, `top_*`, `revenue_*`, `volume_*`, `retention`, `user_*`, `event_timeseries`) recently unified their filter shape and pagination params. The Profiles, Charts, Segments, Alerts, and Contracts APIs are unchanged.
+  **Migrating Query API filters and pagination (breaking).** The analytics endpoints under `/v0/*` (`kpis`, `top_*`, `revenue_*`, `volume_*`, `retention`, `user_*`, `event_timeseries`) recently unified their filter shape and pagination params. The Profiles, Segments, Alerts, and Contracts APIs are unchanged. The Charts API's endpoints and request structure are unchanged, but the `retentionUserFilters` shape inside chart `settings` follows the same `field`/`op` rename described below.
 
   - **Filter keys renamed.** In the JSON-encoded `filters` array (and in `profile_filters`, `user_filters`, `channel_filter`, and `retentionUserFilters`), `operand` → `field`, `operands` → `fields`, and `operator` → `op`. `value` is unchanged.
 
