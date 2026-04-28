@@ -1,0 +1,9 @@
+---
+title: "Get Top Events"
+description: "Top events by frequency over the selected window."
+openapi: "GET /v0/top_events"
+---
+
+Returns the most frequently fired events in the project, by total event count.
+
+Pass `type=custom` to restrict results to custom events (events tracked via `formo.track(...)`). This replaces the previous `top_custom_events` endpoint.

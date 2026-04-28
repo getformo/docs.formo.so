@@ -1,0 +1,7 @@
+---
+title: "Get User Lifecycle"
+description: "Wallet user counts by lifecycle stage (New, Returning, Power user, Resurrected, Churned)."
+openapi: "GET /v0/user_lifecycle"
+---
+
+Counts wallet users in each lifecycle stage, computed against the activity window ending at `date_to`. Pass `lifecycle_filter` to return only one stage, or `include_previous_period=true` to also receive the prior window.

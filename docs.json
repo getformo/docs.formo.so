@@ -159,7 +159,24 @@
           },
           {
             "group": "Query API",
-            "pages": ["api/query"]
+            "pages": [
+              "api/query",
+              "api/query/kpis",
+              "api/query/user-lifecycle",
+              "api/query/revenue-overview",
+              "api/query/revenue-timeseries",
+              "api/query/event-timeseries",
+              "api/query/retention",
+              "api/query/user-frequency",
+              "api/query/top-pages",
+              "api/query/top-sources",
+              "api/query/top-locations",
+              "api/query/top-wallets",
+              "api/query/top-chains",
+              "api/query/top-events",
+              "api/query/revenue-by-metric",
+              "api/query/volume-by-metric"
+            ]
           },
           {
             "group": "Charts API",

@@ -1,0 +1,9 @@
+---
+title: "Get KPIs"
+description: "Time-series traffic KPIs (visitors, pageviews, bounce rate, session duration), with optional dimension breakdown and previous-period comparison."
+openapi: "GET /v0/kpis"
+---
+
+Returns the same KPI series that powers the Formo dashboard's overview chart.
+
+Use `group_by` to break results down by `referrer`, `location`, `device`, `browser`, `os`, or any UTM dimension. Set `include_previous_period=true` to also receive the equivalent prior window for week-over-week comparisons.
