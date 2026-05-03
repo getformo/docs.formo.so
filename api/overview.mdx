@@ -53,6 +53,85 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Create, update, and manage project alerts programmatically.
 - Configure alert conditions and notification channels (email, Slack, webhook).
 
+## Response shape
+
+Successful responses return the **resource directly** — there is no envelope, no `isSuccess` discriminator. HTTP status alone (`200/201/204` vs `4xx/5xx`) carries success.
+
+```json
+{
+  "id": "alrt_…",
+  "name": "Daily revenue drop",
+  "trigger_type": "event",
+  "status": "active",
+  "created_at": "2026-04-12T09:32:18.000Z",
+  "updated_at": "2026-04-25T14:01:55.000Z"
+}
+```
+
+`DELETE` returns `204 No Content` with an empty body — don't try to parse JSON on those.
+
+### Pagination
+
+List endpoints use a Stripe-style envelope only because they need pagination metadata:
+
+```json
+{
+  "data": [
+    { "id": "a" },
+    { "id": "b" }
+  ],
+  "page": 1,
+  "size": 50,
+  "total": 173,
+  "has_more": true
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `data` | The page of rows |
+| `total` | Total count across all pages |
+| `page` | 1-indexed page number echoed from the request |
+| `size` | Page size echoed from the request |
+| `has_more` | `true` if there are pages after the current one |
+
+## Errors
+
+Every non-2xx response uses the same envelope:
+
+```json
+{
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Trigger filters must contain at least one entry",
+    "doc_url": "https://docs.formo.so/api/errors#bad_request",
+    "param": "body.trigger_filters"
+  }
+}
+```
+
+Branch on `error.code` (a stable enum), not `message` or HTTP status alone. The `doc_url` field anchors to the matching section of the [Errors reference](/api/errors), so AI agents can fetch remediation context without escalating to a human.
+
+See [Errors](/api/errors) for the full list of codes.
+
+## Idempotency
+
+Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE so retries can't double-create or double-charge. The first response is cached for 24 hours and replayed byte-for-byte on retry.
+
+```http
+POST /v0/alerts HTTP/1.1
+Authorization: Bearer formo_…
+Idempotency-Key: 8a3a2b1e-7c4d-4a5e-9c2f-1f8a3a2b1e9f
+```
+
+The header is opt-in. See [Idempotency](/api/idempotency) for the full contract, failure modes, and client patterns.
+
+## Versioning
+
+The public API is mounted under `/v0/`. We treat the path version as a major version; we will add `/v1/` (rather than break `/v0/`) for incompatible changes. While under `/v0/` the contract is settling — breaking changes can land before `/v1/` ships, and we will announce them in the changelog.
+
+Within a version we may add new endpoints, new optional request fields, new response fields (clients should ignore unknown fields), and new error codes within an existing HTTP status family. We will not remove or rename existing endpoints/fields, change the HTTP status of an existing error condition, or repurpose an existing `code` value.
+
 ## FAQ
 
 <AccordionGroup>

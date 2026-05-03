@@ -37,7 +37,7 @@ Limits:
 
 ## Response
 
-`200 OK` returns rows plus pagination metadata inferred from the query:
+`200 OK` returns rows plus pagination metadata reflecting the `LIMIT` / `OFFSET` you wrote into the SQL.
 
 ```json
 {
@@ -48,19 +48,31 @@ Limits:
       "timestamp": "2025-01-20T10:00:00Z"
     }
   ],
-  "meta": {
-    "total": 120,
-    "limit": 100,
-    "offset": 0
-  }
+  "total": 120,
+  "limit": 100,
+  "offset": 0,
+  "has_more": true
 }
 ```
 
+| Field | Type | Description |
+|-------|------|-------------|
+| `data` | array | Result rows |
+| `total` | integer | Total rows before `LIMIT` was applied |
+| `limit` | integer | `LIMIT` echoed from the SQL |
+| `offset` | integer | `OFFSET` echoed from the SQL |
+| `has_more` | boolean | `true` if `total > offset + data.length` |
+
+This endpoint uses `limit`/`offset` (not `page`/`size`) because the client controls pagination directly through the SQL query — Formo just echoes the values back.
+
 ## Errors
 
-- `400`: missing query, invalid SQL, LIMIT over 1000, or missing project id.
-- `401`: missing/invalid authorization header or API key.
-- `403`: API key lacks `query:read` permission.
-- `404`: project or read token not found.
-- `500`: failure executing the query.
+Branch on `error.code`; see [Errors](/api/errors) for the full reference.
+
+- `400 BAD_REQUEST`: missing query, invalid SQL, `LIMIT` over 1000, or missing project id.
+- `401 UNAUTHORIZED`: missing/invalid authorization header or API key.
+- `403 FORBIDDEN`: API key lacks `query:read` scope.
+- `404 NOT_FOUND`: project or read token not found.
+- `429 TOO_MANY_REQUESTS`: per-workspace rate limit exceeded.
+- `500 INTERNAL_SERVER_ERROR`: failure executing the query.
 

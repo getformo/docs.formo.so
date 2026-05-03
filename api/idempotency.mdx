@@ -1,0 +1,148 @@
+---
+title: 'Idempotency'
+description: 'Use the Idempotency-Key header to safely retry POST/PUT/PATCH/DELETE requests on the Formo Public API without double-creating or double-charging.'
+icon: rotate
+iconType: solid
+---
+
+Public unsafe methods (POST / PUT / PATCH / DELETE on `/v0/*`) honour an optional `Idempotency-Key` header. When present, Formo de-duplicates retries so a flaky network or a crashed client never causes a double-write.
+
+The header is **opt-in** — omit it and every request is processed independently.
+
+## How it works
+
+```http
+POST /v0/alerts HTTP/1.1
+Host: api.formo.so
+Authorization: Bearer formo_…
+Idempotency-Key: 8a3a2b1e-7c4d-4a5e-9c2f-1f8a3a2b1e9f
+Content-Type: application/json
+
+{ "name": "Daily revenue drop", "trigger_type": "event", "...": "..." }
+```
+
+- The first request runs normally; the response (status code + body) is cached for **24 hours** under `idem:{teamId}:{projectId}:{key}` along with a fingerprint of the request (method + full mount path + body).
+- Subsequent requests with the same key **and** matching fingerprint replay the cached response **byte-for-byte** — retries can never double-create or double-charge.
+- The cache is scoped to `projectId` as well as `teamId`, so two project-scoped API keys in the same workspace can use the same key without colliding.
+
+### What gets cached
+
+| Outcome | Cached? | Why |
+| --- | --- | --- |
+| `2xx` success | ✅ | Replay the original result — that's the whole point. |
+| `5xx` server error | ✅ | If the server failed transiently after partially executing, a retry should see the same failure rather than risk double-execution. |
+| `4xx` client error | ❌ | Validation failures aren't recorded. A corrected retry under the same key runs normally. |
+
+The in-flight lock is also released on `4xx` so a corrected retry under the same key can proceed immediately.
+
+## Failure modes
+
+### `400 INVALID_IDEMPOTENCY_KEY` — key reused for a different request
+
+Reusing the same key for a *different* operation (different method, path, or body) returns `400 INVALID_IDEMPOTENCY_KEY`. This prevents silent dropped writes when a client accidentally reuses a key across distinct requests.
+
+Also returned if the key exceeds 255 characters.
+
+### `409 IDEMPOTENCY_IN_PROGRESS` — concurrent retry
+
+Two concurrent requests with the same key in flight return `409 IDEMPOTENCY_IN_PROGRESS`. Wait briefly (typically < 1 s) and replay — the server will return the cached response of the original request.
+
+### Redis outage
+
+If the idempotency cache (Redis) is unavailable, the request runs without caching — Redis outages don't block writes. Concurrent retries during such an outage may double-execute; the contract is best-effort.
+
+## Recommended client patterns
+
+1. **Generate a fresh UUID v4 per logical operation.** Don't reuse keys across different actions, even if the body looks similar.
+2. **Persist the key before the first attempt.** Save it to disk / DB before calling the API so an in-flight crash doesn't lose it. On restart, retry with the same key.
+3. **Scope to a single workspace.** Two API keys for *different* projects can safely share an idempotency key — but don't rely on that; scope per workspace anyway.
+4. **Pair with retry-with-backoff for `429` / `503` / `5xx`.** Idempotency makes those safe to replay.
+5. **Maximum length: 255 characters.** Use a UUID v4 (36 chars) or any random ≤255-char string.
+
+## Examples
+
+<CodeGroup>
+
+```bash curl
+curl -X POST https://api.formo.so/v0/alerts \
+  -H "Authorization: Bearer formo_…" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Daily revenue drop",
+    "trigger_type": "event",
+    "trigger_filters": [
+      { "name": "event", "operator": "equals", "value": "transaction" }
+    ],
+    "recipient": [{ "type": "email", "value": ["alerts@myapp.com"] }]
+  }'
+```
+
+```javascript JavaScript
+import { randomUUID } from "crypto";
+
+const idempotencyKey = randomUUID();
+
+async function createAlertWithRetry(body, attempt = 0) {
+  const res = await fetch("https://api.formo.so/v0/alerts", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.FORMO_API_KEY}`,
+      "Idempotency-Key": idempotencyKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (res.status === 409) {
+    const { error } = await res.json();
+    if (error.code === "IDEMPOTENCY_IN_PROGRESS" && attempt < 5) {
+      await new Promise((r) => setTimeout(r, 250 * 2 ** attempt));
+      return createAlertWithRetry(body, attempt + 1);
+    }
+  }
+
+  if (res.status >= 500 && attempt < 5) {
+    await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
+    return createAlertWithRetry(body, attempt + 1);
+  }
+
+  return res.json();
+}
+```
+
+```python Python
+import os
+import time
+import uuid
+import requests
+
+idempotency_key = str(uuid.uuid4())
+
+def create_alert_with_retry(body, attempt=0):
+    res = requests.post(
+        "https://api.formo.so/v0/alerts",
+        headers={
+            "Authorization": f"Bearer {os.environ['FORMO_API_KEY']}",
+            "Idempotency-Key": idempotency_key,
+            "Content-Type": "application/json",
+        },
+        json=body,
+    )
+
+    if res.status_code == 409:
+        err = res.json().get("error", {})
+        if err.get("code") == "IDEMPOTENCY_IN_PROGRESS" and attempt < 5:
+            time.sleep(0.25 * (2 ** attempt))
+            return create_alert_with_retry(body, attempt + 1)
+
+    if res.status_code >= 500 and attempt < 5:
+        time.sleep(0.5 * (2 ** attempt))
+        return create_alert_with_retry(body, attempt + 1)
+
+    return res.json()
+```
+
+</CodeGroup>
+
+See [Errors](/api/errors) for the full list of error codes and remediation guidance.

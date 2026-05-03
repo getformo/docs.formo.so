@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Formo Public API",
-    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat. All endpoints require a workspace API key with the appropriate scopes.",
+    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat.\n\n**Auth.** All endpoints require a workspace API key with the appropriate scopes — see `x-api-scopes`.\n\n**Response shape.** Successful responses return the resource directly (or `{ data: [...], total, page, size, has_more }` for paginated lists). HTTP status carries success/failure — there is no envelope wrapping success bodies.\n\n**Errors.** Every non-2xx response uses the `Error` envelope: `{ error: { code, message, doc_url, param?, details? } }`. Branch on the machine-readable `code` (see `ErrorCode` enum) and follow `doc_url` to the matching section of the [errors reference](https://docs.formo.so/api/errors).\n\n**Idempotency.** Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE to make retries safe; the response is cached for 24 h and replayed on duplicate keys.",
     "version": "0.1.0",
     "contact": {
       "name": "Formo",
@@ -33,21 +33,63 @@
       }
     },
     "schemas": {
-      "BaseResponse": {
+      "Error": {
         "type": "object",
+        "description": "Standard error envelope returned by every public API endpoint for any non-2xx response. The HTTP status code carries success/failure; the body provides a machine-readable `code`, a human-readable `message`, and a `doc_url` pointing at the matching section of the docs so agents can fetch context on the fly.",
         "properties": {
-          "isSuccess": {
-            "type": "boolean"
-          },
-          "message": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message",
+              "doc_url"
+            ],
+            "properties": {
+              "code": {
+                "$ref": "#/components/schemas/ErrorCode"
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable error description. Wording may change between releases — branch on `code`, not `message`."
+              },
+              "doc_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Link to the matching section of the errors reference at https://docs.formo.so/api/errors."
+              },
+              "param": {
+                "type": "string",
+                "description": "When the error pertains to a specific request field, the dotted path to that field (e.g. `body.trigger_filters.0.value`)."
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Code-specific extra context. For `INVALID_VALIDATION_REQUEST` this is a `{ fieldPath: message }` map of every Zod validation failure."
+              }
+            }
           }
         },
         "required": [
-          "isSuccess"
+          "error"
+        ]
+      },
+      "ErrorCode": {
+        "type": "string",
+        "description": "Stable, enumerated error codes. New codes may be added in any release; clients should treat unknown codes as the closest matching HTTP status family.",
+        "enum": [
+          "INTERNAL_SERVER_ERROR",
+          "INVALID_VALIDATION_REQUEST",
+          "UNAUTHORIZED",
+          "BAD_REQUEST",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "CONFLICT",
+          "INVALID_CHAIN_ID",
+          "CONTEXT_LIMIT_EXCEEDED",
+          "SERVICE_UNAVAILABLE",
+          "TOO_MANY_REQUESTS",
+          "IDEMPOTENCY_IN_PROGRESS",
+          "INVALID_IDEMPOTENCY_KEY"
         ]
       },
       "Alert": {
@@ -232,7 +274,7 @@
               "track",
               "decoded_log"
             ],
-            "description": "`event` \u2014 built-in page/connect/transaction events; `track` \u2014 custom tracked events; `decoded_log` \u2014 decoded smart-contract events."
+            "description": "`event` — built-in page/connect/transaction events; `track` — custom tracked events; `decoded_log` — decoded smart-contract events."
           },
           "event": {
             "type": "string",
@@ -371,7 +413,7 @@
               "open"
             ],
             "default": "closed",
-            "description": "**Funnel only.** `closed` \u2014 users must complete steps in strict order with no intervening events. `open` \u2014 users may complete steps in order but other events may occur between steps."
+            "description": "**Funnel only.** `closed` — users must complete steps in strict order with no intervening events. `open` — users may complete steps in order but other events may occur between steps."
           },
           "conversionWindow": {
             "$ref": "#/components/schemas/ConversionWindow",
@@ -395,7 +437,7 @@
           },
           "startStep": {
             "$ref": "#/components/schemas/FunnelStep",
-            "description": "**user_paths \u2014 required.** The event where the user flow begins."
+            "description": "**user_paths — required.** The event where the user flow begins."
           },
           "endStep": {
             "oneOf": [
@@ -406,21 +448,21 @@
                 "type": "null"
               }
             ],
-            "description": "**user_paths \u2014 optional.** The event where the user flow ends. If `null` the flow is open-ended."
+            "description": "**user_paths — optional.** The event where the user flow ends. If `null` the flow is open-ended."
           },
           "maxSteps": {
             "type": "integer",
             "minimum": 2,
             "maximum": 10,
             "default": 3,
-            "description": "**user_paths.** Maximum number of steps to show in the flow (2\u201310). Values above 10 are clamped to 10."
+            "description": "**user_paths.** Maximum number of steps to show in the flow (2–10). Values above 10 are clamped to 10."
           },
           "nodesPerStep": {
             "type": "integer",
             "minimum": 2,
             "maximum": 10,
             "default": 5,
-            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2\u201310). Values above 10 are clamped to 10."
+            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2–10). Values above 10 are clamped to 10."
           },
           "filters": {
             "type": "string",
@@ -457,7 +499,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`** \u2014 pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** \u2014 can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** \u2014 required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`** — pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** — can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** — required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -472,7 +514,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
           },
           "title": {
             "type": "string",
@@ -492,7 +534,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` \u2014 at least 1 element required.\n- `pie` / `stacked` \u2014 exactly 1 element required."
+            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` — at least 1 element required.\n- `pie` / `stacked` — exactly 1 element required."
           },
           "group_by": {
             "type": "string",
@@ -504,7 +546,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` \u2014 add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` — add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -531,7 +573,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`** \u2014 pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** \u2014 can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** \u2014 required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`** — pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** — can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** — required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -546,7 +588,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
           },
           "title": {
             "type": "string",
@@ -566,7 +608,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` \u2014 at least 1 element required.\n- `pie` / `stacked` \u2014 exactly 1 element required."
+            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` — at least 1 element required.\n- `pie` / `stacked` — exactly 1 element required."
           },
           "group_by": {
             "type": "string",
@@ -578,7 +620,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` \u2014 add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` — add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -1408,26 +1450,8 @@
         }
       },
       "RestApiError": {
-        "type": "object",
-        "properties": {
-          "isSuccess": {
-            "type": "boolean",
-            "enum": [
-              false
-            ]
-          },
-          "message": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string",
-            "description": "Error code (e.g. UNAUTHORIZED, FORBIDDEN, BAD_REQUEST)"
-          },
-          "error": {
-            "type": "object",
-            "description": "Validation error details (field \u2192 message mapping)"
-          }
-        }
+        "$ref": "#/components/schemas/Error",
+        "description": "Deprecated alias for `Error`. Existing endpoint specs reference this name; new specs should reference `Error` directly."
       },
       "AnalyticsResponse": {
         "type": "object",
@@ -1468,6 +1492,16 @@
       }
     },
     "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": "Optional unique value (e.g. a UUID v4) that lets you safely retry POST/PUT/PATCH/DELETE requests. The first request runs normally; subsequent requests with the same key replay the stored response (status + body) for 24 hours, so retries can never double-create or double-charge. Two concurrent requests with the same key return `409 IDEMPOTENCY_IN_PROGRESS`. Generate a fresh key per logical operation."
+      },
       "AnalyticsDateFrom": {
         "name": "date_from",
         "in": "query",
@@ -1535,6 +1569,130 @@
         },
         "description": "Number of results to skip for pagination (default 0)"
       }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "The request was rejected — typically Zod validation failure. `code` is `INVALID_VALIDATION_REQUEST` and `details` contains a `{ fieldPath: message }` map.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "INVALID_VALIDATION_REQUEST",
+                "message": "Invalid request data",
+                "doc_url": "https://docs.formo.so/api/errors#invalid_validation_request",
+                "details": {
+                  "body.name": "String must contain at least 1 character(s)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid API key.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "UNAUTHORIZED",
+                "message": "Invalid API key",
+                "doc_url": "https://docs.formo.so/api/errors#unauthorized"
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "The API key is valid but lacks the required scope for this endpoint.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "FORBIDDEN",
+                "message": "API key missing required scope: alerts:write",
+                "doc_url": "https://docs.formo.so/api/errors#forbidden"
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The requested resource does not exist or is not visible to this API key's workspace.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "NOT_FOUND",
+                "message": "Alert not found",
+                "doc_url": "https://docs.formo.so/api/errors#not_found"
+              }
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "The request conflicts with current resource state, or an `Idempotency-Key` request with the same key is currently in flight.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "IDEMPOTENCY_IN_PROGRESS",
+                "message": "A request with this Idempotency-Key is already in progress. Retry shortly.",
+                "doc_url": "https://docs.formo.so/api/errors#idempotency_in_progress"
+              }
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Per-workspace rate limit exceeded. Inspect the `RateLimit-*` response headers and back off.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "TOO_MANY_REQUESTS",
+                "message": "Too many requests",
+                "doc_url": "https://docs.formo.so/api/errors#too_many_requests"
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "An unexpected error occurred on the server. The error has been logged; retry with exponential backoff.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "Internal Server Error",
+                "doc_url": "https://docs.formo.so/api/errors#internal_server_error"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "x-api-scopes": {
@@ -1570,17 +1728,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Alert"
-                      }
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Alert"
                   }
                 },
                 "example": {
@@ -1856,15 +2006,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Alert"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Alert"
                 }
               }
             }
@@ -1895,15 +2037,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Alert"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Alert"
                 },
                 "example": {
                   "id": "alrt_4f8e2c1a9b3d4e5f",
@@ -2046,15 +2180,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Alert"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Alert"
                 }
               }
             }
@@ -2084,15 +2210,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "number"
-                    }
-                  }
+                  "type": "number"
                 }
               }
             }
@@ -2158,15 +2276,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Alert"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Alert"
                 }
               }
             }
@@ -2188,17 +2298,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Board"
-                      }
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Board"
                   }
                 },
                 "example": {
@@ -2258,15 +2360,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Board"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Board"
                 }
               }
             }
@@ -2298,15 +2392,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Board"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Board"
                 },
                 "example": {
                   "id": "brd_a1b2c3d4e5f6",
@@ -2389,15 +2475,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Board"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Board"
                 }
               }
             }
@@ -2429,15 +2507,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Board"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Board"
                 }
               }
             }
@@ -2471,22 +2541,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "charts": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Chart"
-                          }
-                        },
-                        "board": {
-                          "$ref": "#/components/schemas/Board"
-                        }
+                    "charts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Chart"
                       }
+                    },
+                    "board": {
+                      "$ref": "#/components/schemas/Board"
                     }
                   }
                 },
@@ -2684,7 +2746,7 @@
                   }
                 },
                 "barChart": {
-                  "summary": "Daily active users \u2014 bar chart",
+                  "summary": "Daily active users — bar chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date",
@@ -2697,7 +2759,7 @@
                   }
                 },
                 "lineChart": {
-                  "summary": "DAU last 30 days \u2014 line chart",
+                  "summary": "DAU last 30 days — line chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS daily_active_users FROM events GROUP BY date ORDER BY date DESC LIMIT 30",
@@ -2710,7 +2772,7 @@
                   }
                 },
                 "pieChart": {
-                  "summary": "Sessions by device \u2014 pie chart",
+                  "summary": "Sessions by device — pie chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
@@ -2723,7 +2785,7 @@
                   }
                 },
                 "stackedChart": {
-                  "summary": "Sessions by device grouped by browser \u2014 stacked chart",
+                  "summary": "Sessions by device grouped by browser — stacked chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
@@ -2737,7 +2799,7 @@
                   }
                 },
                 "numberChart": {
-                  "summary": "Total connected wallets \u2014 number / KPI card",
+                  "summary": "Total connected wallets — number / KPI card",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
@@ -2746,7 +2808,7 @@
                   }
                 },
                 "tableChart": {
-                  "summary": "Recent events \u2014 table",
+                  "summary": "Recent events — table",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
@@ -2755,7 +2817,7 @@
                   }
                 },
                 "userPathsChart": {
-                  "summary": "User flow from connect \u2014 max 5 steps",
+                  "summary": "User flow from connect — max 5 steps",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
@@ -2796,12 +2858,12 @@
                   }
                 },
                 "retentionFiltered": {
-                  "summary": "Weekly retention \u2014 desktop users, transaction event",
+                  "summary": "Weekly retention — desktop users, transaction event",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "",
                     "chart_type": "retention",
-                    "title": "Weekly Retention \u2014 Desktop",
+                    "title": "Weekly Retention — Desktop",
                     "settings": {
                       "retentionFilter": {
                         "type": "event",
@@ -2836,16 +2898,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "string",
-                      "description": "Chart ID"
-                    }
-                  }
+                  "type": "string",
+                  "description": "Chart ID"
                 }
               }
             }
@@ -2885,15 +2939,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Chart"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Chart"
                 },
                 "example": {
                   "id": "cht_x1y2z3a4b5c6",
@@ -2957,16 +3003,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "string",
-                      "description": "Chart ID"
-                    }
-                  }
+                  "type": "string",
+                  "description": "Chart ID"
                 }
               }
             }
@@ -3021,29 +3059,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
+                    "contracts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Contract"
+                      }
                     },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "contracts": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Contract"
-                          }
-                        },
-                        "deployAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "nullable": true
-                        },
-                        "deployDiff": {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          }
-                        }
+                    "deployAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
+                    },
+                    "deployDiff": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
                       }
                     }
                   }
@@ -3244,15 +3274,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Contract"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Contract"
                 }
               }
             }
@@ -3333,15 +3355,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Contract"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Contract"
                 }
               }
             }
@@ -3379,15 +3393,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "null"
-                    }
-                  }
+                  "type": "null"
                 }
               }
             }
@@ -3409,17 +3415,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Segment"
-                      }
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Segment"
                   }
                 },
                 "example": {
@@ -3570,15 +3568,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Segment"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Segment"
                 }
               }
             }
@@ -3610,15 +3600,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "null"
-                    }
-                  }
+                  "type": "null"
                 }
               }
             }
@@ -3636,64 +3618,60 @@
         ],
         "responses": {
           "200": {
-            "description": "Profile search results",
+            "description": "Paginated wallet profile search results.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "data",
+                    "total",
+                    "page",
+                    "size",
+                    "has_more"
+                  ],
                   "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Profile"
-                          }
-                        },
-                        "meta": {
-                          "type": "object",
-                          "properties": {
-                            "total": {
-                              "type": "integer"
-                            },
-                            "limit": {
-                              "type": "integer"
-                            },
-                            "offset": {
-                              "type": "integer"
-                            }
-                          }
-                        }
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Profile"
                       }
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of profiles across all pages."
+                    },
+                    "page": {
+                      "type": "integer",
+                      "description": "1-indexed page number echoed from the request."
+                    },
+                    "size": {
+                      "type": "integer",
+                      "description": "Page size echoed from the request."
+                    },
+                    "has_more": {
+                      "type": "boolean",
+                      "description": "True if there is at least one more page after this one."
                     }
                   }
                 }
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "description": "Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "x-required-scope": "profiles:read",
@@ -3748,23 +3726,25 @@
             "description": "Sort direction"
           },
           {
-            "name": "limit",
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "1-indexed page number (default 1)."
+          },
+          {
+            "name": "size",
             "in": "query",
             "schema": {
               "type": "integer",
               "default": 100,
+              "minimum": 1,
               "maximum": 1000
             },
-            "description": "Max results (default 100, max 1000)"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 0
-            },
-            "description": "Pagination offset"
+            "description": "Page size (default 100, max 1000)."
           }
         ],
         "requestBody": {
@@ -3867,15 +3847,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Profile"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Profile"
                 },
                 "example": {
                   "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
@@ -4008,7 +3980,7 @@
                       "symbol": "USDC",
                       "img": "https://cdn.formo.so/tokens/usdc.png",
                       "decimals": 6,
-                      "price": 1.0,
+                      "price": 1,
                       "balance": "125804.520000",
                       "balance_usd": 125804.52
                     }
@@ -4551,42 +4523,41 @@
         },
         "responses": {
           "200": {
-            "description": "Query results",
+            "description": "Offset-paginated query results. The server doesn't own pagination here — `LIMIT` and `OFFSET` come from your SQL string and are echoed back. `total` is the row count before LIMIT was applied (Tinybird's `rows_before_limit_at_least`); `has_more` is true when there are additional rows beyond the current window.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "data",
+                    "total",
+                    "limit",
+                    "offset",
+                    "has_more"
+                  ],
                   "properties": {
-                    "isSuccess": {
-                      "type": "boolean"
-                    },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          }
-                        },
-                        "meta": {
-                          "type": "object",
-                          "properties": {
-                            "total": {
-                              "type": "integer",
-                              "description": "Total rows before LIMIT"
-                            },
-                            "limit": {
-                              "type": "integer",
-                              "description": "Applied LIMIT"
-                            },
-                            "offset": {
-                              "type": "integer",
-                              "description": "Applied OFFSET"
-                            }
-                          }
-                        }
-                      }
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Result rows."
+                    },
+                    "total": {
+                      "type": "integer",
+                      "description": "Total rows before LIMIT was applied."
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "description": "Applied LIMIT (parsed from your SQL; defaults to the server cap if absent)."
+                    },
+                    "offset": {
+                      "type": "integer",
+                      "description": "Applied OFFSET (parsed from your SQL; 0 if absent)."
+                    },
+                    "has_more": {
+                      "type": "boolean",
+                      "description": "True when `offset + data.length < total` — i.e. there's another page to fetch by re-running with a higher OFFSET."
                     }
                   }
                 },
@@ -4603,54 +4574,30 @@
                     {
                       "day": "2026-04-23",
                       "users": 1411
-                    },
-                    {
-                      "day": "2026-04-24",
-                      "users": 1290
-                    },
-                    {
-                      "day": "2026-04-25",
-                      "users": 1208
-                    },
-                    {
-                      "day": "2026-04-26",
-                      "users": 1467
-                    },
-                    {
-                      "day": "2026-04-27",
-                      "users": 1539
                     }
                   ],
-                  "meta": {
-                    "total": 7,
-                    "limit": 100,
-                    "offset": 0,
-                    "rows_read": 92840,
-                    "elapsed_seconds": 0.087
-                  }
+                  "total": 7,
+                  "limit": 100,
+                  "offset": 0,
+                  "has_more": false
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid SQL query",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "x-required-scope": "query:read"
@@ -4662,7 +4609,7 @@
         "summary": "Get KPIs (visitors, pageviews, bounce rate, session duration)",
         "description": "Time-series traffic KPIs with optional dimension breakdown. Returns visitors, pageviews, bounce rate and average session length.",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -4810,7 +4757,7 @@
         "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / Churned)",
         "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -4930,7 +4877,7 @@
         "operationId": "getAnalyticsRevenueOverview",
         "summary": "Get revenue and transaction volume time-series",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5005,19 +4952,19 @@
                       "date": "2025-10-15",
                       "project_id": "proj_abc",
                       "revenue": 1284.55,
-                      "volume": 412800.0
+                      "volume": 412800
                     },
                     {
                       "date": "2025-10-16",
                       "project_id": "proj_abc",
                       "revenue": 1567.2,
-                      "volume": 506100.0
+                      "volume": 506100
                     },
                     {
                       "date": "2025-10-17",
                       "project_id": "proj_abc",
                       "revenue": 1893.75,
-                      "volume": 612400.0
+                      "volume": 612400
                     }
                   ],
                   "rows": 3,
@@ -5054,7 +5001,7 @@
         "operationId": "getAnalyticsRevenueTimeseries",
         "summary": "Get revenue trend over time",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5115,7 +5062,7 @@
                       "referrer": "google.com",
                       "utm_source": "organic",
                       "revenue": 215.3,
-                      "volume": 68000.0
+                      "volume": 68000
                     },
                     {
                       "date": "2025-10-15",
@@ -5124,7 +5071,7 @@
                       "referrer": "",
                       "utm_source": "",
                       "revenue": 42.1,
-                      "volume": 12500.0
+                      "volume": 12500
                     },
                     {
                       "date": "2025-10-16",
@@ -5133,7 +5080,7 @@
                       "referrer": "twitter.com",
                       "utm_source": "twitter",
                       "revenue": 318.75,
-                      "volume": 102400.0
+                      "volume": 102400
                     }
                   ],
                   "rows": 3,
@@ -5170,7 +5117,7 @@
         "operationId": "getAnalyticsEventTimeseries",
         "summary": "Get event count time-series",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5263,7 +5210,7 @@
         "operationId": "getAnalyticsRetention",
         "summary": "Get user retention cohorts",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5403,7 +5350,7 @@
         "operationId": "getAnalyticsUserFrequency",
         "summary": "Get visit-frequency distribution",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5449,7 +5396,7 @@
                       "project_id": "proj_abc",
                       "session_bucket": "1 session",
                       "user_count": 412,
-                      "avg_session_per_user": 1.0
+                      "avg_session_per_user": 1
                     },
                     {
                       "project_id": "proj_abc",
@@ -5473,7 +5420,7 @@
                       "project_id": "proj_abc",
                       "session_bucket": "> 50 sessions",
                       "user_count": 5,
-                      "avg_session_per_user": 84.0
+                      "avg_session_per_user": 84
                     }
                   ],
                   "rows": 5,
@@ -5510,7 +5457,7 @@
         "operationId": "getAnalyticsTopPages",
         "summary": "Get top pages by visits or users",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5625,7 +5572,7 @@
         "operationId": "getAnalyticsTopSources",
         "summary": "Get top traffic sources (referrers / utm)",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5763,7 +5710,7 @@
         "operationId": "getAnalyticsTopLocations",
         "summary": "Get top countries / regions / cities",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5878,7 +5825,7 @@
         "operationId": "getAnalyticsTopWallets",
         "summary": "Get top wallet types",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5985,7 +5932,7 @@
         "operationId": "getAnalyticsTopChains",
         "summary": "Get top blockchain chains",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6092,7 +6039,7 @@
         "operationId": "getAnalyticsTopEvents",
         "summary": "Get top events by frequency",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6217,7 +6164,7 @@
         "operationId": "getAnalyticsRevenueByMetric",
         "summary": "Get revenue grouped by a chosen column",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6342,7 +6289,7 @@
         "operationId": "getAnalyticsVolumeByMetric",
         "summary": "Get transaction volume grouped by a chosen column",
         "tags": [
-          "Analytics"
+          "Query"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6420,17 +6367,17 @@
                     {
                       "project_id": "proj_abc",
                       "pathname": "app.example.com/trade",
-                      "sum_volume": 2812400.0
+                      "sum_volume": 2812400
                     },
                     {
                       "project_id": "proj_abc",
                       "pathname": "app.example.com/earn",
-                      "sum_volume": 612300.0
+                      "sum_volume": 612300
                     },
                     {
                       "project_id": "proj_abc",
                       "pathname": "app.example.com/swap",
-                      "sum_volume": 412800.0
+                      "sum_volume": 412800
                     }
                   ],
                   "rows": 3,
@@ -6743,11 +6690,7 @@
     },
     {
       "name": "Query",
-      "description": "Execute SQL analytics queries"
-    },
-    {
-      "name": "Analytics",
-      "description": "Pre-built analytics endpoints powering the Formo dashboard (KPIs, top pages, lifecycle, retention, revenue). Requires the query:read scope."
+      "description": "Execute SQL queries and call pre-built analytics endpoints (KPIs, top pages, lifecycle, retention, revenue). Requires the query:read scope."
     },
     {
       "name": "Events",

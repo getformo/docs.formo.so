@@ -81,16 +81,16 @@ Sort direction:
 - `desc` (default) - Descending order
 - `asc` - Ascending order
 
-### `limit`
+### `page`
 
-Maximum number of profiles to return per request.
+1-indexed page number to return.
+- Default: `1`
+
+### `size`
+
+Page size — number of profiles per page.
 - Default: `100`
 - Maximum: `1000`
-
-### `offset`
-
-Number of profiles to skip for pagination.
-- Default: `0`
 
 ## Request Body (Filters)
 
@@ -654,7 +654,7 @@ curl -sS -X GET \
 
 ## Response
 
-The response includes a `data` array of wallet profiles and a `meta` object with pagination information.
+The response is a [paginated envelope](/api/overview#pagination) of wallet profiles.
 
 ```json
 {
@@ -666,15 +666,13 @@ The response includes a `data` array of wallet profiles and a `meta` object with
       "tx_count": 1234,
       "first_onchain": "2024-01-15T10:30:00Z",
       "last_onchain": "2025-01-20T14:22:00Z",
-      "lifecycle": "Returning",
-      // ... other profile fields
+      "lifecycle": "Returning"
     }
   ],
-  "meta": {
-    "total": 150,
-    "limit": 100,
-    "offset": 0
-  }
+  "total": 150,
+  "page": 1,
+  "size": 100,
+  "has_more": true
 }
 ```
 
@@ -683,9 +681,10 @@ The response includes a `data` array of wallet profiles and a `meta` object with
 | Field | Type | Description |
 |-------|------|-------------|
 | `data` | array | Array of wallet profiles matching the search criteria |
-| `meta.total` | integer | Total number of profiles matching the criteria (before pagination) |
-| `meta.limit` | integer | Maximum number of profiles returned in this response |
-| `meta.offset` | integer | Number of profiles skipped (for pagination) |
+| `total` | integer | Total number of profiles matching the criteria across all pages |
+| `page` | integer | 1-indexed page number echoed from the request |
+| `size` | integer | Page size echoed from the request |
+| `has_more` | boolean | `true` if there are pages after the current one |
 
 ### Profile Fields
 
