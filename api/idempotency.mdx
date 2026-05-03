@@ -45,7 +45,7 @@ Also returned if the key exceeds 255 characters.
 
 ### `409 IDEMPOTENCY_IN_PROGRESS` — concurrent retry
 
-Two concurrent requests with the same key in flight return `409 IDEMPOTENCY_IN_PROGRESS`. Wait briefly (typically < 1 s) and replay — the server will return the cached response of the original request.
+Two concurrent requests with the same key in flight return `409 IDEMPOTENCY_IN_PROGRESS`. Wait briefly (typically under 1 second) and replay — the server will return the cached response of the original request.
 
 ### Redis outage
 

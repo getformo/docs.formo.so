@@ -14,7 +14,7 @@ Every non-2xx response from the Formo Public API uses the same envelope:
     "message": "Trigger filters must contain at least one entry",
     "doc_url": "https://docs.formo.so/api/errors#bad_request",
     "param": "body.trigger_filters",
-    "details": { }
+    "details": { "...": "..." }
   }
 }
 ```
@@ -92,7 +92,7 @@ The request conflicts with current resource state (e.g. creating a resource whos
 
 **HTTP:** `409`
 
-Another request with the same `Idempotency-Key` is currently in flight from this workspace. Wait for it to complete (typically <1 s) and replay your request — the server will return the cached response.
+Another request with the same `Idempotency-Key` is currently in flight from this workspace. Wait for it to complete (typically under 1 second) and replay your request — the server will return the cached response.
 
 ### `invalid_idempotency_key`
 
