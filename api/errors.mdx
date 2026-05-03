@@ -1,0 +1,131 @@
+---
+title: 'Errors'
+description: 'Stable error codes returned by the Formo Public API. Branch on error.code for reliable client behavior; doc_url in every response anchors back to this page.'
+icon: triangle-exclamation
+iconType: solid
+---
+
+Every non-2xx response from the Formo Public API uses the same envelope:
+
+```json
+{
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Trigger filters must contain at least one entry",
+    "doc_url": "https://docs.formo.so/api/errors#bad_request",
+    "param": "body.trigger_filters",
+    "details": { "...": "..." }
+  }
+}
+```
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `code` | string | Stable, machine-readable identifier. Branch on this. |
+| `message` | string | Human-readable description. Wording may change between releases — never branch on `message`. |
+| `doc_url` | string | Anchored link into this page. Agents can fetch it for context. |
+| `param` | string? | Dotted path to the offending field, when applicable (`body.trigger_filters.0.value`). |
+| `details` | object? | Code-specific extras. For `INVALID_VALIDATION_REQUEST` this is a `{ fieldPath: message }` map of every Zod failure. |
+
+The HTTP status code carries success/failure; **success bodies are never wrapped** — `GET /v0/alerts/alrt_…` returns the alert directly.
+
+## Handling errors well
+
+1. **Branch on `code`, not `message` or status alone.** Status families collide (most validation issues are `400 BAD_REQUEST`); the `code` enum disambiguates.
+2. **Follow `doc_url` for context.** AI agents can fetch the matching section of this page to learn how to fix the request without escalating to a human.
+3. **Retry only the safe codes.** `429 TOO_MANY_REQUESTS`, `503 SERVICE_UNAVAILABLE`, and `5xx INTERNAL_SERVER_ERROR` are retry-safe with exponential backoff. 4xx codes other than `429` indicate a client bug; retrying without changes will fail the same way.
+4. **Pair retries with `Idempotency-Key`** on POST/PUT/PATCH/DELETE so the server can de-dupe duplicates. See [Idempotency](/api/idempotency).
+
+## Reference
+
+### `bad_request`
+
+**HTTP:** `400`
+
+The request was syntactically valid but semantically wrong — a constraint that Zod can't express was violated (e.g. trying to delete a board that has charts, exceeding the per-project board limit). `message` describes the specific rule that failed; do not retry without changes.
+
+### `invalid_validation_request`
+
+**HTTP:** `400`
+
+A request field failed schema validation. `details` is a `{ fieldPath: message }` map of every failure across `body`, `query`, and `params`.
+
+```json
+{
+  "error": {
+    "code": "INVALID_VALIDATION_REQUEST",
+    "message": "Invalid request data",
+    "doc_url": "https://docs.formo.so/api/errors#invalid_validation_request",
+    "details": {
+      "body.name": "String must contain at least 1 character(s)",
+      "body.trigger_type": "Invalid enum value. Expected 'event' | 'user'"
+    }
+  }
+}
+```
+
+### `unauthorized`
+
+**HTTP:** `401`
+
+The API key is missing, malformed, or revoked. Check that the request includes `Authorization: Bearer formo_…` and that the key still exists in **Team Settings → API Keys**.
+
+### `forbidden`
+
+**HTTP:** `403`
+
+The API key is valid but lacks the required scope for this endpoint. The `message` names the missing scope (e.g. `API key missing required scope: alerts:write`). Issue a new key with the right scopes — scopes can't be added to an existing key.
+
+### `not_found`
+
+**HTTP:** `404`
+
+The resource does not exist or is not visible to this API key's workspace. Note that workspace isolation makes "exists in another workspace" indistinguishable from "doesn't exist" — both return `404`.
+
+### `conflict`
+
+**HTTP:** `409`
+
+The request conflicts with current resource state (e.g. creating a resource whose unique key already exists).
+
+### `idempotency_in_progress`
+
+**HTTP:** `409`
+
+Another request with the same `Idempotency-Key` is currently in flight from this workspace. Wait for it to complete (typically under 1 second) and replay your request — the server will return the cached response.
+
+### `invalid_idempotency_key`
+
+**HTTP:** `400`
+
+The `Idempotency-Key` header exceeded 255 characters, **or** the key was reused for a request whose method, path, or body differs from the original. Generate a fresh UUID v4 per logical operation. See [Idempotency](/api/idempotency).
+
+### `invalid_chain_id`
+
+**HTTP:** `400`
+
+The `chain` parameter is not a supported EVM chain ID. See [Supported Chains](/chains/overview) for the full list.
+
+### `too_many_requests`
+
+**HTTP:** `429`
+
+The per-workspace rate limit has been exceeded. Inspect the `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` response headers and back off until `RateLimit-Reset`. Use exponential backoff with jitter for retries.
+
+### `context_limit_exceeded`
+
+**HTTP:** `400`
+
+An AI request (chat / Ask AI) carried more tokens than the model can accept. Start a fresh conversation or trim the prompt.
+
+### `service_unavailable`
+
+**HTTP:** `503`
+
+A downstream service the endpoint depends on (Tinybird, AI provider, RPC) is offline or degraded. Retry with exponential backoff; the request itself is fine.
+
+### `internal_server_error`
+
+**HTTP:** `5xx`
+
+An unexpected error inside Formo. The error has been captured in our monitoring; retry with exponential backoff. If it persists, include the response timestamp when contacting support so we can correlate it to the captured exception.

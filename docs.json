@@ -139,7 +139,9 @@
             "group": "API Documentation",
             "pages": [
               "api/overview",
-              "api/authentication"
+              "api/authentication",
+              "api/idempotency",
+              "api/errors"
             ]
           },
           {

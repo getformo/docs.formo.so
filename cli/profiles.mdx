@@ -67,8 +67,8 @@ Requires `profiles:read` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--address` | `string` | ❌ | Filter by wallet address |
-| `--limit` | `number` | ❌ | Max results to return |
-| `--offset` | `number` | ❌ | Pagination offset |
+| `--page` | `number` | ❌ | Page number (1-indexed, default `1`) |
+| `--size` | `number` | ❌ | Page size (default `100`, max `1000`) |
 | `--orderBy` | `enum` | ❌ | Field to sort by (see values below) |
 | `--orderDir` | `enum` | ❌ | Sort direction: `asc` or `desc` |
 | `--expand` | `string` | ❌ | Comma-separated fields to expand |
@@ -95,25 +95,27 @@ Requires `profiles:read` scope on your API key.
 
 ```bash
 # List first 10 profiles
-formo profiles search --limit 10
+formo profiles search --size 10
 
 # Top 5 profiles by net worth
-formo profiles search --orderBy net_worth_usd --orderDir desc --limit 5
+formo profiles search --orderBy net_worth_usd --orderDir desc --size 5
+
+# Get the second page of 20 profiles
+formo profiles search --page 2 --size 20
 
 # Search with a filter condition
 formo profiles search \
   --conditions '[{"field":"net_worth_usd","op":"gt","value":10000}]' \
-  --limit 20
+  --size 20
 
 # Search profiles matching either condition (OR logic)
 formo profiles search \
   --conditions '[{"field":"net_worth_usd","op":"gt","value":10000},{"field":"tx_count","op":"gt","value":50}]' \
   --logic or \
-  --limit 20
-
-# Paginate through results
-formo profiles search --limit 50 --offset 100
+  --size 20
 ```
+
+The response is a paginated envelope: `{ data, total, page, size, has_more }`. Use `has_more` to know whether to fetch `--page <n+1>`.
 
 ### FilterCondition reference
 
