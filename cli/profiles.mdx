@@ -2,10 +2,10 @@
 title: "Profiles"
 sidebarTitle: "Profiles"
 icon: user
-description: "Look up individual wallet profiles and search your user base with filters, sorting, and pagination using the Formo CLI profiles commands."
+description: "Look up wallet profiles, search your user base, update identity properties, and manage labels using the Formo CLI profiles commands."
 ---
 
-The `formo profiles` command group lets you look up individual wallet profiles and search across your entire user base with filters, sorting, and pagination.
+The `formo profiles` command group lets you look up individual wallet profiles, search across your entire user base with filters and sorting, merge-update identity properties, and manage labels on a wallet.
 
 ## `formo profiles get`
 
@@ -148,3 +148,123 @@ The `--conditions` option accepts a JSON array of filter condition objects:
 | `nin` | Not in a set of values |
 
 By default, multiple conditions are combined with `AND` logic. Use `--logic or` to combine with `OR` logic instead.
+
+---
+
+## `formo profiles update`
+
+Merge-update identity properties on a wallet profile. Only the listed property keys are accepted; unknown keys are rejected server-side.
+
+<Note>
+Requires `profiles:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--properties` | `string` | ✅ | JSON object of properties to merge |
+
+### Allowed property keys
+
+`user_id`, `display_name`, `email`, `farcaster`, `discord`, `twitter`, `telegram`, `instagram`, `website`, `github`, `linkedin`, `facebook`, `tiktok`, `youtube`, `reddit`, `avatar`, `description`, `location`, `ens`, `lens`, `basenames`, `linea`
+
+### Examples
+
+```bash
+# Set display name and Twitter handle
+formo profiles update 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --properties '{"display_name":"Vitalik","twitter":"VitalikButerin"}'
+
+# Set just the email
+formo profiles update vitalik.eth \
+  --properties '{"email":"alice@example.com"}'
+```
+
+---
+
+## `formo profiles labels create`
+
+Upsert one or more labels on a wallet profile. Provide either a single label via `--tagId` or a batch via `--labels`.
+
+<Note>
+Requires `profiles:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--tagId` | `string` | ❌ | Label identifier (e.g. `vip`, `airdrop_eligible`). Required unless `--labels` is provided. |
+| `--value` | `string` | ❌ | Optional label value (e.g. tier name, country code) |
+| `--chainId` | `string` | ❌ | Optional chain identifier the label applies to |
+| `--labels` | `string` | ❌ | JSON array of `UserLabelInput` objects for batch upsert |
+
+### Examples
+
+```bash
+# Tag a wallet as VIP
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tagId vip
+
+# Apply a tiered label scoped to a chain
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --tagId tier --value gold --chainId 1
+
+# Apply multiple labels in one call
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --labels '[{"tag_id":"vip"},{"tag_id":"airdrop_eligible","chain_id":"1"}]'
+```
+
+### `UserLabelInput` shape
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `tag_id` | `string` | ✅ | Label identifier |
+| `value` | `string` | ❌ | Optional label value |
+| `chain_id` | `string` | ❌ | Optional chain identifier |
+
+---
+
+## `formo profiles labels delete`
+
+Delete a label from a wallet profile. Pass `--chainId` to scope the deletion to a chain-specific label.
+
+<Note>
+Requires `profiles:write` scope on your API key.
+</Note>
+
+### Arguments
+
+| Argument | Type | Required | Description |
+|----------|------|----------|-------------|
+| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--tagId` | `string` | ✅ | Label identifier to delete |
+| `--chainId` | `string` | ❌ | Optional chain identifier to scope the deletion |
+
+### Examples
+
+```bash
+# Remove the vip label
+formo profiles labels delete 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tagId vip
+
+# Remove a chain-scoped label
+formo profiles labels delete 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --tagId tier --chainId 1
+```
