@@ -1410,6 +1410,84 @@
           }
         }
       },
+      "UserLabel": {
+        "type": "object",
+        "description": "Canonical user-label resource. Echoed back from upsert calls so callers can cache the normalised entry without a follow-up read.",
+        "required": [
+          "address",
+          "tag_id",
+          "value",
+          "chain_id",
+          "source",
+          "timestamp"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Wallet address the label applies to"
+          },
+          "tag_id": {
+            "type": "string",
+            "description": "Label identifier (lowercased + trimmed on write)"
+          },
+          "value": {
+            "type": "string",
+            "description": "Label value, empty string when omitted"
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "Chain identifier, empty string when omitted"
+          },
+          "source": {
+            "type": "string",
+            "description": "Origin of the label (e.g. 'import')"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Server-assigned write timestamp"
+          }
+        }
+      },
+      "UpdateUserPropertiesResponse": {
+        "type": "object",
+        "description": "Echo of the wallet identity after the merge-update applied. Synthesised from the request payload (Tinybird ingestion is eventually consistent so we don't round-trip a read).",
+        "required": [
+          "address",
+          "updated_at"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": { "type": "string", "nullable": true },
+          "display_name": { "type": "string", "nullable": true },
+          "email": { "type": "string", "nullable": true },
+          "farcaster": { "type": "string", "nullable": true },
+          "discord": { "type": "string", "nullable": true },
+          "twitter": { "type": "string", "nullable": true },
+          "telegram": { "type": "string", "nullable": true },
+          "instagram": { "type": "string", "nullable": true },
+          "website": { "type": "string", "nullable": true },
+          "github": { "type": "string", "nullable": true },
+          "linkedin": { "type": "string", "nullable": true },
+          "facebook": { "type": "string", "nullable": true },
+          "tiktok": { "type": "string", "nullable": true },
+          "youtube": { "type": "string", "nullable": true },
+          "reddit": { "type": "string", "nullable": true },
+          "avatar": { "type": "string", "nullable": true },
+          "description": { "type": "string", "nullable": true },
+          "location": { "type": "string", "nullable": true },
+          "ens": { "type": "string", "nullable": true },
+          "lens": { "type": "string", "nullable": true },
+          "basenames": { "type": "string", "nullable": true },
+          "linea": { "type": "string", "nullable": true }
+        }
+      },
       "ProfileFilter": {
         "type": "object",
         "description": "Filter conditions for profile search",
@@ -1618,19 +1696,34 @@
     },
     "responses": {
       "BadRequest": {
-        "description": "The request was rejected — typically Zod validation failure. `code` is `INVALID_VALIDATION_REQUEST` and `details` contains a `{ fieldPath: message }` map.",
+        "description": "The request was rejected. `code` is either `INVALID_VALIDATION_REQUEST` (Zod schema mismatch — `details` carries a `{ fieldPath: message }` map) or `BAD_REQUEST` (semantic validation failure outside Zod, e.g. mismatched IDs, business-rule violations). Branch on `code`, not status, to tell the two apart.",
         "content": {
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Error"
             },
-            "example": {
-              "error": {
-                "code": "INVALID_VALIDATION_REQUEST",
-                "message": "Invalid request data",
-                "doc_url": "https://docs.formo.so/api/errors#invalid_validation_request",
-                "details": {
-                  "body.name": "String must contain at least 1 character(s)"
+            "examples": {
+              "validation": {
+                "summary": "Zod schema mismatch",
+                "value": {
+                  "error": {
+                    "code": "INVALID_VALIDATION_REQUEST",
+                    "message": "Invalid request data",
+                    "doc_url": "https://docs.formo.so/api/errors#invalid_validation_request",
+                    "details": {
+                      "body.name": "String must contain at least 1 character(s)"
+                    }
+                  }
+                }
+              },
+              "semantic": {
+                "summary": "Semantic validation failure",
+                "value": {
+                  "error": {
+                    "code": "BAD_REQUEST",
+                    "message": "Target board must be different from the current board",
+                    "doc_url": "https://docs.formo.so/api/errors#bad_request"
+                  }
                 }
               }
             }
@@ -4228,7 +4321,8 @@
               "type": "string"
             },
             "description": "Wallet address (EVM 0x... or Solana base58)"
-          }
+          },
+          { "$ref": "#/components/parameters/IdempotencyKey" }
         ],
         "requestBody": {
           "required": true,
@@ -4323,60 +4417,21 @@
         },
         "responses": {
           "200": {
-            "description": "Properties updated",
+            "description": "Properties updated. Returns the merged identity (the keys actually set, plus address + updated_at) so callers can cache without a follow-up read.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    }
-                  }
+                  "$ref": "#/components/schemas/UpdateUserPropertiesResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "Invalid request (bad address, empty body, or no allowed keys)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key lacks the required scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Project not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         },
         "x-required-scope": "profiles:write"
       }
@@ -4398,7 +4453,8 @@
               "type": "string"
             },
             "description": "Wallet address (EVM 0x... or Solana base58)"
-          }
+          },
+          { "$ref": "#/components/parameters/IdempotencyKey" }
         ],
         "requestBody": {
           "required": true,
@@ -4446,60 +4502,27 @@
         },
         "responses": {
           "200": {
-            "description": "Labels upserted",
+            "description": "Labels upserted. Single label in → bare `UserLabel`; array in → array of `UserLabel`. Echoes the normalised entries (lowercased tag_id, server timestamp).",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
+                  "oneOf": [
+                    { "$ref": "#/components/schemas/UserLabel" },
+                    {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/UserLabel" }
                     }
-                  }
+                  ]
                 }
               }
             }
           },
-          "400": {
-            "description": "Invalid request (bad address, missing tag_id, etc.)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key lacks the required scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Project not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         },
         "x-required-scope": "profiles:write"
       },
@@ -4519,7 +4542,8 @@
               "type": "string"
             },
             "description": "Wallet address (EVM 0x... or Solana base58)"
-          }
+          },
+          { "$ref": "#/components/parameters/IdempotencyKey" }
         ],
         "requestBody": {
           "required": true,
@@ -4553,61 +4577,15 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Label deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
+          "204": {
+            "description": "Label deleted. No body — the caller already knows the new state."
           },
-          "400": {
-            "description": "Invalid request (bad address or missing tag_id)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "API key lacks the required scope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Project not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         },
         "x-required-scope": "profiles:write"
       }

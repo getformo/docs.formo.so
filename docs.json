@@ -140,8 +140,8 @@
             "pages": [
               "api/overview",
               "api/authentication",
-              "api/errors",
-              "api/idempotency"
+              "api/idempotency",
+              "api/errors"
             ]
           },
           {
