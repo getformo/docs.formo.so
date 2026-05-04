@@ -1,7 +1,7 @@
 ---
 title: "Get Revenue Timeseries"
-description: "Daily revenue trend over the selected window."
+description: "Per-event revenue and volume trend for a single wallet."
 openapi: "GET /v0/revenue_timeseries"
 ---
 
-Daily revenue series. Use `revenue-overview` if you also need transaction volume in the same payload.
+Wallet-scoped: `address` is required. For project-wide revenue trends, use [`revenue-overview`](/api/query/revenue-overview) instead.

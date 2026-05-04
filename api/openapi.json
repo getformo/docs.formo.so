@@ -1451,7 +1451,7 @@
       },
       "UpdateUserPropertiesResponse": {
         "type": "object",
-        "description": "Echo of the wallet identity after the merge-update applied. Synthesised from the request payload (Tinybird ingestion is eventually consistent so we don't round-trip a read).",
+        "description": "Echo of the wallet identity after the merge-update applied. Synthesised from the request payload — analytics ingestion is eventually consistent, so the response reflects the applied write rather than a follow-up read.",
         "required": [
           "address",
           "updated_at"
@@ -1556,7 +1556,7 @@
       },
       "AnalyticsResponse": {
         "type": "object",
-        "description": "Raw Tinybird pipe response. The `data` array contains the analytics rows; the exact row shape depends on the endpoint.",
+        "description": "Analytics endpoint response. The `data` array contains the rows; the exact row shape depends on the endpoint. `meta` carries column type information for rendering, `rows` is the row count, and `statistics` holds query timing metadata.",
         "properties": {
           "data": {
             "type": "array",
@@ -1692,6 +1692,211 @@
           "maximum": 100000
         },
         "description": "Number of results to skip for pagination (default 0)"
+      },
+      "AnalyticsIncludePreviousPeriod": {
+        "name": "include_previous_period",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        },
+        "description": "When `true`, returns both current and previous period metrics for week-over-week comparison. The previous period is non-overlapping and equal in length to the current range."
+      },
+      "AnalyticsLifecycleFilter": {
+        "name": "lifecycle_filter",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "New",
+            "Returning",
+            "Power user",
+            "Resurrected",
+            "Churned"
+          ]
+        },
+        "description": "Restrict results to a single lifecycle stage."
+      },
+      "AnalyticsProfileFilters": {
+        "name": "profile_filters",
+        "in": "query",
+        "description": "JSON array filtering by wallet profile attributes (e.g. net worth, total tx count). Each entry is `{ field, op, value }`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/AnalyticsFilterCondition"
+              }
+            },
+            "example": [
+              {
+                "field": "net_worth_usd",
+                "op": "greater",
+                "value": "1000"
+              }
+            ]
+          }
+        }
+      },
+      "AnalyticsSocials": {
+        "name": "socials",
+        "in": "query",
+        "description": "JSON array of social platforms to filter users by. Users must have at least one of the listed identities (e.g. `ens`, `farcaster`, `lens`, `twitter`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": [
+              "ens",
+              "farcaster"
+            ]
+          }
+        }
+      },
+      "AnalyticsAppFilters": {
+        "name": "app_filters",
+        "in": "query",
+        "description": "JSON array of arrays describing DeFi app usage filters. Each entry is `[scope, chain_id, app_id, op, value]` where `scope` is `protocol` or `any`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "array"
+              }
+            },
+            "example": [
+              [
+                "protocol",
+                1,
+                "uniswap-v3",
+                "greater",
+                "0"
+              ]
+            ]
+          }
+        }
+      },
+      "AnalyticsTokenFilters": {
+        "name": "token_filters",
+        "in": "query",
+        "description": "JSON array of arrays describing token-holding filters. Each entry is `[scope, chain_id, app_id, token_address, op, value]` where `scope` is `protocol` or `any`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "array"
+              }
+            },
+            "example": [
+              [
+                "any",
+                1,
+                "",
+                "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                "greater",
+                "100"
+              ]
+            ]
+          }
+        }
+      },
+      "AnalyticsChainFilters": {
+        "name": "chain_filters",
+        "in": "query",
+        "description": "JSON array of arrays describing chain-activity filters. Each entry is `[chain_id, op, value]`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "array"
+              }
+            },
+            "example": [
+              [
+                1,
+                "greater",
+                "0"
+              ]
+            ]
+          }
+        }
+      },
+      "AnalyticsBehaviorFilters": {
+        "name": "behavior_filters",
+        "in": "query",
+        "description": "JSON array filtering users by event-based behavior with counts and date ranges. Each entry is `{ event, op, count, date_from?, date_to? }`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "example": [
+              {
+                "event": "swap",
+                "op": "greaterOrEqual",
+                "count": 3
+              }
+            ]
+          }
+        }
+      },
+      "AnalyticsChannelFilter": {
+        "name": "channel_filter",
+        "in": "query",
+        "description": "JSON object filtering users by acquisition channel. Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `import`, `api`, `web`, `mobile` (pipe-delimited for `in`/`notIn`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            },
+            "example": {
+              "op": "in",
+              "value": "web|mobile"
+            }
+          }
+        }
+      },
+      "AnalyticsLabelFilters": {
+        "name": "label_filters",
+        "in": "query",
+        "description": "JSON array of arrays for filtering users by wallet labels. Each entry is `[tag_id, chain_id, op, value]`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "array"
+              }
+            },
+            "example": [
+              [
+                "whale",
+                1,
+                "equals",
+                "true"
+              ]
+            ]
+          }
+        }
+      },
+      "AnalyticsExclude": {
+        "name": "exclude",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        },
+        "description": "Comma-separated list of event types to exclude from results (e.g. `identify,detect`).",
+        "example": "identify,detect"
       }
     },
     "responses": {
@@ -4688,7 +4893,7 @@
         },
         "responses": {
           "200": {
-            "description": "Offset-paginated query results. The server doesn't own pagination here — `LIMIT` and `OFFSET` come from your SQL string and are echoed back. `total` is the row count before LIMIT was applied (Tinybird's `rows_before_limit_at_least`); `has_more` is true when there are additional rows beyond the current window.",
+            "description": "Offset-paginated query results. The server doesn't own pagination here — `LIMIT` and `OFFSET` come from your SQL string and are echoed back. `total` is the row count before `LIMIT` was applied; `has_more` is true when there are additional rows beyond the current window.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4889,707 +5094,6 @@
                     "rows_read": 12340,
                     "bytes_read": 482310
                   }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v0/user_lifecycle": {
-      "get": {
-        "operationId": "getAnalyticsUserLifecycle",
-        "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / Churned)",
-        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
-        "tags": [
-          "Query"
-        ],
-        "x-required-scope": "query:read",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/AnalyticsDateFrom"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsDateTo"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsFilters"
-          },
-          {
-            "name": "lifecycle_filter",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "New",
-                "Returning",
-                "Power user",
-                "Resurrected",
-                "Churned"
-              ]
-            }
-          },
-          {
-            "name": "include_previous_period",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Return current and previous period for WoW comparison"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Lifecycle counts",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
-                },
-                "example": {
-                  "meta": [
-                    {
-                      "name": "project_id",
-                      "type": "String"
-                    },
-                    {
-                      "name": "user_type",
-                      "type": "String"
-                    },
-                    {
-                      "name": "user_count",
-                      "type": "UInt64"
-                    }
-                  ],
-                  "data": [
-                    {
-                      "project_id": "proj_abc",
-                      "user_type": "New",
-                      "user_count": 184
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "user_type": "Returning",
-                      "user_count": 76
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "user_type": "Power user",
-                      "user_count": 23
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "user_type": "Resurrected",
-                      "user_count": 11
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "user_type": "Churned",
-                      "user_count": 142
-                    }
-                  ],
-                  "rows": 5,
-                  "rows_before_limit_at_least": 5
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v0/revenue_overview": {
-      "get": {
-        "operationId": "getAnalyticsRevenueOverview",
-        "summary": "Get revenue and transaction volume time-series",
-        "tags": [
-          "Query"
-        ],
-        "x-required-scope": "query:read",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/AnalyticsDateFrom"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsDateTo"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsFilters"
-          },
-          {
-            "name": "group_by",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "rank_by",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "include_previous_period",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Return current and previous period for WoW comparison"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Revenue and volume time-series",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
-                },
-                "example": {
-                  "meta": [
-                    {
-                      "name": "date",
-                      "type": "Date"
-                    },
-                    {
-                      "name": "project_id",
-                      "type": "String"
-                    },
-                    {
-                      "name": "revenue",
-                      "type": "Float32"
-                    },
-                    {
-                      "name": "volume",
-                      "type": "Float32"
-                    }
-                  ],
-                  "data": [
-                    {
-                      "date": "2025-10-15",
-                      "project_id": "proj_abc",
-                      "revenue": 1284.55,
-                      "volume": 412800
-                    },
-                    {
-                      "date": "2025-10-16",
-                      "project_id": "proj_abc",
-                      "revenue": 1567.2,
-                      "volume": 506100
-                    },
-                    {
-                      "date": "2025-10-17",
-                      "project_id": "proj_abc",
-                      "revenue": 1893.75,
-                      "volume": 612400
-                    }
-                  ],
-                  "rows": 3,
-                  "rows_before_limit_at_least": 3
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v0/revenue_timeseries": {
-      "get": {
-        "operationId": "getAnalyticsRevenueTimeseries",
-        "summary": "Get revenue trend over time",
-        "tags": [
-          "Query"
-        ],
-        "x-required-scope": "query:read",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/AnalyticsDateFrom"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsDateTo"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsFilters"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Revenue time-series",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
-                },
-                "example": {
-                  "meta": [
-                    {
-                      "name": "date",
-                      "type": "Date"
-                    },
-                    {
-                      "name": "event",
-                      "type": "String"
-                    },
-                    {
-                      "name": "page_path",
-                      "type": "String"
-                    },
-                    {
-                      "name": "referrer",
-                      "type": "String"
-                    },
-                    {
-                      "name": "utm_source",
-                      "type": "String"
-                    },
-                    {
-                      "name": "revenue",
-                      "type": "Float32"
-                    },
-                    {
-                      "name": "volume",
-                      "type": "Float32"
-                    }
-                  ],
-                  "data": [
-                    {
-                      "date": "2025-10-15",
-                      "event": "swap",
-                      "page_path": "/trade",
-                      "referrer": "google.com",
-                      "utm_source": "organic",
-                      "revenue": 215.3,
-                      "volume": 68000
-                    },
-                    {
-                      "date": "2025-10-15",
-                      "event": "stake",
-                      "page_path": "/earn",
-                      "referrer": "",
-                      "utm_source": "",
-                      "revenue": 42.1,
-                      "volume": 12500
-                    },
-                    {
-                      "date": "2025-10-16",
-                      "event": "swap",
-                      "page_path": "/trade",
-                      "referrer": "twitter.com",
-                      "utm_source": "twitter",
-                      "revenue": 318.75,
-                      "volume": 102400
-                    }
-                  ],
-                  "rows": 3,
-                  "rows_before_limit_at_least": 3
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v0/event_timeseries": {
-      "get": {
-        "operationId": "getAnalyticsEventTimeseries",
-        "summary": "Get event count time-series",
-        "tags": [
-          "Query"
-        ],
-        "x-required-scope": "query:read",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/AnalyticsDateFrom"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsDateTo"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsFilters"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Event time-series",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
-                },
-                "example": {
-                  "meta": [
-                    {
-                      "name": "date",
-                      "type": "Date"
-                    },
-                    {
-                      "name": "event_key",
-                      "type": "String"
-                    },
-                    {
-                      "name": "count",
-                      "type": "UInt64"
-                    }
-                  ],
-                  "data": [
-                    {
-                      "date": "2025-10-15",
-                      "event_key": "page",
-                      "count": 1187
-                    },
-                    {
-                      "date": "2025-10-15",
-                      "event_key": "wallet_connect",
-                      "count": 124
-                    },
-                    {
-                      "date": "2025-10-15",
-                      "event_key": "swap",
-                      "count": 38
-                    },
-                    {
-                      "date": "2025-10-15",
-                      "event_key": "identify",
-                      "count": 412
-                    }
-                  ],
-                  "rows": 4,
-                  "rows_before_limit_at_least": 4
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v0/retention": {
-      "get": {
-        "operationId": "getAnalyticsRetention",
-        "summary": "Get user retention cohorts",
-        "tags": [
-          "Query"
-        ],
-        "x-required-scope": "query:read",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/AnalyticsDateFrom"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsDateTo"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsFilters"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Retention cohorts",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
-                },
-                "example": {
-                  "meta": [
-                    {
-                      "name": "metric",
-                      "type": "Tuple(project_id String, user_count UInt64, day7_retained UInt64, day30_retained UInt64, day90_retained UInt64, day7_retention_rate Float64, day30_retention_rate Float64, day90_retention_rate Float64)"
-                    },
-                    {
-                      "name": "user",
-                      "type": "Array(Tuple(project_id String, cohort_week Date, num_users UInt64, week_0 Float64, week_1 Float64, week_2 Float64, week_3 Float64, week_4 Float64, week_5 Float64, week_6 Float64, week_7 Float64, week_8 Float64, week_9 Float64, week_10 Float64, week_11 Float64, week_12 Float64))"
-                    }
-                  ],
-                  "data": [
-                    {
-                      "metric": [
-                        "proj_abc",
-                        1284,
-                        412,
-                        198,
-                        76,
-                        0.32,
-                        0.154,
-                        0.059
-                      ],
-                      "user": [
-                        [
-                          "proj_abc",
-                          "2025-07-28",
-                          142,
-                          100,
-                          48,
-                          32,
-                          22,
-                          18,
-                          14,
-                          12,
-                          11,
-                          9,
-                          8,
-                          7,
-                          6,
-                          null,
-                          null
-                        ],
-                        [
-                          "proj_abc",
-                          "2025-08-04",
-                          178,
-                          100,
-                          52,
-                          36,
-                          26,
-                          20,
-                          16,
-                          14,
-                          12,
-                          10,
-                          9,
-                          8,
-                          null,
-                          null,
-                          null
-                        ],
-                        [
-                          "proj_abc",
-                          "2025-08-11",
-                          165,
-                          100,
-                          50,
-                          34,
-                          24,
-                          19,
-                          15,
-                          13,
-                          11,
-                          null,
-                          null,
-                          null,
-                          null,
-                          null,
-                          null
-                        ]
-                      ]
-                    }
-                  ],
-                  "rows": 1,
-                  "rows_before_limit_at_least": 1
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient permissions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RestApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v0/user_frequency": {
-      "get": {
-        "operationId": "getAnalyticsUserFrequency",
-        "summary": "Get visit-frequency distribution",
-        "tags": [
-          "Query"
-        ],
-        "x-required-scope": "query:read",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/AnalyticsDateFrom"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsDateTo"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsFilters"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Visit frequency distribution",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
-                },
-                "example": {
-                  "meta": [
-                    {
-                      "name": "project_id",
-                      "type": "String"
-                    },
-                    {
-                      "name": "session_bucket",
-                      "type": "String"
-                    },
-                    {
-                      "name": "user_count",
-                      "type": "UInt64"
-                    },
-                    {
-                      "name": "avg_session_per_user",
-                      "type": "Float64"
-                    }
-                  ],
-                  "data": [
-                    {
-                      "project_id": "proj_abc",
-                      "session_bucket": "1 session",
-                      "user_count": 412,
-                      "avg_session_per_user": 1
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "session_bucket": "2 - 10 sessions",
-                      "user_count": 287,
-                      "avg_session_per_user": 4.6
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "session_bucket": "10 - 30 sessions",
-                      "user_count": 76,
-                      "avg_session_per_user": 16.2
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "session_bucket": "30 - 50 sessions",
-                      "user_count": 18,
-                      "avg_session_per_user": 38.4
-                    },
-                    {
-                      "project_id": "proj_abc",
-                      "session_bucket": "> 50 sessions",
-                      "user_count": 5,
-                      "avg_session_per_user": 84
-                    }
-                  ],
-                  "rows": 5,
-                  "rows_before_limit_at_least": 5
                 }
               }
             }
@@ -6547,6 +6051,833 @@
                   ],
                   "rows": 3,
                   "rows_before_limit_at_least": 8
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/revenue_overview": {
+      "get": {
+        "operationId": "getAnalyticsRevenueOverview",
+        "summary": "Get revenue and transaction volume time-series",
+        "tags": [
+          "Query"
+        ],
+        "x-required-scope": "query:read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AnalyticsDateFrom"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsDateTo"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "rank_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include_previous_period",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Return current and previous period for WoW comparison"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revenue and volume time-series",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                },
+                "example": {
+                  "meta": [
+                    {
+                      "name": "date",
+                      "type": "Date"
+                    },
+                    {
+                      "name": "project_id",
+                      "type": "String"
+                    },
+                    {
+                      "name": "revenue",
+                      "type": "Float32"
+                    },
+                    {
+                      "name": "volume",
+                      "type": "Float32"
+                    }
+                  ],
+                  "data": [
+                    {
+                      "date": "2025-10-15",
+                      "project_id": "proj_abc",
+                      "revenue": 1284.55,
+                      "volume": 412800
+                    },
+                    {
+                      "date": "2025-10-16",
+                      "project_id": "proj_abc",
+                      "revenue": 1567.2,
+                      "volume": 506100
+                    },
+                    {
+                      "date": "2025-10-17",
+                      "project_id": "proj_abc",
+                      "revenue": 1893.75,
+                      "volume": 612400
+                    }
+                  ],
+                  "rows": 3,
+                  "rows_before_limit_at_least": 3
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/revenue_timeseries": {
+      "get": {
+        "operationId": "getAnalyticsRevenueTimeseries",
+        "summary": "Get per-event revenue and volume trend for a single wallet",
+        "description": "Returns daily per-event revenue and volume rows for the given wallet `address`. Use this to power per-wallet trend charts and tooltips. For project-wide revenue trends use `/v0/revenue_overview` instead.",
+        "tags": [
+          "Query"
+        ],
+        "x-required-scope": "query:read",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address to scope the timeseries to. Required.",
+            "example": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsDateFrom"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsDateTo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-event revenue/volume time-series for the requested wallet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                },
+                "example": {
+                  "meta": [
+                    {
+                      "name": "date",
+                      "type": "Date"
+                    },
+                    {
+                      "name": "event",
+                      "type": "String"
+                    },
+                    {
+                      "name": "page_path",
+                      "type": "String"
+                    },
+                    {
+                      "name": "referrer",
+                      "type": "String"
+                    },
+                    {
+                      "name": "utm_source",
+                      "type": "String"
+                    },
+                    {
+                      "name": "revenue",
+                      "type": "Float32"
+                    },
+                    {
+                      "name": "volume",
+                      "type": "Float32"
+                    }
+                  ],
+                  "data": [
+                    {
+                      "date": "2025-10-15",
+                      "event": "swap",
+                      "page_path": "/trade",
+                      "referrer": "google.com",
+                      "utm_source": "organic",
+                      "revenue": 215.3,
+                      "volume": 68000
+                    },
+                    {
+                      "date": "2025-10-15",
+                      "event": "stake",
+                      "page_path": "/earn",
+                      "referrer": "",
+                      "utm_source": "",
+                      "revenue": 42.1,
+                      "volume": 12500
+                    },
+                    {
+                      "date": "2025-10-16",
+                      "event": "swap",
+                      "page_path": "/trade",
+                      "referrer": "twitter.com",
+                      "utm_source": "twitter",
+                      "revenue": 318.75,
+                      "volume": 102400
+                    }
+                  ],
+                  "rows": 3,
+                  "rows_before_limit_at_least": 3
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/event_timeseries": {
+      "get": {
+        "operationId": "getAnalyticsEventTimeseries",
+        "summary": "Get event count time-series",
+        "tags": [
+          "Query"
+        ],
+        "x-required-scope": "query:read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AnalyticsDateFrom"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsDateTo"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsExclude"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event time-series",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                },
+                "example": {
+                  "meta": [
+                    {
+                      "name": "date",
+                      "type": "Date"
+                    },
+                    {
+                      "name": "event_key",
+                      "type": "String"
+                    },
+                    {
+                      "name": "count",
+                      "type": "UInt64"
+                    }
+                  ],
+                  "data": [
+                    {
+                      "date": "2025-10-15",
+                      "event_key": "page",
+                      "count": 1187
+                    },
+                    {
+                      "date": "2025-10-15",
+                      "event_key": "wallet_connect",
+                      "count": 124
+                    },
+                    {
+                      "date": "2025-10-15",
+                      "event_key": "swap",
+                      "count": 38
+                    },
+                    {
+                      "date": "2025-10-15",
+                      "event_key": "identify",
+                      "count": 412
+                    }
+                  ],
+                  "rows": 4,
+                  "rows_before_limit_at_least": 4
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/user_lifecycle": {
+      "get": {
+        "operationId": "getAnalyticsUserLifecycle",
+        "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / Churned)",
+        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
+        "tags": [
+          "Query"
+        ],
+        "x-required-scope": "query:read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AnalyticsDateFrom"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsDateTo"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsLifecycleFilter"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsIncludePreviousPeriod"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsProfileFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsSocials"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsAppFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsTokenFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsChainFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsChannelFilter"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsLabelFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lifecycle counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                },
+                "example": {
+                  "meta": [
+                    {
+                      "name": "project_id",
+                      "type": "String"
+                    },
+                    {
+                      "name": "user_type",
+                      "type": "String"
+                    },
+                    {
+                      "name": "user_count",
+                      "type": "UInt64"
+                    }
+                  ],
+                  "data": [
+                    {
+                      "project_id": "proj_abc",
+                      "user_type": "New",
+                      "user_count": 184
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "user_type": "Returning",
+                      "user_count": 76
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "user_type": "Power user",
+                      "user_count": 23
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "user_type": "Resurrected",
+                      "user_count": 11
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "user_type": "Churned",
+                      "user_count": 142
+                    }
+                  ],
+                  "rows": 5,
+                  "rows_before_limit_at_least": 5
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/user_frequency": {
+      "get": {
+        "operationId": "getAnalyticsUserFrequency",
+        "summary": "Get visit-frequency distribution",
+        "tags": [
+          "Query"
+        ],
+        "x-required-scope": "query:read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AnalyticsDateFrom"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsDateTo"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsLifecycleFilter"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsIncludePreviousPeriod"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsProfileFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsSocials"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsAppFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsTokenFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsChainFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsChannelFilter"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsLabelFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Visit frequency distribution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                },
+                "example": {
+                  "meta": [
+                    {
+                      "name": "project_id",
+                      "type": "String"
+                    },
+                    {
+                      "name": "session_bucket",
+                      "type": "String"
+                    },
+                    {
+                      "name": "user_count",
+                      "type": "UInt64"
+                    },
+                    {
+                      "name": "avg_session_per_user",
+                      "type": "Float64"
+                    }
+                  ],
+                  "data": [
+                    {
+                      "project_id": "proj_abc",
+                      "session_bucket": "1 session",
+                      "user_count": 412,
+                      "avg_session_per_user": 1
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "session_bucket": "2 - 10 sessions",
+                      "user_count": 287,
+                      "avg_session_per_user": 4.6
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "session_bucket": "10 - 30 sessions",
+                      "user_count": 76,
+                      "avg_session_per_user": 16.2
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "session_bucket": "30 - 50 sessions",
+                      "user_count": 18,
+                      "avg_session_per_user": 38.4
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "session_bucket": "> 50 sessions",
+                      "user_count": 5,
+                      "avg_session_per_user": 84
+                    }
+                  ],
+                  "rows": 5,
+                  "rows_before_limit_at_least": 5
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v0/retention": {
+      "get": {
+        "operationId": "getAnalyticsRetention",
+        "summary": "Get user retention cohorts",
+        "tags": [
+          "Query"
+        ],
+        "x-required-scope": "query:read",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AnalyticsDateFrom"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsDateTo"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "name": "id_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "address",
+                "anonymous_id"
+              ],
+              "default": "address"
+            },
+            "description": "User identifier to cohort by. `address` (default) groups by wallet; `anonymous_id` groups by anonymous session ID."
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Restrict the cohort-defining event to a single type (e.g. `page`, `connect`, `track`, `transaction`).",
+            "example": "track"
+          },
+          {
+            "name": "event_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Restrict the cohort-defining event to a custom event name. Combine with `event_type=track`.",
+            "example": "swap"
+          },
+          {
+            "name": "min_users",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 0
+            },
+            "description": "Minimum cohort size to include (default 10). Ignored when `user_filters` is set — all weeks are returned regardless of size."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 12,
+              "minimum": 1,
+              "maximum": 52
+            },
+            "description": "Number of weekly cohorts to return (default 12). Also drives the default date range when `date_from`/`date_to` are omitted."
+          },
+          {
+            "name": "user_filters",
+            "in": "query",
+            "description": "JSON array filtering users by profile attributes (`device`, `browser`, `os`, `location`, `volume`, `revenue`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`). When set, all weekly cohorts are returned regardless of `min_users`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnalyticsFilterCondition"
+                  }
+                },
+                "example": [
+                  {
+                    "field": "device",
+                    "op": "equals",
+                    "value": "desktop"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retention cohorts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                },
+                "example": {
+                  "meta": [
+                    {
+                      "name": "metric",
+                      "type": "Tuple(project_id String, user_count UInt64, day7_retained UInt64, day30_retained UInt64, day90_retained UInt64, day7_retention_rate Float64, day30_retention_rate Float64, day90_retention_rate Float64)"
+                    },
+                    {
+                      "name": "user",
+                      "type": "Array(Tuple(project_id String, cohort_week Date, num_users UInt64, week_0 Float64, week_1 Float64, week_2 Float64, week_3 Float64, week_4 Float64, week_5 Float64, week_6 Float64, week_7 Float64, week_8 Float64, week_9 Float64, week_10 Float64, week_11 Float64, week_12 Float64))"
+                    }
+                  ],
+                  "data": [
+                    {
+                      "metric": [
+                        "proj_abc",
+                        1284,
+                        412,
+                        198,
+                        76,
+                        0.32,
+                        0.154,
+                        0.059
+                      ],
+                      "user": [
+                        [
+                          "proj_abc",
+                          "2025-07-28",
+                          142,
+                          100,
+                          48,
+                          32,
+                          22,
+                          18,
+                          14,
+                          12,
+                          11,
+                          9,
+                          8,
+                          7,
+                          6,
+                          null,
+                          null
+                        ],
+                        [
+                          "proj_abc",
+                          "2025-08-04",
+                          178,
+                          100,
+                          52,
+                          36,
+                          26,
+                          20,
+                          16,
+                          14,
+                          12,
+                          10,
+                          9,
+                          8,
+                          null,
+                          null,
+                          null
+                        ],
+                        [
+                          "proj_abc",
+                          "2025-08-11",
+                          165,
+                          100,
+                          50,
+                          34,
+                          24,
+                          19,
+                          15,
+                          13,
+                          11,
+                          null,
+                          null,
+                          null,
+                          null,
+                          null,
+                          null
+                        ]
+                      ]
+                    }
+                  ],
+                  "rows": 1,
+                  "rows_before_limit_at_least": 1
                 }
               }
             }
