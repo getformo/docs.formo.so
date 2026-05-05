@@ -5124,7 +5124,8 @@
     "/v0/top_pages": {
       "get": {
         "operationId": "getAnalyticsTopPages",
-        "summary": "Get top pages by visits or users",
+        "summary": "Get top pages by visits or users, optionally restricted to entry or exit pages",
+        "description": "Returns the most visited pages with traffic metrics. Pass `mode=entry` to restrict to the first page of each session (with `bounce_rate`) or `mode=exit` for the last page (with `exit_rate`). Default `mode=all` returns project-wide page metrics with identity-stitched user counts.",
         "tags": [
           "Query"
         ],
@@ -5144,6 +5145,20 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsOffset"
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "entry",
+                "exit"
+              ],
+              "default": "all"
+            },
+            "description": "Page-flow mode. `all` (default) returns project-wide page metrics with identity-stitched user counts (`visits`, `users`, `hits`). `entry` returns landing pages with `bounce_rate`. `exit` returns exit pages with `exit_rate`. Identity stitching is skipped in `entry`/`exit` modes since those metrics are session-scoped."
           }
         ],
         "responses": {
@@ -6425,9 +6440,9 @@
         }
       }
     },
-    "/v0/user_lifecycle": {
+    "/v0/lifecycle": {
       "get": {
-        "operationId": "getAnalyticsUserLifecycle",
+        "operationId": "getAnalyticsLifecycle",
         "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / Churned)",
         "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
         "tags": [
@@ -6554,9 +6569,9 @@
         }
       }
     },
-    "/v0/user_frequency": {
+    "/v0/frequency": {
       "get": {
-        "operationId": "getAnalyticsUserFrequency",
+        "operationId": "getAnalyticsFrequency",
         "summary": "Get visit-frequency distribution",
         "tags": [
           "Query"
