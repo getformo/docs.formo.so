@@ -39,7 +39,7 @@ cd ios && pod install
 ```
 
 <Note>
-Expo projects handle native linking automatically — no `pod install` needed.
+Expo projects handle native linking automatically - no `pod install` needed.
 </Note>
 
 ## Quick Start
@@ -77,7 +77,7 @@ import { mainnet } from 'wagmi/chains';
 
 const wagmiConfig = createConfig({
   chains: [mainnet],
-  // Required for React Native — MIPD uses browser APIs (window.addEventListener)
+  // Required for React Native - MIPD uses browser APIs (window.addEventListener)
   // that don't exist in the React Native environment
   multiInjectedProviderDiscovery: false,
   // ... your connectors and transports
@@ -109,7 +109,7 @@ function App() {
 
 ## Track screen views
 
-Use the [`screen()`](/data/events/page) method to track screen views — the mobile equivalent of page views:
+Use the [`screen()`](/data/events/page) method to track screen views - the mobile equivalent of page views:
 
 ```tsx
 import { useFormo } from '@formo/analytics-react-native';

@@ -61,7 +61,7 @@ Select whether the alert fires on **events** or **users**:
   <Tab title="Users">
     Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your criteria.
 
-    Each matching user is **notified once per 24 hours** — if the same user remains active and continues to match, they won't be re-sent until the dedup window expires.
+    Each matching user is **notified once per 24 hours** - if the same user remains active and continues to match, they won't be re-sent until the dedup window expires.
 
     Available user filters:
 
@@ -254,7 +254,7 @@ Each message includes:
 - A **header** with the alert name
 - A **user** link (clickable link to Formo profile)
 - **Event properties** (key-value pairs from the event, up to 10 properties)
-- **Metadata fields**: Country, Device, Browser, OS, Referrer, Referral, UTM Source, UTM Medium, UTM Campaign, UTM Term, UTM Content — only shown when non-empty
+- **Metadata fields**: Country, Device, Browser, OS, Referrer, Referral, UTM Source, UTM Medium, UTM Campaign, UTM Term, UTM Content - only shown when non-empty
 - A **timestamp** and **View User** button
 - Up to **25 events** per batch, with an overflow summary if more were found
 
@@ -332,7 +332,7 @@ The webhook payload uses the `alert.user.triggered` event type:
 | `created` | number | Unix timestamp (seconds) when the webhook was created |
 | `data` | array | Array of user profiles that matched your filters |
 
-**Each user in `data`** contains the full wallet profile. All fields from the profile are included — key properties:
+**Each user in `data`** contains the full wallet profile. All fields from the profile are included - key properties:
 
 **Wallet identity:**
 
@@ -488,16 +488,16 @@ For Slack incoming webhooks, Formo formats user profiles as a rich card layout:
 
 | Field | Source | Conditional |
 |-------|--------|-------------|
-| Lifecycle | `lifecycle` (e.g., New, Returning, Power user) | Yes — only shown when non-empty |
-| Net Worth | `net_worth_usd` (formatted as `$1,234`) | No — always shown |
-| First Seen | `first_seen` (formatted date) | No — always shown |
-| Location | `location` | Yes — only shown when non-empty |
-| Browser | `browser` | Yes — only shown when non-empty |
-| Device | `device` | Yes — only shown when non-empty |
-| OS | `os` | Yes — only shown when non-empty |
-| Referrer | `first_referrer` or `last_referrer` | Yes — only shown when non-empty |
-| Referral | `first_ref` or `last_ref` | Yes — only shown when non-empty |
-| UTM | `first_utm_*` or `last_utm_*` (comma-joined) | Yes — only shown when non-empty |
+| Lifecycle | `lifecycle` (e.g., New, Returning, Power user) | Yes - only shown when non-empty |
+| Net Worth | `net_worth_usd` (formatted as `$1,234`) | No - always shown |
+| First Seen | `first_seen` (formatted date) | No - always shown |
+| Location | `location` | Yes - only shown when non-empty |
+| Browser | `browser` | Yes - only shown when non-empty |
+| Device | `device` | Yes - only shown when non-empty |
+| OS | `os` | Yes - only shown when non-empty |
+| Referrer | `first_referrer` or `last_referrer` | Yes - only shown when non-empty |
+| Referral | `first_ref` or `last_ref` | Yes - only shown when non-empty |
+| UTM | `first_utm_*` or `last_utm_*` (comma-joined) | Yes - only shown when non-empty |
 
 **Sample Slack Block Kit payload:**
 

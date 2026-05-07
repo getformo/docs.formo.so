@@ -16,7 +16,7 @@ Formo’s data warehouse gives you direct SQL access to events, users, sessions,
 **Key details:**
 - **SQL dialect**: [ClickHouse SQL](https://clickhouse.com/docs/en/sql-reference) (not standard SQL)
 - **Default row limit**: 100 rows (add your own `LIMIT` clause to override)
-- **Project scoping**: All queries are automatically filtered to your project — you never need to add `WHERE project_id = ...`
+- **Project scoping**: All queries are automatically filtered to your project - you never need to add `WHERE project_id = ...`
 - **Aggregate tables**: Several tables use ClickHouse `AggregateFunction` types that require `-Merge` suffix functions (see [Working with Aggregate Tables](#working-with-aggregate-tables))
 
 Query data with the [Query API](/api/overview#query-api) and [Profiles API](/api/overview#profiles-api), explore with the [BI integration](/data/bi), export with [Data Sync](/data/data-sync), or write SQL directly in the [Explorer](/features/product-analytics/explore).
@@ -50,7 +50,7 @@ wallet_profiles_events (blockchain data)
 
 ### events
 
-The core event log. Contains all user interaction events — page views, custom events, wallet connects, and onchain contract events (`decoded_log`).
+The core event log. Contains all user interaction events - page views, custom events, wallet connects, and onchain contract events (`decoded_log`).
 
 **Use cases:** Event-level analysis, user journey tracking, custom event queries, debugging
 
@@ -250,9 +250,9 @@ Daily aggregated traffic source metrics and attribution data. Each row represent
 | `utm_campaign` | String | UTM campaign |
 | `utm_content` | String | UTM content |
 | `utm_term` | String | UTM term |
-| `visits` | AggregateFunction(uniq, String) | Unique sessions — use `uniqMerge(visits)` |
-| `users` | AggregateFunction(uniq, String) | Unique anonymous users — use `uniqMerge(users)` |
-| `hits` | AggregateFunction(count) | Page views — use `countMerge(hits)` |
+| `visits` | AggregateFunction(uniq, String) | Unique sessions - use `uniqMerge(visits)` |
+| `users` | AggregateFunction(uniq, String) | Unique anonymous users - use `uniqMerge(users)` |
+| `hits` | AggregateFunction(count) | Page views - use `countMerge(hits)` |
 
 ---
 
@@ -520,7 +520,7 @@ The **identities** table is the bridge between anonymous and identified users. I
 
 ## Functions
 
-Custom SQL functions that resolve at query time. Functions use the `{{ function_name(...) }}` syntax — the macro is expanded into a numeric literal before your query runs, so results can be used anywhere a number would be (`SELECT`, `WHERE`, arithmetic, etc.).
+Custom SQL functions that resolve at query time. Functions use the `{{ function_name(...) }}` syntax - the macro is expanded into a numeric literal before your query runs, so results can be used anywhere a number would be (`SELECT`, `WHERE`, arithmetic, etc.).
 
 **Rules:**
 - Maximum 10 function calls per query
@@ -537,9 +537,9 @@ Get token price by contract address and chain ID from Alchemy.
 **Signature:** `{{ alchemy.token_price('ADDRESS', CHAIN_ID, 'CURRENCY') }}`
 
 **Parameters:**
-- `ADDRESS` — EVM contract address (0x-prefixed, 42 characters)
-- `CHAIN_ID` — Numeric chain ID (e.g., `1` for Ethereum, `8453` for Base, `42161` for Arbitrum)
-- `CURRENCY` — One of `usd`, `eur`, `eth`, `btc`
+- `ADDRESS` - EVM contract address (0x-prefixed, 42 characters)
+- `CHAIN_ID` - Numeric chain ID (e.g., `1` for Ethereum, `8453` for Base, `42161` for Arbitrum)
+- `CURRENCY` - One of `usd`, `eur`, `eth`, `btc`
 
 **Example:**
 
@@ -549,7 +549,7 @@ SELECT
 FROM revenue
 ```
 
-See the [Alchemy Prices API — Get Token Prices by Address](https://www.alchemy.com/docs/data/prices-api/prices-api-endpoints/prices-api-endpoints/get-token-prices-by-address) reference.
+See the [Alchemy Prices API - Get Token Prices by Address](https://www.alchemy.com/docs/data/prices-api/prices-api-endpoints/prices-api-endpoints/get-token-prices-by-address) reference.
 
 #### `alchemy.token_price_by_symbol`
 
@@ -558,8 +558,8 @@ Get token price by symbol from Alchemy.
 **Signature:** `{{ alchemy.token_price_by_symbol('SYMBOL', 'CURRENCY') }}`
 
 **Parameters:**
-- `SYMBOL` — Token symbol (e.g., `ETH`, `BTC`, `SOL`)
-- `CURRENCY` — One of `usd`, `eur`, `eth`, `btc`
+- `SYMBOL` - Token symbol (e.g., `ETH`, `BTC`, `SOL`)
+- `CURRENCY` - One of `usd`, `eur`, `eth`, `btc`
 
 **Example:**
 
@@ -569,7 +569,7 @@ SELECT
 FROM revenue
 ```
 
-See the [Alchemy Prices API — Get Token Prices by Symbol](https://www.alchemy.com/docs/data/prices-api/prices-api-endpoints/prices-api-endpoints/get-token-prices-by-symbol) reference.
+See the [Alchemy Prices API - Get Token Prices by Symbol](https://www.alchemy.com/docs/data/prices-api/prices-api-endpoints/prices-api-endpoints/get-token-prices-by-symbol) reference.
 
 #### `pyth.token_price`
 
@@ -578,7 +578,7 @@ Get token price by pair name from Pyth.
 **Signature:** `{{ pyth.token_price('BASE/QUOTE') }}`
 
 **Parameters:**
-- `BASE/QUOTE` — Price pair (e.g., `ETH/USD`, `BTC/USD`, `SOL/USD`)
+- `BASE/QUOTE` - Price pair (e.g., `ETH/USD`, `BTC/USD`, `SOL/USD`)
 
 **Example:**
 
@@ -588,7 +588,7 @@ SELECT
 FROM revenue
 ```
 
-See the [Pyth Hermes API — Latest Price Updates](https://hermes.pyth.network/docs/#/rest/latest_price_updates) reference.
+See the [Pyth Hermes API - Latest Price Updates](https://hermes.pyth.network/docs/#/rest/latest_price_updates) reference.
 
 ---
 
@@ -641,7 +641,7 @@ Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`)
 1. **Always `GROUP BY` the primary key** when querying aggregate tables
 2. **Use `-Merge` suffix** for `AggregateFunction` columns (e.g., `argMaxMerge(last_utm_source)`)
 3. **Use standard functions** for `SimpleAggregateFunction` columns (e.g., `min(first_seen)`, `max(last_seen)`)
-4. **Never `SELECT *`** on aggregate tables — it returns binary aggregate states, not readable values
+4. **Never `SELECT *`** on aggregate tables - it returns binary aggregate states, not readable values
 
 ### Quick reference
 

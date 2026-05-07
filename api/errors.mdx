@@ -22,12 +22,12 @@ Every non-2xx response from the Formo Public API uses the same envelope:
 | Field | Type | Notes |
 | --- | --- | --- |
 | `code` | string | Stable, machine-readable identifier. Branch on this. |
-| `message` | string | Human-readable description. Wording may change between releases — never branch on `message`. |
+| `message` | string | Human-readable description. Wording may change between releases - never branch on `message`. |
 | `doc_url` | string | Anchored link into this page. Agents can fetch it for context. |
 | `param` | string? | Dotted path to the offending field, when applicable (`body.trigger_filters.0.value`). |
 | `details` | object? | Code-specific extras. For `INVALID_VALIDATION_REQUEST` this is a `{ fieldPath: message }` map of every Zod failure. |
 
-The HTTP status code carries success/failure; **success bodies are never wrapped** — `GET /v0/alerts/alrt_…` returns the alert directly.
+The HTTP status code carries success/failure; **success bodies are never wrapped** - `GET /v0/alerts/alrt_…` returns the alert directly.
 
 ## Handling errors well
 
@@ -42,7 +42,7 @@ The HTTP status code carries success/failure; **success bodies are never wrapped
 
 **HTTP:** `400`
 
-The request was syntactically valid but semantically wrong — a constraint that Zod can't express was violated (e.g. trying to delete a board that has charts, exceeding the per-project board limit). `message` describes the specific rule that failed; do not retry without changes.
+The request was syntactically valid but semantically wrong - a constraint that Zod can't express was violated (e.g. trying to delete a board that has charts, exceeding the per-project board limit). `message` describes the specific rule that failed; do not retry without changes.
 
 ### `invalid_validation_request`
 
@@ -74,13 +74,13 @@ The API key is missing, malformed, or revoked. Check that the request includes `
 
 **HTTP:** `403`
 
-The API key is valid but lacks the required scope for this endpoint. The `message` names the missing scope (e.g. `API key missing required scope: alerts:write`). Issue a new key with the right scopes — scopes can't be added to an existing key.
+The API key is valid but lacks the required scope for this endpoint. The `message` names the missing scope (e.g. `API key missing required scope: alerts:write`). Issue a new key with the right scopes - scopes can't be added to an existing key.
 
 ### `not_found`
 
 **HTTP:** `404`
 
-The resource does not exist or is not visible to this API key's workspace. Note that workspace isolation makes "exists in another workspace" indistinguishable from "doesn't exist" — both return `404`.
+The resource does not exist or is not visible to this API key's workspace. Note that workspace isolation makes "exists in another workspace" indistinguishable from "doesn't exist" - both return `404`.
 
 ### `conflict`
 
@@ -92,7 +92,7 @@ The request conflicts with current resource state (e.g. creating a resource whos
 
 **HTTP:** `409`
 
-Another request with the same `Idempotency-Key` is currently in flight from this workspace. Wait for it to complete (typically under 1 second) and replay your request — the server will return the cached response.
+Another request with the same `Idempotency-Key` is currently in flight from this workspace. Wait for it to complete (typically under 1 second) and replay your request - the server will return the cached response.
 
 ### `invalid_idempotency_key`
 

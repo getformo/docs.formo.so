@@ -1,0 +1,48 @@
+---
+title: "Get Funnel"
+description: "Multi-step conversion funnel with per-step user counts, conversion ratios, and median time-to-convert."
+openapi: "GET /v0/funnel"
+---
+
+Returns the same funnel data the dashboard renders on the Funnels page. For an ordered list of step specs, you get one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert.
+
+Use `funnel_type=closed` (default) for ordered, in-window conversions (the default that powers the dashboard) or `funnel_type=open` to count whoever fired step k regardless of order - open mode also returns a `dropped_off_users` column.
+
+Set `breakdown` to a dimension (`device`, `browser`, `os`, `location`, `referrer`, or any UTM column) to group each step by first-touch attribution; `breakdown_top_n` controls how many categories are kept before bucketing the rest as `Others`.
+
+## Defining steps
+
+The `steps` query parameter is a JSON-encoded array of 2–10 step specs. Each step is `{type, event, name, filters?: [...]}`:
+
+- **`type`** - event type (`event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`).
+- **`event`** - the event name to match.
+- **`name`** - a unique step id. Use `<event>::<index>` (e.g. `"connect::1"`) so the same event re-used at multiple steps can be told apart in the response.
+- **`filters`** - optional `[{operand, operator, value}]`.
+  - **Operators:**
+    - `equals`
+    - `notEquals`
+    - `in`
+    - `notIn`
+    - `gt`
+    - `lt`
+    - `gte`
+    - `lte`
+    - `startsWith`
+    - `endsWith`
+    - `includes`
+  - **`operand`** may target a standard event column or a JSON property on `properties`.
+
+## Example
+
+```bash
+curl -G "https://api.formo.so/v0/funnel" \
+  -H "Authorization: Bearer $FORMO_API_KEY" \
+  --data-urlencode "dateFrom=2026-04-01" \
+  --data-urlencode "dateTo=2026-04-30" \
+  --data-urlencode "window_seconds=86400" \
+  --data-urlencode 'steps=[
+    {"type":"event","event":"page","name":"page::0","filters":[]},
+    {"type":"track","event":"connect","name":"connect::1","filters":[]},
+    {"type":"track","event":"swap","name":"swap::2","filters":[{"operand":"chain","operator":"equals","value":"ethereum"}]}
+  ]'
+```

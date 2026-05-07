@@ -8,7 +8,7 @@ openapi: "POST /v0/boards/{boardId}/charts"
 
 Creates a new chart and attaches it to a board. Returns the new chart's ID on success.
 
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special — their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
+The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
 
 ---
 
@@ -131,7 +131,7 @@ Each step in the `steps` array has the following shape:
 
 | Field           | Type                  | Required | Description                                                                                                                                                                                                                                                               |
 | --------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | string                | Yes      | `event` — built-in events (page, connect, transaction); `track` — custom tracked events; `decoded_log` — decoded smart-contract events                                                                                                                                    |
+| `type`          | string                | Yes      | `event` - built-in events (page, connect, transaction); `track` - custom tracked events; `decoded_log` - decoded smart-contract events                                                                                                                                    |
 | `event`         | string                | Yes      | Event name (e.g. `page`, `connect`, `transaction`)                                                                                                                                                                                                                        |
 | `<propertyKey>` | `StepFilterCondition` | No       | One or more property filters. Any extra key on the step object is treated as a filter. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_*`) are filtered directly; all other keys are extracted from `properties` via `JSONExtractString` |
 
@@ -164,9 +164,9 @@ Each step in the `steps` array has the following shape:
 
 | Field              | Type                   | Default    | Description                                                                                                    |
 | ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
-| `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` — strict ordering, no events between steps; `open` — ordered but other events may occur between steps |
+| `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` - strict ordering, no events between steps; `open` - ordered but other events may occur between steps |
 | `conversionWindow` | `ConversionWindow`     | 1 day      | Max time from Step 1 for a user to complete all steps                                                          |
-| `breakdown`        | string                 | —          | Split each funnel bar by this dimension                                                                        |
+| `breakdown`        | string                 | -          | Split each funnel bar by this dimension                                                                        |
 
 #### `ConversionWindow`
 
@@ -293,12 +293,12 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 
 | Field              | Type                   | Default | Description                                                        |
 | ------------------ | ---------------------- | ------- | ------------------------------------------------------------------ |
-| `startStep`        | `FunnelStep`           | —       | **Required.** Event where the flow begins                          |
+| `startStep`        | `FunnelStep`           | -       | **Required.** Event where the flow begins                          |
 | `endStep`          | `FunnelStep` \| `null` | `null`  | Optional ending event. `null` = open-ended                         |
 | `maxSteps`         | integer (2–10)         | `3`     | Max steps to show in the flow. Values above 10 are clamped to 10   |
 | `nodesPerStep`     | integer (2–10)         | `5`     | Max unique event nodes per step. Values above 10 are clamped to 10 |
-| `conversionWindow` | `ConversionWindow`     | —       | Time window to group the flow                                      |
-| `filters`          | string                 | —       | JSON-encoded string of additional path filters                     |
+| `conversionWindow` | `ConversionWindow`     | -       | Time window to group the flow                                      |
+| `filters`          | string                 | -       | JSON-encoded string of additional path filters                     |
 
 ```json
 {
@@ -319,7 +319,7 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 
 ## Retention Charts
 
-Measures how often users return over time. The `query` field is not used — pass `""` or omit it.
+Measures how often users return over time. The `query` field is not used - pass `""` or omit it.
 
 ### `settings` for Retention Charts
 
@@ -341,7 +341,7 @@ Each `RetentionUserFilter`:
   "projectId": "proj_abc",
   "query": "",
   "chart_type": "retention",
-  "title": "Weekly Retention — Desktop Users",
+  "title": "Weekly Retention - Desktop Users",
   "settings": {
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
@@ -377,13 +377,13 @@ For all-user retention with no filters, omit `settings`:
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required              |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL |
 | `user_paths` | `settings.startStep` required; `query` must execute and return valid path data           |
-| `retention`  | No query validation — `query` is ignored                                                 |
+| `retention`  | No query validation - `query` is ignored                                                 |
 
 ---
 
 ## Response
 
-**`201 Created`** — returns the new chart's ID as a bare JSON string.
+**`201 Created`** - returns the new chart's ID as a bare JSON string.
 
 ```json
 "chart_1a2b3c4d"
@@ -391,7 +391,7 @@ For all-user retention with no filters, omit `settings`:
 
 Use the returned ID with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
 
-**`400 Bad Request`** — validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
+**`400 Bad Request`** - validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
 
 ```json
 {
@@ -407,7 +407,7 @@ Use the returned ID with the [Get Chart](/api/boards/get-chart), [Update Chart](
 
 Creates a new chart and attaches it to a board. Returns the new chart's ID on success.
 
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special — their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
+The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
 
 ---
 
@@ -530,7 +530,7 @@ Each step in the `steps` array has the following shape:
 
 | Field           | Type                  | Required | Description                                                                                                                                                                                                                                                               |
 | --------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | string                | Yes      | `event` — built-in events (page, connect, transaction); `track` — custom tracked events; `decoded_log` — decoded smart-contract events                                                                                                                                    |
+| `type`          | string                | Yes      | `event` - built-in events (page, connect, transaction); `track` - custom tracked events; `decoded_log` - decoded smart-contract events                                                                                                                                    |
 | `event`         | string                | Yes      | Event name (e.g. `page`, `connect`, `transaction`)                                                                                                                                                                                                                        |
 | `<propertyKey>` | `StepFilterCondition` | No       | One or more property filters. Any extra key on the step object is treated as a filter. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_*`) are filtered directly; all other keys are extracted from `properties` via `JSONExtractString` |
 
@@ -563,9 +563,9 @@ Each step in the `steps` array has the following shape:
 
 | Field              | Type                   | Default    | Description                                                                                                    |
 | ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
-| `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` — strict ordering, no events between steps; `open` — ordered but other events may occur between steps |
+| `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` - strict ordering, no events between steps; `open` - ordered but other events may occur between steps |
 | `conversionWindow` | `ConversionWindow`     | 1 day      | Max time from Step 1 for a user to complete all steps                                                          |
-| `breakdown`        | string                 | —          | Split each funnel bar by this dimension                                                                        |
+| `breakdown`        | string                 | -          | Split each funnel bar by this dimension                                                                        |
 
 #### `ConversionWindow`
 
@@ -692,12 +692,12 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 
 | Field              | Type                   | Default | Description                                                        |
 | ------------------ | ---------------------- | ------- | ------------------------------------------------------------------ |
-| `startStep`        | `FunnelStep`           | —       | **Required.** Event where the flow begins                          |
+| `startStep`        | `FunnelStep`           | -       | **Required.** Event where the flow begins                          |
 | `endStep`          | `FunnelStep` \| `null` | `null`  | Optional ending event. `null` = open-ended                         |
 | `maxSteps`         | integer (2–10)         | `3`     | Max steps to show in the flow. Values above 10 are clamped to 10   |
 | `nodesPerStep`     | integer (2–10)         | `5`     | Max unique event nodes per step. Values above 10 are clamped to 10 |
 | `conversionWindow` | `ConversionWindow`     | 2 weeks | Time window to group the flow                                      |
-| `filters`          | string                 | —       | JSON-encoded string of additional path filters                     |
+| `filters`          | string                 | -       | JSON-encoded string of additional path filters                     |
 
 ```json
 {
@@ -718,7 +718,7 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 
 ## Retention Charts
 
-Measures how often users return over time. The `query` field is not used — pass `""` or omit it.
+Measures how often users return over time. The `query` field is not used - pass `""` or omit it.
 
 ### `settings` for Retention Charts
 
@@ -740,7 +740,7 @@ Each `RetentionUserFilter`:
   "projectId": "proj_abc",
   "query": "",
   "chart_type": "retention",
-  "title": "Weekly Retention — Desktop Users",
+  "title": "Weekly Retention - Desktop Users",
   "settings": {
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
@@ -776,13 +776,13 @@ For all-user retention with no filters, omit `settings`:
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required                                                                            |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL                                                               |
 | `user_paths` | `settings.startStep` required; `query` must execute and return data in the expected user-path format (columns: user identifier, event name, timestamp) |
-| `retention`  | No query validation — `query` is ignored                                                                                                               |
+| `retention`  | No query validation - `query` is ignored                                                                                                               |
 
 ---
 
 ## Response
 
-**`201 Created`** — returns the new chart's ID as a bare JSON string.
+**`201 Created`** - returns the new chart's ID as a bare JSON string.
 
 ```json
 "chart_1a2b3c4d"
@@ -790,7 +790,7 @@ For all-user retention with no filters, omit `settings`:
 
 Use the returned ID with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
 
-**`400 Bad Request`** — validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
+**`400 Bad Request`** - validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
 
 ```json
 {

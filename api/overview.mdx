@@ -55,7 +55,7 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 
 ## Response shape
 
-Successful responses return the **resource directly** — there is no envelope, no `isSuccess` discriminator. HTTP status alone (`200/201/204` vs `4xx/5xx`) carries success.
+Successful responses return the **resource directly** - there is no envelope, no `isSuccess` discriminator. HTTP status alone (`200/201/204` vs `4xx/5xx`) carries success.
 
 ```json
 {
@@ -68,7 +68,7 @@ Successful responses return the **resource directly** — there is no envelope, 
 }
 ```
 
-`DELETE` returns `204 No Content` with an empty body — don't try to parse JSON on those.
+`DELETE` returns `204 No Content` with an empty body - don't try to parse JSON on those.
 
 ### Pagination
 
@@ -128,7 +128,7 @@ See [Errors](/api/errors) for the full list of codes.
 
 ## Versioning
 
-The public API is mounted under `/v0/`. We treat the path version as a major version; we will add `/v1/` (rather than break `/v0/`) for incompatible changes. While under `/v0/` the contract is settling — breaking changes can land before `/v1/` ships, and we will announce them in the changelog.
+The public API is mounted under `/v0/`. We treat the path version as a major version; we will add `/v1/` (rather than break `/v0/`) for incompatible changes. While under `/v0/` the contract is settling - breaking changes can land before `/v1/` ships, and we will announce them in the changelog.
 
 Within a version we may add new endpoints, new optional request fields, new response fields (clients should ignore unknown fields), and new error codes within an existing HTTP status family. We will not remove or rename existing endpoints/fields, change the HTTP status of an existing error condition, or repurpose an existing `code` value.
 

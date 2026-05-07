@@ -177,7 +177,9 @@
               "api/query/event-timeseries",
               "api/query/user-lifecycle",
               "api/query/user-frequency",
-              "api/query/retention"
+              "api/query/retention",
+              "api/query/funnel",
+              "api/query/flow"
             ]
           },
           {

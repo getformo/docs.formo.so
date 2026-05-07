@@ -1,0 +1,37 @@
+---
+title: "Get Flow"
+description: "Session-scoped user-flow transitions for Sankey-style charts."
+openapi: "GET /v0/flow"
+---
+
+Returns the same Sankey transitions the dashboard renders on the Flows chart. For each session that fires the start step inside `[dateFrom, dateTo]`, the pipe rebuilds the ordered sequence of subsequent events within the conversion window, normalises them into flow-node labels, and emits one row per `(step, source, target)` transition with counts and per-step percentages.
+
+When `end_step` is set, only sessions that reached the end event within the conversion window are kept (converter-only mode), and the matched event is suffixed with `__END_MATCH__`.
+
+## Defining start and end steps
+
+Both `start_step` and `end_step` are JSON-encoded objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`:
+
+- **`type`** - event type (`event`, `track`, `transaction`, `signature`, `decoded_log`).
+- **`event`** - the event name.
+- **`resolved_event`** - the value matched against the events table. Use the sentinel `"__ALL_PAGE_VIEWS__"` to match any page view, or the page path / event name otherwise.
+- **`filters`** - optional `[{operand, operator, value, values?}]`. Use `values` for the `in` / `notIn` operators.
+
+Pass `global_filters` as a JSON-encoded array to apply additional `{operand, operator, value, values?}` constraints to both the start-session scan and the relevant-events scan.
+
+## Conversion window and depth
+
+`window_seconds` (default `1209600`, i.e. 14 days) bounds how long after the start event the path is allowed to extend. `max_steps` (default `4`, clamped to `2..10`) caps the Sankey depth.
+
+## Example
+
+```bash
+curl -G "https://api.formo.so/v0/flow" \
+  -H "Authorization: Bearer $FORMO_API_KEY" \
+  --data-urlencode "dateFrom=2026-04-01" \
+  --data-urlencode "dateTo=2026-04-30" \
+  --data-urlencode "window_seconds=1209600" \
+  --data-urlencode "max_steps=4" \
+  --data-urlencode 'start_step={"type":"event","event":"page","resolved_event":"__ALL_PAGE_VIEWS__","filters":[]}' \
+  --data-urlencode 'end_step={"type":"track","event":"swap","resolved_event":"swap","filters":[]}'
+```
