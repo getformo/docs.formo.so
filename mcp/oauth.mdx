@@ -1,0 +1,193 @@
+---
+title: 'MCP OAuth'
+sidebarTitle: 'OAuth'
+icon: key
+description: 'Connect OAuth-capable MCP clients to Formo.'
+---
+
+## Overview
+
+Formo supports OAuth for remote MCP clients that can discover and complete an OAuth authorization flow.
+
+<Frame>
+  <img src="/images/mcp-oauth-claude.png" alt="Formo OAuth consent page for MCP clients" />
+</Frame>
+
+The MCP endpoint does not change:
+
+```text
+https://api.formo.so/v0/mcp/
+```
+
+<Note>
+  Always configure the MCP endpoint as `/v0/mcp/` with the trailing slash. Do not use `https://api.formo.so/` as the MCP server URL.
+</Note>
+
+## When to use OAuth
+
+Use OAuth when the MCP client manages authentication for users. The setup examples below cover common hosted web clients.
+
+## Setup
+
+Select your web client below to configure Formo with OAuth authentication.
+
+<Tabs>
+  <Tab title="Claude.ai">
+    1. Open **Customize** → **Connectors**
+    2. Add a custom connector
+    3. Enter the connector details:
+
+       **Name**
+
+       ```text
+       Formo
+       ```
+
+       **Server URL**
+
+       ```text
+       https://api.formo.so/v0/mcp/
+       ```
+
+    <Frame>
+      <img src="/images/claude-web-connecters-add.png" alt="Add Formo as a custom connector in Claude.ai" />
+    </Frame>
+
+    4. Click **Add**
+    5. On the Formo confirmation page, select the project Claude.ai should access
+    6. Click **Allow access**
+    7. Return to Claude.ai and confirm Formo appears with the available tools
+
+    <Frame>
+      <img src="/images/claude-web-connectors-config-.png" alt="Formo connector configuration in Claude.ai" />
+    </Frame>
+
+    <Note>
+      Claude.ai stores and refreshes the OAuth connection for the signed-in user. In managed workspaces, an owner or admin may need to add the remote MCP server before members can connect it individually.
+    </Note>
+  </Tab>
+  <Tab title="ChatGPT">
+    1. Open ChatGPT settings
+    2. Go to **Apps**
+    3. Click **Advanced settings**
+    4. Enable **Developer mode**
+
+    <Frame>
+      <img src="/images/chatgpt-developer-mode.png" alt="Enable Developer mode in ChatGPT app settings" />
+    </Frame>
+
+    5. Go back to Apps
+    6. Click **Create app**
+    7. Enter the app details:
+
+       **Name**
+
+       ```text
+       Formo
+       ```
+
+       **MCP server URL**
+
+       ```text
+       https://api.formo.so/v0/mcp/
+       ```
+
+       - **Description:** optional
+       - **Authentication:** OAuth
+
+    <Frame>
+      <img src="/images/chatgpt-apps-add.png" alt="Create a Formo MCP app in ChatGPT" />
+    </Frame>
+
+    8. Click **Create**
+    9. Sign in to Formo, select a project, and approve access
+    10. Start asking ChatGPT questions about your Formo analytics
+
+    <Note>
+      ChatGPT Developer mode is a beta feature. ChatGPT apps created in Developer mode also cannot use memory.
+    </Note>
+
+    Formo can be configured as a data-only MCP app; no extra app UI is required to query analytics.
+  </Tab>
+  <Tab title="Other clients">
+    1. Open your MCP client's connector or app settings
+    2. Add a remote MCP server
+    3. Enter the Formo MCP server URL:
+
+    ```text
+    https://api.formo.so/v0/mcp/
+    ```
+
+    4. Choose OAuth if the client asks for an authentication method
+    5. Save or connect the server
+    6. Sign in to Formo, select a project, and approve access
+
+    If the client asks for scopes, request only `mcp:read` and `offline_access`.
+  </Tab>
+</Tabs>
+
+<Card title="Example queries" icon="message-question" href="/mcp/overview#example-queries">
+  Try prompts you can ask once Formo is connected.
+</Card>
+
+## Scopes
+
+Formo MCP OAuth supports only these scopes:
+
+| Scope | Description |
+|:------|:------------|
+| `mcp:read` | Read-only MCP access to the selected Formo project |
+| `offline_access` | Allows the MCP client to refresh access without asking the user to sign in again |
+
+Formo does not expose `mcp:tools` or `mcp:resources` scopes. Tool permission decisions are handled by the MCP client.
+
+OAuth access is bound to the project selected on the Formo consent page. The MCP server validates that the user still has access to that project before serving requests.
+
+## Advanced details
+
+Most OAuth-capable MCP clients discover Formo's OAuth configuration automatically from the MCP server URL:
+
+```text
+https://api.formo.so/v0/mcp/
+```
+
+Unauthenticated requests return a `401` with a `WWW-Authenticate` challenge that points clients to Formo's protected resource metadata. Access tokens expire after 1 hour; clients that request `offline_access` can refresh access without asking the user to sign in again.
+
+<Accordion title="OAuth metadata URLs">
+  | Metadata | URL |
+  |:---------|:----|
+  | Protected resource metadata | `https://api.formo.so/.well-known/oauth-protected-resource/v0/mcp` |
+  | Authorization server metadata | `https://api.formo.so/v0/mcp/oauth/.well-known/oauth-authorization-server` |
+  | OpenID configuration | `https://api.formo.so/v0/mcp/oauth/.well-known/openid-configuration` |
+</Accordion>
+
+## API key compatibility
+
+OAuth and API key authentication both use the same MCP endpoint:
+
+```text
+https://api.formo.so/v0/mcp/
+```
+
+The backend accepts either:
+
+- `Authorization: Bearer <oauth_access_token>`
+- `Authorization: Bearer <workspace_api_key>`
+
+Workspace API keys must include the MCP scope. Existing Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and `mcp-remote` configurations do not need to change. For setup instructions, see [MCP API Key](/mcp/api-key).
+
+Use a Workspace API Key when your MCP client supports custom request headers and you want to manage credentials yourself, such as local developer tools, CLI bridges, and editor integrations.
+
+## Troubleshooting
+
+**Client does not start OAuth:** Confirm the MCP server URL is exactly `https://api.formo.so/v0/mcp/` and includes the trailing slash.
+
+**Invalid scope:** Request only `mcp:read` and, when refresh is needed, `offline_access`.
+
+**Consent page asks you to sign in again:** Sign in to Formo and you will be returned to the same OAuth authorization flow.
+
+**No projects are available:** The signed-in Formo account must belong to at least one team with a project.
+
+**Project access denied after connecting:** Reconnect and choose a project that your Formo user can still access.
+
+**API key stopped working:** OAuth does not replace API keys. Check that the key has MCP scope, has not been revoked, and is sent as `Authorization: Bearer <workspace_api_key>`.

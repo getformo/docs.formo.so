@@ -7,7 +7,7 @@ description: 'Connect AI agents, coding tools, and custom workflows to Formo wit
 
 ## Overview
 
-The Formo MCP Server enables AI tools like Cursor, Claude Desktop, Claude Code, and others to query your analytics data directly. Ask questions about your users, events, and metrics in natural language.
+The Formo MCP Server enables AI tools, OAuth-capable clients, editor integrations, and custom workflows to query your analytics data directly. Ask questions about your users, events, and metrics in natural language.
 
 The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open standard that allows AI assistants to connect to external data sources and tools. With Formo's MCP server, you can ask:
 
@@ -18,179 +18,25 @@ The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open 
 
 ## Getting started
 
-**Supported clients:** Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any client that supports HTTP or stdio MCP transports.
+**Supported clients:** OAuth-capable MCP clients, Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any client that supports HTTP or stdio MCP transports.
 
-#### Prerequisites
+Formo supports two authentication methods for MCP:
 
-Before setting up the MCP server, you need:
+- **OAuth** for clients that manage user sign-in. Users sign in to Formo, select a project on the consent page, and approve read-only MCP access.
+- **Workspace API keys** for clients that let you configure an `Authorization` header manually.
 
-1. A **Workspace API Key** with MCP scope
-2. An MCP-compatible AI client
+<Note>
+  The MCP server URL is always `https://api.formo.so/v0/mcp/`. Keep the trailing slash and do not use the API root URL.
+</Note>
 
-To create an API key:
-
-1. Go to your [Formo workspace settings](https://app.formo.so)
-2. Navigate to **Settings** → **API Keys**
-3. Click **Create API Key**
-4. Enable the **MCP** scope
-5. Copy the generated key
-
-#### Setup
-
-Select your client below to configure the MCP server.
-
-<Tabs>
-  <Tab title="Claude Desktop">
-    1. On Claude Desktop, go to Settings > Developer > Edit Config
-    2. This will open the Claude Desktop config file:
-       - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-       - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-    3. Add the following configuration:
-
-    ```json
-    {
-      "mcpServers": {
-        "formo": {
-          "command": "npx",
-          "args": [
-            "mcp-remote",
-            "https://api.formo.so/v0/mcp/",
-            "--header",
-            "Authorization: Bearer YOUR_API_KEY"
-          ]
-        }
-      }
-    }
-    ```
-
-    4. Restart Claude Desktop for the changes to take effect
-    5. Upon successful restart, click the + icon on a new chat screen to enable Formo.
-
-    <Frame>
-      <img src="/images/claude-connectors-enable.png" alt="Enable Formo" />
-    </Frame>
-
-    6. You can go to the Connectors settings to configure the Formo connector permissions to Always Allow.
-
-    <Frame>
-      <img src="/images/claude-connectors-config.png" alt="Formo Connector Settings" />
-    </Frame>
-  </Tab>
-    <Tab title="Cursor">
-    1. Press `Cmd+,` (macOS) or `Ctrl+,` (Windows/Linux) to open Settings
-    2. Find the "MCP" section in the settings sidebar
-    3. Click "Add new MCP server" and configure:
-       - **Name:** `formo`
-       - **Type:** `sse`
-       - **URL:** `https://api.formo.so/v0/mcp/`
-       - **Headers:** `Authorization: Bearer YOUR_API_KEY`
-
-    Alternatively, add to `.cursor/mcp.json` in your project:
-
-    ```json
-    {
-      "mcpServers": {
-        "formo": {
-          "url": "https://api.formo.so/v0/mcp/",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="Claude Code">
-    Run the following command:
-
-    ```bash
-    claude mcp add --scope user --transport http formo https://api.formo.so/v0/mcp/ --header "Authorization: Bearer YOUR_API_KEY"
-    ```
-
-    This registers the Formo MCP server globally for your user. To scope it to a specific project, use `--scope project` instead.
-  </Tab>
-  <Tab title="Windsurf">
-    1. Open Windsurf Settings and navigate to the MCP section, or edit `~/.codeium/windsurf/mcp_config.json` directly
-    2. Add the following configuration:
-
-    ```json
-    {
-      "mcpServers": {
-        "formo": {
-          "serverUrl": "https://api.formo.so/v0/mcp/",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
-
-    3. Restart Windsurf for the changes to take effect
-  </Tab>
-  <Tab title="VS Code">
-    Add the following to your `.vscode/mcp.json` in your project:
-
-    ```json
-    {
-      "servers": {
-        "formo": {
-          "type": "http",
-          "url": "https://api.formo.so/v0/mcp/",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="Codex">
-    Add the following to `~/.codex/config.toml`:
-
-    ```toml
-    [mcp_servers.formo]
-    url = "https://api.formo.so/v0/mcp/"
-    http_headers = { "Authorization" = "Bearer YOUR_API_KEY" }
-    ```
-  </Tab>
-  <Tab title="mcp-remote / CLI">
-    For clients that only support stdio-based MCP servers, use the `mcp-remote` bridge to connect to Formo's HTTP-based server.
-
-    1. Ensure Node.js is installed: `node --version`
-    2. Run the following command:
-
-    ```bash
-    npx mcp-remote https://api.formo.so/v0/mcp/ --header "Authorization: Bearer YOUR_API_KEY"
-    ```
-
-    You can use this with any MCP client that supports stdio transports by configuring it as follows:
-
-    ```json
-    {
-      "mcpServers": {
-        "formo": {
-          "command": "npx",
-          "args": [
-            "mcp-remote",
-            "https://api.formo.so/v0/mcp/",
-            "--header",
-            "Authorization: Bearer YOUR_API_KEY"
-          ]
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="Other Clients">
-    Most MCP clients support HTTP transport with custom headers. Configure your client with:
-
-    - **Server URL:** `https://api.formo.so/v0/mcp/`
-    - **Header:** `Authorization: Bearer YOUR_API_KEY`
-
-    If your client only supports stdio transport, use the `mcp-remote` bridge (see the **mcp-remote / CLI** tab).
-  </Tab>
-</Tabs>
+<CardGroup cols={2}>
+  <Card title="OAuth setup" icon="key" href="/mcp/oauth">
+    Connect OAuth-capable MCP clients to Formo.
+  </Card>
+  <Card title="API key setup" icon="brackets-curly" href="/mcp/api-key">
+    Configure local clients, editors, and CLI bridges with a Workspace API Key.
+  </Card>
+</CardGroup>
 
 ## Example queries
 
@@ -239,24 +85,27 @@ For user analytics (retention, lifecycle, user profiles), use `text_to_sql` + `e
 
 <AccordionGroup>
   <Accordion title="Which AI tools support the Formo MCP Server?">
-    The Formo MCP Server works with Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any AI client that supports HTTP or stdio MCP transports. See the setup tabs above for configuration instructions for each client.
+    The Formo MCP Server works with OAuth-capable MCP clients, Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any AI client that supports HTTP or stdio MCP transports. See the OAuth and API key setup pages above for configuration instructions.
   </Accordion>
   <Accordion title="What analytics data can I query through the MCP Server?">
     You can query KPIs, traffic sources, top pages, top events, custom events, geographic distribution, revenue data, and wallet profiles. For advanced queries like retention and cohort analysis, use the `text_to_sql` and `execute_query` tools to run SQL directly against your data.
   </Accordion>
   <Accordion title="Is my analytics data secure when using the MCP Server?">
-    Yes. The MCP Server provides read-only access scoped to your project. Each API key is project-specific and no data is stored by the MCP server itself. You can revoke API keys at any time from your workspace settings.
+    Yes. The MCP Server provides read-only access scoped to one Formo project. OAuth users select the project during consent, and API keys are project-specific. No data is stored by the MCP server itself.
+  </Accordion>
+  <Accordion title="Can I still use an API key?">
+    Yes. OAuth is additive. Existing Workspace API Key configurations continue to work with `Authorization: Bearer YOUR_API_KEY`.
   </Accordion>
 </AccordionGroup>
 
 ## Troubleshooting
 
-**Tools not appearing:** Verify your API key has the MCP scope enabled. Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart your AI assistant after configuration changes.
+**Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart or refresh your AI assistant after configuration changes.
 
-**Authentication errors:** Ensure the API key is correctly formatted: `Bearer YOUR_API_KEY`. Check that the API key hasn't been revoked.
+**OAuth issues:** See [MCP OAuth](/mcp/oauth) for OAuth setup, metadata, and troubleshooting.
 
-**Claude Desktop not connecting:** Ensure Node.js is installed and accessible from the command line. Check Claude Desktop logs: `~/Library/Logs/Claude/` (macOS).
+**API key issues:** See [MCP API Key](/mcp/api-key) for API key setup and troubleshooting.
 
 ### Security
 
-The Formo MCP server provides read-only access to analytics data. Each API key is scoped to a specific project, and sessions expire after 1 hour of inactivity.
+The Formo MCP server provides read-only access to analytics data. OAuth access is scoped to the project selected on the Formo consent page. API key access is scoped to the project attached to the key. MCP sessions expire after 1 hour of inactivity.

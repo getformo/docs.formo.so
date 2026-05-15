@@ -232,7 +232,7 @@
         "groups": [
           {
             "group": "MCP",
-            "pages": ["mcp/overview"]
+            "pages": ["mcp/overview", "mcp/oauth", "mcp/api-key"]
           }
         ]
       },
