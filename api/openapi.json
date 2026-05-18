@@ -4166,7 +4166,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Filter by wallet address"
+            "description": "Filter by wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
           },
           {
             "name": "expand",
@@ -4314,7 +4314,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Wallet address"
+            "description": "Wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
           },
           {
             "name": "expand",
@@ -4524,7 +4524,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Wallet address (EVM 0x... or Solana base58)"
+            "description": "Wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
           },
           { "$ref": "#/components/parameters/IdempotencyKey" }
         ],
@@ -4656,7 +4656,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Wallet address (EVM 0x... or Solana base58)"
+            "description": "Wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
           },
           { "$ref": "#/components/parameters/IdempotencyKey" }
         ],
@@ -4745,7 +4745,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Wallet address (EVM 0x... or Solana base58)"
+            "description": "Wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
           },
           { "$ref": "#/components/parameters/IdempotencyKey" }
         ],
