@@ -248,6 +248,7 @@
             "pages": [
               "cli/profiles",
               "cli/query",
+              "cli/analytics",
               "cli/boards",
               "cli/charts",
               "cli/alerts",

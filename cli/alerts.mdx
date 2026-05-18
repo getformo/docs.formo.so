@@ -54,8 +54,8 @@ Requires `alerts:write` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--name` | `string` | ✅ | Alert name |
-| `--triggerType` | `string` | ✅ | Trigger type (e.g. `event`, `threshold`) |
-| `--triggerFilters` | `string` | ❌ | JSON array of trigger filter objects |
+| `--trigger-type` | `string` | ✅ | Trigger type (e.g. `event`, `threshold`) |
+| `--trigger-filters` | `string` | ❌ | JSON array of trigger filter objects |
 | `--recipient` | `string` | ❌ | JSON array of recipient objects |
 | `--secret` | `string` | ❌ | Webhook secret for the alert |
 
@@ -63,19 +63,19 @@ Requires `alerts:write` scope on your API key.
 
 ```bash
 # Create a basic event alert
-formo alerts create --name "High value tx" --triggerType event
+formo alerts create --name "High value tx" --trigger-type event
 
 # Create an alert with trigger filters and recipients
 formo alerts create \
   --name "Whale activity" \
-  --triggerType threshold \
-  --triggerFilters '[{"field":"net_worth_usd","op":"gt","value":100000}]' \
+  --trigger-type threshold \
+  --trigger-filters '[{"field":"net_worth_usd","op":"gt","value":100000}]' \
   --recipient '[{"type":"email","value":"team@example.com"}]'
 
 # Create an alert with a webhook secret
 formo alerts create \
   --name "Transaction webhook" \
-  --triggerType event \
+  --trigger-type event \
   --secret "whsec_abc123"
 ```
 
@@ -100,8 +100,8 @@ Requires `alerts:write` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--name` | `string` | ❌ | Alert name |
-| `--triggerType` | `string` | ❌ | Trigger type |
-| `--triggerFilters` | `string` | ❌ | JSON array of trigger filter objects |
+| `--trigger-type` | `string` | ❌ | Trigger type |
+| `--trigger-filters` | `string` | ❌ | JSON array of trigger filter objects |
 | `--recipient` | `string` | ❌ | JSON array of recipient objects |
 | `--secret` | `string` | ❌ | Webhook secret for the alert |
 
@@ -109,12 +109,12 @@ Requires `alerts:write` scope on your API key.
 
 ```bash
 # Update an alert name
-formo alerts update alert_abc123 --name "Renamed alert" --triggerType event
+formo alerts update alert_abc123 --name "Renamed alert" --trigger-type event
 
 # Update alert with new recipients
 formo alerts update alert_abc123 \
   --name "Updated alert" \
-  --triggerType threshold \
+  --trigger-type threshold \
   --recipient '[{"type":"slack","value":"#alerts"}]'
 ```
 

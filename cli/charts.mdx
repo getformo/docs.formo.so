@@ -19,10 +19,10 @@ Requires `boards:read` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--boardId` | `string` | ✅ | Board ID to list charts from |
+| `--board-id` | `string` | ✅ | Board ID to list charts from |
 
 ```bash
-formo charts list --boardId board_abc123
+formo charts list --board-id board_abc123
 ```
 
 ---
@@ -45,10 +45,10 @@ Requires `boards:read` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--boardId` | `string` | ✅ | Board ID the chart belongs to |
+| `--board-id` | `string` | ✅ | Board ID the chart belongs to |
 
 ```bash
-formo charts get chart_abc123 --boardId board_abc123
+formo charts get chart_abc123 --board-id board_abc123
 ```
 
 ---
@@ -65,7 +65,7 @@ Requires `boards:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--boardId` | `string` | ✅ | Board ID to add the chart to |
+| `--board-id` | `string` | ✅ | Board ID to add the chart to |
 | `--body` | `string` | ✅ | JSON string with the chart configuration |
 
 ### Examples
@@ -73,12 +73,12 @@ Requires `boards:write` scope on your API key.
 ```bash
 # Create a line chart
 formo charts create \
-  --boardId board_abc123 \
+  --board-id board_abc123 \
   --body '{"name":"Daily active users","chartType":"line"}'
 
 # Create a bar chart with a SQL query
 formo charts create \
-  --boardId board_abc123 \
+  --board-id board_abc123 \
   --body '{"name":"Top chains","chartType":"bar","query":"SELECT chain, count(*) as cnt FROM events GROUP BY chain ORDER BY cnt DESC LIMIT 10"}'
 ```
 
@@ -102,7 +102,7 @@ Requires `boards:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--boardId` | `string` | ✅ | Board ID the chart belongs to |
+| `--board-id` | `string` | ✅ | Board ID the chart belongs to |
 | `--body` | `string` | ✅ | JSON string with updated chart configuration |
 
 ### Examples
@@ -110,12 +110,12 @@ Requires `boards:write` scope on your API key.
 ```bash
 # Update a chart name
 formo charts update chart_abc123 \
-  --boardId board_abc123 \
+  --board-id board_abc123 \
   --body '{"name":"Updated chart name"}'
 
 # Update chart type and query
 formo charts update chart_abc123 \
-  --boardId board_abc123 \
+  --board-id board_abc123 \
   --body '{"name":"Revenue","chartType":"area","query":"SELECT DATE(timestamp) as day, SUM(revenue) as rev FROM events GROUP BY day"}'
 ```
 
@@ -139,10 +139,10 @@ Requires `boards:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--boardId` | `string` | ✅ | Board ID the chart belongs to |
+| `--board-id` | `string` | ✅ | Board ID the chart belongs to |
 
 ```bash
-formo charts delete chart_abc123 --boardId board_abc123
+formo charts delete chart_abc123 --board-id board_abc123
 ```
 
 <Warning>
