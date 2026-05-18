@@ -22,12 +22,17 @@ The API key needs to have the **read permission for profiles** in the API settin
 
 ### `address`
 
-Filter by a specific wallet address (exact match).
+Filter by a specific wallet address (exact match). Accepts an EVM address, a Solana address, or an ENS name (e.g. `vitalik.eth`) which is resolved to an address before filtering. An unresolvable ENS name or an otherwise invalid value returns a `400 BAD_REQUEST`.
 
 ```bash
 curl -sS -X GET \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   "https://api.formo.so/v0/profiles?address=0x1234..."
+
+# ENS names are resolved automatically
+curl -sS -X GET \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  "https://api.formo.so/v0/profiles?address=vitalik.eth"
 ```
 
 ### `search`

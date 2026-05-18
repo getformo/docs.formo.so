@@ -28,7 +28,7 @@ The API key needs to have the **read permission for profiles** in the API settin
 
 ## Path parameters
 
-- `address` (string): EVM Wallet address e.g. `0x0000000000000000000000000000000000000000`.
+- `address` (string): A wallet address or ENS name. Accepts an EVM address (e.g. `0x0000000000000000000000000000000000000000`), a Solana address, or an ENS name (e.g. `vitalik.eth`). ENS names are resolved to an address before lookup.
 
 ## Query parameters
 
@@ -294,7 +294,7 @@ Array of token holdings:
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `BAD_REQUEST` | Invalid wallet address format |
+| 400 | `BAD_REQUEST` | Invalid address or ENS name, or the ENS name could not be resolved |
 | 401 | `UNAUTHORIZED` | Missing or invalid API key |
 | 403 | `FORBIDDEN` | API key does not have `profiles:read` permission |
 | 404 | `PROFILE_NOT_FOUND` | Profile does not exist |
