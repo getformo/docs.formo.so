@@ -1,0 +1,100 @@
+---
+title: "Analytics"
+sidebarTitle: "Analytics"
+icon: chart-mixed
+description: "Run Formo's pre-built analytics pipes — KPIs, funnels, retention, revenue, and top-N breakdowns — directly from the terminal, without writing SQL."
+---
+
+The `formo analytics` command exposes Formo's pre-built analytics pipes — the same data that powers the Formo dashboard — as terminal commands. Each pipe is a subcommand: `formo analytics <pipe>`.
+
+<Note>
+Requires `query:read` scope on your API key.
+</Note>
+
+## `formo analytics <pipe>`
+
+### Pipes
+
+| Pipe | Description |
+|------|-------------|
+| `kpis` | Traffic KPIs: visitors, pageviews, bounce rate, session duration |
+| `event_timeseries` | Event counts over time |
+| `funnel` | Conversion funnel across ordered steps |
+| `flow` | User path / flow analysis between steps |
+| `frequency` | Engagement frequency distribution |
+| `lifecycle` | User lifecycle stages (new, returning, power, resurrected, churned) |
+| `retention` | Retention cohort analysis |
+| `revenue_overview` | Revenue overview with optional breakdown |
+| `revenue_by_metric` | Revenue ranked by a metric column |
+| `revenue_timeseries` | Revenue over time (requires `address`) |
+| `volume_by_metric` | Trading volume ranked by a metric column |
+| `top_chains` | Top chains by activity |
+| `top_events` | Top events by count |
+| `top_locations` | Top locations |
+| `top_pages` | Top pages by traffic |
+| `top_sources` | Top acquisition sources |
+| `top_wallets` | Top wallets by activity |
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--date-from` | `string` | ❌ | Inclusive start date `YYYY-MM-DD` (default: 7 days before `--date-to`) |
+| `--date-to` | `string` | ❌ | Inclusive end date `YYYY-MM-DD` (default: today) |
+| `--filters` | `string` | ❌ | JSON array of filter conditions: `[{"field": "...", "op": "...", "value": "..."}]` |
+| `--params` | `string` | ❌ | JSON object of pipe-specific params merged into the query |
+
+<Note>
+`--params` may **not** set `date_from`/`date_to`/`filters` — use the dedicated
+`--date-from`/`--date-to`/`--filters` flags for those. Object/array values in
+`--params` are JSON-encoded automatically (e.g. `funnel`'s `steps`).
+</Note>
+
+### `--filters`
+
+A JSON array of `{ field, op, value }` conditions, e.g. `[{"field":"location","op":"equals","value":"US"}]`. For multi-value matching, use `in` / `notIn` with a pipe-delimited `value` (e.g. `"chrome|firefox"`).
+
+### `--params` (pipe-specific)
+
+Some pipes take additional, pipe-specific parameters. Pass them as a JSON object via `--params`:
+
+| Pipe | Key params |
+|------|------------|
+| `kpis`, `revenue_overview` | `group_by`, `limit`, `include_previous_period` |
+| `funnel` | `steps` (required — JSON array of `{type,event,name,filters?}`), `window_seconds`, `funnel_type`, `breakdown` |
+| `flow` | `start_step` (required — JSON `{type,event,resolved_event,...}`), `end_step`, `global_filters`, `window_seconds`, `max_steps` |
+| `retention` | `id_type`, `event_type`, `event_name`, `min_users` |
+| `revenue_timeseries` | `address` (required) |
+| `revenue_by_metric`, `volume_by_metric`, `top_sources` | `metric_column`, `limit`, `offset` |
+| `top_chains`, `top_events`, `top_locations`, `top_pages`, `top_wallets` | `limit`, `offset` |
+
+### Examples
+
+```bash
+# Traffic KPIs for the last 7 days (default range)
+formo analytics kpis
+
+# KPIs for April 2026, broken down by device
+formo analytics kpis --date-from 2026-04-01 --date-to 2026-04-30 --params '{"group_by":"device"}'
+
+# Conversion funnel across ordered steps
+formo analytics funnel \
+  --date-from 2026-04-01 --date-to 2026-04-30 \
+  --params '{"steps":[{"type":"event","event":"page","name":"page::0","filters":[]},{"type":"track","event":"connect","name":"connect::1","filters":[]}],"window_seconds":86400}'
+
+# Top 10 wallets by activity last month
+formo analytics top_wallets --date-from 2026-04-01 --date-to 2026-04-30 --params '{"limit":10}'
+
+# Retention restricted to US visitors
+formo analytics retention --filters '[{"field":"location","op":"equals","value":"US"}]'
+
+# Revenue timeseries for a specific wallet
+formo analytics revenue_timeseries \
+  --date-from 2026-04-01 --date-to 2026-04-30 \
+  --params '{"address":"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"}'
+
+# Pipe results to jq for processing
+formo analytics kpis | jq '.data'
+```
+
+The response shape matches the dashboard data: `{ meta, data, rows, statistics }`.

@@ -14,6 +14,9 @@ The Formo CLI (`@formo/cli`) gives you full access to the Formo API from the com
   <Card title="Query" icon="database" href="/cli/query">
     Run SQL queries on my data
   </Card>
+  <Card title="Analytics" icon="chart-mixed" href="/cli/analytics">
+    Run pre-built analytics pipes (KPIs, funnels, retention, revenue)
+  </Card>
   <Card title="Charts" icon="chart-line" href="/cli/charts">
     Create and manage charts within custom dashboards
   </Card>
@@ -55,7 +58,7 @@ formo login formo_abc123
 formo profiles get vitalik.eth
 
 # 3. Run a SQL query
-formo query "SELECT count(*) FROM events"
+formo query run "SELECT count(*) FROM events"
 
 # 4. List your dashboard boards
 formo boards list

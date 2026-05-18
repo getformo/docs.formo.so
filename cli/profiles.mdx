@@ -69,13 +69,13 @@ Requires `profiles:read` scope on your API key.
 | `--address` | `string` | ❌ | Filter by wallet address |
 | `--page` | `number` | ❌ | Page number (1-indexed, default `1`) |
 | `--size` | `number` | ❌ | Page size (default `100`, max `1000`) |
-| `--orderBy` | `enum` | ❌ | Field to sort by (see values below) |
-| `--orderDir` | `enum` | ❌ | Sort direction: `asc` or `desc` |
+| `--order-by` | `enum` | ❌ | Field to sort by (see values below) |
+| `--order-dir` | `enum` | ❌ | Sort direction: `asc` or `desc` |
 | `--expand` | `string` | ❌ | Comma-separated fields to expand |
 | `--conditions` | `string` | ❌ | JSON array of `FilterCondition` objects for advanced filtering |
 | `--logic` | `enum` | ❌ | Logic operator for combining conditions: `and` (default) or `or` |
 
-### `--orderBy` values
+### `--order-by` values
 
 | Value | Description |
 |-------|-------------|
@@ -98,20 +98,25 @@ Requires `profiles:read` scope on your API key.
 formo profiles search --size 10
 
 # Top 5 profiles by net worth
-formo profiles search --orderBy net_worth_usd --orderDir desc --size 5
+formo profiles search --order-by net_worth_usd --order-dir desc --size 5
 
 # Get the second page of 20 profiles
 formo profiles search --page 2 --size 20
 
 # Search with a filter condition
 formo profiles search \
-  --conditions '[{"field":"net_worth_usd","op":"gt","value":10000}]' \
+  --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000}]' \
   --size 20
 
 # Search profiles matching either condition (OR logic)
 formo profiles search \
-  --conditions '[{"field":"net_worth_usd","op":"gt","value":10000},{"field":"tx_count","op":"gt","value":50}]' \
+  --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000},{"field":"users.volume","op":"gt","value":1000}]' \
   --logic or \
+  --size 20
+
+# Filter by on-chain balance on a specific chain (Ethereum = chain 1)
+formo profiles search \
+  --conditions '[{"field":"chains.1.balance","op":"gt","value":1000}]' \
   --size 20
 ```
 
@@ -123,16 +128,36 @@ The `--conditions` option accepts a JSON array of filter condition objects:
 
 ```json
 [
-  { "field": "net_worth_usd", "op": "gt", "value": 10000 },
-  { "field": "tx_count", "op": "gte", "value": 5 }
+  { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
+  { "field": "chains.1.balance", "op": "gte", "value": 1000 }
 ]
 ```
 
+<Warning>
+`field` **must be a typed path** (prefixed by its category — see the table
+below). The CLI rejects a bare/untyped field (e.g. `net_worth_usd`) with an
+error, because the API would otherwise **silently ignore** it — no error, no
+filtering, returning the entire unfiltered dataset. Always prefix the field,
+e.g. `users.net_worth_usd`.
+</Warning>
+
 | Field | Type | Description |
 |-------|------|-------------|
-| `field` | `string` | Profile field to filter on |
+| `field` | `string` | Typed field path (see prefixes below) |
 | `op` | `string` | Operator (see table below) |
 | `value` | `any` | Value to compare against |
+| `scope` | `string` | _(token filters only)_ `any` or `protocol` |
+| `appId` | `string` | _(token filters with `scope: protocol`)_ e.g. `aave-v3` |
+
+### Field path prefixes
+
+| Prefix | Examples |
+|--------|----------|
+| `users.` | `users.net_worth_usd`, `users.volume`, `users.revenue`, `users.points`, `users.device`, `users.location`, `users.lifecycle`, `users.ens`, `users.farcaster` |
+| `chains.` | `chains.balance` (any chain), `chains.1.balance` (Ethereum) |
+| `apps.` | `apps.uniswap-v3.balance` |
+| `tokens.` | `tokens.0xA0b8…48.balance` |
+| `labels.` | `labels.coinbase.verified_account` |
 
 ### Filter operators
 
@@ -191,7 +216,7 @@ formo profiles update vitalik.eth \
 
 ## `formo profiles labels create`
 
-Upsert one or more labels on a wallet profile. Provide either a single label via `--tagId` or a batch via `--labels`.
+Upsert one or more labels on a wallet profile. Provide either a single label via `--tag-id` or a batch via `--labels`.
 
 <Note>
 Requires `profiles:write` scope on your API key.
@@ -207,20 +232,20 @@ Requires `profiles:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--tagId` | `string` | ❌ | Label identifier (e.g. `vip`, `airdrop_eligible`). Required unless `--labels` is provided. |
+| `--tag-id` | `string` | ❌ | Label identifier (e.g. `vip`, `airdrop_eligible`). Required unless `--labels` is provided. |
 | `--value` | `string` | ❌ | Optional label value (e.g. tier name, country code) |
-| `--chainId` | `string` | ❌ | Optional chain identifier the label applies to |
+| `--chain-id` | `string` | ❌ | Optional chain identifier the label applies to |
 | `--labels` | `string` | ❌ | JSON array of `UserLabelInput` objects for batch upsert |
 
 ### Examples
 
 ```bash
 # Tag a wallet as VIP
-formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tagId vip
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tag-id vip
 
 # Apply a tiered label scoped to a chain
 formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
-  --tagId tier --value gold --chainId 1
+  --tag-id tier --value gold --chain-id 1
 
 # Apply multiple labels in one call
 formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
@@ -239,7 +264,7 @@ formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
 
 ## `formo profiles labels delete`
 
-Delete a label from a wallet profile. Pass `--chainId` to scope the deletion to a chain-specific label.
+Delete a label from a wallet profile. Pass `--chain-id` to scope the deletion to a chain-specific label.
 
 <Note>
 Requires `profiles:write` scope on your API key.
@@ -255,16 +280,16 @@ Requires `profiles:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--tagId` | `string` | ✅ | Label identifier to delete |
-| `--chainId` | `string` | ❌ | Optional chain identifier to scope the deletion |
+| `--tag-id` | `string` | ✅ | Label identifier to delete |
+| `--chain-id` | `string` | ❌ | Optional chain identifier to scope the deletion |
 
 ### Examples
 
 ```bash
 # Remove the vip label
-formo profiles labels delete 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tagId vip
+formo profiles labels delete 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tag-id vip
 
 # Remove a chain-scoped label
 formo profiles labels delete 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
-  --tagId tier --chainId 1
+  --tag-id tier --chain-id 1
 ```

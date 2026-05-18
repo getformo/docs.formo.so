@@ -34,7 +34,7 @@ Requires `segments:write` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--title` | `string` | ✅ | Segment title |
-| `--filterSets` | `string` | ✅ | JSON array of filter set strings defining the segment |
+| `--filter-sets` | `string` | ✅ | JSON array of filter set strings defining the segment |
 
 ### Examples
 
@@ -42,12 +42,12 @@ Requires `segments:write` scope on your API key.
 # Create a high-value segment
 formo segments create \
   --title "Whales" \
-  --filterSets '["net_worth_usd > 100000"]'
+  --filter-sets '["net_worth_usd > 100000"]'
 
 # Create a power-user segment
 formo segments create \
   --title "Power Users" \
-  --filterSets '["tx_count > 100", "num_sessions > 10"]'
+  --filter-sets '["tx_count > 100", "num_sessions > 10"]'
 ```
 
 ---
