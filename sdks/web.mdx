@@ -147,13 +147,13 @@ export default HomePage;
 ### Angular
 
 <Note>
-`FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps use the framework-agnostic `FormoAnalytics.init()` core, wrapped in an injectable service, with wallets connected over the bare EIP-1193 provider (`window.ethereum`). Full working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular).
+`FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps import from the React-free [`@formo/analytics/core`](https://github.com/getformo/sdk/releases/tag/v1.30.1) subpath (added in **v1.30.1**) and wrap `FormoAnalytics.init()` in an injectable service, with wallets connected over the bare EIP-1193 provider (`window.ethereum`). Full working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular).
 </Note>
 
-Install the Web SDK along with the `buffer` polyfill. Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads — without it, signing throws `ReferenceError: Buffer is not defined`.
+Install the Web SDK (v1.30.1 or later) along with the `buffer` polyfill. Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads — without it, signing throws `ReferenceError: Buffer is not defined`.
 
 ```bash
-npm install @formo/analytics buffer viem --save
+npm install @formo/analytics@^1.30.1 buffer viem --save
 ```
 
 ```ts
@@ -166,17 +166,17 @@ import { Buffer } from 'buffer';
 // angular.json (build > options)
 {
   "polyfills": ["src/polyfills.ts"],
-  "allowedCommonJsDependencies": ["react", "react/jsx-runtime", "react-dom", "viem"]
+  "allowedCommonJsDependencies": ["viem"]
 }
 ```
 
-Wrap `FormoAnalytics.init()` in an injectable service:
+Wrap `FormoAnalytics.init()` in an injectable service. Import from `@formo/analytics/core` — the root entry pulls in the React provider, which Angular doesn't need:
 
 ```ts
 // src/app/services/formo-analytics.service.ts
 import { Injectable } from '@angular/core';
-import { FormoAnalytics } from '@formo/analytics';
-import type { IFormoAnalytics, IFormoEventProperties } from '@formo/analytics';
+import { FormoAnalytics } from '@formo/analytics/core';
+import type { IFormoAnalytics, IFormoEventProperties } from '@formo/analytics/core';
 
 @Injectable({ providedIn: 'root' })
 export class FormoAnalyticsService {

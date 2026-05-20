@@ -643,14 +643,14 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
     Working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular). Also see the [Angular section](/sdks/web#angular) of the Web SDK page.
     </Note>
 
-    Angular has no first-class Formo binding — `FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps install Formo on the **non-wagmi, non-React path**: the framework-agnostic `FormoAnalytics.init()` core wrapped in an injectable service, with wallets connected over the bare EIP-1193 provider (`window.ethereum`).
+    Angular has no first-class Formo binding — `FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps install Formo on the **non-wagmi, non-React path**: import the framework-agnostic `FormoAnalytics.init()` core from the [`@formo/analytics/core`](https://github.com/getformo/sdk/releases/tag/v1.30.1) subpath (added in **v1.30.1**), wrap it in an injectable service, and connect wallets over the bare EIP-1193 provider (`window.ethereum`).
 
     #### 1. Install the Formo SDK
 
-    Install the SDK along with the `buffer` polyfill (Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads) and viem:
+    Install the SDK (v1.30.1 or later) along with the `buffer` polyfill (Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads) and viem:
 
     ```bash
-    pnpm add @formo/analytics buffer viem
+    pnpm add @formo/analytics@^1.30.1 buffer viem
     pnpm add -D @ngx-env/builder
     ```
 
@@ -662,24 +662,26 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
     (globalThis as unknown as { Buffer?: typeof Buffer }).Buffer ??= Buffer;
     ```
 
-    Reference it from `angular.json` and silence the SDK's React-re-export warnings:
+    Reference it from `angular.json`. Importing from `@formo/analytics/core` (step 2) keeps React out of the dependency graph, so only `viem` needs to be allowlisted for CommonJS:
 
     ```jsonc
     // angular.json (build > options)
     {
       "polyfills": ["src/polyfills.ts"],
-      "allowedCommonJsDependencies": ["react", "react/jsx-runtime", "react-dom", "viem"]
+      "allowedCommonJsDependencies": ["viem"]
     }
     ```
 
     #### 2. Wrap `FormoAnalytics.init()` in an injectable service
 
+    Import from `@formo/analytics/core` — the root entry re-exports the React provider, which Angular doesn't need:
+
     ```ts
     // src/app/services/formo-analytics.service.ts
 
     import { Injectable } from '@angular/core';
-    import { FormoAnalytics } from '@formo/analytics';
-    import type { IFormoAnalytics, IFormoEventProperties } from '@formo/analytics';
+    import { FormoAnalytics } from '@formo/analytics/core';
+    import type { IFormoAnalytics, IFormoEventProperties } from '@formo/analytics/core';
 
     @Injectable({ providedIn: 'root' })
     export class FormoAnalyticsService {
