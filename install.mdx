@@ -637,6 +637,143 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
     ```
 
   </Tab>
+  <Tab icon="angular" title="Angular">
+
+    <Note>
+    Working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular). Also see the [Angular section](/sdks/web#angular) of the Web SDK page.
+    </Note>
+
+    Angular has no first-class Formo binding — `FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps install Formo on the **non-wagmi, non-React path**: the framework-agnostic `FormoAnalytics.init()` core wrapped in an injectable service, with wallets connected over the bare EIP-1193 provider (`window.ethereum`).
+
+    #### 1. Install the Formo SDK
+
+    Install the SDK along with the `buffer` polyfill (Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads) and viem:
+
+    ```bash
+    pnpm add @formo/analytics buffer viem
+    pnpm add -D @ngx-env/builder
+    ```
+
+    Wire the polyfill in `src/polyfills.ts`:
+
+    ```ts
+    // src/polyfills.ts
+    import { Buffer } from 'buffer';
+    (globalThis as unknown as { Buffer?: typeof Buffer }).Buffer ??= Buffer;
+    ```
+
+    Reference it from `angular.json` and silence the SDK's React-re-export warnings:
+
+    ```jsonc
+    // angular.json (build > options)
+    {
+      "polyfills": ["src/polyfills.ts"],
+      "allowedCommonJsDependencies": ["react", "react/jsx-runtime", "react-dom", "viem"]
+    }
+    ```
+
+    #### 2. Wrap `FormoAnalytics.init()` in an injectable service
+
+    ```ts
+    // src/app/services/formo-analytics.service.ts
+
+    import { Injectable } from '@angular/core';
+    import { FormoAnalytics } from '@formo/analytics';
+    import type { IFormoAnalytics, IFormoEventProperties } from '@formo/analytics';
+
+    @Injectable({ providedIn: 'root' })
+    export class FormoAnalyticsService {
+      private analytics: IFormoAnalytics | null = null;
+
+      async init(): Promise<void> {
+        if (typeof window === 'undefined') return;
+        const writeKey = import.meta.env.NG_APP_FORMO_WRITE_KEY;
+        if (!writeKey) return;
+
+        this.analytics = await FormoAnalytics.init(writeKey, {
+          tracking: true,
+          autocapture: { connect: true, disconnect: true, chain: true, signature: true, transaction: true },
+        });
+      }
+
+      identify(address: string): void {
+        void this.analytics?.identify({ address });
+      }
+
+      track(event: string, properties?: IFormoEventProperties): void {
+        void this.analytics?.track(event, properties);
+      }
+    }
+    ```
+
+    Replace `NG_APP_FORMO_WRITE_KEY` with your write key in `.env`. The `NG_APP_*` prefix is exposed to the client by [`@ngx-env/builder`](https://github.com/chihab/ngx-env).
+
+    #### 3. Initialize before bootstrap
+
+    Use `provideAppInitializer` so the SDK's autocapture wraps `window.ethereum` **before** any wallet interaction can happen:
+
+    ```ts
+    // src/app/app.config.ts
+
+    import { ApplicationConfig, inject, provideAppInitializer } from '@angular/core';
+    import { provideRouter } from '@angular/router';
+
+    import { routes } from './app.routes';
+    import { FormoAnalyticsService } from './services/formo-analytics.service';
+
+    export const appConfig: ApplicationConfig = {
+      providers: [
+        provideRouter(routes),
+        provideAppInitializer(() => inject(FormoAnalyticsService).init()),
+      ],
+    };
+    ```
+
+    <Warning>
+    Don't initialize from `ngOnInit` — it runs after first render, leaving a race window where early wallet interactions are not captured.
+    </Warning>
+
+    #### 4. Identify users
+
+    Call `identify()` once a wallet address is known. Angular Router's `pushState` is already wrapped by the SDK, so `page` events are autocaptured on every route change — do not add a `NavigationEnd` subscription that calls `formo.page()` or you'll double-count.
+
+    ```ts
+    import { Injectable, inject, signal } from '@angular/core';
+    import { FormoAnalyticsService } from './services/formo-analytics.service';
+    import type { Address } from 'viem';
+
+    @Injectable({ providedIn: 'root' })
+    export class WalletService {
+      private readonly formo = inject(FormoAnalyticsService);
+      readonly address = signal<Address | null>(null);
+
+      async connect(): Promise<void> {
+        const [account] = await window.ethereum!.request({ method: 'eth_requestAccounts' });
+        this.address.set(account);
+        this.formo.identify(account);
+      }
+    }
+    ```
+
+    #### 5. Track custom events
+
+    Formo autocaptures page views, wallet connect/disconnect, chain switches, signatures, and transactions. Use `track()` for app-specific actions:
+
+    ```ts
+    import { Component, inject } from '@angular/core';
+    import { FormoAnalyticsService } from './services/formo-analytics.service';
+
+    @Component({ /* ... */ })
+    export class Home {
+      private readonly formo = inject(FormoAnalyticsService);
+
+      onSwapCompleted(): void {
+        this.formo.track('Swap Completed', { points: 100 });
+      }
+    }
+    ```
+
+  </Tab>
 </Tabs>
 
 ## Code Examples
