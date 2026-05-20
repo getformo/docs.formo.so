@@ -21,6 +21,7 @@ There are several ways to install the Formo SDK:
 - [Solana](#solana-integration) for Solana apps using framework-kit
 - [HTML Snippet](#html-snippet) is recommended for static websites
 - [React & Next.js (without Wagmi)](#react-&-next-js-without-wagmi)
+- [Angular](#angular) for Angular apps using the bare EIP-1193 provider
 
 We recommend installing Formo on **both your website (example.com) and your app (app.example.com)** on the same project with the same SDK write key. 
 
@@ -143,6 +144,83 @@ const HomePage = () => {
 export default HomePage;
 ```
 
+### Angular
+
+<Note>
+`FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps use the framework-agnostic `FormoAnalytics.init()` core, wrapped in an injectable service, with wallets connected over the bare EIP-1193 provider (`window.ethereum`). Full working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular).
+</Note>
+
+Install the Web SDK along with the `buffer` polyfill. Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads — without it, signing throws `ReferenceError: Buffer is not defined`.
+
+```bash
+npm install @formo/analytics buffer viem --save
+```
+
+```ts
+// src/polyfills.ts
+import { Buffer } from 'buffer';
+(globalThis as unknown as { Buffer?: typeof Buffer }).Buffer ??= Buffer;
+```
+
+```jsonc
+// angular.json (build > options)
+{
+  "polyfills": ["src/polyfills.ts"],
+  "allowedCommonJsDependencies": ["react", "react/jsx-runtime", "react-dom", "viem"]
+}
+```
+
+Wrap `FormoAnalytics.init()` in an injectable service:
+
+```ts
+// src/app/services/formo-analytics.service.ts
+import { Injectable } from '@angular/core';
+import { FormoAnalytics } from '@formo/analytics';
+import type { IFormoAnalytics, IFormoEventProperties } from '@formo/analytics';
+
+@Injectable({ providedIn: 'root' })
+export class FormoAnalyticsService {
+  private analytics: IFormoAnalytics | null = null;
+
+  async init(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    this.analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
+      autocapture: { connect: true, disconnect: true, chain: true, signature: true, transaction: true },
+    });
+  }
+
+  identify(address: string): void {
+    void this.analytics?.identify({ address });
+  }
+
+  track(event: string, properties?: IFormoEventProperties): void {
+    void this.analytics?.track(event, properties);
+  }
+}
+```
+
+Initialize it with `provideAppInitializer` so the SDK's autocapture wraps `window.ethereum` **before** any wallet interaction:
+
+```ts
+// src/app/app.config.ts
+import { ApplicationConfig, inject, provideAppInitializer } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';
+import { FormoAnalyticsService } from './services/formo-analytics.service';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideAppInitializer(() => inject(FormoAnalyticsService).init()),
+  ],
+};
+```
+
+<Note>
+Angular Router navigates with `history.pushState`, which the SDK hooks on init — page changes are autocaptured. Don't add a `NavigationEnd` subscription that calls `formo.page()` or you'll double-count.
+</Note>
+
 ## Identify users
 
 Call [`identify()`](/data/events/identify) after a user connects their wallet or signs in on your website or app:
@@ -222,6 +300,29 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
       "
     ></script>
     ```
+  </Tab>
+  <Tab title="Angular">
+    Inject the analytics service and call `identify()` from the same place you discover the wallet address (for example, a `WalletService` that drives `eth_requestAccounts`):
+
+    ```ts
+    import { Injectable, inject, signal } from '@angular/core';
+    import { FormoAnalyticsService } from './services/formo-analytics.service';
+    import type { Address } from 'viem';
+
+    @Injectable({ providedIn: 'root' })
+    export class WalletService {
+      private readonly formo = inject(FormoAnalyticsService);
+      readonly address = signal<Address | null>(null);
+
+      async connect(): Promise<void> {
+        const [account] = await window.ethereum!.request({ method: 'eth_requestAccounts' });
+        this.address.set(account);
+        this.formo.identify(account);
+      }
+    }
+    ```
+
+    See the [with-angular example](https://github.com/getformo/examples/tree/main/with-angular) for the full wallet service, including the hydrate-on-load and `wallet_revokePermissions` patterns.
   </Tab>
 </Tabs>
 
@@ -334,6 +435,27 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
     href="https://github.com/getformo/examples/tree/main/with-porto"
   >
     examples/with-porto
+  </Card>
+  <Card
+    title="Crossmint"
+    icon="file-code"
+    href="https://github.com/getformo/examples/tree/main/with-crossmint"
+  >
+    Next.js + Crossmint embedded smart wallets. Manual Formo instrumentation (no EIP-1193 / wagmi).
+  </Card>
+  <Card
+    title="Openfort"
+    icon="file-code"
+    href="https://github.com/getformo/examples/tree/main/with-openfort"
+  >
+    Vite + React + Openfort with Shield encryption sessions (Express backend) and an Aave supply/withdraw demo.
+  </Card>
+  <Card
+    title="Angular"
+    icon="file-code"
+    href="https://github.com/getformo/examples/tree/main/with-angular"
+  >
+    Angular 21 + bare EIP-1193 + viem. Uses the framework-agnostic SDK core.
   </Card>
   <Card
     title="Farcaster Mini App"
