@@ -6,16 +6,23 @@ description: 'Reference for the identify event that ties users to their actions 
 The `identify` event lets you tie a user to their actions and record traits about them. 
 It includes a unique User ID, wallet name, and wallet rdns.
 
+## Properties
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `provider_name` | String | Name of the wallet provider (e.g., MetaMask). |
+| `rdns` | String | Reverse-DNS identifier of the wallet provider (e.g., `io.metamask`). |
+
 ## Sample Payload
 
 Here’s the payload of a typical call with most common fields removed:
 
 ```json
 {
-    "type": "identify",   
+    "type": "identify",
+    "user_id": "0c93652b-a366-4c92-ab87-0c0ab4fba5aa",
+    "address": "0x9798d87366bdfc5d70b300abdffc4f9e95369b3d",
     "properties": {
-        "user_id": "0c93652b-a366-4c92-ab87-0c0ab4fba5aa",
-        "address": "0x9798d87366bdfc5d70b300abdffc4f9e95369b3d",
         "provider_name": "MetaMask",
         "rdns": "io.metamask"
     }

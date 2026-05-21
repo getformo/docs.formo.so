@@ -4,7 +4,15 @@ description: 'Reference for the signature event that tracks wallet message signi
 ---
 
 The `signature` event is emitted whenever the user signs a message.
-It includes the signature status (requested, rejected, confirmed), message, signature hash, chain ID, and wallet address.
+It includes the signature status (requested, rejected, confirmed), the signed message, chain ID, and wallet address.
+
+## Properties
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `status` | String | Signature request status: `requested`, `rejected`, or `confirmed`. |
+| `chain_id` | Number | Chain ID of the network. |
+| `message` | String | The message that was requested to be signed (e.g., a stringified EIP-712 typed-data payload). |
 
 ## Sample Payload
 
@@ -12,12 +20,12 @@ Here’s the payload of a typical call with most common fields removed:
 
 ```json
 {
-    "type": "signature", 
+    "type": "signature",
+    "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154",
     "properties": {
         "status": "confirmed",
         "chain_id": 84532,
-        "message": "{\"domain\":{\"name\":\"Example DApp\",\"version\":\"1\",\"chainId\":84532,\"verifyingContract\":\"0xcccccccccccccccccccccccccccccccccccccccc\"},\"message\":{\"from\":{\"name\":\"Alice\",\"wallet\":\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"},\"to\":{\"name\":\"Bob\",\"wallet\":\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"},\"content\":\"zcvzxcvzxvc\"},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallet\",\"type\":\"address\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person\"},{\"name\":\"content\",\"type\":\"string\"}]}}",
-        "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154"
+        "message": "{\"domain\":{\"name\":\"Example DApp\",\"version\":\"1\",\"chainId\":84532,\"verifyingContract\":\"0xcccccccccccccccccccccccccccccccccccccccc\"},\"message\":{\"from\":{\"name\":\"Alice\",\"wallet\":\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"},\"to\":{\"name\":\"Bob\",\"wallet\":\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"},\"content\":\"zcvzxcvzxvc\"},\"primaryType\":\"Mail\",\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallet\",\"type\":\"address\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person\"},{\"name\":\"content\",\"type\":\"string\"}]}}"
     }
 }
 ```

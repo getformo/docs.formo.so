@@ -4,13 +4,13 @@ description: 'Reference for the transaction event, including status tracking for
 ---
 
 The `transaction` event is emitted whenever the user performs a transaction.
-It includes the transaction status (started, broadcasted, rejected), to address, data, value, transaction hash, chain ID, and wallet address.
+It includes the transaction status (started, broadcasted, confirmed, rejected, reverted), to address, data, value, transaction hash, chain ID, and wallet address.
 
 ## Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `status` | string | Transaction status: `started`, `broadcasted`, `confirmed`, or `rejected` |
+| `status` | string | Transaction status: `started`, `broadcasted`, `confirmed`, `rejected`, or `reverted` |
 | `chain_id` | number | Chain ID of the network |
 | `data` | string | Transaction calldata (hex-encoded) |
 | `to` | string | Recipient address |
@@ -19,6 +19,8 @@ It includes the transaction status (started, broadcasted, rejected), to address,
 | `function_name` | string | Decoded function name (if contract interaction) |
 | `function_args` | object | Decoded function arguments (if contract interaction) |
 | `builder_codes` | string | Comma-separated [builder codes](#builder-codes) extracted from the transaction calldata (ERC-8021) |
+
+Each entry in `function_args` is also flattened into the event's top-level properties for easier querying. For example, `function_args: { foo: "bar" }` also adds `foo: "bar"` as a property.
 
 ## Builder Codes
 

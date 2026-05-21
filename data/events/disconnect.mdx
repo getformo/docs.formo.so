@@ -6,16 +6,22 @@ description: 'Reference for the disconnect event emitted when a user disconnects
 The `disconnect` event is emitted whenever the user disconnects a wallet.
 It includes the disconnected chain ID and wallet address of the user.
 
+## Properties
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `chain_id` | Number | Chain ID of the network the wallet disconnected from. |
+
 ## Sample Payload
 
 Here’s the payload of a typical call with most common fields removed:
 
 ```json
 {
-    "type": "disconnect",  
+    "type": "disconnect",
+    "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154",
     "properties": {
-        "chain_id": 1,
-        "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154"
+        "chain_id": 1
     }
 }
 ```
