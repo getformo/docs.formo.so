@@ -5,6 +5,13 @@ description: "Reference for the detect event that identifies a visitor's install
 
 The `detect` event lets you identify a visitor's wallet name and rdns.
 
+## Properties
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `provider_name` | String | Name of the detected wallet provider (e.g., MetaMask). |
+| `rdns` | String | Reverse-DNS identifier of the wallet provider (e.g., `io.metamask`). |
+
 ## Sample Payload
 
 Here’s the payload of a typical call with most common fields removed:

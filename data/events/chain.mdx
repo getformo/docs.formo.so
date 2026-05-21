@@ -6,13 +6,19 @@ description: 'Reference for the chain event emitted when a user switches blockch
 The `chain` event is emitted whenever the user's chain network changes.
 It includes the chain ID the user switched to.
 
+## Properties
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `chain_id` | Number | Chain ID of the network the user switched to. |
+
 ## Sample Payload
 
 Here’s the payload of a typical call with most common fields removed:
 
 ```json
 {
-    "type": "chain", 
+    "type": "chain",
     "address": "0x8e6ca77a7e044ba836a97beb796c124ca3a6a154",
     "properties": {
         "chain_id": 1

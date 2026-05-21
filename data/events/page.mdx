@@ -7,32 +7,22 @@ The `page` event records whenever a user views a page on your website or a scree
 
 On web, page properties are automatically collected from the browser. On mobile, the screen name is mapped to page-equivalent fields (`page_title`, `page_path`, `page_url`) so that web and mobile views are processed through the same analytics pipeline.
 
-## Fields
-
-Apart from the [common fields](/data/events/common), the `page` call accepts the following properties:
-
-| Property | Type | Description |
-|:---------|:-----|:------------|
-| `url` | String | Full URL of the page. |
-| `path` | String | Path component of the URL (without query string or hash). |
-| `hash` | String | Hash fragment of the URL (e.g., `#section`). |
-| `query` | String | Query string of the URL (without the leading `?`). |
-| `name` | String | Name of the page or screen. |
-| `category` | String | Category of the page or screen. |
-| `title` | String | Title of the page. |
-
 ## Properties
 
-The following table shows which properties are automatically set by each SDK:
+| Property | Type | Description | Web SDK | Mobile SDK |
+|:---------|:-----|:------------|:--------|:-----------|
+| `url` | String | Full URL of the page. | `window.location.href` | Not set |
+| `path` | String | Path component of the URL (without query string or hash). | `window.location.pathname` | Not set |
+| `hash` | String | Hash fragment of the URL (e.g., `#section`). | `window.location.hash` | Not set |
+| `query` | String | Query string of the URL (without the leading `?`). | `window.location.search` | Not set |
+| `name` | String | Name of the page or screen. | Caller-provided | Screen name (required) |
+| `category` | String | Category of the page or screen. | Caller-provided | Caller-provided |
+| `title` | String | Title of the page. | Caller-provided | Not set |
 
-| Property | Web SDK | Mobile SDK |
-|:---------|:--------|:-----------|
-| `properties.url` | `window.location.href` | Not set |
-| `properties.path` | `window.location.pathname` | Not set |
-| `properties.hash` | `window.location.hash` | Not set |
-| `properties.query` | `window.location.search` | Not set |
-| `properties.name` | Caller-provided | Screen name (required) |
-| `properties.category` | Caller-provided | Caller-provided |
+On web, any non-UTM query-string parameters are also added as individual properties. The SDKs additionally auto-collect the following context fields:
+
+| Context field | Web SDK | Mobile SDK |
+|:--------------|:--------|:-----------|
 | `context.page_url` | `window.location.href` | `app://{screenName}` |
 | `context.page_title` | `document.title` | Screen name |
 | `context.page_path` | Not set (derived in backend) | Not set (derived in backend) |
