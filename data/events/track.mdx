@@ -1,9 +1,9 @@
 ---
-title: 'Track event'
-description: 'Reference for the Track API call used to record custom user actions like button clicks and purchases, with naming conventions and property schemas.'
+title: 'Custom events'
+description: 'Reference for the custom events used to record custom user actions and in-app behaviour.'
 ---
 
-The Track API call is how you record any [custom events](/features/product-analytics/custom-events) your users are doing, 
+Record any [custom events](/features/product-analytics/custom-events) in your app, 
 along with properties that describe the action. 
 
 Custom events can capture a broad range of actions, such as clicking a button or completing a purchase.
@@ -24,17 +24,24 @@ This allows everyone including you 6 months from now to instantly understand the
 
 Properties are additional information that give more clarity of your users' actions.
 
+Every custom event has `type` set to `track` and `event` set to your custom event name, with the event-specific data passed in the `properties` object:
+
+```json
+{
+  "type": "track",
+  "event": "Swap Reviewed",
+  "properties": {
+    "rating": 5
+  }
+}
+```
+
 Formo has reserved some standard properties listed in the following table and handles them in a special manner.
 
 ### Tracking volume, revenue, points
 
 You can track `volume`, `revenue`, and `points` in your events. 
 Once tracked, they are shown on the dashboard.
-
-<Frame caption="Revenue tracking.">
-	<img src="/images/revenue.png" alt="Revenue tracking." />
-</Frame>
-
 
 Include these optional properties in a custom event to track values associated with an action.
 
@@ -45,6 +52,9 @@ Include these optional properties in a custom event to track values associated w
 | `currency` | String | The currency of the revenue as a result of the event, set in ISO 4217 format. If this is not set, Formo assumes the revenue is in USD. |
 | `points` | String | An abstract value such as points or XP associated with an event, to be used by various teams. |
 
+<Frame caption="Revenue tracking.">
+	<img src="/images/revenue.png" alt="Revenue tracking." />
+</Frame>
 
 ## Sample Payload
 
