@@ -8,7 +8,7 @@ description: 'Install and configure the Formo Web SDK to track page views, walle
   <img src="/images/intro3.png" alt="Formo" />
 </Frame>
 
-The Formo Web SDK is [open source](https://github.com/getformo/sdk) and implements the standard [Events API](/data/events#events-api).
+The Formo Web SDK is [open source](https://github.com/getformo/sdk) and implements the standard [Events API](/data/events/overview#events-api).
 
 ## Installation
 
@@ -20,7 +20,7 @@ There are several ways to install the Formo SDK:
 - [Wagmi](#wagmi) is recommended for EVM apps with wallet connection
 - [Solana](#solana-integration) for Solana apps using framework-kit
 - [HTML Snippet](#html-snippet) is recommended for static websites
-- [React & Next.js (without Wagmi)](#react-&-next-js-without-wagmi)
+- [React & Next.js (without Wagmi)](#react--nextjs-without-wagmi)
 - [Angular](#angular) for Angular apps using the bare EIP-1193 provider
 
 We recommend installing Formo on **both your website (example.com) and your app (app.example.com)** on the same project with the same SDK write key. 
@@ -354,7 +354,7 @@ window.formo.track(...)
 
 Using a [standardized naming convention](/data/events/track#naming-events) for your custom events is recommended.
 
-You can [track volume, revenue, and points](/data/events/track#tracking-volume,-revenue,-points) in custom events.
+You can [track volume, revenue, and points](/data/events/track#tracking-volume-revenue-points) in custom events.
 
 ## Code examples
 
@@ -850,7 +850,7 @@ For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-11
 
 <AccordionGroup>
   <Accordion title="What is the difference between the Wagmi integration and the standard React integration?">
-    The [Wagmi integration](#wagmi) automatically tracks wallet connections, disconnections, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs) tracks wallet events by wrapping the EIP-1193 wallet provider to track signatures and transactions. Use the Wagmi integration if your dApp uses Wagmi and its hooks.
+    The [Wagmi integration](#wagmi) automatically tracks wallet connections, disconnections, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs-without-wagmi) tracks wallet events by wrapping the EIP-1193 wallet provider to track signatures and transactions. Use the Wagmi integration if your dApp uses Wagmi and its hooks.
   </Accordion>
   <Accordion title="How do I track custom events like swaps, deposits, or mints?">
     Use [formo.track()](/data/events/track) to send custom events with any properties you need. For example: `formo.track('swap', { tokenIn: 'USDC', tokenOut: 'ETH', amount: 1000 })`. Custom events appear in the [Activity](/features/product-analytics/activity) feed and can be queried in the [Explorer](/features/product-analytics/explore).
@@ -859,7 +859,7 @@ For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-11
     Yes. The SDK provides built-in [consent management](#consent-management) with `optOutTracking()` and `optInTracking()` methods. Call `optOutTracking()` to stop all tracking for a user, and `optInTracking()` to re-enable it. Formo does not use third-party cookies, IP addresses, or device fingerprinting, so most jurisdictions do not require a cookie consent banner.
   </Accordion>
   <Accordion title="Can I use Formo with Privy or other embedded wallet providers?">
-    Yes. The SDK includes a dedicated [Privy integration](#privy) with `parsePrivyProperties()` to extract profile properties and linked wallet addresses. For other wallet providers, use the standard [React integration](#react--nextjs). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
+    Yes. The SDK includes a dedicated [Privy integration](#identify-users) with `parsePrivyProperties()` to extract profile properties and linked wallet addresses. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
 </AccordionGroup>
 
@@ -875,7 +875,7 @@ Here are the domains used by Formo to load the SDK and send data:
 
 | Domain | Use case |
 |--------|----------|
-| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) e.g. `https://cdn.formo.so/analytics@latest` |
+| cdn.formo.so | Loads the SDK (only for [Website installation](#html-snippet)) e.g. `https://cdn.formo.so/analytics@latest` |
 | events.formo.so | Receives data from the SDK (`https://events.formo.so/v0/raw_events`)|
 
 ### CDN
