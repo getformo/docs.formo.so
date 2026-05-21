@@ -409,13 +409,6 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
     examples/with-metamask
   </Card>
   <Card
-    title="Blocknative"
-    icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/with-web3-onboard"
-  >
-    examples/with-web3-onboard
-  </Card>
-  <Card
     title="Thirdweb"
     icon="file-code"
     href="https://github.com/getformo/examples/tree/main/with-thirdweb"
@@ -430,39 +423,25 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume,-
     examples/with-reown
   </Card>
   <Card
-    title="Porto"
-    icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/with-porto"
-  >
-    examples/with-porto
-  </Card>
-  <Card
     title="Crossmint"
     icon="file-code"
     href="https://github.com/getformo/examples/tree/main/with-crossmint"
   >
-    Next.js + Crossmint embedded smart wallets. Manual Formo instrumentation (no EIP-1193 / wagmi).
+    examples/with-crossmint
   </Card>
   <Card
     title="Openfort"
     icon="file-code"
     href="https://github.com/getformo/examples/tree/main/with-openfort"
   >
-    Vite + React + Openfort with Shield encryption sessions (Express backend) and an Aave supply/withdraw demo.
+    examples/with-openfort
   </Card>
   <Card
     title="Angular"
     icon="file-code"
     href="https://github.com/getformo/examples/tree/main/with-angular"
   >
-    Angular 21 + bare EIP-1193 + viem. Uses the framework-agnostic SDK core.
-  </Card>
-  <Card
-    title="Farcaster Mini App"
-    icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/with-farcaster"
-  >
-    examples/with-farcaster
+    examples/with-angular
   </Card>
   <Card
     title="Solana"
@@ -860,7 +839,7 @@ formo.transaction({ status: TransactionStatus.CONFIRMED, chainId: SOLANA_CHAIN_I
 // Signatures (signMessage / signTransaction)
 formo.signature({ status: SignatureStatus.REQUESTED, chainId: SOLANA_CHAIN_IDS['devnet'], address, message });
 const result = await session.signMessage(encoded);
-formo.signature({ status: SignatureStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['devnet'], address, message, signatureHash });
+formo.signature({ status: SignatureStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['devnet'], address, message });
 ```
 
 <Note>
@@ -896,7 +875,7 @@ Here are the domains used by Formo to load the SDK and send data:
 
 | Domain | Use case |
 |--------|----------|
-| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) e.g. `https://cdn.formo.so/analytics@1.27.0` |
+| cdn.formo.so | Loads the SDK (only for [Website installation](#websites)) e.g. `https://cdn.formo.so/analytics@latest` |
 | events.formo.so | Receives data from the SDK (`https://events.formo.so/v0/raw_events`)|
 
 ### CDN
@@ -915,7 +894,7 @@ module.exports = {
     return [
       {
         source: "/formo.js",
-        destination: "https://cdn.formo.so/analytics@1.27.0", // If using website install script
+        destination: "https://cdn.formo.so/analytics@latest", // If using website install script
       },
       {
         source: "/api/ingest",

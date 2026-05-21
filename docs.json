@@ -209,6 +209,7 @@
             "group": "Contracts API",
             "pages": [
               "api/contracts/list",
+              "api/contracts/get",
               "api/contracts/create",
               "api/contracts/update",
               "api/contracts/delete"

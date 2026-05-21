@@ -16,6 +16,10 @@ The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open 
 - "Show me user retention by cohort"
 - "Which pages have the highest bounce rate?"
 
+<Warning>
+  The Formo MCP server requires a **Scale or Enterprise** plan. This applies to both OAuth and Workspace API key connections. Free and Growth workspaces cannot connect to MCP and will receive a `403` error (`MCP access requires a Scale or Enterprise plan`). [Upgrade your workspace](https://app.formo.so) to enable MCP access.
+</Warning>
+
 ## Getting started
 
 **Supported clients:** OAuth-capable MCP clients, Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any client that supports HTTP or stdio MCP transports.
@@ -55,12 +59,14 @@ Once connected, try these prompts with your AI assistant:
 - "What's the conversion rate from page view to wallet connection?"
 
 **Web3 Analytics**
-- "Show me wallet profiles with their net worth"
-- "What tokens do my users hold?"
+- "Look up the profile for this wallet address, including its net worth"
+- "What are my top wallets and chains?"
 
 ## Available tools
 
-The Formo MCP server exposes these analytics tools:
+The Formo MCP server exposes a curated set of tools, grouped below.
+
+**Core**
 
 | Tool | Description |
 |:-----|:------------|
@@ -69,17 +75,44 @@ The Formo MCP server exposes these analytics tools:
 | `text_to_sql` | Convert natural language to SQL |
 | `list_endpoints` | List available API endpoints |
 | `list_datasources` | List available data sources |
+
+**Analytics endpoints**
+
+| Tool | Description |
+|:-----|:------------|
 | `kpis` | Get key performance indicators |
 | `distinct_values` | Get unique values for filtering |
 | `top_events` | View most common events |
-| `top_custom_events` | View custom tracked events |
+| `event_timeseries` | Event counts over time |
+| `lifecycle` | New, returning, resurrected, and dormant users |
+| `retention` | User retention by cohort |
+| `frequency` | How often users return |
 | `top_pages` | Analyze page performance |
-| `top_sources_metrics` | Attribution and traffic sources |
+| `top_sources` | Attribution and traffic sources |
 | `top_locations` | Geographic distribution |
+| `top_wallets` | Most active wallets |
+| `top_chains` | Activity by blockchain |
 | `revenue_overview` | Revenue analytics |
-| `wallet_profiles` | Web3 wallet data and enrichment |
+| `revenue_timeseries` | Revenue over time |
+| `revenue_by_metric` | Revenue broken down by a dimension |
+| `volume_by_metric` | Transaction volume broken down by a dimension |
+| `cohort_analysis` | Cohort-based behavioral analysis |
+| `funnel` | Multi-step conversion funnels |
+| `flow` | User journey and path analysis |
+| `search_profile` | Look up enrichment for a single wallet address (net worth, tokens, labels) |
 
-For user analytics (retention, lifecycle, user profiles), use `text_to_sql` + `execute_query` to query the users datasource directly.
+**Docs**
+
+| Tool | Description |
+|:-----|:------------|
+| `search_formo_docs` | Search the Formo documentation |
+| `query_docs_filesystem_formo_docs` | Query the Formo docs filesystem |
+
+<Note>
+  The exact set of tools depends on your project's configured endpoints. Use `list_endpoints` to discover what's available for your project.
+</Note>
+
+`lifecycle`, `retention`, and `frequency` are first-class MCP tools. For user-level lists or cohort exports, use `text_to_sql` + `execute_query` to query the users datasource directly.
 
 ## FAQ
 
@@ -88,7 +121,7 @@ For user analytics (retention, lifecycle, user profiles), use `text_to_sql` + `e
     The Formo MCP Server works with OAuth-capable MCP clients, Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any AI client that supports HTTP or stdio MCP transports. See the OAuth and API key setup pages above for configuration instructions.
   </Accordion>
   <Accordion title="What analytics data can I query through the MCP Server?">
-    You can query KPIs, traffic sources, top pages, top events, custom events, geographic distribution, revenue data, and wallet profiles. For advanced queries like retention and cohort analysis, use the `text_to_sql` and `execute_query` tools to run SQL directly against your data.
+    You can query KPIs, traffic sources, top pages, top events, geographic distribution, revenue, lifecycle, retention, frequency, cohorts, funnels, and wallet enrichment. Most of these are available as first-class tools (see [Available tools](#available-tools)).
   </Accordion>
   <Accordion title="Is my analytics data secure when using the MCP Server?">
     Yes. The MCP Server provides read-only access scoped to one Formo project. OAuth users select the project during consent, and API keys are project-specific. No data is stored by the MCP server itself.
@@ -99,6 +132,8 @@ For user analytics (retention, lifecycle, user profiles), use `text_to_sql` + `e
 </AccordionGroup>
 
 ## Troubleshooting
+
+**`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans. [Upgrade your workspace](https://app.formo.so) to connect MCP.
 
 **Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart or refresh your AI assistant after configuration changes.
 

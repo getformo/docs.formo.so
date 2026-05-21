@@ -49,10 +49,10 @@ Click on any wallet address to open its full profile. The wallet profile shows:
 
 | Section | What you'll see |
 |---------|-----------------|
-| **Overview** | ENS name, net worth, and lifecycle stage |
 | **Activity** | Real-time feed of actions on your app with UTM attribution |
-| **Holdings** | Token balances and DeFi positions across chains |
-| **Labels** | Auto-generated labels like "DeFi Trader" or "NFT Collector" |
+| **Apps** | DeFi applications the wallet uses across chains |
+| **Tokens** | Token balances and holdings across chains |
+| **Details** | ENS name, net worth, lifecycle stage, custom properties, and labels. |
 
 <Frame caption="View a user's DeFi positions and token balances across chains.">
 	<img src="/images/screenshots/wallet-profile-activity.png" alt="Wallet Profile" />
@@ -76,14 +76,16 @@ Use the lifecycle filter on the Users page to focus on specific user groups.
 
 Segments let you group users by shared characteristics. Here's how to create one:
 
-1. Go to **Users** > **Segments** in the sidebar
-2. Click **Create Segment**
-3. Add filter conditions. For example:
+1. Go to **Users** in the sidebar
+2. Apply filter conditions. For example:
    - Lifecycle = "Power User"
    - Net worth > $10,000
-   - Label contains "DeFi Trader"
-4. Name your segment (e.g., "High-Value DeFi Users")
+   - Label = "Coinbase Verified Account"
+3. Click **Save as Segment**
+4. Name your segment (e.g., "High-Value Verified Users")
 5. Click **Save**
+
+Saved segments are managed inline on the Users page via the Segments dropdown.
 
 <Frame caption="Create segments by combining wallet properties, lifecycle, and behavior.">
 	<img src="/images/wallet-intelligence-segments.png" alt="Segment builder" />

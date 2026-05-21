@@ -1,16 +1,16 @@
 ---
 title: 'Transaction event'
-description: 'Reference for the transaction event, including status tracking for started, broadcasted, confirmed, and rejected wallet transactions with chain and hash data.'
+description: 'Reference for the transaction event, including status tracking for started, broadcasted, confirmed, reverted, and rejected wallet transactions with chain and hash data.'
 ---
 
 The `transaction` event is emitted whenever the user performs a transaction.
-It includes the transaction status (started, broadcasted, rejected), to address, data, value, transaction hash, chain ID, and wallet address.
+It includes the transaction status (started, broadcasted, confirmed, reverted, rejected), to address, data, value, transaction hash, chain ID, and wallet address.
 
 ## Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `status` | string | Transaction status: `started`, `broadcasted`, `confirmed`, or `rejected` |
+| `status` | string | Transaction status: `started`, `broadcasted`, `confirmed`, `reverted`, or `rejected` |
 | `chain_id` | number | Chain ID of the network |
 | `data` | string | Transaction calldata (hex-encoded) |
 | `to` | string | Recipient address |
@@ -19,6 +19,10 @@ It includes the transaction status (started, broadcasted, rejected), to address,
 | `function_name` | string | Decoded function name (if contract interaction) |
 | `function_args` | object | Decoded function arguments (if contract interaction) |
 | `builder_codes` | string | Comma-separated [builder codes](#builder-codes) extracted from the transaction calldata (ERC-8021) |
+
+<Note>
+Decoded function arguments appear **both** as the nested `function_args` object and flattened into individual top-level properties for easier querying (e.g. `function_args.text` is also emitted as `text`). Nested struct fields are flattened with underscores (e.g. `order.maker` → `order_maker`), and any argument whose name collides with a reserved field is prefixed with `arg_` (e.g. `to` → `arg_to`).
+</Note>
 
 ## Builder Codes
 
