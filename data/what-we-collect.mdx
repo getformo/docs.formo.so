@@ -33,7 +33,7 @@ flowchart TD
     style DISCARD fill:#fef2f2,stroke:#dc2626
 ```
 
-**What the SDK sends:** event type, anonymous session ID, wallet address, chain ID, user agent, browser type, timezone, language, page URL, UTM parameters, and custom event properties.
+**What the SDK sends:** event type, anonymous session ID, wallet address, chain ID, user agent, browser type, timezone, language, page URL, UTM parameters, screen and viewport dimensions (`screen_width`, `screen_height`, `screen_density`, `viewport_width`, `viewport_height`), referral parameters (`ref`, `referral`, `refcode`), and custom event properties.
 
 **What the SDK does NOT send:** IP addresses, cookies, local storage data, device fingerprints, or social profiles.
 
@@ -132,7 +132,7 @@ We collect device screen and browser viewport dimensions to understand how visit
 
 > We collect and store country of each visitor.
 
-We collect visitor country based on the their time zone, not their IP address.
+We collect visitor country based on their time zone, not their IP address.
 
 Every country has their own time zone and modern devices automatically update the time zone when the device travels.
 The time zone is limited to a country, so we can't get data about a city or region within a country.

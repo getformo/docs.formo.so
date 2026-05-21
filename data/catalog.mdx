@@ -58,7 +58,7 @@ The core event log. Contains all user interaction events - page views, custom ev
 |--------|------|-------------|
 | `session_id` | String | User session identifier |
 | `channel` | String | Event channel |
-| `type` | String | Event category: `page`, `track`, `identify`, `connect`, `decoded_log` |
+| `type` | String | Event category: `page`, `track`, `identify`, `detect`, `connect`, `disconnect`, `chain`, `signature`, `transaction`, `decoded_log` |
 | `anonymous_id` | String | Auto-generated anonymous user ID |
 | `user_id` | String | Optional user identifier |
 | `address` | String | Wallet address (empty if not connected) |
@@ -87,6 +87,15 @@ The core event log. Contains all user interaction events - page views, custom ev
 | `utm_campaign` | String | UTM campaign |
 | `utm_term` | String | UTM term |
 | `utm_content` | String | UTM content |
+| `gclid` | String | Google Ads click ID |
+| `gad_source` | String | Google Ads source parameter |
+| `fbclid` | String | Meta (Facebook) click ID |
+| `msclkid` | String | Microsoft Ads click ID |
+| `ttclid` | String | TikTok Ads click ID |
+| `twclid` | String | X (Twitter) Ads click ID |
+| `li_fat_id` | String | LinkedIn Ads click ID |
+| `rdt_cid` | String | Reddit Ads click ID |
+| `builder_codes` | String | Builder/referral codes |
 | `user_agent` | String | Raw user agent string |
 | `device` | String | Device type: `desktop`, `mobile-ios`, `mobile-android`, `tablet`, `bot` |
 | `browser` | String | Browser: `chrome`, `safari`, `firefox`, or Web3 wallets |
@@ -134,11 +143,17 @@ This is an **aggregate table**. Most columns require `-Merge` functions. Always 
 | `last_referrer_url` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_referrer_url)` |
 | `first_ref` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_ref)` |
 | `last_ref` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_ref)` |
+| `first_builder_codes` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_builder_codes)` |
+| `last_builder_codes` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_builder_codes)` |
+| `first_paid_source` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_paid_source)` |
+| `last_paid_source` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_paid_source)` |
+| `first_click_id` | AggregateFunction(argMin, String, DateTime) | `argMinMerge(first_click_id)` |
+| `last_click_id` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_click_id)` |
 | `num_sessions` | AggregateFunction(uniq, String) | `uniqMerge(num_sessions)` |
 | `revenue` | SimpleAggregateFunction(sum, Float64) | `sum(revenue)` |
 | `volume` | SimpleAggregateFunction(sum, Float64) | `sum(volume)` |
 | `points` | SimpleAggregateFunction(sum, Float64) | `sum(points)` |
-| `wallets_state` | AggregateFunction(groupUniqArray, String) | `groupUniqArrayMerge(wallets_state)` |
+| `wallets_state` | AggregateFunction(groupUniqArray, String) | `groupUniqArrayMerge(wallets_state)` (users table only) |
 | `last_type` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_type)` |
 | `last_event` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_event)` |
 | `last_properties` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(last_properties)` |
@@ -146,7 +161,7 @@ This is an **aggregate table**. Most columns require `-Merge` functions. Always 
 | `device` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(device)` |
 | `browser` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(browser)` |
 | `os` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(os)` |
-| `activity_dates` | AggregateFunction(groupUniqArray, Date) | `groupUniqArrayMerge(activity_dates)` |
+| `activity_dates` | AggregateFunction(groupUniqArrayIf, Date, UInt8) | `groupUniqArrayIfMerge(activity_dates)` |
 
 **Lifecycle definitions** (based on `activity_dates`):
 - **New**: `first_seen` within 30 days
@@ -215,6 +230,14 @@ Aggregated session data with engagement metrics and attribution. Each row repres
 | `utm_campaign` | SimpleAggregateFunction(any, String) | Direct access |
 | `utm_content` | SimpleAggregateFunction(any, String) | Direct access |
 | `utm_term` | SimpleAggregateFunction(any, String) | Direct access |
+| `gclid` | SimpleAggregateFunction(any, String) | Direct access |
+| `gad_source` | SimpleAggregateFunction(any, String) | Direct access |
+| `fbclid` | SimpleAggregateFunction(any, String) | Direct access |
+| `msclkid` | SimpleAggregateFunction(any, String) | Direct access |
+| `ttclid` | SimpleAggregateFunction(any, String) | Direct access |
+| `twclid` | SimpleAggregateFunction(any, String) | Direct access |
+| `li_fat_id` | SimpleAggregateFunction(any, String) | Direct access |
+| `rdt_cid` | SimpleAggregateFunction(any, String) | Direct access |
 | `first_hit` | SimpleAggregateFunction(min, DateTime) | Direct access |
 | `latest_hit` | SimpleAggregateFunction(max, DateTime) | Direct access |
 | `hits` | AggregateFunction(count) | `countMerge(hits)` |
@@ -279,6 +302,15 @@ Financial metrics with full attribution context. Tracks revenue, transaction vol
 | `utm_campaign` | String | UTM campaign |
 | `utm_content` | String | UTM content |
 | `utm_term` | String | UTM term |
+| `builder_codes` | String | Builder/referral codes |
+| `gclid` | String | Google Ads click ID |
+| `gad_source` | String | Google Ads source parameter |
+| `fbclid` | String | Meta (Facebook) click ID |
+| `msclkid` | String | Microsoft Ads click ID |
+| `ttclid` | String | TikTok Ads click ID |
+| `twclid` | String | X (Twitter) Ads click ID |
+| `li_fat_id` | String | LinkedIn Ads click ID |
+| `rdt_cid` | String | Reddit Ads click ID |
 | `event` | String | Revenue-generating event name |
 | `rdns` | String | Wallet RDNS identifier |
 | `provider_name` | String | Wallet provider name |
@@ -456,44 +488,20 @@ Raw timestamped wallet profile data from blockchain analysis. Contains the unpro
 
 ---
 
-### chains
+### wallet_profiles_labels
 
-Derived view providing chain usage data with attribution context.
+Wallet labels and tags for categorizing and filtering wallet addresses. Each row is a label assigned to an address, optionally scoped to a chain.
 
-**Use cases:** Chain adoption tracking, multi-chain user analysis
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `chain_id` | String | Blockchain identifier |
-| `date` | DateTime | Activity date |
-| `origin` | String | Site domain |
-| `device` | String | Device type |
-| `browser` | String | Browser |
-| `os` | String | Operating system |
-| `location` | String | Country code |
-| `referrer` | String | Referrer domain |
-| `ref` | String | Ref parameter |
-| `utm_medium` | String | UTM medium |
-| `utm_source` | String | UTM source |
-| `utm_campaign` | String | UTM campaign |
-| `utm_content` | String | UTM content |
-| `utm_term` | String | UTM term |
-| `visits` | String | Visit count |
-
----
-
-### pages
-
-Derived view providing page-level analytics data.
-
-**Use cases:** Page performance analysis, content analytics, top pages
+**Use cases:** Wallet categorization, risk scoring, user segmentation, compliance filtering
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `origin` | String | Site domain |
-| `pathname` | String | URL path |
-| `visits` | Number | Unique session count |
-| `hits` | Number | Total page views |
+| `address` | String | Wallet address |
+| `chain_id` | String | Blockchain identifier (`-` for global labels across all chains) |
+| `tag_id` | String | Unique label identifier |
+| `value` | String | Optional label value/score |
+| `source` | String | System that provided the label |
+| `timestamp` | DateTime | When the label was last updated |
 
 ---
 
@@ -652,6 +660,7 @@ Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`)
 | `AggregateFunction(uniq, T)` | `uniqMerge(col)` | `uniqMerge(num_sessions)` |
 | `AggregateFunction(count)` | `countMerge(col)` | `countMerge(hits)` |
 | `AggregateFunction(groupUniqArray, T)` | `groupUniqArrayMerge(col)` | `groupUniqArrayMerge(wallets_state)` |
+| `AggregateFunction(groupUniqArrayIf, T, UInt8)` | `groupUniqArrayIfMerge(col)` | `groupUniqArrayIfMerge(activity_dates)` |
 | `AggregateFunction(min, T)` | `minMerge(col)` | `minMerge(first_seen)` |
 | `SimpleAggregateFunction(min, T)` | `min(col)` | `min(first_seen)` |
 | `SimpleAggregateFunction(max, T)` | `max(col)` | `max(last_seen)` |

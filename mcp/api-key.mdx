@@ -21,6 +21,10 @@ https://api.formo.so/v0/mcp/
   Keep the trailing slash in `/v0/mcp/`. Do not use `https://api.formo.so/` as the MCP server URL.
 </Note>
 
+<Note>
+  MCP requires a **Scale or Enterprise** plan. Connections from Free or Growth workspaces are rejected with a `403` error, even with a valid API key. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
+</Note>
+
 ## Create an API key
 
 1. Go to your [Formo workspace settings](https://app.formo.so)
@@ -199,6 +203,8 @@ Select your client below to configure Formo with API key authentication.
 </Card>
 
 ## Troubleshooting
+
+**`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans. A valid API key with the MCP scope is not sufficient on Free or Growth workspaces. [Upgrade your workspace](https://app.formo.so) to connect MCP.
 
 **Tools not appearing:** Verify your API key has the MCP scope enabled. Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart your AI assistant after configuration changes.
 

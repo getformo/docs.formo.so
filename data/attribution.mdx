@@ -1,7 +1,7 @@
 ---
 title: 'Attribution'
 icon: magnifying-glass-chart
-description: 'Learn why onchain attribution matters for sustainable growth and how Formo calculates multi-touch attribution from first click to wallet transaction.'
+description: 'Learn why onchain attribution matters for sustainable growth and how Formo attributes conversions from first click to wallet transaction.'
 iconType: solid
 ---
 
@@ -39,11 +39,10 @@ Consider the following example user journey for a DEX called FooSwap with many t
 - The user revisits the app from another channel on Farcaster (*"referrer"*)
 - The user completes a swap transaction (*"conversion"*) emitting an onchain event
 
-As you've seen in the above example, not everything you care about is onchain. In this example, two touchpoints contribute to the successful conversion: X and Farcaster. Using an [attribution model](/data/attribution#attribution-models), we can assign different weights to these touchpoints to determine their relative importance in the conversion:
+As you've seen in the above example, not everything you care about is onchain. In this example, two touchpoints contribute to the successful conversion: X and Farcaster. Using an [attribution model](/data/attribution#attribution-models), we can determine which touchpoint to credit for the conversion:
 
-- Using first touch model, the complete conversion can be attributed to X and the referral
-- Using last touch model, the complete conversion can be attributed to Farcaster
-- Using a linear attribution model, we could assign a weight of 0.5 to each touchpoint, meaning that both X and Farcaster contributed equally to the conversion
+- Using the first-touch model, the complete conversion is attributed to X and the referral
+- Using the last-touch model, the complete conversion is attributed to Farcaster
 
 ### How attribution works in Formo
 
@@ -105,13 +104,12 @@ Spend less time building analytics and leave the complex data engineering to us.
 
 ### Attribution models
 
-Formo helps you understand the impact of each touchpoint in each user journey, whether with first or last touch (single-touch attribution) or across multiple touchpoints using multi-touch attribution.
+Formo helps you understand the impact of touchpoints in each user journey using single-touch attribution, crediting either the first or the last touchpoint within the lookback window.
 
 | Model       | Description                                                                                                |
 | :---------- | :--------------------------------------------------------------------------------------------------------- |
 | First Touch | Gives 100% credit to the first touchpoint within the attribution lookback window                           |
 | Last Touch  | Gives 100% credit to the last touchpoint within the attribution lookback window                            |
-| Linear      | Gives equal credit to every touchpoint leading up to a conversion within the lookback window |
 
 > Looking for more attribution models? [Let us know](mailto:support@formo.so).
 
@@ -120,6 +118,6 @@ Formo helps you understand the impact of each touchpoint in each user journey, w
 | Term                   | Definition                                                                                                                                                                                             |
 | :--------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | User journey           | Consists of touchpoints and the conversion event. It is possible for a conversion event to have no corresponding touchpoints (eg. utm parameters). In this case we consider it a 'direct' conversion     |
-| Conversion             | The primary event you're interested in analyzing with multi-touch attribution models. Typically some final value generating interaction such as "Mint" or "Swap" or "Stake".                     |
+| Conversion             | The primary event you're interested in attributing. Typically a volume or revenue generating conversion event such as "Mint" or "Swap" or "Stake".                     |
 | Touchpoint             | Actions (events) a user's taken or exposed to along the journey before doing the conversion event. [Eg. does event A → B → C → D (conversion event) in a 7 day period; For a lookback window of 7 days, A, B, C are all considered touchpoints] |
 | Lookback window        | The time window where a user's events with this attribution property are counted towards the calculation. The window ends when the conversion metric happens.                                            |
