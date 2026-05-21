@@ -400,7 +400,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
   <Tab icon="react" title="React">
 
     <Note>
-    **Using Wagmi?** Install with [Wagmi](#wagmi) instead for better event tracking.
+    **Using Wagmi?** Install with [Wagmi](/sdks/web#wagmi) instead for better event tracking.
     </Note>
 
     #### 1. Install the Formo SDK
@@ -480,7 +480,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
   <Tab icon="rectangle-terminal" title="Next.js">
 
     <Note>
-    **Using Wagmi?** Install with [Wagmi](#wagmi) instead for better event tracking.
+    **Using Wagmi?** Install with [Wagmi](/sdks/web#wagmi) instead for better event tracking.
     </Note>
 
     #### 1. Install the Formo SDK
@@ -818,7 +818,7 @@ Events that are tracked correctly should also show up in the Activity page of yo
 
 <AccordionGroup>
   <Accordion title="Which installation method should I use: Wagmi, React, Next.js, or HTML snippet?">
-    If your app uses [Wagmi](https://wagmi.sh/) for wallet connections and its hooks for transactions, use the [Wagmi integration](#wagmi). For React or Next.js apps without Wagmi, use the [React integration](#react--nextjs). For static sites or non-React apps, use the [HTML snippet](#websites). For mobile apps, use the [React Native SDK](/sdks/mobile).
+    If your app uses [Wagmi](https://wagmi.sh/) for wallet connections and its hooks for transactions, use the [Wagmi integration](/sdks/web#wagmi). For React or Next.js apps without Wagmi, use the [React integration](/sdks/web#react--nextjs-without-wagmi). For static sites or non-React apps, use the [HTML snippet](/sdks/web#html-snippet). For mobile apps, use the [React Native SDK](/sdks/mobile).
   </Accordion>
   <Accordion title="Why are my transactions and signatures not being tracked?">
     When using the Wagmi integration, transaction and signature tracking requires your app to use the wagmi `useWriteContract` hooks. Contract calls via `@wagmi/core` or `viem` directly bypass the mutation cache and won’t be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.

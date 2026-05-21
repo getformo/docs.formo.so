@@ -13,7 +13,7 @@ This guide covers the common and contextual fields in detail.
 | Name | Datatype | Required | Description |
 |:-----|:----------|:---------|:------------|
 | `type` | String | ✓ | Captures the type of event. Values can be either identify, track, connect, signature, transaction, and others. |
-| `channel` | String | ✓ | Identifies the source of the event. Permitted values are mobile, web, server, onchain, import, and api. |
+| `channel` | String | ✓ | Identifies the source of the event. The Formo SDKs emit `web`, `mobile`, `server`, or `source`. Other values such as `onchain`, `import`, and `api` are reserved for platform and import-pipeline ingestion, not SDK-emitted events. |
 | `version` | String | ✓ | Version of the event spec. |
 | `project_id` | String | ✓ | Unique identification for the project in the database. |
 | `session_id` | String | ✓ | Privacy-friendly daily changing session identifier. |
@@ -46,6 +46,14 @@ Contextual fields give additional information about a particular event. The foll
 | `utm_term` | String |  | Identifies search terms. |
 | `utm_content` | String |  | Identifies what specifically was clicked to bring the user to the site. |
 | `ref` | String |  | Referral code or identifier. |
+| `gclid` | String |  | Google Ads click identifier. |
+| `gad_source` | String |  | Google Ads source parameter (newer attribution). |
+| `fbclid` | String |  | Meta (Facebook/Instagram) click identifier. |
+| `msclkid` | String |  | Microsoft Ads (Bing) click identifier. |
+| `ttclid` | String |  | TikTok Ads click identifier. |
+| `twclid` | String |  | Twitter/X Ads click identifier. |
+| `li_fat_id` | String |  | LinkedIn Ads click identifier. |
+| `rdt_cid` | String |  | Reddit Ads click identifier. |
 | `page_url` | String |  | Full URL of the page. |
 | `page_path` | String |  | Path component of the URL. |
 | `page_title` | String |  | Title of the page. |
@@ -106,7 +114,7 @@ Here's an example event with common and contextual fields included:
 {
     "type": "page",
     "channel": "web",
-    "version": "1",
+    "version": "0",
     "project_id": "d5naNbBlqxSBXLuNa6zwc",
     "session_id": "117b982a451dc22edea6413b8e20958216c0a5b3baaa1d90699c42dbf4e74e33",    
     "anonymous_id": "c2bc0ebe-d852-49d1-9efd-e45744850ae0",
@@ -125,11 +133,11 @@ Here's an example event with common and contextual fields included:
         "utm_campaign": "early-access",
         "utm_term": "",
         "utm_content": "",
-        "page_url": "https://www.estore.com/best-seller/1",
-        "page_path": "/best-seller/1",
-        "page_title": "The best sellers offered by EStore",
+        "page_url": "https://app.morpho.org/vaults/1",
+        "page_path": "/vaults/1",
+        "page_title": "USDC Vault | Morpho",
         "library_name": "Formo Web SDK",
-        "library_version": "1.25.0",
+        "library_version": "1.30.1",
         "browser": "chrome",
         "screen_width": 1920,
         "screen_height": 1080,
@@ -138,12 +146,12 @@ Here's an example event with common and contextual fields included:
         "viewport_height": 969
     },
     "properties": {
-        "name": "Best Seller",
-        "category": "Docs",
-        "url": "https://formo.so/faucets?utm_source=chatgpt.com",
-        "path": "/best-seller/1",
-        "hash": "#submit",
-        "title": "The best sellers offered by EStore"
+        "name": "USDC Vault",
+        "category": "Vaults",
+        "url": "https://app.morpho.org/vaults/1?utm_source=chatgpt.com",
+        "path": "/vaults/1",
+        "hash": "#deposit",
+        "title": "USDC Vault | Morpho"
     },
     "message_id": "48555101eee2f44ac0f0632fcb7c7c9f6ce0012ae395ae79f8a0d515e4f5e41f",
     "original_timestamp": "2025-04-03 18:21:00",

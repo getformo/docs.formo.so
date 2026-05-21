@@ -1,26 +1,28 @@
 ---
 title: 'Transaction event'
-description: 'Reference for the transaction event, including status tracking for started, broadcasted, confirmed, and rejected wallet transactions with chain and hash data.'
+description: 'Reference for the transaction event, including status tracking for started, broadcasted, confirmed, reverted, and rejected wallet transactions with chain and hash data.'
 ---
 
 The `transaction` event is emitted whenever the user performs a transaction.
-It includes the transaction status (started, broadcasted, confirmed, rejected, reverted), to address, data, value, transaction hash, chain ID, and wallet address.
+It includes the transaction status (started, broadcasted, confirmed, reverted, rejected), recipient address, data, value, transaction hash, chain ID, and wallet address.
 
 ## Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `status` | string | Transaction status: `started`, `broadcasted`, `confirmed`, `rejected`, or `reverted` |
-| `chain_id` | number | Chain ID of the network |
-| `data` | string | Transaction calldata (hex-encoded) |
-| `to` | string | Recipient address |
-| `value` | string | Transaction value (hex-encoded) |
-| `transaction_hash` | string | Transaction hash (available after broadcast) |
-| `function_name` | string | Decoded function name (if contract interaction) |
-| `function_args` | object | Decoded function arguments (if contract interaction) |
-| `builder_codes` | string | Comma-separated [builder codes](#builder-codes) extracted from the transaction calldata (ERC-8021) |
+| `status` | String | Transaction status: `started`, `broadcasted`, `confirmed`, `reverted`, or `rejected` |
+| `chain_id` | Number | Chain ID of the network |
+| `data` | String | Transaction calldata (hex-encoded) |
+| `to` | String | Recipient address |
+| `value` | String | Transaction value (hex-encoded) |
+| `transaction_hash` | String | Transaction hash (available after broadcast) |
+| `function_name` | String | Decoded function name (if contract interaction) |
+| `function_args` | Object | Decoded function arguments (if contract interaction) |
+| `builder_codes` | String | Comma-separated [builder codes](#builder-codes) extracted from the transaction calldata (ERC-8021) |
 
+<Note>
 Each entry in `function_args` is also flattened into the event's top-level properties for easier querying. For example, `function_args: { foo: "bar" }` also adds `foo: "bar"` as a property.
+</Note>
 
 ## Builder Codes
 

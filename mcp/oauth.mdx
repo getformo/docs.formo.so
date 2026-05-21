@@ -23,6 +23,10 @@ https://api.formo.so/v0/mcp/
   Always configure the MCP endpoint as `/v0/mcp/` with the trailing slash. Do not use `https://api.formo.so/` as the MCP server URL.
 </Note>
 
+<Note>
+  MCP requires a **Scale or Enterprise** plan. The plan is enforced during the OAuth flow: Free and Growth workspaces cannot complete authorization and receive a `403` error. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
+</Note>
+
 ## When to use OAuth
 
 Use OAuth when the MCP client manages authentication for users. The setup examples below cover common hosted web clients.
@@ -158,7 +162,9 @@ Unauthenticated requests return a `401` with a `WWW-Authenticate` challenge that
   |:---------|:----|
   | Protected resource metadata | `https://api.formo.so/.well-known/oauth-protected-resource/v0/mcp` |
   | Authorization server metadata | `https://api.formo.so/v0/mcp/oauth/.well-known/oauth-authorization-server` |
-  | OpenID configuration | `https://api.formo.so/v0/mcp/oauth/.well-known/openid-configuration` |
+  | OpenID configuration alias | `https://api.formo.so/v0/mcp/oauth/.well-known/openid-configuration` |
+
+  The `openid-configuration` path is an alias that returns the same OAuth authorization-server metadata for clients that look there. Formo MCP is OAuth 2.0 only and does not implement full OpenID Connect.
 </Accordion>
 
 ## API key compatibility
@@ -179,6 +185,8 @@ Workspace API keys must include the MCP scope. Existing Claude Desktop, Cursor, 
 Use a Workspace API Key when your MCP client supports custom request headers and you want to manage credentials yourself, such as local developer tools, CLI bridges, and editor integrations.
 
 ## Troubleshooting
+
+**`403 MCP access requires a Scale or Enterprise plan`:** The signed-in workspace is on a Free or Growth plan. MCP authorization is gated server-side, so the OAuth flow will not complete. [Upgrade the workspace](https://app.formo.so) to a Scale or Enterprise plan, then reconnect.
 
 **Client does not start OAuth:** Confirm the MCP server URL is exactly `https://api.formo.so/v0/mcp/` and includes the trailing slash.
 
