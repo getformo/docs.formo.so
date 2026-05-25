@@ -2050,7 +2050,7 @@
       "segments:read": "List segments",
       "segments:write": "Create and delete segments (requires segments:read)",
       "profiles:read": "Search and get wallet profiles",
-      "profiles:write": "Import wallet addresses (requires profiles:read)",
+      "profiles:write": "Update wallet properties, manage labels, and import addresses (requires profiles:read)",
       "query:read": "Execute SQL analytics queries and read pre-built analytics endpoints (KPIs, top pages, lifecycle, retention, revenue, etc.)",
       "mcp:read": "MCP protocol access (analytics tools + management tools based on other scopes)"
     }
