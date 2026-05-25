@@ -679,13 +679,16 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 
 Formo autodetects `ref`, `referral`, and `refcode` query parameters in the URL. You can customize how referrals are detected by the SDK:
 
-```javascript
-const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
-  referral: {
-    queryParams: ['via', 'ref'],
-    pathPattern: '/referral/([^/]+)'
-  }
-});
+```tsx
+<FormoAnalyticsProvider
+  writeKey="<YOUR_WRITE_KEY>"
+  options={{
+    referral: {
+      queryParams: ['via', 'ref'],      // Query params to detect (default: ['ref', 'referral', 'refcode'])
+      pathPattern: '/referral/([^/]+)', // Regex to extract referral code from the URL path
+    },
+  }}
+>
 ```
 
 In the above configuration, Formo will detect referrals from:
