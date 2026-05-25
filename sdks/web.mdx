@@ -147,13 +147,13 @@ export default HomePage;
 ### Angular
 
 <Note>
-`FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps import from the React-free [`@formo/analytics/core`](https://github.com/getformo/sdk/releases/tag/v1.30.1) subpath (added in **v1.30.1**) and wrap `FormoAnalytics.init()` in an injectable service, with wallets connected over the bare EIP-1193 provider (`window.ethereum`). Full working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular).
+`FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps import from the React-free `@formo/analytics/core` subpath and wrap `FormoAnalytics.init()` in an injectable service, with wallets connected over the bare EIP-1193 provider (`window.ethereum`). Full working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular).
 </Note>
 
-Install the Web SDK (v1.30.1 or later) along with the `buffer` polyfill. Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads — without it, signing throws `ReferenceError: Buffer is not defined`.
+Install the Web SDK along with the `buffer` polyfill. Angular's esbuild build doesn't auto-polyfill Node globals, but the SDK uses `Buffer` to decode signed-message payloads. Without it, signing throws `ReferenceError: Buffer is not defined`.
 
 ```bash
-npm install @formo/analytics@^1.30.1 buffer viem --save
+npm install @formo/analytics buffer viem --save
 ```
 
 ```ts
@@ -170,7 +170,7 @@ import { Buffer } from 'buffer';
 }
 ```
 
-Wrap `FormoAnalytics.init()` in an injectable service. Import from `@formo/analytics/core` — the root entry pulls in the React provider, which Angular doesn't need:
+Wrap `FormoAnalytics.init()` in an injectable service. Import from `@formo/analytics/core`; the root entry pulls in the React provider, which Angular doesn't need:
 
 ```ts
 // src/app/services/formo-analytics.service.ts
@@ -216,10 +216,6 @@ export const appConfig: ApplicationConfig = {
   ],
 };
 ```
-
-<Note>
-Angular Router navigates with `history.pushState`, which the SDK hooks on init — page changes are autocaptured. Don't add a `NavigationEnd` subscription that calls `formo.page()` or you'll double-count.
-</Note>
 
 ## Identify users
 
@@ -302,7 +298,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
     ```
   </Tab>
   <Tab title="Angular">
-    Inject the analytics service and call `identify()` from the same place you discover the wallet address (for example, a `WalletService` that drives `eth_requestAccounts`):
+    Inject the analytics service and call `identify()` from the same place you discover the wallet address:
 
     ```ts
     import { Injectable, inject, signal } from '@angular/core';
@@ -322,7 +318,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
     }
     ```
 
-    See the [with-angular example](https://github.com/getformo/examples/tree/main/with-angular) for the full wallet service, including the hydrate-on-load and `wallet_revokePermissions` patterns.
+    See the [with-angular example](https://github.com/getformo/examples/tree/main/with-angular) for a full working example.
   </Tab>
 </Tabs>
 
