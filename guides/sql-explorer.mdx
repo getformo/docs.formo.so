@@ -44,6 +44,7 @@ Key columns:
 - `referrer_url`: Referrer URL
 - `utm_source`, `utm_medium`, `utm_campaign`: Attribution data
 - `properties`: JSON string with event-specific data (chain_id, tx_hash, etc. stored here)
+- `volume`, `revenue`, `points`: Float32 columns extracted from `properties` at ingest (values >100M zeroed as anomalies). Query these flat columns rather than `JSONExtractFloat(properties, ...)`
 - `location`: Country/geo (LowCardinality String)
 - `device`: Device type (LowCardinality String)
 - `browser`: Browser name (LowCardinality String)

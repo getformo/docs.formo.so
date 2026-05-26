@@ -100,6 +100,9 @@ The core event log. Contains all user interaction events - page views, custom ev
 | `device` | String | Device type: `desktop`, `mobile-ios`, `mobile-android`, `tablet`, `bot` |
 | `browser` | String | Browser: `chrome`, `safari`, `firefox`, or Web3 wallets |
 | `os` | String | OS: `windows`, `ios`, `android`, `macos`, `linux` |
+| `volume` | Float32 | Transaction volume extracted from `properties.volume` at ingest. Values above 100M are zeroed as anomalies. Always query this flat column instead of `JSONExtractFloat(properties, 'volume')` |
+| `revenue` | Float32 | Revenue extracted from `properties.revenue` at ingest. Values above 100M are zeroed as anomalies. Always query this flat column instead of `JSONExtractFloat(properties, 'revenue')` |
+| `points` | Float32 | Points extracted from `properties.points` at ingest. Values above 100M are zeroed as anomalies. Always query this flat column instead of `JSONExtractFloat(properties, 'points')` |
 
 **Example:**
 
