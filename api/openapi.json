@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Formo Public API",
-    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat.\n\n**Auth.** All endpoints require a workspace API key with the appropriate scopes — see `x-api-scopes`.\n\n**Response shape.** Successful responses return the resource directly (or `{ data: [...], total, page, size, has_more }` for paginated lists). HTTP status carries success/failure — there is no envelope wrapping success bodies.\n\n**Errors.** Every non-2xx response uses the `Error` envelope: `{ error: { code, message, doc_url, param?, details? } }`. Branch on the machine-readable `code` (see `ErrorCode` enum) and follow `doc_url` to the matching section of the [errors reference](https://docs.formo.so/api/errors).\n\n**Idempotency.** Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE to make retries safe; the response is cached for 24 h and replayed on duplicate keys.",
+    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat.\n\n**Auth.** All endpoints require a workspace API key with the appropriate scopes (see `x-api-scopes`).\n\n**Response shape.** Successful responses return the resource directly (or `{ data: [...], total, page, size, has_more }` for paginated lists). HTTP status carries success/failure; there is no envelope wrapping success bodies.\n\n**Errors.** Every non-2xx response uses the `Error` envelope: `{ error: { code, message, doc_url, param?, details? } }`. Branch on the machine-readable `code` (see `ErrorCode` enum) and follow `doc_url` to the matching section of the [errors reference](https://docs.formo.so/api/errors).\n\n**Idempotency.** Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE to make retries safe; the response is cached for 24 h and replayed on duplicate keys.",
     "version": "0.1.0",
     "contact": {
       "name": "Formo",
@@ -73,7 +73,7 @@
               },
               "message": {
                 "type": "string",
-                "description": "Human-readable error description. Wording may change between releases — branch on `code`, not `message`."
+                "description": "Human-readable error description. Wording may change between releases, so branch on `code`, not `message`."
               },
               "doc_url": {
                 "type": "string",
@@ -297,7 +297,7 @@
               "track",
               "decoded_log"
             ],
-            "description": "`event` — built-in page/connect/transaction events; `track` — custom tracked events; `decoded_log` — decoded smart-contract events."
+            "description": "`event`: built-in page/connect/transaction events; `track`: custom tracked events; `decoded_log`: decoded smart-contract events."
           },
           "event": {
             "type": "string",
@@ -436,7 +436,7 @@
               "open"
             ],
             "default": "closed",
-            "description": "**Funnel only.** `closed` — users must complete steps in strict order with no intervening events. `open` — users may complete steps in order but other events may occur between steps."
+            "description": "**Funnel only.** `closed`: users must complete steps in strict order with no intervening events. `open`: users may complete steps in order but other events may occur between steps."
           },
           "conversionWindow": {
             "$ref": "#/components/schemas/ConversionWindow",
@@ -460,7 +460,7 @@
           },
           "startStep": {
             "$ref": "#/components/schemas/FunnelStep",
-            "description": "**user_paths — required.** The event where the user flow begins."
+            "description": "**user_paths (required).** The event where the user flow begins."
           },
           "endStep": {
             "oneOf": [
@@ -471,7 +471,7 @@
                 "type": "null"
               }
             ],
-            "description": "**user_paths — optional.** The event where the user flow ends. If `null` the flow is open-ended."
+            "description": "**user_paths (optional).** The event where the user flow ends. If `null` the flow is open-ended."
           },
           "maxSteps": {
             "type": "integer",
@@ -522,7 +522,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`** — pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** — can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** — required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -557,7 +557,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` — at least 1 element required.\n- `pie` / `stacked` — exactly 1 element required."
+            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line`: at least 1 element required.\n- `pie` / `stacked`: exactly 1 element required."
           },
           "group_by": {
             "type": "string",
@@ -569,7 +569,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` — add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -596,7 +596,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`** — pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`** — can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types** — required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -631,7 +631,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line` — at least 1 element required.\n- `pie` / `stacked` — exactly 1 element required."
+            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line`: at least 1 element required.\n- `pie` / `stacked`: exactly 1 element required."
           },
           "group_by": {
             "type": "string",
@@ -643,7 +643,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep` — add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -1450,7 +1450,7 @@
       },
       "UpdateUserPropertiesResponse": {
         "type": "object",
-        "description": "Echo of the wallet identity after the merge-update applied. Synthesised from the request payload — analytics ingestion is eventually consistent, so the response reflects the applied write rather than a follow-up read.",
+        "description": "Echo of the wallet identity after the merge-update applied. Synthesised from the request payload; analytics ingestion is eventually consistent, so the response reflects the applied write rather than a follow-up read.",
         "required": [
           "address",
           "updated_at"
@@ -1900,7 +1900,7 @@
     },
     "responses": {
       "BadRequest": {
-        "description": "The request was rejected. `code` is either `INVALID_VALIDATION_REQUEST` (Zod schema mismatch — `details` carries a `{ fieldPath: message }` map) or `BAD_REQUEST` (semantic validation failure outside Zod, e.g. mismatched IDs, business-rule violations). Branch on `code`, not status, to tell the two apart.",
+        "description": "The request was rejected. `code` is either `INVALID_VALIDATION_REQUEST` (Zod schema mismatch; `details` carries a `{ fieldPath: message }` map) or `BAD_REQUEST` (semantic validation failure outside Zod, e.g. mismatched IDs, business-rule violations). Branch on `code`, not status, to tell the two apart.",
         "content": {
           "application/json": {
             "schema": {
@@ -3157,7 +3157,7 @@
                   }
                 },
                 "barChart": {
-                  "summary": "Daily active users — bar chart",
+                  "summary": "Daily active users: bar chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date",
@@ -3170,7 +3170,7 @@
                   }
                 },
                 "lineChart": {
-                  "summary": "DAU last 30 days — line chart",
+                  "summary": "DAU last 30 days: line chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS daily_active_users FROM events GROUP BY date ORDER BY date DESC LIMIT 30",
@@ -3183,7 +3183,7 @@
                   }
                 },
                 "pieChart": {
-                  "summary": "Sessions by device — pie chart",
+                  "summary": "Sessions by device: pie chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
@@ -3196,7 +3196,7 @@
                   }
                 },
                 "stackedChart": {
-                  "summary": "Sessions by device grouped by browser — stacked chart",
+                  "summary": "Sessions by device grouped by browser: stacked chart",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
@@ -3210,7 +3210,7 @@
                   }
                 },
                 "numberChart": {
-                  "summary": "Total connected wallets — number / KPI card",
+                  "summary": "Total connected wallets: number / KPI card",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
@@ -3219,7 +3219,7 @@
                   }
                 },
                 "tableChart": {
-                  "summary": "Recent events — table",
+                  "summary": "Recent events: table",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
@@ -3228,7 +3228,7 @@
                   }
                 },
                 "userPathsChart": {
-                  "summary": "User flow from connect — max 5 steps",
+                  "summary": "User flow from connect: max 5 steps",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
@@ -3269,12 +3269,12 @@
                   }
                 },
                 "retentionFiltered": {
-                  "summary": "Weekly retention — desktop users, transaction event",
+                  "summary": "Weekly retention: desktop users, transaction event",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "",
                     "chart_type": "retention",
-                    "title": "Weekly Retention — Desktop",
+                    "title": "Weekly Retention: Desktop",
                     "settings": {
                       "retentionFilter": {
                         "type": "event",
@@ -4782,7 +4782,7 @@
         },
         "responses": {
           "204": {
-            "description": "Label deleted. No body — the caller already knows the new state."
+            "description": "Label deleted. No body; the caller already knows the new state."
           },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
@@ -4892,7 +4892,7 @@
         },
         "responses": {
           "200": {
-            "description": "Offset-paginated query results. The server doesn't own pagination here — `LIMIT` and `OFFSET` come from your SQL string and are echoed back. `total` is the row count before `LIMIT` was applied; `has_more` is true when there are additional rows beyond the current window.",
+            "description": "Offset-paginated query results. The server doesn't own pagination here; `LIMIT` and `OFFSET` come from your SQL string and are echoed back. `total` is the row count before `LIMIT` was applied; `has_more` is true when there are additional rows beyond the current window.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4926,7 +4926,7 @@
                     },
                     "has_more": {
                       "type": "boolean",
-                      "description": "True when `offset + data.length < total` — i.e. there's another page to fetch by re-running with a higher OFFSET."
+                      "description": "True when `offset + data.length < total`; i.e. there's another page to fetch by re-running with a higher OFFSET."
                     }
                   }
                 },
@@ -6220,7 +6220,7 @@
       "get": {
         "operationId": "getAnalyticsRevenueTimeseries",
         "summary": "Get per-event revenue and volume trend for a single wallet",
-        "description": "Returns daily per-event revenue and volume rows for the given wallet `address`. Scoped per wallet — there is no project-wide aggregate mode on this endpoint.",
+        "description": "Returns daily per-event revenue and volume rows for the given wallet `address`. Scoped per wallet; there is no project-wide aggregate mode on this endpoint.",
         "tags": [
           "Query"
         ],
@@ -6762,7 +6762,7 @@
               "default": 10,
               "minimum": 0
             },
-            "description": "Minimum cohort size to include (default 10). Ignored when `user_filters` is set — all weeks are returned regardless of size."
+            "description": "Minimum cohort size to include (default 10). Ignored when `user_filters` is set; all weeks are returned regardless of size."
           },
           {
             "name": "limit",
@@ -6961,7 +6961,7 @@
             "description": "JSON-encoded array of 2–10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `includes`. For `in`/`notIn`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
-                "summary": "Simple 3-step funnel — page → connect → swap",
+                "summary": "Simple 3-step funnel: page → connect → swap",
                 "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[]},{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::1\",\"filters\":[]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::2\",\"filters\":[]}]"
               },
               "standardColumnFilter": {
@@ -7013,7 +7013,7 @@
               "enum": ["closed", "open"],
               "default": "closed"
             },
-            "description": "`closed` (default) — ordered, in-window via `windowFunnel`. `open` — unordered per-step `minIf`; emits an extra `dropped_off_users` column."
+            "description": "`closed` (default): ordered, in-window via `windowFunnel`. `open`: unordered per-step `minIf`; emits an extra `dropped_off_users` column."
           },
           {
             "name": "breakdown",
@@ -7144,7 +7144,7 @@
       "get": {
         "operationId": "getAnalyticsFlow",
         "summary": "Get session-scoped user-flow transitions (Sankey)",
-        "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the pipe rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour — every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).",
+        "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the pipe rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour; every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).",
         "tags": [
           "Query"
         ],

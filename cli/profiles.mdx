@@ -134,9 +134,9 @@ The `--conditions` option accepts a JSON array of filter condition objects:
 ```
 
 <Warning>
-`field` **must be a typed path** (prefixed by its category — see the table
+`field` **must be a typed path** (prefixed by its category; see the table
 below). The CLI rejects a bare/untyped field (e.g. `net_worth_usd`) with an
-error, because the API would otherwise **silently ignore** it — no error, no
+error, because the API would otherwise **silently ignore** it: no error, no
 filtering, returning the entire unfiltered dataset. Always prefix the field,
 e.g. `users.net_worth_usd`.
 </Warning>

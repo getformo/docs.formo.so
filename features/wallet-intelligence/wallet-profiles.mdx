@@ -22,15 +22,15 @@ Gain a complete view of each user's behaviour across chains and platforms:
 
 ## User Lifecycle
 
-Each user's lifecycle stage is automatically calculated based on their activity:
+Each user's lifecycle stage is computed relative to a **reference date** (the end of the queried date range, which defaults to today). The default thresholds are shown below; projects can override them in **Settings → Lifecycle**.
 
-| Lifecycle | Description |
+| Lifecycle | Definition |
 |:----------|:------------|
-| **New** | Wallets engaging with your app for the first time. A spike in new wallets indicates a successful campaign or marketing push. |
-| **Returning** | Users who consistently return after their first interaction. Low retention may indicate issues with user experience or platform value. |
-| **Power Users** | Returning users who very frequently use your app (active on at least 5 days out of the last 30 days). |
-| **Churned** | Wallets that stopped engaging after being active (e.g., 30 days of inactivity). An increase signals a need to reassess engagement strategies. |
-| **Resurrected** | Wallets that were once inactive but have re-engaged. Useful for evaluating re-engagement campaigns. |
+| **New** | First seen within the last 30 days. |
+| **Returning** | First seen more than 30 days ago, active within the last 30 days, but on fewer than 5 distinct days and with no 30+ day inactivity gap in their history. |
+| **Power Users** | First seen more than 30 days ago and active on at least 5 of the last 30 days. |
+| **Resurrected** | Re-engaged within the last 30 days after a 30+ day inactivity gap. |
+| **Churned** | Last seen more than 30 days ago. |
 
 Filter users by lifecycle to create [segments](/features/wallet-intelligence/segments) and audiences. For example, "Show me whales who use app X who are power users" or "Show me high net worth wallets who have churned."
 
@@ -183,12 +183,12 @@ Each event shows:
 
 The **Apps** and **Tokens** tabs show the user's onchain footprint:
 
-**Apps tab — DeFi positions:**
+**Apps tab (DeFi positions):**
 - Active positions in protocols (Aave, Uniswap, etc.) across supported chains
 - USD value and portfolio percentage for each position
 - Useful for understanding which crypto apps the wallet interacts with
 
-**Tokens tab — token balances:**
+**Tokens tab (token balances):**
 - All tokens held across supported chains
 - Token amounts, USD values, and portfolio percentages
 

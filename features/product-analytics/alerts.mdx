@@ -37,7 +37,7 @@ Get real-time notifications when high-value users interact with your app. This g
 | Setting | Description |
 |---------|-------------|
 | **Name** | Descriptive name (e.g., "Whale Alert") |
-| **Trigger Type** | Event alerts (User alerts coming soon — see below) |
+| **Trigger Type** | Event alerts (User alerts coming soon; see below) |
 | **Conditions** | Filter conditions (optional) |
 | **Notification** | Webhook (generic HTTP or Slack via an incoming-webhook URL) |
 
@@ -59,7 +59,7 @@ Currently, **Event alerts** are the supported, working trigger type. **User aler
     You can add conditions to filter on event properties (e.g., `chain_id = 8453`, `status = failed`).
   </Tab>
   <Tab title="Users (coming soon)">
-    <Note>User alerts are not yet available — the User trigger type is disabled in the dashboard. The behavior below describes the planned functionality.</Note>
+    <Note>User alerts are not yet available; the User trigger type is disabled in the dashboard. The behavior below describes the planned functionality.</Note>
 
     Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your criteria.
 
@@ -319,7 +319,7 @@ Each message includes:
 
 ### User alerts (coming soon)
 
-<Note>User alerts are not yet available — the User trigger type is disabled in the dashboard. The payload format below documents the planned behavior.</Note>
+<Note>User alerts are not yet available; the User trigger type is disabled in the dashboard. The payload format below documents the planned behavior.</Note>
 
 When a user alert is triggered, Formo sends matching user profiles to your webhook.
 

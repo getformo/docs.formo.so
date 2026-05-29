@@ -2,10 +2,10 @@
 title: "Analytics"
 sidebarTitle: "Analytics"
 icon: chart-mixed
-description: "Run Formo's pre-built analytics pipes — KPIs, funnels, retention, revenue, and top-N breakdowns — directly from the terminal, without writing SQL."
+description: "Run Formo's pre-built analytics pipes (KPIs, funnels, retention, revenue, and top-N breakdowns) directly from the terminal, without writing SQL."
 ---
 
-The `formo analytics` command exposes Formo's pre-built analytics pipes — the same data that powers the Formo dashboard — as terminal commands. Each pipe is a subcommand: `formo analytics <pipe>`.
+The `formo analytics` command exposes Formo's pre-built analytics pipes (the same data that powers the Formo dashboard) as terminal commands. Each pipe is a subcommand: `formo analytics <pipe>`.
 
 <Note>
 Requires `query:read` scope on your API key.
@@ -45,7 +45,7 @@ Requires `query:read` scope on your API key.
 | `--params` | `string` | ❌ | JSON object of pipe-specific params merged into the query |
 
 <Note>
-`--params` may **not** set `date_from`/`date_to`/`filters` — use the dedicated
+`--params` may **not** set `date_from`/`date_to`/`filters`; use the dedicated
 `--date-from`/`--date-to`/`--filters` flags for those. Object/array values in
 `--params` are JSON-encoded automatically (e.g. `funnel`'s `steps`).
 </Note>
@@ -61,8 +61,8 @@ Some pipes take additional, pipe-specific parameters. Pass them as a JSON object
 | Pipe | Key params |
 |------|------------|
 | `kpis`, `revenue_overview` | `group_by`, `limit`, `include_previous_period` |
-| `funnel` | `steps` (required — JSON array of `{type,event,name,filters?}`), `window_seconds`, `funnel_type`, `breakdown` |
-| `flow` | `start_step` (required — JSON `{type,event,resolved_event,...}`), `end_step`, `global_filters`, `window_seconds`, `max_steps` |
+| `funnel` | `steps` (required, a JSON array of `{type,event,name,filters?}`), `window_seconds`, `funnel_type`, `breakdown` |
+| `flow` | `start_step` (required, a JSON `{type,event,resolved_event,...}`), `end_step`, `global_filters`, `window_seconds`, `max_steps` |
 | `retention` | `id_type`, `event_type`, `event_name`, `min_users` |
 | `revenue_timeseries` | `address` (required) |
 | `revenue_by_metric`, `volume_by_metric`, `top_sources` | `metric_column`, `limit`, `offset` |

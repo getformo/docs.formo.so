@@ -166,12 +166,12 @@ This is an **aggregate table**. Most columns require `-Merge` functions. Always 
 | `os` | AggregateFunction(argMax, String, DateTime) | `argMaxMerge(os)` |
 | `activity_dates` | AggregateFunction(groupUniqArrayIf, Date, UInt8) | `groupUniqArrayIfMerge(activity_dates)` |
 
-**Lifecycle definitions** (based on `activity_dates`):
-- **New**: `first_seen` within 30 days
-- **Churned**: `last_seen` >= 30 days ago
-- **Power**: 5+ unique active days in last 30 days
-- **Resurrected**: had 30+ day gap but returned
-- **Returning**: default
+**Lifecycle definitions** (based on `activity_dates`, computed against a reference date that defaults to today):
+- **New**: `first_seen` within the last 30 days
+- **Power**: `first_seen` more than 30 days ago and 5+ unique active days in the last 30 days
+- **Resurrected**: `first_seen` more than 30 days ago and re-engaged within the last 30 days after a 30+ day gap
+- **Churned**: `last_seen` more than 30 days ago
+- **Returning**: default (first seen more than 30 days ago, active recently, but not Power or Resurrected)
 
 **Example:**
 

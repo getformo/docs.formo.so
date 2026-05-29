@@ -643,7 +643,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
     Working example: [with-angular](https://github.com/getformo/examples/tree/main/with-angular). Also see the [Angular section](/sdks/web#angular) of the Web SDK page.
     </Note>
 
-    Angular has no first-class Formo binding — `FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps install Formo on the **non-wagmi, non-React path**: import the framework-agnostic `FormoAnalytics.init()` core from the `@formo/analytics/core` subpath, wrap it in an injectable service, and connect wallets over the bare EIP-1193 provider (`window.ethereum`).
+    Angular has no first-class Formo binding: `FormoAnalyticsProvider` and `useFormo()` are React-only. Angular apps install Formo on the **non-wagmi, non-React path**: import the framework-agnostic `FormoAnalytics.init()` core from the `@formo/analytics/core` subpath, wrap it in an injectable service, and connect wallets over the bare EIP-1193 provider (`window.ethereum`).
 
     #### 1. Install the Formo SDK
 
@@ -674,7 +674,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
     #### 2. Wrap `FormoAnalytics.init()` in an injectable service
 
-    Import from `@formo/analytics/core` — the root entry re-exports the React provider, which Angular doesn't need:
+    Import from `@formo/analytics/core`. The root entry re-exports the React provider, which Angular doesn't need:
 
     ```ts
     // src/app/services/formo-analytics.service.ts
@@ -732,12 +732,12 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
     ```
 
     <Warning>
-    Don't initialize from `ngOnInit` — it runs after first render, leaving a race window where early wallet interactions are not captured.
+    Don't initialize from `ngOnInit`; it runs after first render, leaving a race window where early wallet interactions are not captured.
     </Warning>
 
     #### 4. Identify users
 
-    Call `identify()` once a wallet address is known. Angular Router's `pushState` is already wrapped by the SDK, so `page` events are autocaptured on every route change — do not add a `NavigationEnd` subscription that calls `formo.page()` or you'll double-count.
+    Call `identify()` once a wallet address is known. Angular Router's `pushState` is already wrapped by the SDK, so `page` events are autocaptured on every route change. Do not add a `NavigationEnd` subscription that calls `formo.page()` or you'll double-count.
 
     ```ts
     import { Injectable, inject, signal } from '@angular/core';
