@@ -598,6 +598,38 @@ const analytics = await FormoAnalytics.init('your-write-key', {
 
 Specify exact hostnames and exact paths in exclusion lists.
 
+### Excluding query parameters
+
+Formo automatically captures the page URL, query string, individual query-parameter properties, and the referrer. 
+
+If your URLs carry sensitive data (auth tokens, one-time codes, emails), use `tracking.excludeQueryParams` to strip those parameters in the browser, before any event is sent so they are never transmitted or stored:
+
+```tsx
+<FormoAnalyticsProvider
+  writeKey="<YOUR_WRITE_KEY>"
+  options={{
+    tracking: {
+      excludeQueryParams: ["token", "access_token", "email", "signature"],
+    },
+  }}
+>
+  {children}
+</FormoAnalyticsProvider>
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `excludeQueryParams` | `string[]` | `[]` | Query parameter names to strip from captured URLs before any event is sent. Applied on top of an always-on built-in denylist that cannot be disabled. |
+
+The following parameters are **always** stripped, regardless of configuration:
+
+- `privy_oauth_code` — Privy OAuth authorization code
+- `privy_oauth_state` — Privy OAuth CSRF state token
+- `privy_oauth_provider` — Privy OAuth provider identifier
+
+Excluded parameters are removed from the `url`, `query`, `referrer`, and other event properties. Matching is case-insensitive.
+
+
 ### Consent management
 
 The Formo Web SDK includes simplified consent management functionality to help you comply with privacy regulations like GDPR, CCPA, and ePrivacy Directive.
