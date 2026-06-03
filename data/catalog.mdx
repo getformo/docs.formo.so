@@ -170,8 +170,9 @@ This is an **aggregate table**. Most columns require `-Merge` functions. Always 
 - **New**: `first_seen` within the last 30 days
 - **Power**: `first_seen` more than 30 days ago and 5+ unique active days in the last 30 days
 - **Resurrected**: `first_seen` more than 30 days ago and re-engaged within the last 30 days after a 30+ day gap
+- **At Risk**: `first_seen` more than 30 days ago, still active, but `last_seen` 14+ days ago with fewer than 5 active days in the last 30 days, no 30+ day gap, and 1+ active day in the prior window (days 30 to 60 ago)
 - **Churned**: `last_seen` more than 30 days ago
-- **Returning**: default (first seen more than 30 days ago, active recently, but not Power or Resurrected)
+- **Returning**: default (first seen more than 30 days ago, active recently, but not Power, Resurrected, or At Risk)
 
 **Example:**
 

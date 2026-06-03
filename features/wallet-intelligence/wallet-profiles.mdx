@@ -26,13 +26,16 @@ Each user's lifecycle stage is computed relative to a **reference date** (the en
 
 | Lifecycle | Definition |
 |:----------|:------------|
-| **New** | First seen within the last 30 days. |
-| **Returning** | First seen more than 30 days ago, active within the last 30 days, but on fewer than 5 distinct days and with no 30+ day inactivity gap in their history. |
-| **Power Users** | First seen more than 30 days ago and active on at least 5 of the last 30 days. |
-| **Resurrected** | Re-engaged within the last 30 days after a 30+ day inactivity gap. |
+| **New** | First seen within the last 30 days and still active. |
+| **Power User** | First seen more than 30 days ago, still active, and active on at least 5 distinct days in the last 30 days. |
+| **Resurrected** | First seen more than 30 days ago and re-engaged within the last 30 days after a 30+ day inactivity gap. |
+| **At Risk** | Established and still active, but going quiet: last seen at least 14 days ago, fewer than 5 active days in the last 30 days, and no 30+ day gap. To qualify they must have had at least 1 active day in the prior window (days 30 to 60 ago), so they were genuinely engaged before fading (not a one-off visit). |
+| **Returning** | Established active users who don't fit another stage: active recently but not New, Power, Resurrected, or At Risk. |
 | **Churned** | Last seen more than 30 days ago. |
 
-Filter users by lifecycle to create [segments](/features/wallet-intelligence/segments) and audiences. For example, "Show me whales who use app X who are power users" or "Show me high net worth wallets who have churned."
+Stages are mutually exclusive and evaluated in precedence order: Churned, New, Power User, Resurrected, At Risk, Returning. **At Risk** carves out fading users that would otherwise sit in Returning, surfacing established wallets to re-engage before they churn.
+
+Filter users by lifecycle to create [segments](/features/wallet-intelligence/segments) and audiences. For example, "Show me whales who use app X who are power users" or "Show me high net worth wallets who are at risk."
 
 ## Wallet Metadata
 
@@ -158,7 +161,7 @@ The profile header shows key information at a glance:
 | **Address** | Wallet address with copy button |
 | **ENS/Identity** | ENS name, Farcaster, Lens, or other identity |
 | **Net Worth** | Total value across all chains |
-| **Lifecycle** | New, Returning, Power User, Churned, or Resurrected |
+| **Lifecycle** | New, Returning, Power User, Resurrected, At Risk, or Churned |
 | **First Seen** | When they first visited your app |
 | **Last Seen** | Most recent activity |
 

@@ -945,6 +945,7 @@
               "Returning",
               "Power user",
               "Resurrected",
+              "At Risk",
               "Churned"
             ]
           },
@@ -1710,6 +1711,7 @@
             "Returning",
             "Power user",
             "Resurrected",
+            "At Risk",
             "Churned"
           ]
         },
@@ -6442,7 +6444,7 @@
     "/v0/lifecycle": {
       "get": {
         "operationId": "getAnalyticsLifecycle",
-        "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / Churned)",
+        "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / At Risk / Churned)",
         "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
         "tags": [
           "Query"
