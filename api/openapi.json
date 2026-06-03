@@ -1832,7 +1832,7 @@
       "AnalyticsBehaviorFilters": {
         "name": "behavior_filters",
         "in": "query",
-        "description": "JSON array filtering users by event-based behavior with counts and date ranges. Each entry is `{ event, op, count, date_from?, date_to? }`.",
+        "description": "JSON array filtering users by event-based behavior with counts and either an absolute date range or a window relative to the user's first event. Each entry is `{ event, op, count, date_from?, date_to?, event_type?, relative_to?, window? }`. When `relative_to: \"first_seen\"` is set, the matching events must occur within `window.value` `window.unit` (`hour` | `day`) after the user's first event; `date_from`/`date_to` are ignored. `event_type` narrows matching to a specific event-type column (`page`, `connect`, `disconnect`, `chain`, `signature`, `transaction`, `track`, `decoded_log`, `detect`, `identify`); for `track` and `decoded_log` the `event` field is the named identifier; for other types only the `type` column is matched.",
         "content": {
           "application/json": {
             "schema": {
@@ -1844,8 +1844,14 @@
             "example": [
               {
                 "event": "swap",
+                "event_type": "track",
                 "op": "greaterOrEqual",
-                "count": 3
+                "count": 1,
+                "relative_to": "first_seen",
+                "window": {
+                  "value": 24,
+                  "unit": "hour"
+                }
               }
             ]
           }
@@ -1889,6 +1895,76 @@
             ]
           }
         }
+      },
+      "LifecycleNewWindowDays": {
+        "name": "new_window_days",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "description": "Override: a wallet is New if first seen within this many days of the reference date (default 30). Caller value wins over the project's saved setting."
+      },
+      "LifecycleChurnWindowDays": {
+        "name": "churn_window_days",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "description": "Override: a wallet is Churned once last seen this many days before the reference date (default 30)."
+      },
+      "LifecyclePowerUserMinActiveDays": {
+        "name": "power_user_min_active_days",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "description": "Override: distinct active days within the power-user window required to qualify as Power user (default 5)."
+      },
+      "LifecyclePowerUserWindowDays": {
+        "name": "power_user_window_days",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "description": "Override: trailing window in which active days are counted for Power user qualification (default 30)."
+      },
+      "LifecycleResurrectedGapDays": {
+        "name": "resurrected_gap_days",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "description": "Override: minimum inactivity gap that marks a re-engaging wallet as Resurrected (default 30)."
+      },
+      "LifecycleAtRiskMinDaysInactive": {
+        "name": "at_risk_min_days_inactive",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "description": "Override: minimum days since last activity for an established, still-active wallet to be At Risk (default 14; must be < churn_window_days)."
+      },
+      "LifecycleAtRiskPriorActiveDaysThreshold": {
+        "name": "at_risk_prior_active_days_threshold",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "description": "Override: minimum active days a wallet had in the window before the recent quiet stretch to qualify as At Risk (default 1)."
       },
       "AnalyticsExclude": {
         "name": "exclude",
@@ -6444,8 +6520,8 @@
     "/v0/lifecycle": {
       "get": {
         "operationId": "getAnalyticsLifecycle",
-        "summary": "Get user lifecycle stages (New / Returning / Power / Resurrected / At Risk / Churned)",
-        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.",
+        "summary": "Get user lifecycle stages (New / Returning / Power user / Resurrected / At Risk / Churned)",
+        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
         "tags": [
           "Query"
         ],
@@ -6489,6 +6565,27 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsLabelFilters"
+          },
+          {
+            "$ref": "#/components/parameters/LifecycleNewWindowDays"
+          },
+          {
+            "$ref": "#/components/parameters/LifecycleChurnWindowDays"
+          },
+          {
+            "$ref": "#/components/parameters/LifecyclePowerUserMinActiveDays"
+          },
+          {
+            "$ref": "#/components/parameters/LifecyclePowerUserWindowDays"
+          },
+          {
+            "$ref": "#/components/parameters/LifecycleResurrectedGapDays"
+          },
+          {
+            "$ref": "#/components/parameters/LifecycleAtRiskMinDaysInactive"
+          },
+          {
+            "$ref": "#/components/parameters/LifecycleAtRiskPriorActiveDaysThreshold"
           }
         ],
         "responses": {
@@ -6523,7 +6620,7 @@
                     {
                       "project_id": "proj_abc",
                       "user_type": "Returning",
-                      "user_count": 76
+                      "user_count": 62
                     },
                     {
                       "project_id": "proj_abc",
@@ -6537,12 +6634,17 @@
                     },
                     {
                       "project_id": "proj_abc",
+                      "user_type": "At Risk",
+                      "user_count": 14
+                    },
+                    {
+                      "project_id": "proj_abc",
                       "user_type": "Churned",
                       "user_count": 142
                     }
                   ],
-                  "rows": 5,
-                  "rows_before_limit_at_least": 5
+                  "rows": 6,
+                  "rows_before_limit_at_least": 6
                 }
               }
             }
