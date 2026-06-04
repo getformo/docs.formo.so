@@ -25,31 +25,31 @@ If you have Formo installed on your website and app, you will also get the user'
     ```bash
     curl -sS \
       -H "Authorization: Bearer <your_workspace_api_key>" \
-      "https://api.formo.so/v0/profiles/0x<address>"
+      "https://api.formo.so/v0/profiles/<address>"
     ```
 
     <Note>
-    Create a key with **profiles:read** scope in **Team Settings → API Keys**.
+    Create a key with **profiles:read** scope in **Team Settings > API Keys**.
     </Note>
   </Tab>
-  <Tab title="x402 (AI agents)">
-    AI agents can access this endpoint through the **x402 gateway** — no Formo API key required. The agent pays per request using the [x402 protocol](https://www.x402.org/).
+  <Tab title="x402">
+    AI agents can access this endpoint through the **x402 gateway** with no Formo API key required. The agent pays per request using the [x402 protocol](https://www.x402.org/).
 
     **Gateway URL:** `https://formo.x402.paysponge.com/v0/profiles/{address}`
 
     **Price:** 0.05 USDC per request (Base network)
 
-    The gateway issues a `402 Payment Required` challenge on the first request. A compliant x402 client handles the payment automatically and retries with an `X-PAYMENT` header.
+    The gateway issues a `402 Payment Required` challenge on the first request. A compliant x402 client handles the payment automatically.
 
     **Using the Sponge wallet SDK:**
 
     ```typescript
     import { SpongeWallet } from '@paysponge/sdk';
 
-    const wallet = new SpongeWallet({ apiKey: process.env.SPONGE_API_KEY });
+    const wallet = await SpongeWallet.connect({ apiKey: process.env.SPONGE_API_KEY });
 
     const response = await wallet.x402Fetch({
-      url: 'https://formo.x402.paysponge.com/v0/profiles/0x<address>',
+      url: 'https://formo.x402.paysponge.com/v0/profiles/<address>',
       method: 'GET',
     });
 
@@ -59,14 +59,14 @@ If you have Formo installed on your website and app, you will also get the user'
     **Raw HTTP (after payment):**
 
     ```http
-    GET /v0/profiles/0x<address> HTTP/1.1
+    GET /v0/profiles/<address> HTTP/1.1
     Host: formo.x402.paysponge.com
-    X-PAYMENT: <x402 payment payload>
+    PAYMENT-SIGNATURE: <x402 payment payload>
     ```
 
     The response shape is identical to the standard endpoint. The `expand` query parameter works the same way.
   </Tab>
-  <Tab title="MPP (AI agents)">
+  <Tab title="MPP">
     AI agents can also access this endpoint through the **MPP gateway** using the [MPP protocol](https://mpp.dev/).
 
     **Gateway URL:** `https://formo.mpp.paysponge.com/v0/profiles/{address}`
@@ -85,7 +85,7 @@ If you have Formo installed on your website and app, you will also get the user'
     });
 
     const response = await client.fetch(
-      'https://formo.mpp.paysponge.com/v0/profiles/0x<address>',
+      'https://formo.mpp.paysponge.com/v0/profiles/<address>',
     );
 
     const profile = await response.json();
@@ -94,7 +94,7 @@ If you have Formo installed on your website and app, you will also get the user'
     **Raw HTTP (after payment):**
 
     ```http
-    GET /v0/profiles/0x<address> HTTP/1.1
+    GET /v0/profiles/<address> HTTP/1.1
     Host: formo.mpp.paysponge.com
     Authorization: Payment <mpp payment payload>
     ```
