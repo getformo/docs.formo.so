@@ -4,11 +4,9 @@ description: 'Retrieve a comprehensive wallet profile by address, including onch
 openapi: 'GET /v0/profiles/{address}'
 ---
 
-Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps. 
+Retrieves wallet profile information for a given address. Returns comprehensive profile data including wallet properties, labels, tokens, and apps.
 
 If you have Formo installed on your website and app, you will also get the user's web demographics (country, device, browser, operating system), lifecycle, volume, and revenue.
-
-> Available on [x402](https://formo.x402.paysponge.com) on [MPP](https://formo.mpp.paysponge.com).
 
 <Frame>
 	<img src="/images/profile-api-diagram.png" alt="Profiles API architecture diagram showing user device, Profiles API, and Wallet Profiles interaction" />
@@ -16,15 +14,100 @@ If you have Formo installed on your website and app, you will also get the user'
 
 ## Authentication
 
-This endpoint requires authentication using a **Workspace API Key** with `profiles:read` permission. Include the API key in your request headers:
+<Tabs>
+  <Tab title="Workspace API Key">
+    This endpoint requires a **Workspace API Key** with `profiles:read` permission. Include the API key in your request headers:
 
-```bash
-Authorization: Bearer <your_workspace_api_key>
-```
+    ```bash
+    Authorization: Bearer <your_workspace_api_key>
+    ```
 
-<Note>
-The API key needs to have the **read permission for profiles** in the API settings. You can configure this in your workspace API key settings.
-</Note>
+    ```bash
+    curl -sS \
+      -H "Authorization: Bearer <your_workspace_api_key>" \
+      "https://api.formo.so/v0/profiles/<address>"
+    ```
+
+    <Note>
+    Create a key with **profiles:read** scope in **Team Settings > API Keys**.
+    </Note>
+  </Tab>
+  <Tab title="x402">
+    AI agents can access this endpoint through the **x402 gateway** with no Formo API key required. The agent pays per request using the [x402 protocol](https://www.x402.org/).
+
+    **Gateway URL:**
+    ```
+    https://formo.x402.paysponge.com/v0/profiles/{address}
+    ```
+
+    **Price:** 0.05 USDC per request (Base network)
+
+    The gateway issues a `402 Payment Required` challenge on the first request. A compliant x402 client handles the payment automatically.
+
+    **Using the Sponge wallet SDK:**
+
+    ```typescript
+    import { SpongeWallet } from '@paysponge/sdk';
+
+    const wallet = await SpongeWallet.connect({ apiKey: process.env.SPONGE_API_KEY });
+
+    const response = await wallet.x402Fetch({
+      url: 'https://formo.x402.paysponge.com/v0/profiles/<address>',
+      method: 'GET',
+    });
+
+    console.log(response.data); // wallet profile object
+    ```
+
+    **Raw HTTP (after payment):**
+
+    ```http
+    GET /v0/profiles/<address> HTTP/1.1
+    Host: formo.x402.paysponge.com
+    PAYMENT-SIGNATURE: <x402 payment payload>
+    ```
+
+    The response shape is identical to the standard endpoint. The `expand` query parameter works the same way.
+  </Tab>
+  <Tab title="MPP">
+    AI agents can also access this endpoint through the **MPP gateway** using the [MPP protocol](https://mpp.dev/).
+
+    **Gateway URL:**
+    ```
+    https://formo.mpp.paysponge.com/v0/profiles/{address}
+    ```
+
+    **Price:** 0.05 USDC.e per request (Tempo network)
+
+    The gateway issues a `402 Payment Required` challenge. A compliant MPP client handles the payment authorization automatically.
+
+    **Using the mppx SDK:**
+
+    ```typescript
+    import { createTempoClient } from 'mppx';
+
+    const client = createTempoClient({
+      privateKey: process.env.TEMPO_PRIVATE_KEY,
+    });
+
+    const response = await client.fetch(
+      'https://formo.mpp.paysponge.com/v0/profiles/<address>',
+    );
+
+    const profile = await response.json();
+    ```
+
+    **Raw HTTP (after payment):**
+
+    ```http
+    GET /v0/profiles/<address> HTTP/1.1
+    Host: formo.mpp.paysponge.com
+    Authorization: Payment <mpp payment payload>
+    ```
+
+    The response shape is identical to the standard endpoint. The `expand` query parameter works the same way.
+  </Tab>
+</Tabs>
 
 ## Path parameters
 
