@@ -5,37 +5,25 @@ icon: chart-simple
 iconType: solid
 ---
 
-### Current Visitors
+### Live Visitors
 
-How many unique visitors are currently interacting with your site or app.
-It includes all visitors who have viewed a page in the last 5 minutes.
+How many visitors are currently active on your site or app.
+It counts unique active sessions with a page view in the last 10 minutes.
 
-### Unique Visitors
+### Visitors
 
-How many daily / weekly / monthly unique visitors are interacting with your site or app across multiple page views and events. 
-A visitor is only counted once within a 24 hour window. The 24 hour limit is necessary to comply with GDPR.
+How many unique visitors are interacting with your site or app across the selected period, spanning multiple page views and events.
+A visitor is identified by a persistent visitor ID (their anonymous ID) and is not stitched to a wallet, so this counts distinct visitors rather than connected wallets.
 
-### New Users
+In the overview, the **Visitors** chart shows the daily unique-visitor count (a visitor active on several days adds to each of those days), while the headline number is de-duplicated across the entire selected period, so a visitor active on multiple days is counted only once.
 
-Users who visit your site or app for the first time within the selected time period.
+Comparable to Google Analytics' "Active users".
 
-### Returning Users
+### Wallets
 
-Users who have visited your site or app in previous time periods and return within the current period. 
-
-### Resurrected Users
-
-Users who were previously active, became inactive for a period of time, and then return after being inactive.
-
-### Active Wallets
-
-How many unique daily / weekly / monthly wallets are active on your site or app.
+Unique wallet addresses active with at least one session during the selected period.
 
 We also collect other wallet details, such as the wallet address, wallet type, and wallet profiles.
-
-### Wallet Connects
-
-How many users have connected their crypto wallets to your app.
 
 ### Transactions
 
@@ -48,22 +36,19 @@ How many times a page has been viewed across your site or app.
 ### Sessions
 
 A session (also known as a visit) is a set of actions that a user takes on your site. 
-Each session is a 24 hour window. If a visitor returns after this window, a new session is counted.
-
-This is useful for debugging and identifying problems on your site. 
-For example, if visitors are not completing transactions, you can see which pages were visited and what events were triggered to identify a common problem on your site that is preventing visitors from completing.
+Formo counts unique session IDs. With the web SDK, each visitor's session is counted once per day, so one visitor can have multiple sessions across days.
 
 ### Session Duration
 
-Session duration measures how long a visitor stays on your website or app during a single visit (session).
+Session duration measures the observed active time a visitor spends during a single visit (session).
 
 ##### How It's Calculated
 
-1. Starting Point: When a visitor first lands on your site, the system records a timestamp.
+1. Per-event gaps: The system measures the time between each consecutive event in a session.
 
-2. Ending Point: When the visitor performs their last action before leaving, another timestamp is recorded.
+2. Active time only: It sums those gaps but ignores any gap longer than 30 minutes (1800 seconds) — long inactivity is treated as the visitor leaving, not as time on site.
 
-3. The Calculation: The system simply subtracts the first timestamp from the last one to determine how long the visitor stayed.
+3. Per-session duration: Adding the counted gaps gives the session's active duration. A session with a single event (e.g. one pageview) has a duration of 0.
 
 4. Averaging: To get the average session duration shown in your reports, the system adds up all individual session durations and divides by the number of sessions.
 
@@ -78,8 +63,8 @@ For most purposes, this calculation method provides an accurate and useful measu
 
 ### Bounce Rate
 
-The bounce rate is the relative number of visitors who have left the site after a single page view, compared to the total number of unique visitors.
-Formo counts a "bounce" if the visitor visits only a single page and leaves without performing an engaging action. 
+The bounce rate is the percentage of sessions that bounce, measured over sessions (not unique visitors).
+Formo counts a "bounce" when a session has a single pageview, no engagement events, and less than 10 seconds of observed activity. Engagement events are wallet connects, transactions, tracked custom events, and smart contract events (decoded logs).
 
 ### Referrers / Sources
 
@@ -136,7 +121,7 @@ How many users are using a particular device such as desktop, mobile, tablet, et
 
 Browser is the statistics of the browser used by the visitor. It is extracted from the User-Agent and Client Hints HTTP headers.
 
-### Operating System
+### OS
 
 Shows the operating systems used by your visitors.
 
@@ -147,6 +132,32 @@ The date and time when a user or wallet was first observed interacting with your
 ### Last Seen
 
 The most recent date and time when a user or wallet was observed interacting with your app.
+
+### User lifecycle
+
+The lifecycle stage of each wallet or visitor (New, Returning, Power User, Resurrected, At Risk, or Churned), computed from their activity recency and frequency relative to a reference date.
+
+See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds for each stage.
+
+### New Users
+
+Users who visit your site or app for the first time within the selected time period.
+
+### Returning Users
+
+Users who have visited your site or app in previous time periods and return within the current period. 
+
+### Resurrected Users
+
+Users who were previously active, became inactive for a period of time, and then return after being inactive.
+
+### At Risk Users
+
+Established users who are still active but have been quiet for a stretch, and who had real activity before going quiet (so it is not a one-off visit).
+
+### Churned Users
+
+Users with no activity within the project's churn window.
 
 ### Events
 
@@ -200,10 +211,6 @@ The date and time of the first onchain activity detected for a wallet.
 
 The most recent date and time of onchain activity detected for a wallet.
 
-### Wallet Score
-
-A score that indicates the quality and intent of a wallet address.
-
 ### Wallet Labels
 
 Labels are assigned to a wallet address based on its past onchain activity and public information offchain.
@@ -250,10 +257,4 @@ This is a part of [revenue attribution tracking](/features/product-analytics/cus
 
 ### Customer Lifetime Value (CLTV)
 
-CLV estimates the total revenue a user generates over their entire engagement with your crypto app.
-
-### User lifecycle
-
-The lifecycle stage of each wallet or visitor (New, Returning, Power User, Resurrected, At Risk, or Churned), computed from their activity recency and frequency relative to a reference date.
-
-See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds for each stage.
+CLV estimates the total revenue a user generates over their entire engagement with your app.

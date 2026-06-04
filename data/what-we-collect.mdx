@@ -35,9 +35,9 @@ flowchart TD
 
 **What the SDK sends:** event type, anonymous session ID, wallet address, chain ID, user agent, browser type, timezone, language, page URL, UTM parameters, screen and viewport dimensions (`screen_width`, `screen_height`, `screen_density`, `viewport_width`, `viewport_height`), referral parameters (`ref`, `referral`, `refcode`), and custom event properties.
 
-**What the SDK does NOT send:** IP addresses, cookies, local storage data, device fingerprints, or social profiles.
+**What the SDK does NOT send:** IP addresses, third-party cookies, local storage data, device fingerprints, or social profiles.
 
-**What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only to compute a daily-rotating session hash for unique visitor counting, then discards it. The raw IP address is never stored in logs or databases.
+**What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only to compute a daily-rotating session hash for session counting, then discards it. The raw IP address is never stored in logs or databases.
 
 ### What We Do NOT Collect
 
@@ -65,15 +65,15 @@ Every HTTP request to any server (including GA4, Umami, and Plausible) includes 
 
 > We do NOT use device or browser fingerprinting.
 
-We do not attempt to generate a device-persistent identifier because they are considered personal data under GDPR.
+We identify visitors with a first-party anonymous ID — a random identifier stored in a first-party cookie — rather than by fingerprinting the device or browser. The overview **Visitors** metric counts unique first-party anonymous IDs.
 
-To count unique visitors, we generate a daily-changing identifier on the server using data from standard HTTP headers:
+For sessions, we additionally derive a daily-rotating identifier on the server from standard HTTP headers:
 
 ```
 hash(daily_salt + website_domain + ip_address + user_agent)
 ```
 
-This hash is a **one-way function** - it cannot be reversed to recover the original IP address or user-agent. The salt rotates every 24 hours, making cross-day correlation impossible.
+This session hash is a **one-way function** - it cannot be reversed to recover the original IP address or user-agent, and the salt rotates every 24 hours.
 
 ### NO Third-party Cookies
 

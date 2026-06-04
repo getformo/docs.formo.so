@@ -5053,8 +5053,8 @@
     "/v0/kpis": {
       "get": {
         "operationId": "getAnalyticsKpis",
-        "summary": "Get KPIs (visitors, pageviews, bounce rate, session duration)",
-        "description": "Time-series traffic KPIs with optional dimension breakdown. Returns visitors, pageviews, bounce rate and average session length.",
+        "summary": "Get KPIs (sessions, pageviews, bounce rate, session duration)",
+        "description": "Time-series traffic KPIs with optional dimension breakdown. Returns `sessions` (session count), pageviews, bounce rate and average session length. When `include_previous_period=true` without `group_by`, the response also includes `visitors` (unique visitors), `visitors_current` and `visitors_previous`.",
         "tags": [
           "Query"
         ],
@@ -5122,7 +5122,7 @@
                       "type": "String"
                     },
                     {
-                      "name": "visitors",
+                      "name": "sessions",
                       "type": "UInt64"
                     },
                     {
@@ -5142,7 +5142,7 @@
                     {
                       "date": "2025-10-15",
                       "project_id": "proj_abc",
-                      "visitors": 412,
+                      "sessions": 412,
                       "pageviews": 1187,
                       "bounce_rate": 0.31,
                       "avg_session_sec": 142.6
@@ -5150,7 +5150,7 @@
                     {
                       "date": "2025-10-16",
                       "project_id": "proj_abc",
-                      "visitors": 487,
+                      "sessions": 487,
                       "pageviews": 1402,
                       "bounce_rate": 0.28,
                       "avg_session_sec": 156.2
@@ -5158,7 +5158,7 @@
                     {
                       "date": "2025-10-17",
                       "project_id": "proj_abc",
-                      "visitors": 533,
+                      "sessions": 533,
                       "pageviews": 1610,
                       "bounce_rate": 0.26,
                       "avg_session_sec": 168.4
