@@ -4,6 +4,6 @@ description: "Time-series traffic KPIs (visitors, pageviews, bounce rate, sessio
 openapi: "GET /v0/kpis"
 ---
 
-Returns the same KPI series that powers the Formo dashboard's overview chart. Here `visitors` is the per-day session count (the overview's **Sessions** card), while `unique_users` (and `unique_users_current` / `unique_users_previous`) are unique anonymous visitors (the overview's **Visitors** card) — returned only when `include_previous_period=true` and no `group_by` is set.
+Returns the same KPI series that powers the Formo dashboard's overview chart. Here `visitors` is the per-day session count (the overview's **Sessions** card), while `unique_users` (and `unique_users_current` / `unique_users_previous`) are unique anonymous visitors (the overview's **Visitors** card), returned only when `include_previous_period=true` and no `group_by` is set.
 
 Use `group_by` to break results down by `referrer`, `location`, `device`, `browser`, `os`, or any UTM dimension. Set `include_previous_period=true` to also receive the equivalent prior window for week-over-week comparisons.

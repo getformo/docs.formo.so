@@ -46,7 +46,7 @@ Session duration measures the observed active time a visitor spends during a sin
 
 1. Per-event gaps: The system measures the time between each consecutive event in a session.
 
-2. Active time only: It sums those gaps but ignores any gap longer than 30 minutes (1800 seconds) — long inactivity is treated as the visitor leaving, not as time on site.
+2. Active time only: It sums those gaps but ignores any gap longer than 30 minutes (1800 seconds); long inactivity is treated as the visitor leaving, not as time on site.
 
 3. Per-session duration: Adding the counted gaps gives the session's active duration. A session with a single event (e.g. one pageview) has a duration of 0.
 
@@ -153,7 +153,7 @@ Users who were previously active, became inactive for a period of time, and then
 
 ### At Risk Users
 
-Established users who are still active but have been quiet for a stretch, and who had real activity before going quiet (so it is not a one-off visit).
+Previously active users whose activity has slowed but who haven't churned yet: last seen at least 14 days ago, fewer than 5 active days in the last 30 days, and no 30+ day gap, with at least 1 active day in the prior 30 to 60 days.
 
 ### Churned Users
 

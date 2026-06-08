@@ -623,9 +623,9 @@ If your URLs carry sensitive data (auth tokens, one-time codes, emails), use `tr
 
 The following parameters are **always** stripped, regardless of configuration:
 
-- `privy_oauth_code` — Privy OAuth authorization code
-- `privy_oauth_state` — Privy OAuth CSRF state token
-- `privy_oauth_provider` — Privy OAuth provider identifier
+- `privy_oauth_code`: Privy OAuth authorization code
+- `privy_oauth_state`: Privy OAuth CSRF state token
+- `privy_oauth_provider`: Privy OAuth provider identifier
 
 Excluded parameters are removed from the `url`, `query`, `referrer`, and other event properties. Matching is case-insensitive.
 

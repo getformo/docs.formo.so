@@ -29,7 +29,7 @@ Each user's lifecycle stage is computed relative to a **reference date** (the en
 | **New** | First seen within the last 30 days and still active. |
 | **Power User** | First seen more than 30 days ago, still active, and active on at least 5 distinct days in the last 30 days. |
 | **Resurrected** | First seen more than 30 days ago and re-engaged within the last 30 days after a 30+ day inactivity gap. |
-| **At Risk** | Established and still active, but going quiet: last seen at least 14 days ago, fewer than 5 active days in the last 30 days, and no 30+ day gap. To qualify they must have had at least 1 active day in the prior window (days 30 to 60 ago), so they were genuinely engaged before fading (not a one-off visit). |
+| **At Risk** | Previously active wallet whose activity has slowed but that hasn't churned yet: last seen at least 14 days ago, fewer than 5 active days in the last 30 days, and no 30+ day gap, with at least 1 active day in the prior 30 to 60 days. |
 | **Returning** | Established active users who don't fit another stage: active recently but not New, Power, Resurrected, or At Risk. |
 | **Churned** | Last seen more than 30 days ago. |
 
@@ -37,7 +37,7 @@ Stages are mutually exclusive and evaluated in precedence order: Churned, New, P
 
 Filter users by lifecycle to create [segments](/features/wallet-intelligence/segments) and audiences. For example, "Show me whales who use app X who are power users" or "Show me high net worth wallets who are at risk."
 
-## Wallet Metadata
+## User Wallet Metadata
 
 Each wallet profile includes key metadata aggregated across all chains:
 
