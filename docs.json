@@ -259,7 +259,7 @@
             ]
           }
         ]
-      },      
+      },
       {
         "tab": "Security",
         "groups": [
@@ -316,10 +316,10 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/getformo",
-      "linkedin": "https://linkedin.com/company/getformo",
+      "website": "https://formo.so",
       "github": "https://github.com/getformo",
-      "website": "https://formo.so"
+      "x": "https://x.com/getformo",
+      "linkedin": "https://linkedin.com/company/getformo"
     }
   },
   "integrations": {
