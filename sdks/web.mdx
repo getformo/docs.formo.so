@@ -608,7 +608,9 @@ Specify exact hostnames and exact paths in exclusion lists.
 
 #### Excluding by timezone
 
-When the visitor's browser-resolved timezone (via `Intl.DateTimeFormat().resolvedOptions().timeZone`) matches an entry in `excludeTimezones`, the SDK suppresses tracking entirely for that visitor: no events are enqueued or sent, including `identify` and `connect`, and no identity cookie is written. This is useful for opting whole regions out of analytics (for example, to honor a jurisdiction's privacy expectations).
+When the visitor's browser-resolved timezone (via `Intl.DateTimeFormat().resolvedOptions().timeZone`) matches an entry in `excludeTimezones`, the SDK suppresses tracking entirely for that visitor.
+
+No events are enqueued or sent, including `identify` and `connect`, and no identity cookie is written. This is useful for opting whole regions out of analytics (for example, to honor a jurisdiction's privacy expectations).
 
 #### Excluding query parameters
 
