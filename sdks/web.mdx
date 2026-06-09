@@ -590,12 +590,24 @@ const analytics = await FormoAnalytics.init('your-write-key', {
   tracking: {
     excludeHosts: ['stage-v2.puri.fi'], // Exclude tracking based on window.location.hostname
     excludePaths: ['/test', '/debug'], // Exclude tracking based on window.location.pathname
-    excludeChains: [5] // Exclude tracking on Goerli testnet (5)
+    excludeChains: [5], // Exclude tracking on Goerli testnet (5)
+    excludeTimezones: ['Asia/Bangkok', 'America/New_York'] // Exclude visitors whose browser timezone matches
   }
 });
 ```
 
 Specify exact hostnames and exact paths in exclusion lists.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `excludeHosts` | `string[]` | `[]` | Exact hostnames (`window.location.hostname`) to exclude from tracking. |
+| `excludePaths` | `string[]` | `[]` | Exact paths (`window.location.pathname`) to exclude from tracking. |
+| `excludeChains` | `ChainID[]` | `[]` | Chain IDs to exclude from tracking. |
+| `excludeTimezones` | `string[]` | `[]` | IANA timezone names (e.g. `Asia/Bangkok`) to opt out of tracking entirely. |
+
+#### Excluding by timezone
+
+When the visitor's browser-resolved timezone (via `Intl.DateTimeFormat().resolvedOptions().timeZone`) matches an entry in `excludeTimezones`, the SDK suppresses tracking entirely for that visitor: no events are enqueued or sent, including `identify` and `connect`, and no identity cookie is written. This is useful for opting whole regions out of analytics (for example, to honor a jurisdiction's privacy expectations).
 
 ### Excluding query parameters
 
