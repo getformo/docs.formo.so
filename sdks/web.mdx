@@ -604,12 +604,13 @@ Specify exact hostnames and exact paths in exclusion lists.
 | `excludePaths` | `string[]` | `[]` | Exact paths (`window.location.pathname`) to exclude from tracking. |
 | `excludeChains` | `ChainID[]` | `[]` | Chain IDs to exclude from tracking. |
 | `excludeTimezones` | `string[]` | `[]` | IANA timezone names (e.g. `Asia/Bangkok`) to opt out of tracking entirely. |
+| `excludeQueryParams` | `string[]` | `[]` | Query parameter names to strip from captured URLs before any event is sent. |
 
 #### Excluding by timezone
 
 When the visitor's browser-resolved timezone (via `Intl.DateTimeFormat().resolvedOptions().timeZone`) matches an entry in `excludeTimezones`, the SDK suppresses tracking entirely for that visitor: no events are enqueued or sent, including `identify` and `connect`, and no identity cookie is written. This is useful for opting whole regions out of analytics (for example, to honor a jurisdiction's privacy expectations).
 
-### Excluding query parameters
+#### Excluding query parameters
 
 Formo automatically captures the page URL, query string, individual query-parameter properties, and the referrer. 
 
@@ -628,11 +629,7 @@ If your URLs carry sensitive data (auth tokens, one-time codes, emails), use `tr
 </FormoAnalyticsProvider>
 ```
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `excludeQueryParams` | `string[]` | `[]` | Query parameter names to strip from captured URLs before any event is sent. Applied on top of an always-on built-in denylist that cannot be disabled. |
-
-The following parameters are **always** stripped, regardless of configuration:
+These parameters are applied on top of an always-on built-in denylist that cannot be disabled. The following parameters are always stripped, regardless of configuration:
 
 - `privy_oauth_code`: Privy OAuth authorization code
 - `privy_oauth_state`: Privy OAuth CSRF state token
