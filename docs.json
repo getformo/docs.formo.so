@@ -140,6 +140,7 @@
             "pages": [
               "api/overview",
               "api/authentication",
+              "api/x402",
               "api/idempotency",
               "api/errors"
             ]
