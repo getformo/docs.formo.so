@@ -1,0 +1,27 @@
+---
+title: 'x402 / MPP'
+description: 'Let AI agents call the Formo API and pay per request, with no API key required, using the x402 and MPP payment protocols.'
+icon: 'robot'
+---
+
+AI agents can access Formo endpoints without a Workspace API key by paying per request through a payment gateway. Two protocols are supported:
+
+- **[x402](https://www.x402.org/)** via `formo.x402.paysponge.com`: the agent pays 0.05 USDC per request on Base.
+- **[MPP](https://mpp.dev/)** via `formo.mpp.paysponge.com`: the agent pays 0.05 USDC.e per request on Tempo.
+
+In both cases the gateway issues a `402 Payment Required` challenge on the first request, and a compliant client handles the payment automatically. The response shape is identical to the standard, API-key authenticated endpoint.
+
+## How it works
+
+1. The agent sends a request to the gateway URL for the endpoint it wants.
+2. The gateway responds with `402 Payment Required` and the payment terms.
+3. A compliant x402 or MPP client signs and submits the payment, then retries.
+4. The gateway proxies the request to Formo and returns the response.
+
+## Per-endpoint details
+
+Each API endpoint that supports agent access documents its gateway URL, price, and SDK examples under its **Authentication** section. See:
+
+<Card title="Get Profile" icon="user" href="/api/profiles/get#authentication">
+  Gateway URLs and x402 / MPP SDK examples for the Profiles endpoint.
+</Card>
