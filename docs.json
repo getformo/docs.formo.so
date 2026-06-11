@@ -140,6 +140,11 @@
             "pages": [
               "api/overview",
               "api/authentication",
+              {
+                "anchor": "x402 / MPP",
+                "href": "https://docs.formo.so/api/profiles/get#x402",
+                "icon": "robot"
+              },
               "api/idempotency",
               "api/errors"
             ]
