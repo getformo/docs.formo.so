@@ -7,15 +7,16 @@ keywords: ["smart contract analytics", "contract event tracking", "onchain event
 
 Frontend analytics only tell half the story. Contract events complete it.
 
-A user might visit your dapp 10 times but never make a transaction. Or they might spend 2 minutes on your site and execute a $50k swap. Frontend events alone miss the onchain reality. Smart contract event tracking bridges that gap.
+A user might visit your DeFi app 10 times but never make a transaction. Or a user may skip your site altogether and execute a $50k swap. Smart contract event tracking bridges that visibiity gap.
 
 With Formo, you can monitor contract activity in real time, link it to your users, and use it in funnels, flows, and dashboards.
 
 ## Part 1: Navigate to Project Settings > Contracts
 
-In the Formo dashboard, click the gear icon (settings) in the top right. Click **Contracts**.
-
-You'll see a list of contracts you're already tracking (if any) and an **Add Contract** button.
+In the Formo dashboard: 
+- Go to your project settings
+- Select **Contracts**.
+- You'll see a list of contracts you're already and an **Add Contract** button.
 
 <Frame>
   <img src="/images/contract-events.png" alt="Contract settings page showing list of tracked contracts and add button" />
@@ -31,7 +32,9 @@ Click **Add Contract**. A modal opens.
 
 Formo fetches the contract's ABI from Etherscan (or equivalent block explorer). If successful, you'll see a list of all events in the contract.
 
-If auto-detection fails, paste the ABI manually (copy from Etherscan, Hardhat build output, or your IDE).
+If auto-detection fails, you can paste the ABI manually (copy from Etherscan, Hardhat build output, or your IDE).
+
+> For proxy contracts, paste the implementation ABI, not the proxy ABI.
 
 ## Part 3: Select Events to Track
 
@@ -55,36 +58,36 @@ Once events are selected, click **Deploy**. Formo provisions the pipeline in the
 
 Pipeline states progress as: **Draft** > **Initializing** > **Active**
 
-This typically takes 30-120 seconds. Monitor the status in the Project Settings > Contracts panel.
+This typically takes a few minutes. Monitor the status in the Project Settings > Contracts panel.
 
-Once **Active**, contract events start flowing into Formo.
+Once **Active**, your smart contract events will start flowing into your Formo project.
 
 <Tip>
-You don't need to redeploy if you add more contracts later. Just select events and deploy the new contract. The pipeline updates automatically.
+You can add more contracts later. Just add it, select events, and deploy to update the pipeline.
 </Tip>
 
 ## Part 5: See Contract Events in Activity Feed
 
-Navigate to **Activity** in the sidebar. You'll see a mixed feed of frontend events (page views) and contract events (swaps, transfers).
+Navigate to **Activity** in the sidebar. You'll see a unified feed of offchain events (web page views, mobile events) and onchain events (smart contract events e.g. swaps, transfers).
 
-Scroll through to verify events are being captured. Look for events like "Swap" or "Transfer" with details like amount, token, and timestamp.
+Scroll through to verify events are being captured. Filter for events by name like "Swap" or "Transfer" and properties like amount, token address, and timestamp.
 
-Each contract event is linked to a wallet address, so Formo associates it with the user who executed the transaction.
+Each contract event is automatically linked to a wallet address and session, so you can associate it with the user who executed the transaction.
 
 ## Part 6: Use Contract Events as Funnel Steps
 
-Now that contract events are flowing, use them in funnels.
+Now that contract events are flowing, use them as steps in funnels and other charts.
 
 Click **Dashboards** > **Create Chart** > **Conversion Funnel**.
 
-In the funnel builder, you'll see both frontend events (page views) and contract events (swaps, transfers) in the step selector.
+In the funnel builder, you'll see a list of all of your events including events from the frontend (page views, wallet connects) and contract events (swaps, transfers) in the step dropdown.
 
 Example funnel:
 1. "Wallet Connected" (frontend event with type `connect`)
-2. "Approved Spend" (contract event: Approval)
+2. "Transaction" (frontend event with type type `transcation`)
 3. "Swap" (contract event: Swap)
 
-This funnel measures: Of users who connected a wallet, how many approved spending, and of those, how many executed a swap?
+This funnel measures: Of users who connected a wallet, how many made a transaction, and of those, how many executed a swap?
 
 <Frame>
   <img src="/images/product-analytics-contract-events.png" alt="Funnel builder showing mix of frontend and contract events" />
