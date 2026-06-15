@@ -37,7 +37,7 @@ flowchart TD
 
 **What the SDK does NOT send:** IP addresses, third-party cookies, local storage data, device fingerprints, or social profiles.
 
-**What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only to compute a daily-rotating session hash for session counting, then discards it. The raw IP address is never stored in logs or databases.
+**What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only to compute a daily-rotating session hash for session counting, then discards it. The raw IP address is never stored in logs or databases. Separately, the network edge resolves the IP to a country code (see [Country](#country)) and passes only that code to Formo; the IP itself never reaches our servers for this purpose.
 
 ### What We Do NOT Collect
 
@@ -132,10 +132,13 @@ We collect device screen and browser viewport dimensions to understand how visit
 
 > We collect and store country of each visitor.
 
-We collect visitor country based on their time zone, not their IP address.
+We resolve visitor country server-side at the network edge, the same approach used by analytics tools like Google Analytics, Plausible, and OpenPanel. The edge performs an IP lookup and passes only the resolved ISO 3166-1 alpha-2 country code (for example, `US`, `GB`, `DE`) to Formo. The raw IP address never reaches our servers and is never stored.
 
-Every country has their own time zone and modern devices automatically update the time zone when the device travels.
-The time zone is limited to a country, so we can't get data about a city or region within a country.
+Country is the only geographic granularity we collect: we do not derive or store region or city. Where the edge cannot resolve a country, the value falls back to `unknown`.
+
+<Note>
+  Previously, country was inferred from the browser timezone (`Intl.DateTimeFormat().resolvedOptions().timeZone`) on the client side. Edge-based geolocation is more accurate because a single timezone can span multiple countries (for example, the UTC+7 band covers both Thailand and Vietnam). For events sent from a server-side SDK (`server`, `api`, or `import` channels), the location provided by the SDK is preserved, since the request IP belongs to your backend rather than the end user.
+</Note>
 
 ### Language
 
@@ -229,7 +232,7 @@ You are responsible for ensuring that sensitive data is not collected through fo
     The classification of wallet addresses under GDPR depends on context. Formo treats wallet addresses as pseudonymous identifiers - they are not linked to names, emails, or IP addresses in our system. We recommend consulting your legal counsel for guidance specific to your jurisdiction and use case.
   </Accordion>
   <Accordion title="How does Formo determine a visitor's country without storing IP addresses?">
-    Formo derives the visitor's country from the browser's timezone (`Intl.DateTimeFormat().resolvedOptions().timeZone`) on the client side. This maps a timezone to a country code without using IP geolocation. The raw IP address is never stored.
+    Formo resolves the visitor's country server-side at the network edge, which performs an IP lookup and passes only the resolved ISO 3166-1 alpha-2 country code to our servers. The raw IP address never reaches Formo and is never stored. We collect country only: never region or city. (Earlier versions inferred country from the browser timezone on the client side; edge geolocation replaced this because a single timezone can span multiple countries.)
   </Accordion>
   <Accordion title="Does Formo set any cookies?">
     Formo uses first-party cookies for anonymous visitor identification and cross-subdomain tracking (e.g., an `anonymous-id` cookie and session cookies). These are first-party cookies scoped to your domain only - Formo does **not** set any third-party cookies or cross-site tracking cookies. Because Formo does not use third-party cookies, most jurisdictions do not require a cookie consent banner, but consult your legal counsel for your specific case.

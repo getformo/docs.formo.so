@@ -5469,7 +5469,7 @@
     "/v0/top_locations": {
       "get": {
         "operationId": "getAnalyticsTopLocations",
-        "summary": "Get top countries / regions / cities",
+        "summary": "Get top countries",
         "tags": [
           "Query"
         ],
@@ -5493,7 +5493,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Top locations",
+            "description": "Top countries",
             "content": {
               "application/json": {
                 "schema": {
