@@ -5,27 +5,25 @@ description: "Write custom ClickHouse SQL queries against your Formo analytics d
 keywords: ["SQL analytics", "ClickHouse queries", "crypto data SQL", "web3 data explorer", "DeFi SQL queries", "analytics SQL"]
 ---
 
-Dashboards show what builders thought you'd want. SQL lets you ask anything.
-
-The SQL Explorer is your direct line to Formo's analytics database. Write custom queries in ClickHouse SQL, visualize results, export as CSV, and connect external BI tools. If dashboards don't have what you need, SQL does.
+The SQL Explorer gives you direct access to your data. Write custom queries in ClickHouse SQL, visualize results, export as CSV, and connect external BI tools. If dashboards don't have what you need, SQL does.
 
 ## Part 1: Navigate to Explorer
 
-Click **Explorer** in the sidebar. You'll see:
+Click **Explorer** in the sidebar and select **Data**. You'll see:
 
 - **Left panel**: Schema browser with tables and columns
 - **Center panel**: SQL editor with syntax highlighting
 - **Bottom panel**: Results table with pagination and export options
+- **Examples**: Working SQL examples you can modify to fit your use case
+- **Tools**: Explain this Query, Generate SQL, and Format SQL helps you iterate faster
 
 <Frame>
   <img src="/images/explore.png" alt="SQL Explorer with schema browser on left, editor in center, results at bottom" />
 </Frame>
 
-Start with an empty editor. The schema is your reference guide.
-
 ## Part 2: Browse the Schema
 
-The schema browser shows 3 main tables:
+The schema browser includes 3 main tables:
 
 ### events
 All tracked events (page views, contract events, custom events)
