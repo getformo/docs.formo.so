@@ -1857,10 +1857,10 @@
           }
         }
       },
-      "AnalyticsChannelFilter": {
-        "name": "channel_filter",
+      "AnalyticsSourceFilter": {
+        "name": "source_filter",
         "in": "query",
-        "description": "JSON object filtering users by acquisition channel. Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `import`, `api`, `web`, `mobile` (pipe-delimited for `in`/`notIn`).",
+        "description": "JSON object filtering users by raw event source — which SDK/integration the event was sent from (the raw `channel` column). Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `web`, `api`, `import`, `mobile`, `server`, `onchain` (pipe-delimited for `in`/`notIn`). Distinct from `channel_filter`, which matches the classified acquisition channel.",
         "content": {
           "application/json": {
             "schema": {
@@ -1869,6 +1869,22 @@
             "example": {
               "op": "in",
               "value": "web|mobile"
+            }
+          }
+        }
+      },
+      "AnalyticsChannelFilter": {
+        "name": "channel_filter",
+        "in": "query",
+        "description": "JSON object filtering users by classified acquisition channel — the precomputed `channel_type` column (GA4-style attribution). Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `Direct`, `Organic Search`, `Organic Social`, `Organic Video`, `Paid Search`, `Paid Social`, `Paid Video`, `Email`, `Referrals`, `Display`, `AI`, `Referrers` (pipe-delimited for `in`/`notIn`). Distinct from `source_filter`, which matches the raw SDK source.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            },
+            "example": {
+              "op": "in",
+              "value": "Organic Search|Paid Social"
             }
           }
         }
@@ -6561,6 +6577,9 @@
             "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsSourceFilter"
+          },
+          {
             "$ref": "#/components/parameters/AnalyticsChannelFilter"
           },
           {
@@ -6713,6 +6732,9 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsSourceFilter"
           },
           {
             "$ref": "#/components/parameters/AnalyticsChannelFilter"
