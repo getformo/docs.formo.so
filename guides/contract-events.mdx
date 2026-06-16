@@ -78,13 +78,13 @@ Each contract event is automatically linked to a wallet address and session, so 
 
 Now that contract events are flowing, use them as steps in funnels and other charts.
 
-Click **Dashboards** > **Create Chart** > **Conversion Funnel**.
+Click **Dashboards** > **Add Chart** > **Funnel**.
 
 In the funnel builder, you'll see a list of all of your events including events from the frontend (page views, wallet connects) and contract events (swaps, transfers) in the step dropdown.
 
 Example funnel:
 1. "Wallet Connected" (frontend event with type `connect`)
-2. "Transaction" (frontend event with type type `transcation`)
+2. "Transaction" (frontend event with type `transaction`)
 3. "Swap" (contract event: Swap)
 
 This funnel measures: Of users who connected a wallet, how many made a transaction, and of those, how many executed a swap?
@@ -97,7 +97,7 @@ This funnel measures: Of users who connected a wallet, how many made a transacti
 
 For advanced analysis, use the **Explorer** (SQL editor).
 
-Navigate to **Explore** in the sidebar. The schema browser on the left shows available tables: `events`, `users`, `anonymous_users`.
+Navigate to **Explorer** in the sidebar. The schema browser on the left shows available tables: `events`, `users`, `anonymous_users`.
 
 The `events` table includes contract events with columns like:
 - `type`: Event type (e.g., `decoded_log` for contract events, `connect` for wallet connections)

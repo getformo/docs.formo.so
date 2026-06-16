@@ -37,13 +37,12 @@ Formo is compatible with Business Intelligence (BI) tools through our HTTP inter
 
 ## Alerts & Notifications
 
-Formo delivers server-side alerts to your tools when events or user thresholds match your filters. Configure recipients per alert.
+Formo delivers server-side alerts via webhook when events or user thresholds match your filters. Configure the recipient URL per alert.
 
 | Channel  | Supported | Details |
 |:---------|:----------|:--------|
-| Slack    | ✅        | Posts formatted event cards to a Slack channel via an incoming webhook URL |
-| Webhooks | ✅        | Sends matched events as JSON to your endpoint. |
-| Email    | ✅        | Sends alert notifications to one or more email recipients |
+| Webhooks | ✅        | Sends matched events as JSON to any HTTPS endpoint. |
+| Slack    | ✅        | Paste a Slack incoming webhook URL to post formatted event cards to a channel. |
 
 ## Chains
 

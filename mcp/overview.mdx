@@ -84,9 +84,10 @@ The Formo MCP server exposes a curated set of tools, grouped below.
 | `distinct_values` | Get unique values for filtering |
 | `top_events` | View most common events |
 | `event_timeseries` | Event counts over time |
-| `lifecycle` | New, returning, resurrected, and dormant users |
+| `lifecycle` | Lifecycle stage breakdown (new, returning, power, resurrected, at risk, churned) |
 | `retention` | User retention by cohort |
 | `frequency` | How often users return |
+| `project_users` | Row-level user list, filterable by lifecycle stage, token holdings, and more |
 | `top_pages` | Analyze page performance |
 | `top_sources` | Attribution and traffic sources |
 | `top_locations` | Geographic distribution |
@@ -112,7 +113,7 @@ The Formo MCP server exposes a curated set of tools, grouped below.
   The exact set of tools depends on your project's configured endpoints. Use `list_endpoints` to discover what's available for your project.
 </Note>
 
-`lifecycle`, `retention`, and `frequency` are first-class MCP tools. For user-level lists or cohort exports, use `text_to_sql` + `execute_query` to query the users datasource directly.
+`lifecycle`, `retention`, `frequency`, and `project_users` are first-class MCP tools. For cohort exports or anything beyond these endpoints, use `text_to_sql` + `execute_query` to query the datasources directly.
 
 ## FAQ
 

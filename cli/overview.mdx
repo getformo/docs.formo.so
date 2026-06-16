@@ -149,15 +149,23 @@ The CLI stores configuration at `~/.config/formo/config.json` with restricted pe
 
 ## Output format
 
-- **Interactive mode (TTY):** The CLI displays colored, human-readable output with status icons and formatting.
-- **Piped/scripted mode:** The CLI outputs raw JSON, making it easy to pipe into `jq` or other tools.
+By default, commands print compact, human-readable TOON output. Pass one of the standard output flags to change the format:
+
+| Flag | Description |
+|------|-------------|
+| `--format <toon\|json\|yaml\|md\|jsonl>` | Output format (default: `toon`) |
+| `--json` | Shorthand for `--format json` |
+| `--verbose` | Include the full response envelope (`ok`, `data`, `meta`) |
+| `--filter-output <keys>` | Filter output by key paths (e.g. `data,meta.duration`) |
+
+Status messages (login confirmation, errors, and similar) are written to stderr in interactive terminals, so they never pollute piped output.
 
 ```bash
-# Human-friendly output
+# Default TOON output
 formo profiles get vitalik.eth
 
-# Pipe JSON to jq
-formo profiles get vitalik.eth | jq '.net_worth_usd'
+# JSON output, piped to jq
+formo profiles get vitalik.eth --json | jq '.net_worth_usd'
 ```
 
 ## AI agent usage
