@@ -86,19 +86,19 @@ To minimize the amount of traffic that falls within the "Direct / None" category
 
 ### Channel
 
-The acquisition channel that brought a session to your app. Every session is assigned to exactly one of 12 channels at query time, using a priority-ordered ladder over referrer domain, `utm_medium`, and 8 ad-platform click IDs (`gclid`, `gad_source`, `fbclid`, `msclkid`, `ttclid`, `twclid`, `li_fat_id`, `rdt_cid`).
+The acquisition channel that brought a session to your app. Every session is assigned to exactly one of 12 channels when its events are ingested, using a priority-ordered ladder over referrer domain, `utm_source`, `utm_medium`, and 8 ad-platform click IDs (`gclid`, `gad_source`, `fbclid`, `msclkid`, `ttclid`, `twclid`, `li_fat_id`, `rdt_cid`). The channel is stored on the event, so queries read it back without recomputing.
 
 | # | Channel | Definition |
 |---|---------|------------|
 | 1 | Paid Search | Paid signal + referrer is a search engine (Google, Bing, DuckDuckGo, Yahoo, Yandex, Baidu, Brave, Kagi, Naver, ...) |
 | 2 | Paid Video | Paid signal + referrer is a video platform (YouTube, Vimeo, Twitch, Dailymotion, Loom, Wistia) |
 | 3 | Paid Social | Paid signal + referrer is a social platform (Meta, X, LinkedIn, Reddit, TikTok, Pinterest, Snapchat, Threads, Discord, Telegram, Farcaster, ...) |
-| 4 | Email | `utm_medium` ∈ \{`email`, `e-mail`, `e_mail`, `newsletter`\} |
-| 5 | Affiliates | `utm_medium=affiliate` or non-empty `ref` query parameter |
+| 4 | Email | `utm_medium` ∈ \{`email`, `e-mail`, `e_mail`, `newsletter`\}, or referrer is a known email or newsletter domain (Gmail, Proton Mail, Yahoo Mail, Outlook, Substack, Beehiiv, Paragraph) |
+| 5 | Referrals | `utm_medium=affiliate` or non-empty `ref` query parameter |
 | 6 | Display | `utm_medium` ∈ \{`display`, `banner`, `expandable`, `interstitial`\} |
-| 7 | AI | Referrer is an AI assistant domain (ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, Phind, Poe, Mistral Chat, Meta AI, You.com, Pi) |
+| 7 | AI | Referrer is an AI assistant domain (ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, Phind, Poe, Mistral Chat, Meta AI, You.com, Pi, Grok, Qwen, Kimi, Hugging Face, Genspark) |
 | 8 | Organic Search | `utm_medium=organic` or referrer is a search engine with no paid signal |
-| 9 | Organic Social | `utm_medium` ∈ \{`social`, `social-network`, `social-media`, `sm`\} or referrer is a social platform with no paid signal |
+| 9 | Organic Social | `utm_medium` ∈ \{`social`, `social-network`, `social-media`, `sm`, `social network`, `social media`\} or referrer is a social platform with no paid signal |
 | 10 | Organic Video | Referrer is a video platform with no paid signal |
 | 11 | Referrers | Any other non-empty referrer not matched by the rules above |
 | 12 | Direct | No referrer, no UTM, no click ID (typed URL, bookmark, or stripped referrer) |

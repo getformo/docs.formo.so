@@ -202,9 +202,9 @@ FROM (
 )
 ```
 
-### Query 7: New vs Returning Users
+### Query 7: Bucket users by session frequency
 
-What's your retention?
+Group users into simple tiers by how many sessions they've had.
 
 ```sql
 SELECT 
@@ -214,9 +214,9 @@ FROM (
   SELECT 
     address,
     case 
-      when uniqMerge(num_sessions) = 1 then 'New'
-      when uniqMerge(num_sessions) <= 10 then 'Returning'
-      else 'Power User'
+      when uniqMerge(num_sessions) = 1 then 'One-time'
+      when uniqMerge(num_sessions) <= 10 then 'Casual'
+      else 'Frequent'
     end as user_type
   FROM users
   WHERE first_seen >= now() - INTERVAL 30 DAY
@@ -224,6 +224,8 @@ FROM (
 )
 GROUP BY user_type
 ```
+
+This is a simple session-count split. Formo's built-in [user lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) (New, Returning, Power User, Resurrected, At Risk, Churned) uses recency and active days instead.
 
 ### Query 8: Whale Analysis
 

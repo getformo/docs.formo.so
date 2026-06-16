@@ -17,11 +17,7 @@ Each tracked user on Formo is assigned labels based on their onchain activity an
 
 ### User lifecycle labels
 
-| Label | Description |
-|-------|-------------|
-| **New User** | Number of sessions = 1 |
-| **Returning User** | Number of sessions > 1 and < 10 |
-| **Power User** | Number of sessions > 10 |
+Every wallet is assigned a lifecycle stage based on its recency and active days: **New**, **Returning**, **Power User**, **Resurrected**, **At Risk**, or **Churned**. See [User lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds.
 
 ### Attestations
 
@@ -53,9 +49,10 @@ Wallet labels turn anonymous addresses into actionable user profiles. This guide
 Formo automatically analyzes each wallet's onchain activity and assigns relevant labels. Labels update as users' behavior changes.
 
 **Label sources:**
-- **Onchain activity** - Protocols used, tokens held, transaction patterns
-- **Attestations** - Verified credentials from Coinbase, Gitcoin Passport, etc.
-- **App behavior** - Session count, engagement patterns on your app
+- **Lifecycle** - Engagement stage derived from each wallet's recency and active days
+- **Attestations** - Verified credentials from Coinbase, Binance, Human Passport, and OFAC sanction lists
+- **Campaigns** - Participation in incentive campaigns such as Merkl
+- **Onchain registries** - Standards such as ERC-8004 that identify AI agent wallets
 
 ### Step 1: View labels on a user profile
 
@@ -78,7 +75,7 @@ Use labels to find specific user types:
 
 | Goal | Label Filter |
 |------|--------------|
-| Find DeFi power users | Label = "DeFi Active" AND Label = "Power User" |
+| Find power users | Lifecycle = "Power User" |
 | Find verified humans | Human Passport Score > 50 |
 | Exclude sanctioned wallets | Label != "Sanctioned User" |
 | Find Coinbase users | Label = "Coinbase Verified Account" |
@@ -90,7 +87,7 @@ Labels become powerful when combined with other criteria:
 **High-value DeFi users:**
 | Filter | Value |
 |--------|-------|
-| Label | DeFi Active |
+| Apps | Uniswap, Aave (or other DeFi protocols) |
 | Net Worth | > $50,000 |
 | Lifecycle | Power User |
 
@@ -104,9 +101,8 @@ Labels become powerful when combined with other criteria:
 **At-risk whales:**
 | Filter | Value |
 |--------|-------|
-| Label | ETH Staker |
 | Net Worth | > $100,000 |
-| Lifecycle | Churned |
+| Lifecycle | At Risk |
 
 ### Step 4: Save as a segment
 
@@ -131,7 +127,7 @@ Turn useful label combinations into reusable segments:
 3. Export clean lists for marketing or rewards
 
 **Quality scoring:**
-1. Combine multiple positive labels (DeFi Active + Power User + Coinbase Verified)
+1. Combine multiple positive labels (Power User + Coinbase Verified Account + Human Passport Score > 50)
 2. Users matching more labels = higher quality
 3. Prioritize multi-label users for outreach
 
@@ -146,8 +142,8 @@ Set up alerts based on labels:
 
 1. Go to **Settings** > **Alerts**
 2. Create an alert for `connect` events
-3. Add condition: Label = "DeFi Active" AND Net Worth > $100,000
-4. Get notified when high-value DeFi users connect
+3. Add condition: Lifecycle = "Power User" AND Net Worth > $100,000
+4. Get notified when high-value power users connect
 
 ### Next Steps
 

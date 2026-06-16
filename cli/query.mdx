@@ -2,7 +2,7 @@
 title: "Query"
 sidebarTitle: "Query"
 icon: database
-description: "Run ClickHouse SQL queries against your Formo analytics data warehouse directly from the terminal and output results in table, JSON, or CSV format."
+description: "Run ClickHouse SQL queries against your Formo analytics data warehouse directly from the terminal, with results in TOON, JSON, or other output formats."
 ---
 
 The `formo query run` command lets you execute SQL queries against your Formo analytics data warehouse directly from the terminal.
@@ -34,7 +34,7 @@ formo query run "SELECT address, net_worth_usd FROM wallet_profiles ORDER BY net
 formo query run "SELECT DATE(timestamp) as day, COUNT(DISTINCT address) as dau FROM events WHERE timestamp > now() - INTERVAL 7 DAY GROUP BY day ORDER BY day"
 
 # Pipe results to jq for processing
-formo query run "SELECT count(*) as total FROM events" | jq '.data'
+formo query run "SELECT count(*) as total FROM events" --json | jq '.data'
 ```
 
 ### Tips
@@ -42,4 +42,4 @@ formo query run "SELECT count(*) as total FROM events" | jq '.data'
 - SQL queries execute against your project's analytics data warehouse.
 - Wrap your query in double quotes to prevent shell interpretation.
 - Use single quotes inside your SQL for string literals.
-- Pipe the output to `jq` for JSON processing in scripts.
+- Pass `--json` and pipe the output to `jq` for processing in scripts (default output is TOON).
