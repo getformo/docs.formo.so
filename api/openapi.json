@@ -5201,8 +5201,8 @@
     "/v0/top_pages": {
       "get": {
         "operationId": "getAnalyticsTopPages",
-        "summary": "Get top pages by visits or users, optionally restricted to entry or exit pages",
-        "description": "Returns the most visited pages with traffic metrics. Pass `mode=entry` to restrict to the first page of each session (with `bounce_rate`) or `mode=exit` for the last page (with `exit_rate`). Default `mode=all` returns project-wide page metrics with identity-stitched user counts.",
+        "summary": "Get top pages by sessions or visitors, optionally restricted to entry or exit pages",
+        "description": "Returns the most visited pages with traffic metrics. Pass `mode=entry` to restrict to the first page of each session (with `bounce_rate`) or `mode=exit` for the last page (with `exit_rate`). Default `mode=all` returns project-wide page metrics with anon-per-session visitor counts.",
         "tags": [
           "Query"
         ],
@@ -5235,7 +5235,7 @@
               ],
               "default": "all"
             },
-            "description": "Page-flow mode. `all` (default) returns project-wide page metrics with identity-stitched user counts (`visits`, `users`, `hits`). `entry` returns landing pages with `bounce_rate`. `exit` returns exit pages with `exit_rate`. Identity stitching is skipped in `entry`/`exit` modes since those metrics are session-scoped."
+            "description": "Page-flow mode. `all` (default) returns project-wide page metrics with anon-per-session visitor counts (`sessions`, `visitors`, `hits`). `entry` returns landing pages with `bounce_rate`. `exit` returns exit pages with `exit_rate`. The visitor count is omitted in `entry`/`exit` modes since those metrics are session-scoped."
           }
         ],
         "responses": {
@@ -5261,11 +5261,11 @@
                       "type": "String"
                     },
                     {
-                      "name": "visits",
+                      "name": "sessions",
                       "type": "UInt64"
                     },
                     {
-                      "name": "users",
+                      "name": "visitors",
                       "type": "UInt64"
                     },
                     {
@@ -5278,24 +5278,24 @@
                       "project_id": "proj_abc",
                       "origin": "app.example.com",
                       "pathname": "/",
-                      "visits": 1284,
-                      "users": 982,
+                      "sessions": 1284,
+                      "visitors": 982,
                       "hits": 1456
                     },
                     {
                       "project_id": "proj_abc",
                       "origin": "app.example.com",
                       "pathname": "/trade",
-                      "visits": 612,
-                      "users": 487,
+                      "sessions": 612,
+                      "visitors": 487,
                       "hits": 1024
                     },
                     {
                       "project_id": "proj_abc",
                       "origin": "app.example.com",
                       "pathname": "/earn",
-                      "visits": 412,
-                      "users": 318,
+                      "sessions": 412,
+                      "visitors": 318,
                       "hits": 587
                     }
                   ],
@@ -5395,11 +5395,11 @@
                       "type": "String"
                     },
                     {
-                      "name": "visits",
+                      "name": "sessions",
                       "type": "UInt64"
                     },
                     {
-                      "name": "users",
+                      "name": "visitors",
                       "type": "UInt64"
                     },
                     {
@@ -5411,29 +5411,29 @@
                     {
                       "project_id": "proj_abc",
                       "referrer": "Direct",
-                      "visits": 612,
-                      "users": 487,
+                      "sessions": 612,
+                      "visitors": 487,
                       "hits": 1024
                     },
                     {
                       "project_id": "proj_abc",
                       "referrer": "google.com",
-                      "visits": 312,
-                      "users": 268,
+                      "sessions": 312,
+                      "visitors": 268,
                       "hits": 542
                     },
                     {
                       "project_id": "proj_abc",
                       "referrer": "twitter.com",
-                      "visits": 184,
-                      "users": 154,
+                      "sessions": 184,
+                      "visitors": 154,
                       "hits": 312
                     },
                     {
                       "project_id": "proj_abc",
                       "referrer": "farcaster.xyz",
-                      "visits": 98,
-                      "users": 86,
+                      "sessions": 98,
+                      "visitors": 86,
                       "hits": 167
                     }
                   ],
@@ -5510,11 +5510,11 @@
                       "type": "String"
                     },
                     {
-                      "name": "visits",
+                      "name": "sessions",
                       "type": "UInt64"
                     },
                     {
-                      "name": "users",
+                      "name": "visitors",
                       "type": "UInt64"
                     },
                     {
@@ -5526,29 +5526,29 @@
                     {
                       "project_id": "proj_abc",
                       "location": "US",
-                      "visits": 482,
-                      "users": 387,
+                      "sessions": 482,
+                      "visitors": 387,
                       "hits": 824
                     },
                     {
                       "project_id": "proj_abc",
                       "location": "GB",
-                      "visits": 184,
-                      "users": 156,
+                      "sessions": 184,
+                      "visitors": 156,
                       "hits": 312
                     },
                     {
                       "project_id": "proj_abc",
                       "location": "DE",
-                      "visits": 142,
-                      "users": 124,
+                      "sessions": 142,
+                      "visitors": 124,
                       "hits": 268
                     },
                     {
                       "project_id": "proj_abc",
                       "location": "JP",
-                      "visits": 98,
-                      "users": 86,
+                      "sessions": 98,
+                      "visitors": 86,
                       "hits": 187
                     }
                   ],
@@ -5625,11 +5625,11 @@
                       "type": "String"
                     },
                     {
-                      "name": "visits",
+                      "name": "sessions",
                       "type": "UInt64"
                     },
                     {
-                      "name": "users",
+                      "name": "visitors",
                       "type": "UInt64"
                     }
                   ],
@@ -5637,26 +5637,26 @@
                     {
                       "project_id": "proj_abc",
                       "rdns": "io.metamask",
-                      "visits": 412,
-                      "users": 318
+                      "sessions": 412,
+                      "visitors": 318
                     },
                     {
                       "project_id": "proj_abc",
                       "rdns": "com.coinbase.wallet",
-                      "visits": 184,
-                      "users": 142
+                      "sessions": 184,
+                      "visitors": 142
                     },
                     {
                       "project_id": "proj_abc",
                       "rdns": "me.rainbow",
-                      "visits": 98,
-                      "users": 76
+                      "sessions": 98,
+                      "visitors": 76
                     },
                     {
                       "project_id": "proj_abc",
                       "rdns": "app.phantom",
-                      "visits": 87,
-                      "users": 64
+                      "sessions": 87,
+                      "visitors": 64
                     }
                   ],
                   "rows": 4,
@@ -5732,11 +5732,11 @@
                       "type": "String"
                     },
                     {
-                      "name": "visits",
+                      "name": "sessions",
                       "type": "UInt64"
                     },
                     {
-                      "name": "users",
+                      "name": "visitors",
                       "type": "UInt64"
                     }
                   ],
@@ -5744,26 +5744,26 @@
                     {
                       "project_id": "proj_abc",
                       "chain_id": "1",
-                      "visits": 482,
-                      "users": 387
+                      "sessions": 482,
+                      "visitors": 387
                     },
                     {
                       "project_id": "proj_abc",
                       "chain_id": "8453",
-                      "visits": 312,
-                      "users": 268
+                      "sessions": 312,
+                      "visitors": 268
                     },
                     {
                       "project_id": "proj_abc",
                       "chain_id": "42161",
-                      "visits": 184,
-                      "users": 154
+                      "sessions": 184,
+                      "visitors": 154
                     },
                     {
                       "project_id": "proj_abc",
                       "chain_id": "137",
-                      "visits": 142,
-                      "users": 118
+                      "sessions": 142,
+                      "visitors": 118
                     }
                   ],
                   "rows": 4,
