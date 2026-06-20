@@ -30,6 +30,18 @@
         "type": "http",
         "scheme": "bearer",
         "description": "Workspace API key (e.g. `formo_xxx`). Create one in the Formo dashboard under Team Settings > API Keys."
+      },
+      "X402Payment": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-PAYMENT",
+        "description": "x402 payment payload generated after the gateway returns a 402 challenge."
+      },
+      "MPPPayment": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "MPP payment authorization header, formatted as `Payment <payload>`, generated after the gateway returns a 402 challenge."
       }
     },
     "schemas": {
@@ -427,7 +439,7 @@
       },
       "ChartSettings": {
         "type": "object",
-        "description": "Chart-type-specific configuration. The fields that apply depend on `chart_type`:\n\n- **funnel**: `funnelType`, `conversionWindow`, `breakdown`\n- **user_paths**: `startStep`, `endStep`, `maxSteps`, `nodesPerStep`, `conversionWindow`, `filters`\n- **retention**: `retentionFilter`, `retentionUserFilters`\n\nAll fields are optional at the schema level; see per-type validation rules for which are functionally required.",
+        "description": "Chart-type-specific configuration. The fields that apply depend on `chart_type`:\n\n- **funnel**: `funnelType`, `conversionWindow`, `breakdown`\n- **user_paths**: `startStep`, `endStep`, `maxSteps`, `nodesPerStep`, `conversionWindow`, `filters`\n- **retention**: `retentionFilter`, `retentionUserFilters`, `retentionSignalType`, `retentionLabelSignal`\n\nAll fields are optional at the schema level; see per-type validation rules for which are functionally required.",
         "properties": {
           "funnelType": {
             "type": "string",
@@ -478,14 +490,14 @@
             "minimum": 2,
             "maximum": 10,
             "default": 3,
-            "description": "**user_paths.** Maximum number of steps to show in the flow (2–10). Values above 10 are clamped to 10."
+            "description": "**user_paths.** Maximum number of steps to show in the flow (2 to 10). Values above 10 are clamped to 10."
           },
           "nodesPerStep": {
             "type": "integer",
             "minimum": 2,
             "maximum": 10,
             "default": 5,
-            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2–10). Values above 10 are clamped to 10."
+            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2 to 10). Values above 10 are clamped to 10."
           },
           "filters": {
             "type": "string",
@@ -508,6 +520,19 @@
               "$ref": "#/components/schemas/RetentionUserFilter"
             },
             "description": "**retention.** Zero or more user-segment filters that narrow the cohort (e.g. only desktop users, only users from a specific UTM source)."
+          },
+          "retentionSignalType": {
+            "type": "string",
+            "enum": [
+              "event",
+              "label"
+            ],
+            "default": "event",
+            "description": "**retention.** `event` (default): cohort and retention are driven by events. `label`: driven by a label value over time (see `retentionLabelSignal`); when `label`, the event fields are ignored."
+          },
+          "retentionLabelSignal": {
+            "$ref": "#/components/schemas/RetentionLabelSignal",
+            "description": "**retention.** The label predicate when `retentionSignalType` is `label`."
           }
         }
       },
@@ -522,7 +547,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types**: required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -596,7 +621,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched from the retention pipe directly.\n- **All other types**: required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -1407,6 +1432,11 @@
           "chain_id": {
             "type": "string",
             "description": "Optional chain identifier the label applies to"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Optional ISO-8601 event-time for the label. When provided, the label is recorded at this time instead of the server's current time; used to backfill historical values (e.g. an `open_interest` reading from a past week) so label-based retention can evaluate them at the right point in time. Must not be in the future. Defaults to server time when omitted."
           }
         }
       },
@@ -1445,7 +1475,7 @@
           "timestamp": {
             "type": "string",
             "format": "date-time",
-            "description": "Server-assigned write timestamp"
+            "description": "Event-time of the label: the caller-supplied `timestamp` when provided (retrospective backfill), otherwise the server's write time."
           }
         }
       },
@@ -1487,6 +1517,82 @@
           "basenames": { "type": "string", "nullable": true },
           "linea": { "type": "string", "nullable": true }
         }
+      },
+      "BatchWriteResponse": {
+        "type": "object",
+        "description": "Acknowledgement for a batch write. `successful_rows` counts rows accepted and forwarded to ingest after a 2xx (ingestion is async/eventually-consistent; there is no follow-up read). `quarantined_rows` counts rows skipped for an invalid address or no valid keys; `errors` (omitted when nothing was quarantined) maps each skipped row back to its request index.",
+        "required": [
+          "successful_rows",
+          "quarantined_rows"
+        ],
+        "properties": {
+          "successful_rows": {
+            "type": "integer",
+            "description": "Number of rows accepted and forwarded to ingest."
+          },
+          "quarantined_rows": {
+            "type": "integer",
+            "description": "Number of rows skipped (invalid address, or no valid keys)."
+          },
+          "errors": {
+            "type": "array",
+            "description": "One entry per quarantined row. Omitted when quarantined_rows is 0.",
+            "items": {
+              "type": "object",
+              "required": ["index", "reason"],
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "description": "Zero-based index of the row in the request array."
+                },
+                "address": {
+                  "type": "string",
+                  "description": "The address as submitted, echoed back."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why the row was quarantined."
+                }
+              }
+            }
+          }
+        }
+      },
+      "RetentionLabelSignal": {
+        "type": "object",
+        "description": "The label predicate for label-based retention. The cohort is wallets grouped by the week they FIRST crossed this predicate on their label value; a wallet is retained in a later week if its latest value as of that week's end still satisfies it (as-of / carry-forward, evaluated against label history).",
+        "properties": {
+          "tag_id": {
+            "type": "string",
+            "description": "The label tag to evaluate (matches the `tag_id` set via `POST /v0/profiles/:address/labels`)."
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "greater",
+              "greaterOrEqual",
+              "less",
+              "lessOrEqual",
+              "equals"
+            ],
+            "default": "greater",
+            "description": "Comparison operator. Numeric operators coerce both sides via toFloat64OrZero, so a numeric op on a non-numeric value yields no match (not an error)."
+          },
+          "value": {
+            "type": "string",
+            "description": "The threshold/value to compare against. Always a string; numeric ops coerce it."
+          },
+          "chain_id": {
+            "type": "string",
+            "default": "",
+            "description": "Optional chain scope. Empty string matches across all chains."
+          }
+        },
+        "required": [
+          "tag_id",
+          "op",
+          "value"
+        ]
       },
       "ProfileFilter": {
         "type": "object",
@@ -1857,10 +1963,10 @@
           }
         }
       },
-      "AnalyticsChannelFilter": {
-        "name": "channel_filter",
+      "AnalyticsSourceFilter": {
+        "name": "source_filter",
         "in": "query",
-        "description": "JSON object filtering users by acquisition channel. Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `import`, `api`, `web`, `mobile` (pipe-delimited for `in`/`notIn`).",
+        "description": "JSON object filtering users by raw event source; which SDK/integration the event was sent from (the raw `channel` column). Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `web`, `api`, `import`, `mobile`, `server`, `onchain` (pipe-delimited for `in`/`notIn`). Distinct from `channel_filter`, which matches the classified acquisition channel.",
         "content": {
           "application/json": {
             "schema": {
@@ -1869,6 +1975,22 @@
             "example": {
               "op": "in",
               "value": "web|mobile"
+            }
+          }
+        }
+      },
+      "AnalyticsChannelFilter": {
+        "name": "channel_filter",
+        "in": "query",
+        "description": "JSON object filtering users by classified acquisition channel; the precomputed `channel_type` column (GA4-style attribution). Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `Direct`, `Organic Search`, `Organic Social`, `Organic Video`, `Paid Search`, `Paid Social`, `Paid Video`, `Email`, `Referrals`, `Display`, `AI`, `Referrers` (pipe-delimited for `in`/`notIn`). Distinct from `source_filter`, which matches the raw SDK source.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            },
+            "example": {
+              "op": "in",
+              "value": "Organic Search|Paid Social"
             }
           }
         }
@@ -3235,7 +3357,7 @@
                   }
                 },
                 "barChart": {
-                  "summary": "Daily active users: bar chart",
+                  "summary": "Daily active users (bar chart)",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date",
@@ -3248,7 +3370,7 @@
                   }
                 },
                 "lineChart": {
-                  "summary": "DAU last 30 days: line chart",
+                  "summary": "DAU last 30 days (line chart)",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS daily_active_users FROM events GROUP BY date ORDER BY date DESC LIMIT 30",
@@ -3261,7 +3383,7 @@
                   }
                 },
                 "pieChart": {
-                  "summary": "Sessions by device: pie chart",
+                  "summary": "Sessions by device (pie chart)",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
@@ -3274,7 +3396,7 @@
                   }
                 },
                 "stackedChart": {
-                  "summary": "Sessions by device grouped by browser: stacked chart",
+                  "summary": "Sessions by device grouped by browser (stacked chart)",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
@@ -3288,7 +3410,7 @@
                   }
                 },
                 "numberChart": {
-                  "summary": "Total connected wallets: number / KPI card",
+                  "summary": "Total connected wallets (number / KPI card)",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
@@ -3297,7 +3419,7 @@
                   }
                 },
                 "tableChart": {
-                  "summary": "Recent events: table",
+                  "summary": "Recent events (table)",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
@@ -3306,7 +3428,7 @@
                   }
                 },
                 "userPathsChart": {
-                  "summary": "User flow from connect: max 5 steps",
+                  "summary": "User flow from connect (max 5 steps)",
                   "value": {
                     "projectId": "proj_abc",
                     "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
@@ -4381,6 +4503,32 @@
       "get": {
         "operationId": "getProfile",
         "summary": "Get wallet profile",
+        "description": "Get a single wallet profile. Agents can call the same path through the paid x402 or MPP gateway hosts without a caller-supplied Formo API key; Paysponge uses Formo's workspace API key behind the scenes. Paid gateway callers only provide the protocol payment header returned by the gateway challenge.",
+        "servers": [
+          {
+            "url": "https://api.formo.so",
+            "description": "Standard Formo API; authenticate with `Authorization: Bearer formo_...`."
+          },
+          {
+            "url": "https://formo.x402.paysponge.com",
+            "description": "x402 paid gateway; authenticate with `X-PAYMENT`."
+          },
+          {
+            "url": "https://formo.mpp.paysponge.com",
+            "description": "MPP paid gateway; authenticate with `Authorization: Payment ...`."
+          }
+        ],
+        "security": [
+          {
+            "WorkspaceApiKey": []
+          },
+          {
+            "X402Payment": []
+          },
+          {
+            "MPPPayment": []
+          }
+        ],
         "tags": [
           "Profiles"
         ],
@@ -4777,6 +4925,15 @@
                       "chain_id": "1"
                     }
                   ]
+                },
+                "historicalLabel": {
+                  "summary": "Backfill a label at a past timestamp",
+                  "description": "Set `timestamp` to record the label at a historical point in time instead of the server's write time; used to backfill values from another source so label-based retention evaluates them at the correct point. ISO-8601 datetime (UTC `Z` or with a timezone offset); future values are rejected with 400.",
+                  "value": {
+                    "tag_id": "open_interest",
+                    "value": "high",
+                    "timestamp": "2024-01-15T00:00:00.000Z"
+                  }
                 }
               }
             }
@@ -4784,7 +4941,7 @@
         },
         "responses": {
           "200": {
-            "description": "Labels upserted. Single label in → bare `UserLabel`; array in → array of `UserLabel`. Echoes the normalised entries (lowercased tag_id, server timestamp).",
+            "description": "Labels upserted. Single label in → bare `UserLabel`; array in → array of `UserLabel`. Echoes the normalised entries (lowercased tag_id; the caller-supplied `timestamp` when present, otherwise the server write time).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4861,6 +5018,188 @@
         "responses": {
           "204": {
             "description": "Label deleted. No body; the caller already knows the new state."
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        },
+        "x-required-scope": "profiles:write"
+      }
+    },
+    "/v0/profiles/labels": {
+      "post": {
+        "operationId": "batchUpsertUserLabels",
+        "summary": "Batch add or update user labels",
+        "description": "Upsert up to 100 labels across many wallets in one request; each item carries its own `address`. Modelled on the events ingest API: rows with an invalid address (ENS names are NOT resolved here; pass a literal EVM `0x...` or Solana address) are quarantined (skipped and reported in the response) rather than failing the whole batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
+        "tags": [
+          "Profiles"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 100,
+                "items": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/UserLabelInput" },
+                    {
+                      "type": "object",
+                      "required": ["address"],
+                      "properties": {
+                        "address": {
+                          "type": "string",
+                          "description": "Wallet address the label applies to. Literal EVM (0x...) or Solana address only; ENS names are not resolved in batch requests."
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "examples": {
+                "batchLabels": {
+                  "summary": "Upsert labels for multiple wallets",
+                  "value": [
+                    {
+                      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                      "tag_id": "vip",
+                      "value": "tier-1"
+                    },
+                    {
+                      "address": "EPjFWaYbrgqCC2Qbg4EV4FjUreEMKwMn1zNbiboXXKV",
+                      "tag_id": "airdrop_eligible",
+                      "chain_id": "1"
+                    }
+                  ]
+                },
+                "historicalLabels": {
+                  "summary": "Backfill labels at past timestamps",
+                  "description": "Each row may carry a `timestamp` to record the label at a historical point in time instead of now; used to import historical values (e.g. a time series of a label's value) so label-based retention evaluates them at the correct point. ISO-8601 datetime (UTC `Z` or with a timezone offset); a future value rejects the whole batch with 400.",
+                  "value": [
+                    {
+                      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                      "tag_id": "open_interest",
+                      "value": "high",
+                      "timestamp": "2024-01-15T00:00:00.000Z"
+                    },
+                    {
+                      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                      "tag_id": "open_interest",
+                      "value": "low",
+                      "timestamp": "2024-02-15T00:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch processed. Returns counts of forwarded vs quarantined rows, with a per-row `errors` entry for each quarantined row.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchWriteResponse"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        },
+        "x-required-scope": "profiles:write"
+      }
+    },
+    "/v0/profiles/properties": {
+      "post": {
+        "operationId": "batchUpdateUserProperties",
+        "summary": "Batch set user properties",
+        "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
+        "tags": [
+          "Profiles"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "description": "Flat { address, ...keys } object. `address` is required; only the listed profile keys are persisted (all string-valued). Unknown keys are accepted but ignored.",
+                  "required": ["address"],
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "type": "string",
+                      "description": "Wallet address. Literal EVM (0x...) or Solana address only; ENS names are not resolved in batch requests."
+                    },
+                    "user_id": { "type": "string" },
+                    "display_name": { "type": "string" },
+                    "email": { "type": "string" },
+                    "farcaster": { "type": "string" },
+                    "discord": { "type": "string" },
+                    "twitter": { "type": "string" },
+                    "telegram": { "type": "string" },
+                    "instagram": { "type": "string" },
+                    "website": { "type": "string" },
+                    "github": { "type": "string" },
+                    "linkedin": { "type": "string" },
+                    "facebook": { "type": "string" },
+                    "tiktok": { "type": "string" },
+                    "youtube": { "type": "string" },
+                    "reddit": { "type": "string" },
+                    "avatar": { "type": "string" },
+                    "description": { "type": "string" },
+                    "location": { "type": "string" },
+                    "ens": { "type": "string" },
+                    "lens": { "type": "string" },
+                    "basenames": { "type": "string" },
+                    "linea": { "type": "string" }
+                  }
+                }
+              },
+              "examples": {
+                "batchProperties": {
+                  "summary": "Set properties for multiple wallets",
+                  "value": [
+                    {
+                      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                      "display_name": "alice.eth",
+                      "email": "alice@example.com"
+                    },
+                    {
+                      "address": "EPjFWaYbrgqCC2Qbg4EV4FjUreEMKwMn1zNbiboXXKV",
+                      "twitter": "bob"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch processed. Returns counts of forwarded vs quarantined rows, with a per-row `errors` entry for each quarantined row.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchWriteResponse"
+                }
+              }
+            }
           },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
@@ -5261,15 +5600,15 @@
                       "type": "String"
                     },
                     {
+                      "name": "hits",
+                      "type": "UInt64"
+                    },
+                    {
                       "name": "sessions",
                       "type": "UInt64"
                     },
                     {
                       "name": "visitors",
-                      "type": "UInt64"
-                    },
-                    {
-                      "name": "hits",
                       "type": "UInt64"
                     }
                   ],
@@ -5278,25 +5617,25 @@
                       "project_id": "proj_abc",
                       "origin": "app.example.com",
                       "pathname": "/",
+                      "hits": 1456,
                       "sessions": 1284,
-                      "visitors": 982,
-                      "hits": 1456
+                      "visitors": 982
                     },
                     {
                       "project_id": "proj_abc",
                       "origin": "app.example.com",
                       "pathname": "/trade",
+                      "hits": 1024,
                       "sessions": 612,
-                      "visitors": 487,
-                      "hits": 1024
+                      "visitors": 487
                     },
                     {
                       "project_id": "proj_abc",
                       "origin": "app.example.com",
                       "pathname": "/earn",
+                      "hits": 587,
                       "sessions": 412,
-                      "visitors": 318,
-                      "hits": 587
+                      "visitors": 318
                     }
                   ],
                   "rows": 3,
@@ -5395,15 +5734,15 @@
                       "type": "String"
                     },
                     {
+                      "name": "hits",
+                      "type": "UInt64"
+                    },
+                    {
                       "name": "sessions",
                       "type": "UInt64"
                     },
                     {
                       "name": "visitors",
-                      "type": "UInt64"
-                    },
-                    {
-                      "name": "hits",
                       "type": "UInt64"
                     }
                   ],
@@ -5411,30 +5750,30 @@
                     {
                       "project_id": "proj_abc",
                       "referrer": "Direct",
+                      "hits": 1024,
                       "sessions": 612,
-                      "visitors": 487,
-                      "hits": 1024
+                      "visitors": 487
                     },
                     {
                       "project_id": "proj_abc",
                       "referrer": "google.com",
+                      "hits": 542,
                       "sessions": 312,
-                      "visitors": 268,
-                      "hits": 542
+                      "visitors": 268
                     },
                     {
                       "project_id": "proj_abc",
                       "referrer": "twitter.com",
+                      "hits": 312,
                       "sessions": 184,
-                      "visitors": 154,
-                      "hits": 312
+                      "visitors": 154
                     },
                     {
                       "project_id": "proj_abc",
                       "referrer": "farcaster.xyz",
+                      "hits": 167,
                       "sessions": 98,
-                      "visitors": 86,
-                      "hits": 167
+                      "visitors": 86
                     }
                   ],
                   "rows": 4,
@@ -5510,15 +5849,15 @@
                       "type": "String"
                     },
                     {
+                      "name": "hits",
+                      "type": "UInt64"
+                    },
+                    {
                       "name": "sessions",
                       "type": "UInt64"
                     },
                     {
                       "name": "visitors",
-                      "type": "UInt64"
-                    },
-                    {
-                      "name": "hits",
                       "type": "UInt64"
                     }
                   ],
@@ -5526,30 +5865,30 @@
                     {
                       "project_id": "proj_abc",
                       "location": "US",
+                      "hits": 824,
                       "sessions": 482,
-                      "visitors": 387,
-                      "hits": 824
+                      "visitors": 387
                     },
                     {
                       "project_id": "proj_abc",
                       "location": "GB",
+                      "hits": 312,
                       "sessions": 184,
-                      "visitors": 156,
-                      "hits": 312
+                      "visitors": 156
                     },
                     {
                       "project_id": "proj_abc",
                       "location": "DE",
+                      "hits": 268,
                       "sessions": 142,
-                      "visitors": 124,
-                      "hits": 268
+                      "visitors": 124
                     },
                     {
                       "project_id": "proj_abc",
                       "location": "JP",
+                      "hits": 187,
                       "sessions": 98,
-                      "visitors": 86,
-                      "hits": 187
+                      "visitors": 86
                     }
                   ],
                   "rows": 4,
@@ -6561,6 +6900,9 @@
             "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsSourceFilter"
+          },
+          {
             "$ref": "#/components/parameters/AnalyticsChannelFilter"
           },
           {
@@ -6713,6 +7055,9 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsSourceFilter"
           },
           {
             "$ref": "#/components/parameters/AnalyticsChannelFilter"
@@ -7027,7 +7372,7 @@
       "get": {
         "operationId": "getAnalyticsFunnel",
         "summary": "Get multi-step conversion funnel",
-        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`, computed via ClickHouse `windowFunnel`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `breakdown` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others'). First-touch attribution is used for the per-user dimension value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2–10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | startsWith | endsWith | includes`. `operand` may target a standard event column or a JSON property on `properties`.",
+        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `breakdown` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others'). First-touch attribution is used for the per-user dimension value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | startsWith | endsWith | includes`. `operand` may target a standard event column or a JSON property on `properties`.",
         "tags": [
           "Query"
         ],
@@ -7062,7 +7407,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded array of 2–10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `includes`. For `in`/`notIn`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `includes`. For `in`/`notIn`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
                 "summary": "Simple 3-step funnel: page → connect → swap",
@@ -7106,7 +7451,7 @@
               "default": 1209600,
               "minimum": 1
             },
-            "description": "Conversion window length in seconds. Defaults to 1,209,600 (14 days). For closed funnels this is the `windowFunnel` cap; for both variants the events scan is extended by this amount past `date_to`.",
+            "description": "Conversion window length in seconds. Defaults to 1,209,600 (14 days). For closed funnels this is the in-order completion cap; for both variants the events scan is extended by this amount past `date_to`.",
             "example": 86400
           },
           {
@@ -7117,7 +7462,7 @@
               "enum": ["closed", "open"],
               "default": "closed"
             },
-            "description": "`closed` (default): ordered, in-window via `windowFunnel`. `open`: unordered per-step `minIf`; emits an extra `dropped_off_users` column."
+            "description": "`closed` (default): ordered, in-window. `open`: unordered per-step; emits an extra `dropped_off_users` column."
           },
           {
             "name": "breakdown",
@@ -7248,7 +7593,7 @@
       "get": {
         "operationId": "getAnalyticsFlow",
         "summary": "Get session-scoped user-flow transitions (Sankey)",
-        "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the pipe rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour; every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).",
+        "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the endpoint rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour; every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).",
         "tags": [
           "Query"
         ],

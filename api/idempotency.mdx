@@ -47,9 +47,9 @@ Also returned if the key exceeds 255 characters.
 
 Two concurrent requests with the same key in flight return `409 IDEMPOTENCY_IN_PROGRESS`. Wait briefly (typically under 1 second) and replay - the server will return the cached response of the original request.
 
-### Redis outage
+### Cache outage
 
-If the idempotency cache (Redis) is unavailable, the request runs without caching - Redis outages don't block writes. Concurrent retries during such an outage may double-execute; the contract is best-effort.
+If the idempotency cache is unavailable, the request runs without caching - a cache outage doesn't block writes. Concurrent retries during such an outage may double-execute; the contract is best-effort.
 
 ## Recommended client patterns
 

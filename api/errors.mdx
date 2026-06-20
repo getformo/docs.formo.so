@@ -122,7 +122,7 @@ An AI request (chat / Ask AI) carried more tokens than the model can accept. Sta
 
 **HTTP:** `503`
 
-A downstream service the endpoint depends on (Tinybird, AI provider, RPC) is offline or degraded. Retry with exponential backoff; the request itself is fine.
+A downstream service the endpoint depends on is offline or degraded. Retry with exponential backoff; the request itself is fine.
 
 ### `internal_server_error`
 

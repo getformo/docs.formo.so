@@ -3,3 +3,19 @@ title: 'Create Label'
 description: 'Add or update one or more labels on a wallet profile. Labels tag wallets with custom attributes like VIP tier, airdrop eligibility, or verification status.'
 openapi: 'POST /v0/profiles/{address}/labels'
 ---
+
+## Historical (backfilled) labels
+
+Each label accepts an optional `timestamp` (ISO-8601). When set, the label is recorded at that time instead of the server's current time, so you can backfill historical values (for example, an `open_interest` reading from a past week). Label-based retention then evaluates each value at the correct point in time.
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{ "tag_id": "open_interest", "value": "1200", "timestamp": "2026-01-05T00:00:00Z" }' \
+  "https://api.formo.so/v0/profiles/<address>/labels"
+```
+
+<Note>
+`timestamp` must not be in the future; future timestamps are rejected with `400`. When omitted, the label is recorded at server time. The response echoes the caller-supplied `timestamp` when present, otherwise the server write time.
+</Note>

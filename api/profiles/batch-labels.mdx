@@ -1,0 +1,24 @@
+---
+title: 'Batch Labels'
+description: 'Add or update up to 100 labels across many wallets in a single request. Each item carries its own address; rows with an invalid address are quarantined and reported rather than failing the whole batch.'
+openapi: 'POST /v0/profiles/labels'
+---
+
+## Historical (backfilled) labels
+
+Each item extends the single-wallet label schema, so it accepts the same optional `timestamp` (ISO-8601). When set, that row is recorded at the given time instead of the server's current time, letting you backfill historical values per wallet in one batch. Label-based retention then evaluates each value at the correct point in time.
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '[
+    { "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "tag_id": "open_interest", "value": "1200", "timestamp": "2026-01-05T00:00:00Z" },
+    { "address": "EPjFWaYbrgqCC2Qbg4EV4FjUreEMKwMn1zNbiboXXKV", "tag_id": "open_interest", "value": "800", "timestamp": "2026-01-12T00:00:00Z" }
+  ]' \
+  "https://api.formo.so/v0/profiles/labels"
+```
+
+<Note>
+`timestamp` must not be in the future. Unlike an invalid address (which is quarantined for that row only), a future timestamp fails request validation and rejects the whole batch with `400`. When omitted, the row is recorded at server time.
+</Note>

@@ -157,7 +157,9 @@
               "api/profiles/import",
               "api/profiles/update",
               "api/profiles/create-label",
-              "api/profiles/delete-label"
+              "api/profiles/delete-label",
+              "api/profiles/batch-labels",
+              "api/profiles/batch-properties"
             ]
           },
           {
