@@ -22,3 +22,25 @@ curl -sS -X POST \
 <Note>
 `timestamp` must not be in the future. Unlike an invalid address (which is quarantined for that row only), a future timestamp fails request validation and rejects the whole batch with `400`. When omitted, the row is recorded at server time.
 </Note>
+
+## Backdated removals (historical tombstones)
+
+Set the optional `_is_deleted` flag to `1` on a row to backfill a *removal* at that row's `timestamp` instead of writing a live value. This records a tombstone marking the label as removed at time `T`, so point-in-time retention drops the wallet from that historical week. `_is_deleted` is an optional integer, either `0` or `1`, and defaults to `0` (a live label).
+
+This is the same per-row flag as on the single-wallet endpoint, so a batch can carry a full value-then-removal time series across many wallets in one request:
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '[
+    { "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "tag_id": "open_interest", "value": "high", "timestamp": "2026-01-15T00:00:00Z" },
+    { "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "tag_id": "open_interest", "value": "low",  "timestamp": "2026-02-15T00:00:00Z" },
+    { "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "tag_id": "open_interest", "_is_deleted": 1, "timestamp": "2026-03-15T00:00:00Z" }
+  ]' \
+  "https://api.formo.so/v0/profiles/labels"
+```
+
+<Note>
+A tombstone follows the same validation as any backfilled row: a future `timestamp` rejects the whole batch with [`400 BAD_REQUEST`](/api/errors#bad_request). Order of ingest does not matter, since reads resolve to the value with the latest `timestamp`. For a **chain-scoped** label, the tombstone must carry the same `chain_id` as the label it removes; a tombstone's `value` is irrelevant. The storage-only `_is_deleted` flag is never echoed back in the response.
+</Note>

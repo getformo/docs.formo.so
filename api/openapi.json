@@ -1437,6 +1437,14 @@
             "type": "string",
             "format": "date-time",
             "description": "Optional ISO-8601 event-time for the label. When provided, the label is recorded at this time instead of the server's current time; used to backfill historical values (e.g. an `open_interest` reading from a past week) so label-based retention can evaluate them at the right point in time. Must not be in the future. Defaults to server time when omitted."
+          },
+          "_is_deleted": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "Optional tombstone flag for backfilled removals. `1` records the row as a soft-delete (label removed) instead of a live value; pair it with a past `timestamp` to express \"label removed at past time T\" so point-in-time retention drops the wallet from that week. The future-timestamp guard still applies. Defaults to `0` (a live label) when omitted."
           }
         }
       },
@@ -4934,6 +4942,15 @@
                     "value": "high",
                     "timestamp": "2024-01-15T00:00:00.000Z"
                   }
+                },
+                "historicalTombstone": {
+                  "summary": "Backfill a label removal at a past timestamp",
+                  "description": "Set `_is_deleted` to 1 together with a past `timestamp` to record that the label was removed at a historical point in time. Used by history imports to express \"label removed at past time T\" so point-in-time retention drops the wallet from that week, rather than only from now. Future timestamps are rejected with 400.",
+                  "value": {
+                    "tag_id": "open_interest",
+                    "_is_deleted": 1,
+                    "timestamp": "2024-03-15T00:00:00.000Z"
+                  }
                 }
               }
             }
@@ -5078,8 +5095,8 @@
                   ]
                 },
                 "historicalLabels": {
-                  "summary": "Backfill labels at past timestamps",
-                  "description": "Each row may carry a `timestamp` to record the label at a historical point in time instead of now; used to import historical values (e.g. a time series of a label's value) so label-based retention evaluates them at the correct point. ISO-8601 datetime (UTC `Z` or with a timezone offset); a future value rejects the whole batch with 400.",
+                  "summary": "Backfill a label time series ending in a removal",
+                  "description": "Each row may carry a `timestamp` to record the label at a historical point in time instead of now; used to import a time series of a label's value so label-based retention evaluates it at the correct point. Set `_is_deleted` to 1 on a row to backfill a removal at that timestamp (here the label is removed on 2024-03-15). ISO-8601 datetime (UTC `Z` or with a timezone offset); a future value rejects the whole batch with 400.",
                   "value": [
                     {
                       "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
@@ -5092,6 +5109,12 @@
                       "tag_id": "open_interest",
                       "value": "low",
                       "timestamp": "2024-02-15T00:00:00.000Z"
+                    },
+                    {
+                      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                      "tag_id": "open_interest",
+                      "_is_deleted": 1,
+                      "timestamp": "2024-03-15T00:00:00.000Z"
                     }
                   ]
                 }

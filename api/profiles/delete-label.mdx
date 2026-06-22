@@ -3,3 +3,7 @@ title: 'Delete Label'
 description: 'Delete a label from a wallet profile by tag_id, optionally scoped to a specific chain.'
 openapi: 'DELETE /v0/profiles/{address}/labels'
 ---
+
+<Note>
+This endpoint tombstones the label at the current server time. To record a removal at a *past* point in time (for example, when importing a label's history), use [Create Label](/api/profiles/create-label) with `_is_deleted: 1` and a past `timestamp` instead.
+</Note>
