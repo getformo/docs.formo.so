@@ -5049,7 +5049,7 @@
     "/v0/profiles/labels": {
       "post": {
         "operationId": "batchUpsertUserLabels",
-        "summary": "Create Labels",
+        "summary": "Batch add or update user labels",
         "description": "Upsert up to 100 labels across many wallets in one request; each item carries its own `address`. Modelled on the events ingest API: rows with an invalid address (ENS names are NOT resolved here; pass a literal EVM `0x...` or Solana address) are quarantined (skipped and reported in the response) rather than failing the whole batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
         "tags": [
           "Profiles"
@@ -5146,7 +5146,7 @@
     "/v0/profiles/properties": {
       "post": {
         "operationId": "batchUpdateUserProperties",
-        "summary": "Create Properties",
+        "summary": "Batch update user properties",
         "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
         "tags": [
           "Profiles"

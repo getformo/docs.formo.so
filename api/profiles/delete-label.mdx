@@ -5,5 +5,5 @@ openapi: 'DELETE /v0/profiles/{address}/labels'
 ---
 
 <Note>
-This endpoint tombstones the label at the current server time. To record a removal at a *past* point in time (for example, when importing a label's history), use [Create Label](/api/profiles/create-label) with `_is_deleted: 1` and a past `timestamp` instead.
+This endpoint tombstones the label at the current server time. To record a removal at a *past* point in time (for example, when importing a label's history), use [Add Labels](/api/profiles/add-labels) with `_is_deleted: 1` and a past `timestamp` instead.
 </Note>

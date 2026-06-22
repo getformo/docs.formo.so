@@ -154,12 +154,12 @@
             "pages": [
               "api/profiles/get",
               "api/profiles/search",
-              "api/profiles/import",
-              "api/profiles/update",
-              "api/profiles/create-label",
+              "api/profiles/update-properties",
+              "api/profiles/batch-update-properties",
+              "api/profiles/add-labels",
               "api/profiles/delete-label",
-              "api/profiles/create-labels",
-              "api/profiles/create-properties"
+              "api/profiles/batch-add-labels",
+              "api/profiles/import"
             ]
           },
           {
@@ -347,5 +347,23 @@
   },
   "apiReference": {
     "spec": "api/openapi.json"
-  }
+  },
+  "redirects": [
+    {
+      "source": "/api/profiles/update",
+      "destination": "/api/profiles/update-properties"
+    },
+    {
+      "source": "/api/profiles/create-properties",
+      "destination": "/api/profiles/batch-update-properties"
+    },
+    {
+      "source": "/api/profiles/create-label",
+      "destination": "/api/profiles/add-labels"
+    },
+    {
+      "source": "/api/profiles/create-labels",
+      "destination": "/api/profiles/batch-add-labels"
+    }
+  ]
 }
