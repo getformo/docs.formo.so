@@ -158,8 +158,8 @@
               "api/profiles/update",
               "api/profiles/create-label",
               "api/profiles/delete-label",
-              "api/profiles/batch-labels",
-              "api/profiles/batch-properties"
+              "api/profiles/create-labels",
+              "api/profiles/create-properties"
             ]
           },
           {
