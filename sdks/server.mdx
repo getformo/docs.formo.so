@@ -53,11 +53,15 @@ To track custom events (actions, conversions, or backend states) use the [`track
 await analytics.track({
   address: "0x9798d87366bdfc5d70b300abdffc4f9e95369b3d", // optional: wallet address
   anonymousId: uuid(), // optional: auto-generated if not provided
-  event: "Purchase Completed", // required: event name
+  event: "Swap Completed", // required: event name
   properties: {
-    order_id: "123",
-    revenue: 99.99,
-    currency: "USD",
+    pair: "ETH/USDC",
+    token_in: "ETH",
+    token_out: "USDC",
+    amount_in: 1.5,
+    amount_out: 4500,
+    volume: 4500,
+    revenue: 13.5,
   },
 });
 ```

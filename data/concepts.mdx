@@ -36,7 +36,7 @@ Wallets are automatically linked to the user when multiple wallets are connected
 ### 3. Properties
 
 Properties are **additional information about users and events.**
-- Event properties are attributes that describe details specific to the particular instance of an event. For example, if you had a Purchase Completed event, you could specify what the user purchased, the total value of the order, and the payment method used.
+- Event properties are attributes that describe details specific to the particular instance of an event. For example, if you had a Swap Completed event, you could specify the token pair, input amount, output amount, volume, and protocol fee.
 - User properties are traits describing the user and apply across all their future events until the properties are modified. Formo's SDK captures several user properties by default, and you can also set up your own properties to track.
 
 Properties examples:
@@ -44,4 +44,4 @@ Properties examples:
 - A Page View event has page URL, referrer URL, and other metadata.
 - A User has net worth and first-touch UTM parameter properties.
 
-When you track custom events, you can also set properties to describe the event. For example, if you had a Purchase Completed event, you could specify what the user purchased, the total value of the order, and the payment method used.
+When you track custom events, you can also set properties to describe the event. For example, if you had a Swap Completed event, you could specify the token pair, input amount, output amount, volume, and protocol fee.

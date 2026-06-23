@@ -1,6 +1,6 @@
 ---
 title: 'Custom events'
-description: 'Define and track custom events like button clicks, form submissions, and purchases with structured properties using the Formo SDK Track API.'
+description: 'Define and track custom events like swaps, deposits, and quests with structured properties using the Formo SDK Track API.'
 ---
 
 ## Overview
@@ -22,8 +22,8 @@ Track actions that aren't captured automatically:
 
 | Action | Why track it |
 |--------|--------------|
-| Button clicks | Measure CTA effectiveness |
-| Form submissions | Track lead generation |
+| Swap submissions | Measure swap conversion |
+| Deposit completions | Track liquidity flows |
 | Feature usage | Understand adoption |
 | Errors | Debug user issues |
 | Key conversions | Measure business outcomes |
@@ -47,7 +47,7 @@ Track actions that aren't captured automatically:
 
     ```javascript
     // Track an event
-    window.formo.track('Event Name', { property: 'value' });
+    window.formo.track('Swap Completed', { pair: 'ETH/USDC' });
     ```
   </Tab>
 </Tabs>
@@ -73,9 +73,11 @@ analytics.track('Swap Completed', {
 For events with monetary value, use special properties:
 
 ```typescript
-analytics.track('Trade Executed', {
+analytics.track('Swap Completed', {
   pair: 'ETH/USDC',
-  volume: 5000,    // USD value of the trade
+  token_in: 'ETH',
+  token_out: 'USDC',
+  volume: 5000,    // USD value of the swap
   revenue: 25,     // Revenue earned (e.g., fees)
   points: 100      // Loyalty/reward points
 });
@@ -167,21 +169,22 @@ analytics.track('Swap Failed', {
 });
 ```
 
-### Example: Tracking feature adoption
+### Example: Tracking DeFi feature adoption
 
-Measure which features users engage with:
+Measure which protocol features users engage with:
 
 ```typescript
-// User opens a feature
-analytics.track('Feature Opened', {
-  feature: 'Portfolio',
+// User opens a liquidity pool
+analytics.track('Pool Opened', {
+  pool_id: 'ETH/USDC',
   source: 'sidebar'
 });
 
-// User completes key action in feature
-analytics.track('Portfolio Export', {
-  format: 'csv',
-  date_range: '30d'
+// User completes a key action in the pool
+analytics.track('Liquidity Added', {
+  pool_id: 'ETH/USDC',
+  token_0: 'ETH',
+  token_1: 'USDC'
 });
 ```
 
