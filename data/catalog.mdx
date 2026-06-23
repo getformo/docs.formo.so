@@ -364,6 +364,43 @@ LIMIT 20
 
 ---
 
+### user_profiles_mv
+
+Project-scoped, first-party **user profile traits** captured from `identify` events. One row per `address`, holding the latest value of each trait. This is the identity-data counterpart to `wallet_profiles_mv` (which holds public onchain profile data); `user_profiles_mv` holds the traits *you* send.
+
+**Use cases:** User enrichment, first-party identity resolution, personalization, outreach
+
+<Warning>
+This is an **aggregate table** (`AggregatingMergeTree`). Each trait is stored as an aggregate state, so read it with `-Merge` functions (e.g. `argMaxIfMerge(email)`) and always `GROUP BY address`. Never use `SELECT *`. See [Working with Aggregate Tables](#working-with-aggregate-tables).
+</Warning>
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `address` | String | Wallet address (primary key within your project) |
+| `user_id` | String | Your own external user identifier |
+| `display_name` | String | Display name |
+| `email` | String | Email address |
+| `farcaster`, `discord`, `twitter`, `telegram`, `instagram`, `github`, `linkedin`, `facebook`, `tiktok`, `youtube`, `reddit` | String | Social handles |
+| `website` | String | Website URL |
+| `ens`, `lens`, `basenames`, `linea` | String | Web3 name-service handles |
+| `avatar` | String | Avatar image URL |
+| `description` | String | Bio / description |
+| `location` | String | Location |
+| `updated_at` | DateTime | Last time any trait was updated |
+
+**Example:**
+
+```sql
+SELECT
+    address,
+    argMaxIfMerge(display_name) AS display_name,
+    argMaxIfMerge(email) AS email
+FROM user_profiles_mv
+GROUP BY address
+```
+
+---
+
 ### wallet_profiles_mv
 
 Global wallet profile data aggregated across all chains. One row per wallet address with social profiles, contact info, and net worth.
@@ -509,6 +546,23 @@ Wallet labels and tags for categorizing and filtering wallet addresses. Each row
 
 ---
 
+### user_labels
+
+Project-scoped **labels and tags you assign to wallet addresses** (e.g. your own segments, scores, or categories). The latest value per `(tag_id, address, chain_id)` is kept automatically. This is the project-specific counterpart to `wallet_profiles_labels`, which holds **global** labels supplied by Formo's wallet profiler.
+
+**Use cases:** Custom segmentation, scoring, audience building, tagging
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `address` | String | Labeled wallet address |
+| `chain_id` | String | Chain the label applies to (`-` for all chains) |
+| `tag_id` | String | Label / tag identifier |
+| `value` | String | Optional label value or score |
+| `source` | String | System that supplied the label |
+| `timestamp` | DateTime | When the label was last updated |
+
+---
+
 ## Table relationships
 
 ```
@@ -646,7 +700,7 @@ ORDER BY date
 
 ## Working with aggregate tables
 
-Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`) use ClickHouse [AggregateFunction](https://clickhouse.com/docs/en/sql-reference/data-types/aggregatefunction) types. These store intermediate aggregation states, not final values.
+Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`, `user_profiles_mv`) use ClickHouse [AggregateFunction](https://clickhouse.com/docs/en/sql-reference/data-types/aggregatefunction) types. These store intermediate aggregation states, not final values.
 
 ### Rules
 
@@ -660,6 +714,7 @@ Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`)
 | Aggregate Type | Query Pattern | Example |
 |---------------|--------------|---------|
 | `AggregateFunction(argMax, T, DateTime)` | `argMaxMerge(col)` | `argMaxMerge(location)` |
+| `AggregateFunction(argMaxIf, T, DateTime, UInt8)` | `argMaxIfMerge(col)` | `argMaxIfMerge(email)` |
 | `AggregateFunction(argMin, T, DateTime)` | `argMinMerge(col)` | `argMinMerge(first_utm_source)` |
 | `AggregateFunction(uniq, T)` | `uniqMerge(col)` | `uniqMerge(num_sessions)` |
 | `AggregateFunction(count)` | `countMerge(col)` | `countMerge(hits)` |
