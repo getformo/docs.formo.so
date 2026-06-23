@@ -326,7 +326,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
 > The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.) You do not need to manually track them.
 
-To track custom events (in-app user actions, key conversions) use the [`track`](/data/events/track) function with details of what happenned:
+To track custom events (in-app user actions, key conversions) use the [`track`](/data/events/track) function with details of what happened:
 
 ```ts
 import { useFormo } from '@formo/analytics';
@@ -826,7 +826,7 @@ npm install @formo/analytics @solana/client @solana/react-hooks
       const formo = useFormo();
 
       const handleClick = () => {
-        formo.track('button_click', { page: 'home' });
+        formo.track('Swap Started', { pair: 'ETH/USDC' });
       };
     }
     ```
@@ -894,7 +894,7 @@ For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-11
     The [Wagmi integration](#wagmi) automatically tracks wallet connects, disconnects, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs-without-wagmi) tracks wallet events by wrapping the EIP-1193 wallet provider to track signatures and transactions. Use the Wagmi integration if your dApp uses Wagmi and its hooks.
   </Accordion>
   <Accordion title="How do I track custom events like swaps, deposits, or mints?">
-    Use [formo.track()](/data/events/track) to send custom events with any properties you need. For example: `formo.track('swap', { tokenIn: 'USDC', tokenOut: 'ETH', amount: 1000 })`. Custom events appear in the [Activity](/features/product-analytics/activity) feed and can be queried in the [Explorer](/features/product-analytics/explore).
+    Use [formo.track()](/data/events/track) to send custom events with any properties you need. For example: `formo.track('Swap Completed', { pair: 'ETH/USDC', token_in: 'ETH', token_out: 'USDC', amount_in: 1.5 })`. Custom events appear in the [Activity](/features/product-analytics/activity) feed and can be queried in the [Explorer](/features/product-analytics/explore).
   </Accordion>
   <Accordion title="Does the Formo SDK support consent management for GDPR?">
     Yes. The SDK provides built-in [consent management](#consent-management) with `optOutTracking()` and `optInTracking()` methods. Call `optOutTracking()` to stop all tracking for a user, and `optInTracking()` to re-enable it. Formo does not use third-party cookies, IP addresses, or device fingerprinting, so most jurisdictions do not require a cookie consent banner.

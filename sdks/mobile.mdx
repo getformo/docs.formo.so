@@ -230,14 +230,14 @@ formo.track('Swap Completed', {
 });
 
 // With reserved properties for analytics
-formo.track('Purchase Completed', {
-  productId: 'premium-nft-001',
+formo.track('NFT Minted', {
+  collection: 'founders-pass',
+  tokenId: '001',
   revenue: 99.99,   // Reserved: revenue tracking
-  currency: 'USD',  // Reserved: currency for revenue
 });
 
-formo.track('Achievement Unlocked', {
-  achievementId: 'first_transaction',
+formo.track('Quest Completed', {
+  questId: 'first_swap',
   points: 500,      // Reserved: points tracking
 });
 
