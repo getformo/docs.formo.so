@@ -351,7 +351,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
         useEffect(() => {
           // Track a custom event
-          analytics.track('Swap Completed', { points: 100 });
+          analytics.track('Swap Completed', { volume: 100 });
         }, [analytics]);
 
         return <div>Welcome to the Home Page!</div>;
@@ -391,7 +391,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
     For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
 
     ```html
-    <button type="button" onclick="window.formo.track('Swap Completed', { foo: 'bar' })">
+    <button type="button" onclick="window.formo.track('Swap Completed', { volume: 100 })">
       Track event
     </button>
     ```
@@ -467,7 +467,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
         useEffect(() => {
           // Track a custom event
-          analytics.track('Swap Completed', { points: 100 });
+          analytics.track('Swap Completed', { volume: 100 });
         }, [analytics]);
 
         return <div>Welcome to the Home Page!</div>;
@@ -627,7 +627,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
         useEffect(() => {
           // Track a custom event
-          analytics.track('Swap Completed', { points: 100 });
+          analytics.track('Swap Completed', { volume: 100 });
         }, [analytics]);
 
         return <div>Welcome to the Home Page!</div>;
@@ -770,7 +770,7 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
       private readonly formo = inject(FormoAnalyticsService);
 
       onSwapCompleted(): void {
-        this.formo.track('Swap Completed', { points: 100 });
+        this.formo.track('Swap Completed', { volume: 100 });
       }
     }
     ```
