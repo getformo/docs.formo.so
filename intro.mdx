@@ -137,25 +137,19 @@ Connect Formo to Claude and other AI tools with **[MCP](/mcp/overview)** and **[
 
 <AccordionGroup>
   <Accordion title="How is Formo different from Google Analytics for crypto apps?">
-    Formo is purpose-built for onchain apps. Unlike Google Analytics, Formo natively tracks wallet connections, transactions, and signatures alongside traditional web analytics like pageviews and sessions. It also provides [onchain attribution](/data/attribution), [wallet intelligence](/features/wallet-intelligence/overview), and [token-gated forms](/features/token-gated-forms/form-builder) - features that general-purpose analytics tools don't offer.
+    Formo is purpose-built for onchain apps. Unlike Google Analytics, Formo natively tracks wallet connects, transactions, and signatures alongside traditional web analytics like pageviews and sessions. It also provides [onchain attribution](/data/attribution), [wallet intelligence](/features/wallet-intelligence/overview), and [token-gated forms](/features/token-gated-forms/form-builder) - features that general-purpose analytics tools don't offer.
   </Accordion>
   <Accordion title="Does Formo work with Solana, or only EVM chains?">
     Formo supports both EVM and Solana. See the full list of [supported chains](/chains/overview).
   </Accordion>
-  <Accordion title="Is Formo GDPR-compliant? Do I need a cookie consent banner?">
-    Yes, Formo is GDPR-compliant by default. We do not collect IP addresses, use device fingerprinting, or set third-party cookies - so you do not need a cookie consent banner. See [what we collect](/data/what-we-collect) for details.
-  </Accordion>
-  <Accordion title="What does Formo track automatically without any custom code?">
-    After installing the SDK, Formo automatically tracks pageviews, sessions, referrer sources, UTM parameters, wallet connections, disconnections, chain switches, transactions, and signatures. See [events](/data/events/overview) for the full list.
-  </Accordion>
-  <Accordion title="How much does Formo cost?">
-    Formo offers a free tier to get started. Visit [Pricing](https://formo.so/pricing) for additional pricing tiers.
-  </Accordion>
   <Accordion title="Which frameworks does Formo support?">
     Formo works with any JavaScript framework: React, Vue, Svelte, Next.js, Remix, Astro, and vanilla JavaScript. We have optimized integration guides for wagmi and RainbowKit. See [SDKs](/sdks/web) for framework-specific examples.
   </Accordion>
+  <Accordion title="What does Formo SDK track?">
+    After installing the SDK, Formo automatically tracks page views, sessions, referrer sources, UTM parameters, referral codes, wallet connects, disconnects, chain switches, transactions, and signatures. See [events](/data/events/overview) and [what we collect](/data/what-we-collect) for more information.
+  </Accordion>
   <Accordion title="Can I track events from my backend?">
-    Yes. Formo provides a [Server SDK](/sdks/server) for backend tracking. Use it to send custom events, identify users, or batch track historical data.
+    Yes. Formo provides a [Server-side SDK](/sdks/server) and [API](/api/overview) for tracking events from the backend. Use it to send custom events, identify users, or batch track historical data.
   </Accordion>
   <Accordion title="How often is my data updated?">
     All data is ingested and displayed in real time.

@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "aspen",
+  "theme": "sequoia",
   "name": "Formo Docs",
   "colors": {
     "primary": "#0D9373",
@@ -308,13 +308,13 @@
   "navbar": {
     "links": [
       {
-        "label": "Demo",
+        "label": "Book a demo",
         "href": "https://cal.com/formo/demo"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
+      "label": "Sign in",
       "href": "https://app.formo.so"
     }
   },
@@ -346,25 +346,15 @@
   "background": {
     "decoration": "gradient"
   },
+  "openapi": "api/openapi.json",
+  "api": {
+    "baseUrl": ["https://api.formo.so", "https://events.formo.so"],
+    "auth": {
+      "method": "bearer",
+      "name": "Authorization"
+    }
+  },
   "apiReference": {
     "spec": "api/openapi.json"
-  },
-  "redirects": [
-    {
-      "source": "/api/profiles/update",
-      "destination": "/api/profiles/update-properties"
-    },
-    {
-      "source": "/api/profiles/create-properties",
-      "destination": "/api/profiles/batch-update-properties"
-    },
-    {
-      "source": "/api/profiles/create-label",
-      "destination": "/api/profiles/add-labels"
-    },
-    {
-      "source": "/api/profiles/create-labels",
-      "destination": "/api/profiles/batch-add-labels"
-    }
-  ]
+  }
 }
