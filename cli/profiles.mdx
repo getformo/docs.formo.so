@@ -5,9 +5,25 @@ icon: user
 description: "Look up wallet profiles, search your user base, update identity properties, and manage labels using the Formo CLI profiles commands."
 ---
 
-The `formo profiles` command group lets you look up individual wallet profiles, search across your entire user base with filters and sorting, merge-update identity properties, and manage labels on a wallet.
+The `formo profiles` command group lets you look up individual wallet profiles, search your user base, merge-update identity properties, and manage labels.
 
-## `formo profiles get`
+## Lifecycle Threshold Options
+
+`profiles get` and `profiles search` accept optional lifecycle threshold overrides:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `--new-window-days` | `number` | Override lifecycle new-user window in days |
+| `--churn-window-days` | `number` | Override lifecycle churn window in days |
+| `--power-user-min-active-days` | `number` | Override lifecycle power-user minimum active days |
+| `--power-user-window-days` | `number` | Override lifecycle power-user window in days |
+| `--resurrected-gap-days` | `number` | Override lifecycle resurrected gap in days |
+| `--at-risk-min-days-inactive` | `number` | Override lifecycle at-risk minimum inactive days |
+| `--at-risk-prior-active-days-threshold` | `number` | Override lifecycle at-risk prior active days threshold |
+
+---
+
+## `formo profiles get <address>`
 
 Fetch a single wallet profile by address or ENS name.
 
@@ -15,48 +31,27 @@ Fetch a single wallet profile by address or ENS name.
 Requires `profiles:read` scope on your API key.
 </Note>
 
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
-
 ### Options
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--expand` | `string` | ❌ | Comma-separated list of fields to expand: `apps`, `chains`, `tokens`, `labels` |
+| `--expand` | `string` | ❌ | Comma-separated fields to expand: `apps`, `chains`, `tokens`, `labels` |
+
+The lifecycle threshold options listed above are also supported.
 
 ### Examples
 
 ```bash
-# Get a wallet profile by address
 formo profiles get 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
-
-# Get a profile by ENS name
-formo profiles get vitalik.eth
-
-# Get profile with expanded labels and chains
 formo profiles get vitalik.eth --expand labels,chains
-
-# Get profile with all expanded fields
-formo profiles get 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --expand apps,chains,tokens,labels
+formo profiles get vitalik.eth --expand apps,chains,tokens,labels --churn-window-days 30
 ```
-
-### Expand fields
-
-| Field | Description |
-|-------|-------------|
-| `apps` | DApps the wallet has interacted with |
-| `chains` | Blockchain networks the wallet is active on |
-| `tokens` | Token holdings for the wallet |
-| `labels` | Wallet labels and tags |
 
 ---
 
 ## `formo profiles search`
 
-Search wallet profiles with optional filters, sorting, and pagination.
+Search wallet profiles with optional filters, sorting, free-text search, and pagination.
 
 <Note>
 Requires `profiles:read` scope on your API key.
@@ -67,29 +62,20 @@ Requires `profiles:read` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--address` | `string` | ❌ | Filter by wallet address |
-| `--page` | `number` | ❌ | Page number (1-indexed, default `1`) |
-| `--size` | `number` | ❌ | Page size (default `100`, max `1000`) |
-| `--order-by` | `enum` | ❌ | Field to sort by (see values below) |
+| `--search` | `string` | ❌ | Free-text search across address and identity fields |
+| `--page` | `number` | ❌ | Page number, 1-indexed |
+| `--size` | `number` | ❌ | Page size |
+| `--order-by` | `enum` | ❌ | Field to sort by |
 | `--order-dir` | `enum` | ❌ | Sort direction: `asc` or `desc` |
 | `--expand` | `string` | ❌ | Comma-separated fields to expand |
-| `--conditions` | `string` | ❌ | JSON array of `FilterCondition` objects for advanced filtering |
-| `--logic` | `enum` | ❌ | Logic operator for combining conditions: `and` (default) or `or` |
+| `--conditions` | `string` | ❌ | JSON array of `FilterCondition` objects |
+| `--logic` | `enum` | ❌ | Combine conditions with `and` or `or` |
 
-### `--order-by` values
+The lifecycle threshold options listed above are also supported.
 
-| Value | Description |
-|-------|-------------|
-| `last_onchain` | Last on-chain activity timestamp |
-| `first_onchain` | First on-chain activity timestamp |
-| `net_worth_usd` | Total net worth in USD |
-| `updated_at` | Profile last updated |
-| `tx_count` | Total transaction count |
-| `first_seen` | First seen by Formo |
-| `last_seen` | Last seen by Formo |
-| `num_sessions` | Number of sessions |
-| `revenue` | Revenue attributed |
-| `volume` | Volume attributed |
-| `points` | Points attributed |
+### `--order-by` Values
+
+`last_onchain`, `first_onchain`, `net_worth_usd`, `updated_at`, `tx_count`, `first_seen`, `last_seen`, `num_sessions`, `revenue`, `volume`, `points`
 
 ### Examples
 
@@ -97,34 +83,34 @@ Requires `profiles:read` scope on your API key.
 # List first 10 profiles
 formo profiles search --size 10
 
+# Search text fields
+formo profiles search --search vitalik --size 5
+
 # Top 5 profiles by net worth
 formo profiles search --order-by net_worth_usd --order-dir desc --size 5
 
-# Get the second page of 20 profiles
-formo profiles search --page 2 --size 20
-
-# Search with a filter condition
+# Search with a typed filter condition
 formo profiles search \
   --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000}]' \
   --size 20
 
-# Search profiles matching either condition (OR logic)
+# Search profiles matching either condition
 formo profiles search \
   --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000},{"field":"users.volume","op":"gt","value":1000}]' \
   --logic or \
   --size 20
 
-# Filter by on-chain balance on a specific chain (Ethereum = chain 1)
+# Filter by onchain balance on Ethereum
 formo profiles search \
   --conditions '[{"field":"chains.1.balance","op":"gt","value":1000}]' \
   --size 20
 ```
 
-The response is a paginated envelope: `{ data, total, page, size, has_more }`. Use `has_more` to know whether to fetch `--page <n+1>`.
+The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
-### FilterCondition reference
+### Filter Conditions
 
-The `--conditions` option accepts a JSON array of filter condition objects:
+`--conditions` accepts a JSON array of filter condition objects:
 
 ```json
 [
@@ -134,61 +120,22 @@ The `--conditions` option accepts a JSON array of filter condition objects:
 ```
 
 <Warning>
-`field` **must be a typed path** (prefixed by its category; see the table
-below). The CLI rejects a bare/untyped field (e.g. `net_worth_usd`) with an
-error, because the API would otherwise **silently ignore** it: no error, no
-filtering, returning the entire unfiltered dataset. Always prefix the field,
-e.g. `users.net_worth_usd`.
+`field` must be a typed path such as `users.net_worth_usd`, `chains.1.balance`, `apps.uniswap-v3.balance`, `tokens.0xA0b8...48.balance`, or `labels.vip`. Bare names like `net_worth_usd` are rejected by the CLI because the API ignores them.
 </Warning>
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `field` | `string` | Typed field path (see prefixes below) |
-| `op` | `string` | Operator (see table below) |
-| `value` | `any` | Value to compare against |
-| `scope` | `string` | _(token filters only)_ `any` or `protocol` |
-| `appId` | `string` | _(token filters with `scope: protocol`)_ e.g. `aave-v3` |
+### Filter Operators
 
-### Field path prefixes
-
-| Prefix | Examples |
-|--------|----------|
-| `users.` | `users.net_worth_usd`, `users.volume`, `users.revenue`, `users.points`, `users.device`, `users.location`, `users.lifecycle`, `users.ens`, `users.farcaster` |
-| `chains.` | `chains.balance` (any chain), `chains.1.balance` (Ethereum) |
-| `apps.` | `apps.uniswap-v3.balance` |
-| `tokens.` | `tokens.0xA0b8…48.balance` |
-| `labels.` | `labels.coinbase.verified_account` |
-
-### Filter operators
-
-| Operator | Description |
-|----------|-------------|
-| `eq` | Equal to |
-| `neq` | Not equal to |
-| `gt` | Greater than |
-| `gte` | Greater than or equal to |
-| `lt` | Less than |
-| `lte` | Less than or equal to |
-| `in` | In a set of values |
-| `nin` | Not in a set of values |
-
-By default, multiple conditions are combined with `AND` logic. Use `--logic or` to combine with `OR` logic instead.
+`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`
 
 ---
 
-## `formo profiles update`
+## `formo profiles update <address>`
 
-Merge-update identity properties on a wallet profile. Only the listed property keys are accepted; unknown keys are rejected server-side.
+Merge-update identity properties on a single wallet profile.
 
 <Note>
 Requires `profiles:write` scope on your API key.
 </Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
 
 ### Options
 
@@ -196,85 +143,110 @@ Requires `profiles:write` scope on your API key.
 |--------|------|----------|-------------|
 | `--properties` | `string` | ✅ | JSON object of properties to merge |
 
-### Allowed property keys
+Allowed property keys:
 
 `user_id`, `display_name`, `email`, `farcaster`, `discord`, `twitter`, `telegram`, `instagram`, `website`, `github`, `linkedin`, `facebook`, `tiktok`, `youtube`, `reddit`, `avatar`, `description`, `location`, `ens`, `lens`, `basenames`, `linea`
 
-### Examples
-
 ```bash
-# Set display name and Twitter handle
 formo profiles update 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
   --properties '{"display_name":"Vitalik","twitter":"VitalikButerin"}'
-
-# Set just the email
-formo profiles update vitalik.eth \
-  --properties '{"email":"alice@example.com"}'
 ```
 
 ---
 
-## `formo profiles labels create`
+## `formo profiles properties batch`
 
-Upsert one or more labels on a wallet profile. Provide either a single label via `--tag-id` or a batch via `--labels`.
+Batch update first-party profile properties for up to 100 wallets.
 
 <Note>
 Requires `profiles:write` scope on your API key.
 </Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
 
 ### Options
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--tag-id` | `string` | ❌ | Label identifier (e.g. `vip`, `airdrop_eligible`). Required unless `--labels` is provided. |
-| `--value` | `string` | ❌ | Optional label value (e.g. tier name, country code) |
-| `--chain-id` | `string` | ❌ | Optional chain identifier the label applies to |
-| `--labels` | `string` | ❌ | JSON array of `UserLabelInput` objects for batch upsert |
-
-### Examples
+| `--rows` | `string` | ✅ | JSON array of flat `{address, ...properties}` objects |
 
 ```bash
-# Tag a wallet as VIP
-formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tag-id vip
-
-# Apply a tiered label scoped to a chain
-formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
-  --tag-id tier --value gold --chain-id 1
-
-# Apply multiple labels in one call
-formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
-  --labels '[{"tag_id":"vip"},{"tag_id":"airdrop_eligible","chain_id":"1"}]'
+formo profiles properties batch \
+  --rows '[{"address":"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045","display_name":"alice.eth","email":"alice@example.com"}]'
 ```
 
-### `UserLabelInput` shape
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `tag_id` | `string` | ✅ | Label identifier |
-| `value` | `string` | ❌ | Optional label value |
-| `chain_id` | `string` | ❌ | Optional chain identifier |
+<Note>
+ENS names are not resolved in batch requests. Use wallet addresses in each `address` field.
+</Note>
 
 ---
 
-## `formo profiles labels delete`
+## `formo profiles labels create <address>`
 
-Delete a label from a wallet profile. Pass `--chain-id` to scope the deletion to a chain-specific label.
+Upsert one or more labels on a wallet profile. Provide either a single label with `--tag-id` or a wallet-local batch with `--labels`.
 
 <Note>
 Requires `profiles:write` scope on your API key.
 </Note>
 
-### Arguments
+### Options
 
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `address` | `string` | ✅ | Wallet address (`0x…`) or ENS name |
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--tag-id` | `string` | ❌ | Label identifier, required unless `--labels` is provided |
+| `--value` | `string` | ❌ | Optional label value |
+| `--chain-id` | `string` | ❌ | Optional chain identifier the label applies to |
+| `--timestamp` | `string` | ❌ | Optional historical ISO-8601 timestamp for the label row |
+| `--is-deleted` | `boolean` | ❌ | Backfill a historical label removal tombstone |
+| `--labels` | `string` | ❌ | JSON array of `UserLabelInput` objects for this wallet |
+
+### Examples
+
+```bash
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tag-id vip
+
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --tag-id tier --value gold --chain-id 1
+
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --tag-id tier --timestamp 2024-03-15T00:00:00.000Z --is-deleted
+
+formo profiles labels create 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --labels '[{"tag_id":"vip"},{"tag_id":"airdrop_eligible","chain_id":"1"}]'
+```
+
+---
+
+## `formo profiles labels batch`
+
+Batch upsert labels across up to 100 wallets.
+
+<Note>
+Requires `profiles:write` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--labels` | `string` | ✅ | JSON array of `{address, tag_id, value?, chain_id?, timestamp?, _is_deleted?}` objects |
+
+```bash
+formo profiles labels batch \
+  --labels '[{"address":"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045","tag_id":"vip","value":"tier-1"}]'
+```
+
+<Note>
+ENS names are not resolved in batch requests. Use wallet addresses in each `address` field.
+</Note>
+
+---
+
+## `formo profiles labels delete <address>`
+
+Delete a label from a wallet profile. Pass `--chain-id` to scope deletion to a chain-specific label.
+
+<Note>
+Requires `profiles:write` scope on your API key.
+</Note>
 
 ### Options
 
@@ -283,13 +255,9 @@ Requires `profiles:write` scope on your API key.
 | `--tag-id` | `string` | ✅ | Label identifier to delete |
 | `--chain-id` | `string` | ❌ | Optional chain identifier to scope the deletion |
 
-### Examples
-
 ```bash
-# Remove the vip label
 formo profiles labels delete 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 --tag-id vip
 
-# Remove a chain-scoped label
 formo profiles labels delete 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
   --tag-id tier --chain-id 1
 ```

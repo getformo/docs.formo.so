@@ -2,13 +2,13 @@
 title: "Import"
 sidebarTitle: "Import"
 icon: file-import
-description: "Bulk import wallet addresses into your Formo project from a CSV file or stdin using the CLI. Imported wallets are automatically enriched with onchain data."
+description: "Bulk import wallet addresses into your Formo project from the CLI. Imported wallets are enriched with onchain data and may include first-party profile properties."
 ---
 
-The `formo import` command group lets you bulk import wallet addresses into your project.
+The `formo import` command group bulk imports wallet addresses into your project.
 
 <Note>
-Requires `profiles:write` scope on your API key. Only available on **Scale** and **Enterprise** plans.
+Requires `profiles:write` scope on your API key. This endpoint is available on **Scale** and **Enterprise** plans.
 </Note>
 
 ## `formo import wallets`
@@ -19,25 +19,30 @@ Bulk import wallet addresses into the project.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--addresses` | `string` | ✅ | JSON array of wallet address strings to import |
-| `--write-key` | `string` | ✅ | Project write SDK key |
+| `--addresses` | `string` | ❌ | JSON array of wallet address strings to import |
+| `--rows` | `string` | ❌ | JSON array of `{address, properties?}` objects for imports with profile properties |
+| `--write-key` | `string` | ❌ | Deprecated and ignored; import now uses the project write key server-side |
+
+Provide either `--addresses` or `--rows`.
 
 ### Examples
 
 ```bash
 # Import two wallet addresses
 formo import wallets \
-  --addresses '["0xabc123...","0xdef456..."]' \
-  --write-key write_key_xxx
+  --addresses '["0xabc123...","0xdef456..."]'
 
-# Import a list of addresses from a file (using jq)
+# Import wallets with profile properties
 formo import wallets \
-  --addresses "$(cat wallets.json)" \
-  --write-key write_key_xxx
+  --rows '[{"address":"0xabc123...","properties":{"display_name":"Alice"}}]'
+
+# Import a list of addresses from a file
+formo import wallets \
+  --addresses "$(cat wallets.json)"
 ```
 
 ### Tips
 
-- The `--addresses` value must be a valid JSON array of strings.
-- Each string should be a valid wallet address (e.g. `0x…`).
+- `--addresses` must be a JSON array of wallet address strings.
+- `--rows` must be a JSON array of objects with a non-empty `address`.
 - Use this command to backfill historical wallet addresses into your Formo project.

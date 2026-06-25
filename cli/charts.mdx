@@ -2,32 +2,46 @@
 title: "Charts"
 sidebarTitle: "Charts"
 icon: chart-line
-description: "Create, list, update, and delete charts within dashboard boards using the Formo CLI. Charts are scoped to a specific board and support multiple types."
+description: "Create, list, query, move, duplicate, reorder, update, and delete charts within dashboard boards using the Formo CLI."
 ---
 
-The `formo charts` command group lets you manage charts within dashboard boards. Charts are always scoped to a specific board.
+The `formo charts` command group manages charts within dashboard boards. Every chart command is scoped to a board with `--board-id`.
 
 ## `formo charts list`
 
-List all charts for a board.
+List charts for a board, including executed results when available.
 
 <Note>
 Requires `boards:read` scope on your API key.
 </Note>
 
-### Options
-
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--board-id` | `string` | ✅ | Board ID to list charts from |
+| `--page` | `number` | ❌ | Page number, 1-indexed |
+| `--size` | `number` | ❌ | Page size |
 
 ```bash
-formo charts list --board-id board_abc123
+formo charts list --board-id board_abc123 --size 25
 ```
 
 ---
 
-## `formo charts get`
+## `formo charts meta`
+
+List lightweight chart metadata for a board without query results.
+
+<Note>
+Requires `boards:read` scope on your API key.
+</Note>
+
+```bash
+formo charts meta --board-id board_abc123
+```
+
+---
+
+## `formo charts get <chartId>`
 
 Get a single chart by ID.
 
@@ -35,27 +49,35 @@ Get a single chart by ID.
 Requires `boards:read` scope on your API key.
 </Note>
 
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `chartId` | `string` | ✅ | Chart ID |
-
-### Options
-
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `--board-id` | `string` | ✅ | Board ID the chart belongs to |
-
 ```bash
 formo charts get chart_abc123 --board-id board_abc123
 ```
 
 ---
 
+## `formo charts query <chartId>`
+
+Execute a saved chart query after substituting `{{date_from}}` and `{{date_to}}`.
+
+<Note>
+Requires `boards:read` scope and a chart query that uses both date variables.
+</Note>
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--board-id` | `string` | ✅ | Board ID the chart belongs to |
+| `--date-from` | `string` | ✅ | Date variable value, `YYYY-MM-DD` |
+| `--date-to` | `string` | ✅ | Date variable value, `YYYY-MM-DD` |
+
+```bash
+formo charts query chart_abc123 --board-id board_abc123 --date-from 2026-04-01 --date-to 2026-04-30
+```
+
+---
+
 ## `formo charts create`
 
-Create a new chart in a board.
+Create a chart from typed flags or a raw JSON body.
 
 <Note>
 Requires `boards:write` scope on your API key.
@@ -66,80 +88,106 @@ Requires `boards:write` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--board-id` | `string` | ✅ | Board ID to add the chart to |
-| `--body` | `string` | ✅ | JSON string with the chart configuration |
+| `--body` | `string` | ❌ | Raw JSON chart body. Typed flags override matching keys. |
+| `--title` | `string` | ❌ | Chart title |
+| `--description` | `string` | ❌ | Optional chart description |
+| `--chart-type` | `enum` | ❌ | `table`, `number`, `funnel`, `bar`, `line`, `area`, `pie`, `stacked`, `user_paths`, or `retention` |
+| `--query` | `string` | ❌ | SQL query for SQL-backed charts |
+| `--x-axis` | `string` | ❌ | Column used as the x-axis |
+| `--y-axis` | `string` | ❌ | Comma-separated or JSON array of y-axis columns |
+| `--group-by` | `string` | ❌ | Column used to group or stack series |
+| `--steps` | `string` | ❌ | JSON array of funnel/user-path step objects |
+| `--settings` | `string` | ❌ | JSON object of chart settings |
+
+Provide either `--body` or typed chart fields such as `--title`, `--chart-type`, and `--query`.
 
 ### Examples
 
 ```bash
-# Create a line chart
+# Create a line chart from typed flags
 formo charts create \
   --board-id board_abc123 \
-  --body '{"name":"Daily active users","chartType":"line"}'
+  --title "Daily active users" \
+  --chart-type line \
+  --query "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date" \
+  --x-axis date \
+  --y-axis users
 
-# Create a bar chart with a SQL query
+# Create from raw JSON
 formo charts create \
   --board-id board_abc123 \
-  --body '{"name":"Top chains","chartType":"bar","query":"SELECT chain, count(*) as cnt FROM events GROUP BY chain ORDER BY cnt DESC LIMIT 10"}'
+  --body '{"title":"Recent events","chart_type":"table","query":"SELECT * FROM events LIMIT 10"}'
 ```
 
 ---
 
-## `formo charts update`
+## `formo charts update <chartId>`
 
-Update an existing chart.
+Update an existing chart. You can pass partial typed fields; the CLI fetches the current chart and sends the full body required by the API.
 
 <Note>
 Requires `boards:write` scope on your API key.
 </Note>
 
-### Arguments
+```bash
+formo charts update chart_abc123 --board-id board_abc123 --title "Updated chart name"
+```
 
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `chartId` | `string` | ✅ | Chart ID to update |
+The same typed options as `create` are available.
 
-### Options
+---
 
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `--board-id` | `string` | ✅ | Board ID the chart belongs to |
-| `--body` | `string` | ✅ | JSON string with updated chart configuration |
+## `formo charts move <chartId>`
 
-### Examples
+Move a chart to another board.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
 
 ```bash
-# Update a chart name
-formo charts update chart_abc123 \
-  --board-id board_abc123 \
-  --body '{"name":"Updated chart name"}'
-
-# Update chart type and query
-formo charts update chart_abc123 \
-  --board-id board_abc123 \
-  --body '{"name":"Revenue","chartType":"area","query":"SELECT DATE(timestamp) as day, SUM(revenue) as rev FROM events GROUP BY day"}'
+formo charts move chart_abc123 --board-id source_board --target-board-id target_board
 ```
 
 ---
 
-## `formo charts delete`
+## `formo charts duplicate <chartId>`
+
+Duplicate a chart within its board. The CLI returns the new chart ID.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+```bash
+formo charts duplicate chart_abc123 --board-id board_abc123
+```
+
+---
+
+## `formo charts reorder`
+
+Reorder charts in a board.
+
+<Note>
+Requires `boards:write` scope on your API key.
+</Note>
+
+```bash
+formo charts reorder --board-id board_abc123 --chart-ids chart_a,chart_b,chart_c
+```
+
+`--chart-ids` may be comma-separated text or a JSON array.
+
+---
+
+## `formo charts delete <chartId>`
 
 Delete a chart.
 
 <Note>
 Requires `boards:write` scope on your API key.
 </Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `chartId` | `string` | ✅ | Chart ID to delete |
-
-### Options
-
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `--board-id` | `string` | ✅ | Board ID the chart belongs to |
 
 ```bash
 formo charts delete chart_abc123 --board-id board_abc123

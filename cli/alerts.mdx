@@ -2,38 +2,39 @@
 title: "Alerts"
 sidebarTitle: "Alerts"
 icon: bell
-description: "Manage project alerts from the terminal with the Formo CLI. Create, list, update, delete, and toggle alerts that notify you of key events and thresholds."
+description: "Manage project alerts from the terminal with the Formo CLI. Create, list, update, test, delete, and toggle alerts that notify your team about matching events or users."
 ---
 
-The `formo alerts` command group lets you manage project alerts. Alerts notify you when specific events or thresholds are triggered.
+The `formo alerts` command group manages project alerts. Alerts can notify email, Slack, or webhook recipients when event or user filters match.
 
 ## `formo alerts list`
 
-List all alerts for the project.
+List alerts for the active project.
 
 <Note>
 Requires `alerts:read` scope on your API key.
 </Note>
 
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--page` | `number` | ❌ | Page number, 1-indexed |
+| `--size` | `number` | ❌ | Page size |
+
 ```bash
-formo alerts list
+formo alerts list --size 25
 ```
 
 ---
 
-## `formo alerts get`
+## `formo alerts get <alertId>`
 
 Get a single alert by ID.
 
 <Note>
 Requires `alerts:read` scope on your API key.
 </Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `alertId` | `string` | ✅ | Alert ID |
 
 ```bash
 formo alerts get alert_abc123
@@ -54,34 +55,45 @@ Requires `alerts:write` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--name` | `string` | ✅ | Alert name |
-| `--trigger-type` | `string` | ✅ | Trigger type (e.g. `event`, `threshold`) |
+| `--trigger-type` | `enum` | ✅ | Trigger type: `event` or `user` |
 | `--trigger-filters` | `string` | ❌ | JSON array of trigger filter objects |
 | `--recipient` | `string` | ❌ | JSON array of recipient objects |
 | `--secret` | `string` | ❌ | Webhook secret for the alert |
+| `--slack-property-keys` | `string` | ❌ | JSON array of event/user property keys to include in Slack alerts |
+
+### Recipient Shape
+
+`--recipient` is a JSON array. Each entry should include a `type` such as `email`, `slack`, or `webhook`, plus a `value`.
+
+```json
+[
+  { "type": "email", "value": ["team@example.com"] },
+  { "type": "webhook", "value": ["https://example.com/formo-webhook"] }
+]
+```
 
 ### Examples
 
 ```bash
-# Create a basic event alert
 formo alerts create --name "High value tx" --trigger-type event
 
-# Create an alert with trigger filters and recipients
 formo alerts create \
   --name "Whale activity" \
-  --trigger-type threshold \
-  --trigger-filters '[{"field":"net_worth_usd","op":"gt","value":100000}]' \
-  --recipient '[{"type":"email","value":"team@example.com"}]'
+  --trigger-type user \
+  --trigger-filters '[{"name":"net_worth_usd","operator":"gt","value":100000}]' \
+  --recipient '[{"type":"email","value":["team@example.com"]}]'
 
-# Create an alert with a webhook secret
 formo alerts create \
-  --name "Transaction webhook" \
+  --name "Slack revenue alert" \
   --trigger-type event \
-  --secret "whsec_abc123"
+  --trigger-filters '[{"name":"revenue","operator":"gt","numericThreshold":1000}]' \
+  --recipient '[{"type":"slack","value":["#alerts"]}]' \
+  --slack-property-keys '["event","revenue","address"]'
 ```
 
 ---
 
-## `formo alerts update`
+## `formo alerts update <alertId>`
 
 Update an existing alert.
 
@@ -89,50 +101,82 @@ Update an existing alert.
 Requires `alerts:write` scope on your API key.
 </Note>
 
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `alertId` | `string` | ✅ | Alert ID to update |
+The API expects the full alert configuration, so provide the required alert fields again when updating.
 
 ### Options
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--name` | `string` | ❌ | Alert name |
-| `--trigger-type` | `string` | ❌ | Trigger type |
+| `--name` | `string` | ✅ | Alert name |
+| `--trigger-type` | `enum` | ✅ | Trigger type: `event` or `user` |
 | `--trigger-filters` | `string` | ❌ | JSON array of trigger filter objects |
 | `--recipient` | `string` | ❌ | JSON array of recipient objects |
 | `--secret` | `string` | ❌ | Webhook secret for the alert |
-
-### Examples
+| `--slack-property-keys` | `string` | ❌ | JSON array of event/user property keys to include in Slack alerts |
 
 ```bash
-# Update an alert name
-formo alerts update alert_abc123 --name "Renamed alert" --trigger-type event
-
-# Update alert with new recipients
 formo alerts update alert_abc123 \
-  --name "Updated alert" \
-  --trigger-type threshold \
-  --recipient '[{"type":"slack","value":"#alerts"}]'
+  --name "Renamed alert" \
+  --trigger-type event \
+  --recipient '[{"type":"webhook","value":["https://example.com/formo-webhook"]}]'
 ```
 
 ---
 
-## `formo alerts delete`
+## `formo alerts toggle <alertId>`
+
+Toggle an alert status.
+
+<Note>
+Requires `alerts:write` scope on your API key.
+</Note>
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--status` | `enum` | ✅ | New status: `active` or `inactive`. `paused` is accepted as a deprecated alias for `inactive`. |
+
+```bash
+formo alerts toggle alert_abc123 --status inactive
+formo alerts toggle alert_abc123 --status active
+```
+
+---
+
+## `formo alerts test <alertId>`
+
+Send a test delivery for an alert.
+
+<Note>
+Requires `alerts:write` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--sample-event` | `string` | ❌ | JSON object to use as the sample event |
+| `--sample-user` | `string` | ❌ | JSON object to use as the sample user/profile |
+| `--recipient-overrides` | `string` | ❌ | JSON array of recipient objects to test instead of saved recipients |
+
+```bash
+formo alerts test alert_abc123 \
+  --sample-event '{"event":"transaction","revenue":250}' \
+  --recipient-overrides '[{"type":"email","value":["team@example.com"]}]'
+```
+
+<Note>
+Webhook tests require a public webhook URL. Localhost and private-network URLs are blocked by backend SSRF protections.
+</Note>
+
+---
+
+## `formo alerts delete <alertId>`
 
 Delete an alert.
 
 <Note>
 Requires `alerts:write` scope on your API key.
 </Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `alertId` | `string` | ✅ | Alert ID to delete |
 
 ```bash
 formo alerts delete alert_abc123
@@ -141,35 +185,3 @@ formo alerts delete alert_abc123
 <Warning>
 Deleting an alert is permanent.
 </Warning>
-
----
-
-## `formo alerts toggle`
-
-Toggle an alert's status between `active` and `paused`.
-
-<Note>
-Requires `alerts:write` scope on your API key.
-</Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `alertId` | `string` | ✅ | Alert ID to toggle |
-
-### Options
-
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `--status` | `enum` | ✅ | New status: `active` or `paused` |
-
-### Examples
-
-```bash
-# Pause an alert
-formo alerts toggle alert_abc123 --status paused
-
-# Re-activate an alert
-formo alerts toggle alert_abc123 --status active
-```

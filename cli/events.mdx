@@ -1,0 +1,71 @@
+---
+title: "Events"
+sidebarTitle: "Events"
+icon: send
+description: "Send raw analytics events to Formo from the CLI using a project SDK write key."
+---
+
+The `formo events` command group sends raw analytics events to the Formo events API. This uses a project SDK write key, not a workspace API key.
+
+## Authentication
+
+Pass a write key with `--write-key`, or set it once in your shell:
+
+```bash
+export FORMO_WRITE_KEY=formo_write_key_xxx
+```
+
+For local development or proxying, override the events API base URL:
+
+```bash
+export FORMO_EVENTS_BASE_URL=http://localhost:3002
+```
+
+---
+
+## `formo events ingest`
+
+Send one or more raw events.
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--event` | `string` | ❌ | Single event as a JSON object; wrapped in an array before sending |
+| `--events` | `string` | ❌ | JSON array of event objects to send |
+| `--write-key` | `string` | ❌ | Project SDK write key. Defaults to `FORMO_WRITE_KEY`. |
+
+Provide either `--event` or `--events`.
+
+### Examples
+
+```bash
+# Send one event with FORMO_WRITE_KEY
+formo events ingest \
+  --event '{"type":"track","channel":"cli","version":"1","anonymous_id":"anon_123","address":"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045","event":"CLI Test","context":{},"properties":{},"original_timestamp":"2026-04-27T23:05:38.000Z","sent_at":"2026-04-27T23:05:42.000Z","message_id":"cli-test-1"}'
+
+# Send a batch
+formo events ingest \
+  --events '[{"type":"track","channel":"cli","version":"1","anonymous_id":"anon_1","event":"Signed Up","context":{},"properties":{},"original_timestamp":"2026-04-27T23:05:38.000Z","sent_at":"2026-04-27T23:05:42.000Z","message_id":"cli-test-1"}]'
+
+# Pass the write key inline
+formo events ingest \
+  --write-key formo_write_key_xxx \
+  --event '{"type":"track","channel":"cli","version":"1","anonymous_id":"anon_123","event":"CLI Test","context":{},"properties":{},"original_timestamp":"2026-04-27T23:05:38.000Z","sent_at":"2026-04-27T23:05:42.000Z","message_id":"cli-test-1"}'
+```
+
+### Common Event Fields
+
+| Field | Description |
+|-------|-------------|
+| `type` | Event type, such as `track`, `identify`, or `page` |
+| `channel` | Source channel, for example `cli` |
+| `version` | Event schema version |
+| `anonymous_id` | Anonymous visitor or session identifier |
+| `address` | Optional wallet address |
+| `event` | Event name |
+| `context` | Event context object |
+| `properties` | Event properties object |
+| `original_timestamp` | When the event happened |
+| `sent_at` | When the event was sent |
+| `message_id` | Client-generated event identifier |

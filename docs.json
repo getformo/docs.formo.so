@@ -253,6 +253,7 @@
               "cli/profiles",
               "cli/query",
               "cli/analytics",
+              "cli/events",
               "cli/boards",
               "cli/charts",
               "cli/alerts",

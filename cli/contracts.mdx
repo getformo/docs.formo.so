@@ -2,21 +2,56 @@
 title: "Contracts"
 sidebarTitle: "Contracts"
 icon: file-contract
-description: "Register, list, update, and remove tracked smart contracts from the terminal. Manage ABIs and event configurations for onchain event ingestion."
+description: "Register, list, inspect, update, recommend, and remove tracked smart contracts from the terminal. Manage ABIs, monitored events, and pipeline inclusion."
 ---
 
-The `formo contracts` command group lets you manage the smart contracts tracked by your project. Register new contracts, update their ABIs and event configurations, and remove contracts you no longer need.
+The `formo contracts` command group manages smart contracts tracked by your project for decoding and event ingestion.
 
 ## `formo contracts list`
 
-List all tracked contracts for the project.
+List tracked contracts for the project.
+
+<Note>
+Requires `contracts:read` scope on your API key.
+</Note>
+
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--page` | `number` | ❌ | Page number, 1-indexed |
+| `--size` | `number` | ❌ | Page size |
+
+```bash
+formo contracts list --size 25
+```
+
+---
+
+## `formo contracts recommendations`
+
+List contracts your project already interacts with but has not added yet.
 
 <Note>
 Requires `contracts:read` scope on your API key.
 </Note>
 
 ```bash
-formo contracts list
+formo contracts recommendations
+```
+
+---
+
+## `formo contracts get <chain> <address>`
+
+Get a tracked contract by chain ID and address.
+
+<Note>
+Requires `contracts:read` scope on your API key.
+</Note>
+
+```bash
+formo contracts get 1 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
 ```
 
 ---
@@ -33,86 +68,89 @@ Requires `contracts:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--address` | `string` | ✅ | Contract address (`0x…`) |
-| `--chain` | `number` | ✅ | Chain ID (e.g. `1` for Ethereum, `137` for Polygon) |
+| `--address` | `string` | ✅ | Contract address (`0x...`) |
+| `--chain` | `number` | ✅ | Chain ID, for example `1` for Ethereum |
 | `--name` | `string` | ✅ | Human-readable contract name |
-| `--abi` | `string` | ✅ | Contract ABI as a JSON string |
-| `--events` | `string` | ✅ | Events configuration as a JSON string |
+| `--abi` | `string` | ✅ | Contract ABI as a JSON array string |
+| `--events` | `string` | ✅ | JSON array of ABI event objects to monitor, max 10 |
+| `--start-block` | `number` | ❌ | Optional start block |
+| `--include-in-pipeline` | `boolean` | ❌ | Whether to include this contract in the events pipeline |
 
-### Examples
+### Example
 
 ```bash
-# Register an ERC-20 contract on Ethereum
 formo contracts create \
-  --address 0x1234567890abcdef1234567890abcdef12345678 \
+  --address 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
   --chain 1 \
-  --name "My Token" \
-  --abi '[{"type":"event","name":"Transfer","inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"value","type":"uint256"}]}]' \
-  --events '{"Transfer":true}'
-
-# Register a contract on Polygon
-formo contracts create \
-  --address 0xabcdefabcdefabcdefabcdefabcdefabcdefabcd \
-  --chain 137 \
-  --name "Polygon DEX" \
-  --abi '[{"type":"event","name":"Swap"}]' \
-  --events '{"Swap":true}'
+  --name "USDC" \
+  --abi '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}]}]' \
+  --events '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}]}]' \
+  --start-block 6082465 \
+  --include-in-pipeline true
 ```
+
+<Note>
+`--abi` is sent to the API as an ABI JSON string. `--events` is sent as an array of ABI event objects.
+</Note>
 
 ---
 
-## `formo contracts update`
+## `formo contracts update <chain> <address>`
 
-Update a tracked contract. The contract is identified by chain ID and address.
+Update a tracked contract.
 
 <Note>
 Requires `contracts:write` scope on your API key.
 </Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `chain` | `string` | ✅ | Chain ID |
-| `address` | `string` | ✅ | Contract address (`0x…`) |
 
 ### Options
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--name` | `string` | ✅ | Updated contract name |
-| `--abi` | `string` | ✅ | Updated ABI as a JSON string |
-| `--events` | `string` | ✅ | Updated events configuration as a JSON string |
-
-### Examples
+| `--abi` | `string` | ✅ | Updated ABI as a JSON array string |
+| `--events` | `string` | ✅ | Updated JSON array of ABI event objects to monitor |
+| `--start-block` | `number` | ❌ | Optional start block |
+| `--include-in-pipeline` | `boolean` | ❌ | Whether to include this contract in the events pipeline |
 
 ```bash
-# Update a contract's name and events
-formo contracts update 1 0x1234567890abcdef1234567890abcdef12345678 \
-  --name "Renamed Token" \
-  --abi '[{"type":"event","name":"Transfer"}]' \
-  --events '{"Transfer":true}'
+formo contracts update 1 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
+  --name "USD Coin" \
+  --abi '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[]}]' \
+  --events '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[]}]'
 ```
 
 ---
 
-## `formo contracts delete`
+## `formo contracts pipeline <chain> <address>`
 
-Remove a tracked contract. The contract is identified by chain ID and address.
+Toggle whether a tracked contract is included in the project events pipeline without resending its ABI.
 
 <Note>
 Requires `contracts:write` scope on your API key.
 </Note>
 
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `chain` | `string` | ✅ | Chain ID |
-| `address` | `string` | ✅ | Contract address (`0x…`) |
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--include-in-pipeline` | `boolean` | ✅ | `true` to include the contract, `false` to exclude it |
 
 ```bash
-formo contracts delete 1 0x1234567890abcdef1234567890abcdef12345678
+formo contracts pipeline 1 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
+  --include-in-pipeline false
+```
+
+---
+
+## `formo contracts delete <chain> <address>`
+
+Remove a tracked contract.
+
+<Note>
+Requires `contracts:write` scope on your API key.
+</Note>
+
+```bash
+formo contracts delete 1 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
 ```
 
 <Warning>

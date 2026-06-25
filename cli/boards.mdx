@@ -5,7 +5,7 @@ icon: table-columns
 description: "Manage analytics dashboard boards from the terminal with the Formo CLI. Create, list, update, and delete boards that organize your charts and reports."
 ---
 
-The `formo boards` command group lets you manage dashboard boards for your project. Boards are containers for charts and can be used to organize your analytics dashboards.
+The `formo boards` command group manages dashboard boards for the active project. Boards are containers for charts.
 
 ## `formo boards list`
 
@@ -15,25 +15,26 @@ List all boards for the project.
 Requires `boards:read` scope on your API key.
 </Note>
 
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--page` | `number` | ❌ | Page number, 1-indexed |
+| `--size` | `number` | ❌ | Page size |
+
 ```bash
-formo boards list
+formo boards list --size 25
 ```
 
 ---
 
-## `formo boards get`
+## `formo boards get <boardId>`
 
 Get a single board by ID.
 
 <Note>
 Requires `boards:read` scope on your API key.
 </Note>
-
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `boardId` | `string` | ✅ | Board ID |
 
 ```bash
 formo boards get board_abc123
@@ -53,55 +54,45 @@ Requires `boards:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--name` | `string` | ✅ | Board name |
+| `--title` | `string` | ✅ | Board title |
+| `--name` | `string` | ❌ | Deprecated alias for `--title` |
 | `--description` | `string` | ❌ | Board description |
+| `--is-public` | `boolean` | ❌ | Whether the board is publicly viewable |
 
 ### Examples
 
 ```bash
-# Create a board
-formo boards create --name "KPI Dashboard"
-
-# Create a board with a description
-formo boards create --name "Revenue Metrics" --description "Weekly revenue tracking"
+formo boards create --title "KPI Dashboard"
+formo boards create --title "Revenue Metrics" --description "Weekly revenue tracking" --is-public false
 ```
 
 ---
 
-## `formo boards update`
+## `formo boards update <boardId>`
 
-Update an existing board.
+Update an existing board. Provide at least one updatable option.
 
 <Note>
 Requires `boards:write` scope on your API key.
 </Note>
 
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `boardId` | `string` | ✅ | Board ID to update |
-
 ### Options
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--name` | `string` | ❌ | New board name |
+| `--title` | `string` | ❌ | New board title |
+| `--name` | `string` | ❌ | Deprecated alias for `--title` |
 | `--description` | `string` | ❌ | New board description |
-
-### Examples
+| `--is-public` | `boolean` | ❌ | Whether the board is publicly viewable |
 
 ```bash
-# Rename a board
-formo boards update board_abc123 --name "Renamed Board"
-
-# Update description
-formo boards update board_abc123 --description "Updated weekly metrics"
+formo boards update board_abc123 --title "Renamed Board"
+formo boards update board_abc123 --description "Updated weekly metrics" --is-public true
 ```
 
 ---
 
-## `formo boards delete`
+## `formo boards delete <boardId>`
 
 Delete a board.
 
@@ -109,16 +100,10 @@ Delete a board.
 Requires `boards:write` scope on your API key.
 </Note>
 
-### Arguments
-
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `boardId` | `string` | ✅ | Board ID to delete |
-
 ```bash
 formo boards delete board_abc123
 ```
 
 <Warning>
-Deleting a board is permanent and will also remove all charts associated with it.
+Deleting a board is permanent and also removes its charts.
 </Warning>

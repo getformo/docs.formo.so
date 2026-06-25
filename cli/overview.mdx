@@ -17,6 +17,12 @@ The Formo CLI (`@formo/cli`) gives you full access to the Formo API from the com
   <Card title="Analytics" icon="chart-mixed" href="/cli/analytics">
     Run pre-built analytics pipes (KPIs, funnels, retention, revenue)
   </Card>
+  <Card title="Events" icon="send" href="/cli/events">
+    Send raw analytics events with a project SDK write key
+  </Card>
+  <Card title="Boards" icon="table-columns" href="/cli/boards">
+    Create and manage dashboard boards
+  </Card>
   <Card title="Charts" icon="chart-line" href="/cli/charts">
     Create and manage charts within custom dashboards
   </Card>
@@ -33,6 +39,23 @@ The Formo CLI (`@formo/cli`) gives you full access to the Formo API from the com
     Import wallet addresses
   </Card>
 </CardGroup>
+
+## Command Coverage
+
+The CLI covers the main Formo API resources:
+
+| Command group | What you can do |
+|---------------|-----------------|
+| `formo profiles` | Get and search profiles, tune lifecycle thresholds, update properties, batch update properties with `profiles properties batch`, and manage labels |
+| `formo query` | Run SQL against your Formo analytics data |
+| `formo analytics` | Run pre-built KPI, funnel, retention, revenue, and top-N analytics pipes |
+| `formo events` | Send raw events with `events ingest` using a project SDK write key |
+| `formo boards` | List, get, create, update, and delete dashboard boards |
+| `formo charts` | List, get, create, update, query, move, duplicate, reorder, and delete charts |
+| `formo alerts` | List, get, create, update, test, toggle, and delete project alerts |
+| `formo contracts` | List, get, create, update, delete, inspect recommendations, and toggle pipeline inclusion |
+| `formo segments` | List, create, and delete user segments |
+| `formo import` | Bulk import wallet addresses, optionally with profile properties |
 
 ## Installation
 
@@ -62,6 +85,10 @@ formo query run "SELECT count(*) FROM events"
 
 # 4. List your dashboard boards
 formo boards list
+
+# 5. Send a raw event with a project SDK write key
+FORMO_WRITE_KEY=formo_write_key_xxx formo events ingest \
+  --event '{"type":"track","channel":"cli","version":"1","anonymous_id":"anon_123","event":"CLI Test","context":{},"properties":{},"original_timestamp":"2026-04-27T23:05:38.000Z","sent_at":"2026-04-27T23:05:42.000Z","message_id":"cli-test-1"}'
 ```
 
 ## Authentication
@@ -147,6 +174,15 @@ The CLI stores configuration at `~/.config/formo/config.json` with restricted pe
 | `workspace` | Workspace name (set automatically on login) |
 | `projectId` | Project ID (set automatically on login) |
 
+### Environment Overrides
+
+| Environment variable | Description |
+|----------------------|-------------|
+| `FORMO_API_KEY` | Workspace API key. Takes precedence over saved config. |
+| `FORMO_API_BASE_URL` | Override the API base URL for local development or proxies. |
+| `FORMO_WRITE_KEY` | Project SDK write key for `formo events ingest`. |
+| `FORMO_EVENTS_BASE_URL` | Override the events API base URL for local development or proxies. |
+
 ## Output format
 
 By default, commands print compact, human-readable TOON output. Pass one of the standard output flags to change the format:
@@ -177,13 +213,40 @@ The CLI is designed to work as a tool for AI agents. It includes built-in sugges
 - "run a SQL query on my analytics data"
 - "search profiles ordered by last_onchain desc"
 - "set the display name and twitter handle on a wallet profile"
+- "batch update profile properties with profiles properties batch"
 - "tag a wallet as vip"
+- "batch upsert labels for wallets"
 - "remove a label from a wallet profile"
 - "list all project alerts"
 - "create an alert for high-value transactions"
+- "send a test alert"
 - "list all dashboard boards"
+- "create a dashboard board"
 - "list charts in a board"
+- "create a line chart in a board"
+- "move a chart to another board"
+- "duplicate a chart"
 - "list all tracked contracts"
 - "register a new smart contract"
+- "toggle contract pipeline inclusion"
 - "list user segments"
 - "import wallet addresses"
+- "send raw analytics events"
+
+### Agent Integrations
+
+The CLI is built with `incur`, so agents can discover and call commands through structured metadata:
+
+```bash
+# Print an LLM-readable command manifest
+formo --llms
+
+# Register the CLI as an MCP server
+formo mcp add
+
+# Start an MCP stdio server directly
+formo --mcp
+
+# Sync Formo CLI skill files for compatible agents
+formo skills add
+```
