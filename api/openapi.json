@@ -369,9 +369,12 @@
               "greaterOrEqual",
               "lessOrEqual",
               "in",
-              "notIn"
+              "notIn",
+              "startsWith",
+              "endsWith",
+              "includes"
             ],
-            "description": "Comparison operator."
+            "description": "Comparison operator. `startsWith` / `endsWith` / `includes` are substring matches on text columns (e.g. `referrer`, `ref`, `utm_*`, `origin`, `builder_codes`)."
           },
           "value": {
             "oneOf": [
@@ -433,6 +436,42 @@
         },
         "required": [
           "field",
+          "op",
+          "value"
+        ]
+      },
+      "RetentionLabelSignal": {
+        "type": "object",
+        "description": "The label predicate for label-based retention. The cohort is wallets grouped by the week they FIRST crossed this predicate on their label value; a wallet is retained in a later week if its latest value as of that week's end still satisfies it (as-of / carry-forward, evaluated against label history).",
+        "properties": {
+          "tag_id": {
+            "type": "string",
+            "description": "The label tag to evaluate (matches the `tag_id` set via `POST /v0/profiles/:address/labels`)."
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "greater",
+              "greaterOrEqual",
+              "less",
+              "lessOrEqual",
+              "equals"
+            ],
+            "default": "greater",
+            "description": "Comparison operator. Numeric operators coerce both sides via toFloat64OrZero, so a numeric op on a non-numeric value yields no match (not an error)."
+          },
+          "value": {
+            "type": "string",
+            "description": "The threshold/value to compare against. Always a string; numeric ops coerce it."
+          },
+          "chain_id": {
+            "type": "string",
+            "default": "",
+            "description": "Optional chain scope. Empty string matches across all chains."
+          }
+        },
+        "required": [
+          "tag_id",
           "op",
           "value"
         ]
@@ -1566,42 +1605,6 @@
           }
         }
       },
-      "RetentionLabelSignal": {
-        "type": "object",
-        "description": "The label predicate for label-based retention. The cohort is wallets grouped by the week they FIRST crossed this predicate on their label value; a wallet is retained in a later week if its latest value as of that week's end still satisfies it (as-of / carry-forward, evaluated against label history).",
-        "properties": {
-          "tag_id": {
-            "type": "string",
-            "description": "The label tag to evaluate (matches the `tag_id` set via `POST /v0/profiles/:address/labels`)."
-          },
-          "op": {
-            "type": "string",
-            "enum": [
-              "greater",
-              "greaterOrEqual",
-              "less",
-              "lessOrEqual",
-              "equals"
-            ],
-            "default": "greater",
-            "description": "Comparison operator. Numeric operators coerce both sides via toFloat64OrZero, so a numeric op on a non-numeric value yields no match (not an error)."
-          },
-          "value": {
-            "type": "string",
-            "description": "The threshold/value to compare against. Always a string; numeric ops coerce it."
-          },
-          "chain_id": {
-            "type": "string",
-            "default": "",
-            "description": "Optional chain scope. Empty string matches across all chains."
-          }
-        },
-        "required": [
-          "tag_id",
-          "op",
-          "value"
-        ]
-      },
       "ProfileFilter": {
         "type": "object",
         "description": "Filter conditions for profile search",
@@ -1831,6 +1834,48 @@
         },
         "description": "Restrict results to a single lifecycle stage."
       },
+      "LifecycleNewWindowDays": {
+        "name": "new_window_days",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 90 },
+        "description": "Override: a wallet is New if first seen within this many days of the reference date (default 30). Caller value wins over the project's saved setting."
+      },
+      "LifecycleChurnWindowDays": {
+        "name": "churn_window_days",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 90 },
+        "description": "Override: a wallet is Churned once last seen this many days before the reference date (default 30)."
+      },
+      "LifecyclePowerUserMinActiveDays": {
+        "name": "power_user_min_active_days",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 90 },
+        "description": "Override: distinct active days within the power-user window required to qualify as Power user (default 5)."
+      },
+      "LifecyclePowerUserWindowDays": {
+        "name": "power_user_window_days",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 90 },
+        "description": "Override: trailing window in which active days are counted for Power user qualification (default 30)."
+      },
+      "LifecycleResurrectedGapDays": {
+        "name": "resurrected_gap_days",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 90 },
+        "description": "Override: minimum inactivity gap that marks a re-engaging wallet as Resurrected (default 30)."
+      },
+      "LifecycleAtRiskMinDaysInactive": {
+        "name": "at_risk_min_days_inactive",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 90 },
+        "description": "Override: minimum days since last activity for an established, still-active wallet to be At Risk (default 14; must be < churn_window_days)."
+      },
+      "LifecycleAtRiskPriorActiveDaysThreshold": {
+        "name": "at_risk_prior_active_days_threshold",
+        "in": "query",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 90 },
+        "description": "Override: minimum active days a wallet had in the window before the recent quiet stretch to qualify as At Risk (default 1)."
+      },
       "AnalyticsProfileFilters": {
         "name": "profile_filters",
         "in": "query",
@@ -1962,10 +2007,7 @@
                 "op": "greaterOrEqual",
                 "count": 1,
                 "relative_to": "first_seen",
-                "window": {
-                  "value": 24,
-                  "unit": "hour"
-                }
+                "window": { "value": 24, "unit": "hour" }
               }
             ]
           }
@@ -2025,76 +2067,6 @@
             ]
           }
         }
-      },
-      "LifecycleNewWindowDays": {
-        "name": "new_window_days",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 90
-        },
-        "description": "Override: a wallet is New if first seen within this many days of the reference date (default 30). Caller value wins over the project's saved setting."
-      },
-      "LifecycleChurnWindowDays": {
-        "name": "churn_window_days",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 90
-        },
-        "description": "Override: a wallet is Churned once last seen this many days before the reference date (default 30)."
-      },
-      "LifecyclePowerUserMinActiveDays": {
-        "name": "power_user_min_active_days",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 90
-        },
-        "description": "Override: distinct active days within the power-user window required to qualify as Power user (default 5)."
-      },
-      "LifecyclePowerUserWindowDays": {
-        "name": "power_user_window_days",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 90
-        },
-        "description": "Override: trailing window in which active days are counted for Power user qualification (default 30)."
-      },
-      "LifecycleResurrectedGapDays": {
-        "name": "resurrected_gap_days",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 90
-        },
-        "description": "Override: minimum inactivity gap that marks a re-engaging wallet as Resurrected (default 30)."
-      },
-      "LifecycleAtRiskMinDaysInactive": {
-        "name": "at_risk_min_days_inactive",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 90
-        },
-        "description": "Override: minimum days since last activity for an established, still-active wallet to be At Risk (default 14; must be < churn_window_days)."
-      },
-      "LifecycleAtRiskPriorActiveDaysThreshold": {
-        "name": "at_risk_prior_active_days_threshold",
-        "in": "query",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 90
-        },
-        "description": "Override: minimum active days a wallet had in the window before the recent quiet stretch to qualify as At Risk (default 1)."
       },
       "AnalyticsExclude": {
         "name": "exclude",
@@ -3394,7 +3366,7 @@
                   "summary": "Sessions by device (pie chart)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
+                    "query": "SELECT device, COUNT(*) AS session_count FROM (SELECT session_id, argMinMerge(device) AS device FROM sessions GROUP BY session_id) GROUP BY device ORDER BY session_count DESC LIMIT 10",
                     "chart_type": "pie",
                     "title": "Sessions by Device",
                     "x_axis": "device",
@@ -3407,7 +3379,7 @@
                   "summary": "Sessions by device grouped by browser (stacked chart)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
+                    "query": "SELECT device, browser, COUNT(*) AS session_count FROM (SELECT session_id, argMinMerge(device) AS device, argMinMerge(browser) AS browser FROM sessions GROUP BY session_id) GROUP BY device, browser ORDER BY session_count DESC",
                     "chart_type": "stacked",
                     "title": "Sessions by Device and Browser",
                     "x_axis": "device",
@@ -4308,210 +4280,14 @@
         "x-required-scope": "segments:write"
       }
     },
-    "/v0/profiles": {
-      "get": {
-        "operationId": "searchProfiles",
-        "summary": "Search wallet profiles",
-        "tags": [
-          "Profiles"
-        ],
-        "responses": {
-          "200": {
-            "description": "Paginated wallet profile search results.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    { "$ref": "#/components/schemas/PaginatedListMeta" },
-                    {
-                      "type": "object",
-                      "required": ["data"],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": { "$ref": "#/components/schemas/Profile" }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "example": {
-                  "data": [
-                    {
-                      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                      "net_worth_usd": 12345.67
-                    }
-                  ],
-                  "page": 1,
-                  "size": 100,
-                  "total": 1,
-                  "has_more": false
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "429": {
-            "$ref": "#/components/responses/TooManyRequests"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "x-required-scope": "profiles:read",
-        "parameters": [
-          {
-            "name": "address",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
-          },
-          {
-            "name": "expand",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Comma-separated: apps, chains, tokens, labels"
-          },
-          {
-            "name": "order_by",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "net_worth_usd",
-                "tx_count",
-                "first_onchain",
-                "last_onchain",
-                "updated_at",
-                "first_seen",
-                "last_seen",
-                "num_sessions",
-                "revenue",
-                "volume",
-                "points"
-              ]
-            },
-            "description": "Sort field"
-          },
-          {
-            "name": "order_dir",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ]
-            },
-            "description": "Sort direction"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "minimum": 1
-            },
-            "description": "1-indexed page number (default 1)."
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 100,
-              "minimum": 1,
-              "maximum": 1000
-            },
-            "description": "Page size (default 100, max 1000)."
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "description": "Optional filter conditions",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProfileFilter"
-              },
-              "examples": {
-                "highNetWorth": {
-                  "summary": "Users with >$10k net worth",
-                  "value": {
-                    "conditions": [
-                      {
-                        "field": "users.net_worth_usd",
-                        "op": "gt",
-                        "value": 10000
-                      }
-                    ],
-                    "logic": "and"
-                  }
-                },
-                "chainFilter": {
-                  "summary": "Users active on Ethereum with >$1k balance",
-                  "value": {
-                    "conditions": [
-                      {
-                        "field": "chains.1.balance",
-                        "op": "gt",
-                        "value": 1000
-                      }
-                    ],
-                    "logic": "and"
-                  }
-                },
-                "labelFilter": {
-                  "summary": "Coinbase verified users",
-                  "value": {
-                    "conditions": [
-                      {
-                        "field": "labels.coinbase.verified_account",
-                        "op": "eq",
-                        "value": "true"
-                      }
-                    ],
-                    "logic": "and"
-                  }
-                },
-                "tokenFilter": {
-                  "summary": "Users holding USDC in any protocol",
-                  "value": {
-                    "conditions": [
-                      {
-                        "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
-                        "op": "gt",
-                        "value": 0,
-                        "scope": "any"
-                      }
-                    ],
-                    "logic": "and"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v0/profiles/{address}": {
       "get": {
         "operationId": "getProfile",
         "summary": "Get wallet profile",
         "description": "Get a single wallet profile. Agents can call the same path through the paid x402 or MPP gateway hosts without a caller-supplied Formo API key; Paysponge uses Formo's workspace API key behind the scenes. Paid gateway callers only provide the protocol payment header returned by the gateway challenge.",
+        "tags": [
+          "Profiles"
+        ],
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -4536,9 +4312,6 @@
           {
             "MPPPayment": []
           }
-        ],
-        "tags": [
-          "Profiles"
         ],
         "parameters": [
           {
@@ -4742,6 +4515,205 @@
         "x-required-scope": "profiles:read"
       }
     },
+    "/v0/profiles": {
+      "get": {
+        "operationId": "searchProfiles",
+        "summary": "Search wallet profiles",
+        "tags": [
+          "Profiles"
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated wallet profile search results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/PaginatedListMeta" },
+                    {
+                      "type": "object",
+                      "required": ["data"],
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Profile" }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "data": [
+                    {
+                      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                      "net_worth_usd": 12345.67
+                    }
+                  ],
+                  "page": 1,
+                  "size": 100,
+                  "total": 1,
+                  "has_more": false
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "x-required-scope": "profiles:read",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
+          },
+          {
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated: apps, chains, tokens, labels"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "net_worth_usd",
+                "tx_count",
+                "first_onchain",
+                "last_onchain",
+                "updated_at",
+                "first_seen",
+                "last_seen",
+                "num_sessions",
+                "revenue",
+                "volume",
+                "points"
+              ]
+            },
+            "description": "Sort field"
+          },
+          {
+            "name": "order_dir",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            },
+            "description": "Sort direction"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "1-indexed page number (default 1)."
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "description": "Page size (default 100, max 1000)."
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Optional filter conditions",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileFilter"
+              },
+              "examples": {
+                "highNetWorth": {
+                  "summary": "Users with >$10k net worth",
+                  "value": {
+                    "conditions": [
+                      {
+                        "field": "users.net_worth_usd",
+                        "op": "gt",
+                        "value": 10000
+                      }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "chainFilter": {
+                  "summary": "Users active on Ethereum with >$1k balance",
+                  "value": {
+                    "conditions": [
+                      {
+                        "field": "chains.1.balance",
+                        "op": "gt",
+                        "value": 1000
+                      }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "labelFilter": {
+                  "summary": "Coinbase verified users",
+                  "value": {
+                    "conditions": [
+                      {
+                        "field": "labels.coinbase.verified_account",
+                        "op": "eq",
+                        "value": "true"
+                      }
+                    ],
+                    "logic": "and"
+                  }
+                },
+                "tokenFilter": {
+                  "summary": "Users holding USDC in any protocol",
+                  "value": {
+                    "conditions": [
+                      {
+                        "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+                        "op": "gt",
+                        "value": 0,
+                        "scope": "any"
+                      }
+                    ],
+                    "logic": "and"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v0/profiles/{address}/properties": {
       "put": {
         "operationId": "updateUserProperties",
@@ -4860,6 +4832,97 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UpdateUserPropertiesResponse"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        },
+        "x-required-scope": "profiles:write"
+      }
+    },
+    "/v0/profiles/properties": {
+      "post": {
+        "operationId": "batchUpdateUserProperties",
+        "summary": "Batch update user properties",
+        "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
+        "tags": [
+          "Profiles"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 100,
+                "items": {
+                  "type": "object",
+                  "description": "Flat { address, ...keys } object. `address` is required; only the listed profile keys are persisted (all string-valued). Unknown keys are accepted but ignored.",
+                  "required": ["address"],
+                  "additionalProperties": true,
+                  "properties": {
+                    "address": {
+                      "type": "string",
+                      "description": "Wallet address. Literal EVM (0x...) or Solana address only; ENS names are not resolved in batch requests."
+                    },
+                    "user_id": { "type": "string" },
+                    "display_name": { "type": "string" },
+                    "email": { "type": "string" },
+                    "farcaster": { "type": "string" },
+                    "discord": { "type": "string" },
+                    "twitter": { "type": "string" },
+                    "telegram": { "type": "string" },
+                    "instagram": { "type": "string" },
+                    "website": { "type": "string" },
+                    "github": { "type": "string" },
+                    "linkedin": { "type": "string" },
+                    "facebook": { "type": "string" },
+                    "tiktok": { "type": "string" },
+                    "youtube": { "type": "string" },
+                    "reddit": { "type": "string" },
+                    "avatar": { "type": "string" },
+                    "description": { "type": "string" },
+                    "location": { "type": "string" },
+                    "ens": { "type": "string" },
+                    "lens": { "type": "string" },
+                    "basenames": { "type": "string" },
+                    "linea": { "type": "string" }
+                  }
+                }
+              },
+              "examples": {
+                "batchProperties": {
+                  "summary": "Set properties for multiple wallets",
+                  "value": [
+                    {
+                      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                      "display_name": "alice.eth",
+                      "email": "alice@example.com"
+                    },
+                    {
+                      "address": "EPjFWaYbrgqCC2Qbg4EV4FjUreEMKwMn1zNbiboXXKV",
+                      "twitter": "bob"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch processed. Returns counts of forwarded vs quarantined rows, with a per-row `errors` entry for each quarantined row.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchWriteResponse"
                 }
               }
             }
@@ -5115,97 +5178,6 @@
                       "tag_id": "open_interest",
                       "_is_deleted": 1,
                       "timestamp": "2024-03-15T00:00:00.000Z"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Batch processed. Returns counts of forwarded vs quarantined rows, with a per-row `errors` entry for each quarantined row.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BatchWriteResponse"
-                }
-              }
-            }
-          },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" },
-          "429": { "$ref": "#/components/responses/TooManyRequests" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
-        },
-        "x-required-scope": "profiles:write"
-      }
-    },
-    "/v0/profiles/properties": {
-      "post": {
-        "operationId": "batchUpdateUserProperties",
-        "summary": "Batch update user properties",
-        "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
-        "tags": [
-          "Profiles"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 100,
-                "items": {
-                  "type": "object",
-                  "description": "Flat { address, ...keys } object. `address` is required; only the listed profile keys are persisted (all string-valued). Unknown keys are accepted but ignored.",
-                  "required": ["address"],
-                  "additionalProperties": true,
-                  "properties": {
-                    "address": {
-                      "type": "string",
-                      "description": "Wallet address. Literal EVM (0x...) or Solana address only; ENS names are not resolved in batch requests."
-                    },
-                    "user_id": { "type": "string" },
-                    "display_name": { "type": "string" },
-                    "email": { "type": "string" },
-                    "farcaster": { "type": "string" },
-                    "discord": { "type": "string" },
-                    "twitter": { "type": "string" },
-                    "telegram": { "type": "string" },
-                    "instagram": { "type": "string" },
-                    "website": { "type": "string" },
-                    "github": { "type": "string" },
-                    "linkedin": { "type": "string" },
-                    "facebook": { "type": "string" },
-                    "tiktok": { "type": "string" },
-                    "youtube": { "type": "string" },
-                    "reddit": { "type": "string" },
-                    "avatar": { "type": "string" },
-                    "description": { "type": "string" },
-                    "location": { "type": "string" },
-                    "ens": { "type": "string" },
-                    "lens": { "type": "string" },
-                    "basenames": { "type": "string" },
-                    "linea": { "type": "string" }
-                  }
-                }
-              },
-              "examples": {
-                "batchProperties": {
-                  "summary": "Set properties for multiple wallets",
-                  "value": [
-                    {
-                      "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-                      "display_name": "alice.eth",
-                      "email": "alice@example.com"
-                    },
-                    {
-                      "address": "EPjFWaYbrgqCC2Qbg4EV4FjUreEMKwMn1zNbiboXXKV",
-                      "twitter": "bob"
                     }
                   ]
                 }
@@ -5590,11 +5562,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "all",
-                "entry",
-                "exit"
-              ],
+              "enum": ["all", "entry", "exit"],
               "default": "all"
             },
             "description": "Page-flow mode. `all` (default) returns project-wide page metrics with anon-per-session visitor counts (`sessions`, `visitors`, `hits`). `entry` returns landing pages with `bounce_rate`. `exit` returns exit pages with `exit_rate`. The visitor count is omitted in `entry`/`exit` modes since those metrics are session-scoped."
@@ -6803,6 +6771,29 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsExclude"
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "channel_type",
+                "device",
+                "browser",
+                "os",
+                "location",
+                "referrer",
+                "ref",
+                "utm_source",
+                "utm_medium",
+                "utm_campaign",
+                "utm_content",
+                "utm_term",
+                "builder_codes"
+              ]
+            },
+            "description": "Optional breakdown dimension. When set, `event_key` carries the dimension's value (empty → `Direct`) instead of the event type/name, so the series splits by that dimension. Top 100 values + `Others`."
           }
         ],
         "responses": {
@@ -7395,7 +7386,7 @@
       "get": {
         "operationId": "getAnalyticsFunnel",
         "summary": "Get multi-step conversion funnel",
-        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `breakdown` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others'). First-touch attribution is used for the per-user dimension value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | startsWith | endsWith | includes`. `operand` may target a standard event column or a JSON property on `properties`.",
+        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | startsWith | endsWith | includes`. `operand` may target a standard event column or a JSON property on `properties`.",
         "tags": [
           "Query"
         ],
@@ -7482,13 +7473,16 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["closed", "open"],
+              "enum": [
+                "closed",
+                "open"
+              ],
               "default": "closed"
             },
             "description": "`closed` (default): ordered, in-window. `open`: unordered per-step; emits an extra `dropped_off_users` column."
           },
           {
-            "name": "breakdown",
+            "name": "group_by",
             "in": "query",
             "schema": {
               "type": "string",
@@ -7498,24 +7492,36 @@
                 "os",
                 "location",
                 "referrer",
+                "ref",
                 "utm_source",
                 "utm_medium",
                 "utm_campaign",
                 "utm_content",
-                "utm_term"
+                "utm_term",
+                "builder_codes"
               ]
             },
-            "description": "Optional dimension to break each step down by (first-touch attribution). When set, the response gains a `breakdown` column."
+            "description": "Optional dimension to break each step down by. Defaults to first-touch attribution; pass `attribution=last_touch` to bucket by each user's latest value. When set, the response gains a `breakdown` column."
           },
           {
-            "name": "breakdown_top_n",
+            "name": "limit",
             "in": "query",
             "schema": {
               "type": "integer",
-              "default": 8,
+              "default": 5,
               "minimum": 1
             },
-            "description": "Top-N breakdown categories to keep (by user count). Remaining categories are bucketed as `Others`. Defaults to 8."
+            "description": "Top-N breakdown categories to keep (by user count), used only with `group_by`. Remaining categories are bucketed as `Others`. Defaults to 5."
+          },
+          {
+            "name": "attribution",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["first_touch", "last_touch"],
+              "default": "first_touch"
+            },
+            "description": "Per-user attribution for the `group_by` dimension. `first_touch` (default) buckets each user by their earliest value; `last_touch` by their latest. Ignored unless `group_by` is set."
           }
         ],
         "responses": {

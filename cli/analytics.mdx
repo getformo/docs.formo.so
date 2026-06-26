@@ -61,7 +61,7 @@ Some pipes take additional, pipe-specific parameters. Pass them as a JSON object
 | Pipe | Key params |
 |------|------------|
 | `kpis`, `revenue_overview` | `group_by`, `limit`, `include_previous_period` |
-| `funnel` | `steps` (required, a JSON array of `{type,event,name,filters?}`), `window_seconds`, `funnel_type`, `breakdown` |
+| `funnel` | `steps` (required, a JSON array of `{type,event,name,filters?}`), `window_seconds`, `funnel_type`, `group_by`, `limit`, `attribution` |
 | `flow` | `start_step` (required, a JSON `{type,event,resolved_event,...}`), `end_step`, `global_filters`, `window_seconds`, `max_steps` |
 | `retention` | `id_type`, `event_type`, `event_name`, `min_users` |
 | `revenue_timeseries` | `address` (required) |

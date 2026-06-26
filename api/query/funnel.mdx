@@ -8,7 +8,11 @@ Returns the same funnel data the dashboard renders on the Funnels page. For an o
 
 Use `funnel_type=closed` (default) for ordered, in-window conversions (the default that powers the dashboard) or `funnel_type=open` to count whoever fired step k regardless of order - open mode also returns a `dropped_off_users` column.
 
-Set `breakdown` to a dimension (`device`, `browser`, `os`, `location`, `referrer`, or any UTM column) to group each step by first-touch attribution; `breakdown_top_n` controls how many categories are kept before bucketing the rest as `Others`.
+Set `group_by` to a dimension (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `builder_codes`, or any UTM column) to group each step by per-user attribution; `limit` controls how many categories are kept (default `5`) before bucketing the rest as `Others`. Attribution defaults to first-touch; pass `attribution=last_touch` to bucket each user by their latest value instead.
+
+<Note>
+  The `group_by`, `limit`, and `attribution` params replace the former `breakdown` and `breakdown_top_n` params. Direct callers using `?breakdown=` / `?breakdown_top_n=` must migrate - there are no aliases.
+</Note>
 
 ## Defining steps
 

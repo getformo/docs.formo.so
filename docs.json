@@ -134,6 +134,7 @@
       },
       {
         "tab": "API",
+        "openapi": "api/openapi.json",
         "groups": [
           {
             "group": "API Documentation",
@@ -346,15 +347,11 @@
   "background": {
     "decoration": "gradient"
   },
-  "openapi": "api/openapi.json",
   "api": {
     "baseUrl": ["https://api.formo.so", "https://events.formo.so"],
     "auth": {
       "method": "bearer",
       "name": "Authorization"
     }
-  },
-  "apiReference": {
-    "spec": "api/openapi.json"
   }
 }
