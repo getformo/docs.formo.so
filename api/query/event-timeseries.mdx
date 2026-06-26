@@ -5,3 +5,7 @@ openapi: "GET /v0/event_timeseries"
 ---
 
 Returns total event counts per day. Combine with `filters` to scope to a specific event, source, or location.
+
+Set `group_by` to a breakdown dimension (`channel_type`, `device`, `browser`, `os`, `location`, `referrer`, `ref`, `builder_codes`, or any UTM column) to split the series by that dimension. When set, `event_key` carries the dimension's value (empty → `Direct`) instead of the event type/name; the response keeps the top 100 values and buckets the rest as `Others`.
+
+`filters` supports the string operators `startsWith`, `endsWith`, and `includes` (substring matches on text columns such as `referrer`, `ref`, `utm_*`) alongside the standard comparison operators. An unsupported operator now returns `400 Invalid query parameters` rather than silently matching everything.
