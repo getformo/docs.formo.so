@@ -1,43 +1,41 @@
 ---
-title: 'Attribution'
-icon: magnifying-glass-chart
-description: 'Learn why onchain attribution matters for sustainable growth and how Formo attributes conversions from first click to wallet transaction.'
-iconType: solid
+title: "How attribution works"
+icon: "magnifying-glass-chart"
+description: "Learn why onchain attribution matters for sustainable growth and how Formo attributes conversions from first click to wallet transaction."
+iconType: "solid"
 ---
 
 ### Overview
 
-User acquisition is one of the biggest problems in crypto. 
-For an app to succeed, it must have **sustainable unit economics** when it comes to user acquisition. 
-The lifetime revenue of a user (LTV) should be greater than the cost to acquire them (CAC) at a healthy multiple.
+User acquisition is one of the biggest problems in crypto. For an app to succeed, it must have **sustainable unit economics** when it comes to user acquisition. The lifetime revenue of a user (LTV) should be greater than the cost to acquire them (CAC) at a healthy multiple.
 
 <Frame>
-  <img src="/images/intro0.png" alt="Formo" />
+  ![Formo](/images/intro0.png)
 </Frame>
 
-Without accurate attribution, you are lost in the dark forest. 
-Attribution helps answer:
-- Where did users come from? 
+Without accurate attribution, you are lost in the dark forest. Attribution helps answer:
+
+- Where did users come from?
 - What meaningful activity did users perform on my app?
 - How well are users monetizing? How much revenue did I make? (ARPU, LTV)
 - How long are users sticking around? (Retention, Churn)
-- Is my ROI for an acquisition channel positive? (LTV > CAC)
+- Is my ROI for an acquisition channel positive? (LTV \> CAC)
 
 ### Example
 
-Attribution in web3 is *complex*.
+Attribution in web3 is _complex_.
 
 Consider the following example user journey for a DEX called FooSwap with many touchpoints:
 
-- A user sees a tweet thread about an app on X (*"referrer"*) clicks on a referral link 
-- The user visits the app's website (fooswap.com) 
+- A user sees a tweet thread about an app on X (_"referrer"_) clicks on a referral link
+- The user visits the app's website (fooswap.com)
 - The user visits the app (app.fooswap.com)
 - The user connects their wallet on the app
 - The user signs a token approval message
 - The user starts a swap transaction but the wallet has insufficient gas
-- The user abandons their transaction (*"dropoff"*)
-- The user revisits the app from another channel on Farcaster (*"referrer"*)
-- The user completes a swap transaction (*"conversion"*) emitting an onchain event
+- The user abandons their transaction (_"dropoff"_)
+- The user revisits the app from another channel on Farcaster (_"referrer"_)
+- The user completes a swap transaction (_"conversion"_) emitting an onchain event
 
 As you've seen in the above example, not everything you care about is onchain. In this example, two touchpoints contribute to the successful conversion: X and Farcaster. Using an [attribution model](/data/attribution#attribution-models), we can determine which touchpoint to credit for the conversion:
 
@@ -46,8 +44,7 @@ As you've seen in the above example, not everything you care about is onchain. I
 
 ### How attribution works in Formo
 
-To understand the full user journey, **we must navigate two different worlds: offchain and onchain.** 
-It's imperative to trace the event sequence from initial engagement offchain to conversion onchain.
+To understand the full user journey, **we must navigate two different worlds: offchain and onchain.** It's imperative to trace the event sequence from initial engagement offchain to conversion onchain.
 
 Here's a high-level overview of how it works:
 
@@ -97,7 +94,8 @@ note over Wallet,Formo: Index transactions, wallets, contracts
 ```
 
 Formo solves two core functions: attribution and identity.
-- **Attribution** refers to [event-based analytics](/data/events/overview) about where, how, and when users interact with links, sites, and apps (touchpoint trackers, UTM & referral parameters, events, ingestion). 
+
+- **Attribution** refers to [event-based analytics](/data/events/overview) about where, how, and when users interact with links, sites, and apps (touchpoint trackers, UTM & referral parameters, events, ingestion).
 - **Identity** refers to the resolution of user activity into a single [unified profile](/features/wallet-intelligence/wallet-profiles) (sessions, demographics, wallets, onchain data).
 
 Spend less time building analytics and leave the complex data engineering to us.
@@ -106,18 +104,18 @@ Spend less time building analytics and leave the complex data engineering to us.
 
 Formo helps you understand the impact of touchpoints in each user journey using single-touch attribution, crediting either the first or the last touchpoint within the lookback window.
 
-| Model       | Description                                                                                                |
-| :---------- | :--------------------------------------------------------------------------------------------------------- |
-| First Touch | Gives 100% credit to the first touchpoint within the attribution lookback window                           |
-| Last Touch  | Gives 100% credit to the last touchpoint within the attribution lookback window                            |
+| Model | Description |
+| :-- | :-- |
+| First Touch | Gives 100% credit to the first touchpoint within the attribution lookback window |
+| Last Touch | Gives 100% credit to the last touchpoint within the attribution lookback window |
 
 > Looking for more attribution models? [Let us know](mailto:support@formo.so).
 
 ### Glossary
 
-| Term                   | Definition                                                                                                                                                                                             |
-| :--------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| User journey           | Consists of touchpoints and the conversion event. It is possible for a conversion event to have no corresponding touchpoints (eg. utm parameters). In this case we consider it a 'direct' conversion     |
-| Conversion             | The primary event you're interested in attributing. Typically a volume or revenue generating conversion event such as "Mint" or "Swap" or "Stake".                     |
-| Touchpoint             | Actions (events) a user's taken or exposed to along the journey before doing the conversion event. [Eg. does event A → B → C → D (conversion event) in a 7 day period; For a lookback window of 7 days, A, B, C are all considered touchpoints] |
-| Lookback window        | The time window where a user's events with this attribution property are counted towards the calculation. The window ends when the conversion metric happens.                                            |
+| Term | Definition |
+| :-- | :-- |
+| User journey | Consists of touchpoints and the conversion event. It is possible for a conversion event to have no corresponding touchpoints (eg. utm parameters). In this case we consider it a 'direct' conversion |
+| Conversion | The primary event you're interested in attributing. Typically a volume or revenue generating conversion event such as "Mint" or "Swap" or "Stake". |
+| Touchpoint | Actions (events) a user's taken or exposed to along the journey before doing the conversion event. \[Eg. does event A → B → C → D (conversion event) in a 7 day period; For a lookback window of 7 days, A, B, C are all considered touchpoints\] |
+| Lookback window | The time window where a user's events with this attribution property are counted towards the calculation. The window ends when the conversion metric happens. |
