@@ -1,0 +1,7 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <mask id="dune-slash">
+    <rect width="24" height="24" fill="white" />
+    <path d="M-1 18 L22 10 L21.4 8.3 L-1.6 16.3 Z" fill="black" />
+  </mask>
+  <circle cx="12" cy="12" r="11" fill="currentColor" mask="url(#dune-slash)" />
+</svg>
