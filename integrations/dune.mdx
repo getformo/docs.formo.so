@@ -1,0 +1,77 @@
+---
+title: "Dune"
+sidebarTitle: "Dune"
+icon: chart-mixed
+description: "Query on-chain data from Dune directly in your Formo dashboards and SQL Explorer, alongside your Tinybird analytics data."
+keywords: ["Dune", "Dune Analytics", "on-chain data", "Trino", "DuneSQL", "crypto SQL", "web3 analytics"]
+---
+
+Connect [Dune](https://dune.com) to query on-chain data (transactions, DEX trades, tokens, and more) directly inside Formo — in the SQL Explorer and in dashboard charts — right next to your first-party analytics.
+
+## How it works
+
+Formo has one SQL editor that talks to two engines:
+
+- **Tinybird** (ClickHouse) runs your Formo analytics data — this is the default.
+- **Dune** (Trino) runs on-chain data.
+
+You pick the engine **by the query itself**: prefix a table with `dune.` and the query runs on Dune. Anything else runs on Tinybird.
+
+```sql
+-- Runs on Tinybird (your Formo data)
+SELECT * FROM events
+
+-- Runs on Dune (on-chain data)
+SELECT * FROM dune.ethereum.transactions
+```
+
+The `dune.` prefix is just a routing marker — Formo strips it before sending the query to Dune, so `dune.ethereum.transactions` runs as `ethereum.transactions` on Dune.
+
+<Note>
+  A query can only use **one** engine. You can't join a `dune.` table with a
+  Tinybird table in the same query — they're separate databases. To combine
+  them, put a Tinybird chart and a Dune chart on the same dashboard.
+</Note>
+
+## Add your Dune API key
+
+Dune queries run against **your** Dune account, so you need to add your API key once per project.
+
+<Steps>
+  <Step title="Get your API key">
+    Create an API key in your Dune account settings at [dune.com](https://dune.com). A free plan works to get started.
+  </Step>
+  <Step title="Add it in Formo">
+    Go to **Project Settings → Integrations**, paste your key, and click **Save**. Formo validates the key against Dune and stores it encrypted.
+  </Step>
+</Steps>
+
+The key is stored encrypted and never shown again — you'll only see whether one is configured. Remove or replace it any time from the same screen.
+
+## Query Dune in the SQL Explorer
+
+Open **Explorer → Data**, then write a query that references a `dune.` table:
+
+```sql
+SELECT date_trunc('day', block_time) AS day, count(*) AS txns
+FROM dune.ethereum.transactions
+WHERE block_time > now() - interval '7' day
+GROUP BY 1
+ORDER BY 1
+```
+
+The editor shows a **Dune** badge, switches autocomplete and examples to Dune (Trino) SQL, and runs the query against your Dune account. The **Examples** dropdown includes ready-to-run Dune starters.
+
+## Build Dune charts
+
+In the chart builder, write a `dune.` query and save it like any other chart. Dune charts:
+
+- show a **Dune** badge on the dashboard,
+- load in the background (Dune queries can take up to a minute, so they never block the rest of the board),
+- require a Dune API key to be configured before you can save one.
+
+## Good to know
+
+- **Dialect.** Dune uses [Trino / DuneSQL](https://docs.dune.com/query-engine/Functions-and-operators/) (e.g. `date_trunc`, `approx_distinct`), which differs from Tinybird's ClickHouse SQL.
+- **Speed.** Dune queries are asynchronous and can take a few seconds to ~a minute, especially on the free plan. Repeated identical queries are served from Dune's cache.
+- **Cost.** Query executions use **your** Dune credits. Shared/public dashboards run Dune charts on the project owner's key.
