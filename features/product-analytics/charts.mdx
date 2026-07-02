@@ -57,6 +57,20 @@ Ask AI to write and fix SQL code based on your instructions.
 
 Select your query in the SQL editor and share your thoughts to get AI-assisted query generation and debugging.
 
+## Dune charts
+
+Charts can also query on-chain data from [Dune](/integrations/dune) instead of your Formo data. Prefix a table with `dune.` (e.g. `dune.ethereum.transactions`) and the chart runs on Dune; otherwise it runs on Tinybird.
+
+```sql
+SELECT date_trunc('day', block_time) AS day, count(*) AS txns
+FROM dune.ethereum.transactions
+WHERE block_time > now() - interval '7' day
+GROUP BY 1
+ORDER BY 1
+```
+
+Dune charts show a **Dune** badge, load in the background (Dune queries can take up to a minute), and need a Dune API key set in **Project Settings → Integrations** before you can save one. Autocomplete switches to Dune (Trino) functions and tables while you're writing a `dune.` query. See the [Dune integration](/integrations/dune) for setup.
+
 ## Chart Types
 
 Here is the current list of supported chart types on Formo:

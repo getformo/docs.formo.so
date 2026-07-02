@@ -62,6 +62,7 @@
                 ]
               },
               "integrations/overview",
+              "integrations/dune",
               "chains/overview"
             ]
           }
