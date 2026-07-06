@@ -339,7 +339,7 @@ Your BI tool becomes another analytics interface alongside Formo dashboards.
 
 ## Query on-chain data with Dune
 
-The same editor can also query [Dune](/integrations/dune) (on-chain data) instead of Tinybird. Prefix a table with `dune.` and the query runs on Dune (Trino SQL); everything else runs on Tinybird (ClickHouse SQL).
+The same editor can also query [Dune](/integrations/dune) (on-chain data) instead of Formo. Prefix a table with `dune.` and the query runs on Dune (Trino SQL); everything else runs on Formo (ClickHouse SQL).
 
 ```sql
 SELECT date_trunc('day', block_time) AS day, count(*) AS txns
@@ -352,7 +352,7 @@ ORDER BY 1
 Add your Dune API key first in **Project Settings → Integrations**. Dune queries run against your Dune account and can take up to a minute. See the [Dune integration](/integrations/dune) for setup and details.
 
 <Note>
-  A single query can't mix Dune and Tinybird tables — they're separate
+  A single query can't mix Dune and Formo tables; they're separate
   databases. Use two charts on one dashboard to show both.
 </Note>
 

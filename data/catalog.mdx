@@ -7,7 +7,7 @@ description: Full data catalog for the Formo warehouse covering events, users, s
 Formo’s data warehouse gives you direct SQL access to events, users, sessions, revenue, and wallet profiles across chains.
 
 - **Events**, **Users**, **Sessions**, **Revenue**, and **Sources** are first-party data scoped to your project.
-- **Wallet Profiles** include public onchain data (net worth, apps, tokens, chains, social profiles, etc.) and are globally accessible across all workspaces.
+- **Wallet Profiles** are based on public onchain data (net worth, apps, tokens, chains, social profiles, etc.) and are globally accessible across all projects.
 
 <Frame caption="Browse the schema and run SQL queries in the Explorer.">
   <img src="/images/explore.png" alt="Data catalog" />
@@ -18,8 +18,8 @@ Formo’s data warehouse gives you direct SQL access to events, users, sessions,
 - **Default row limit**: 100 rows (add your own `LIMIT` clause to override)
 - **Project scoping**: All queries are automatically filtered to your project - you never need to add `WHERE project_id = ...`
 - **Aggregate tables**: Several tables use ClickHouse `AggregateFunction` types that require `-Merge` suffix functions (see [Working with Aggregate Tables](#working-with-aggregate-tables))
-
-Query data with the [Query API](/api/overview#query-api) and [Profiles API](/api/overview#profiles-api), explore with the [BI integration](/data/bi), export with [Data Sync](/data/data-sync), or write SQL directly in the [Explorer](/features/product-analytics/explore).
+- *Functions and variables*: Formo supports dynamic date [variables](#variables) and other built-in [functions](#functions).
+Query data with the [Query API](/api/overview#query-api) and [Profiles API](/api/overview#profiles-api), explore with the [BI integration](/data/bi), export with [Data sync](/data/data-sync), or write SQL directly in the [Explorer](/features/product-analytics/explore).
 
 ## Data flow
 
@@ -43,8 +43,6 @@ wallet_profiles_events (blockchain data)
     ├──▶ wallet_profiles_chains_tokens_mv (token holdings)
     └──▶ wallet_profiles_chains_apps_mv (DeFi app usage)
 ```
-
----
 
 ## Tables
 
@@ -112,8 +110,6 @@ FROM events
 ORDER BY timestamp DESC
 LIMIT 10
 ```
-
----
 
 ### users
 
@@ -194,8 +190,6 @@ GROUP BY address
 LIMIT 10
 ```
 
----
-
 ### anonymous_users
 
 Profiles for users who haven’t connected a wallet yet. Same structure as `users` but keyed by `anonymous_id` instead of `address`.
@@ -209,8 +203,6 @@ Profiles for users who haven’t connected a wallet yet. Same structure as `user
 | `anonymous_id` | String | Direct access |
 
 All other columns are identical to the [users](#users) table, with `anonymous_id` replacing `address` as the primary key.
-
----
 
 ### sessions
 
@@ -253,8 +245,6 @@ SELECT AVG(latest_hit - first_hit) AS avg_session_length
 FROM sessions
 ```
 
----
-
 ### sources
 
 Daily aggregated traffic source metrics and attribution data. Each row represents one day of activity from a specific referrer/UTM combination.
@@ -280,8 +270,6 @@ Daily aggregated traffic source metrics and attribution data. Each row represent
 | `visits` | AggregateFunction(uniq, String) | Unique sessions - use `uniqMerge(visits)` |
 | `users` | AggregateFunction(uniq, String) | Unique anonymous users - use `uniqMerge(users)` |
 | `hits` | AggregateFunction(count) | Page views - use `countMerge(hits)` |
-
----
 
 ### revenue
 
@@ -332,8 +320,6 @@ GROUP BY utm_campaign
 ORDER BY total_revenue DESC
 ```
 
----
-
 ### identities
 
 Identity graph linking anonymous sessions to wallet addresses. Each row represents a connection between an anonymous user and a wallet.
@@ -361,8 +347,6 @@ GROUP BY address, anonymous_id, session_id
 ORDER BY connected_at DESC
 LIMIT 20
 ```
-
----
 
 ### user_profiles_mv
 
@@ -399,8 +383,6 @@ FROM user_profiles_mv
 GROUP BY address
 ```
 
----
-
 ### wallet_profiles_mv
 
 Global wallet profile data aggregated across all chains. One row per wallet address with social profiles, contact info, and net worth.
@@ -434,8 +416,6 @@ Global wallet profile data aggregated across all chains. One row per wallet addr
 | `location` | SimpleAggregateFunction(max, String) | Direct access |
 | `updated_at` | SimpleAggregateFunction(max, DateTime) | Direct access |
 
----
-
 ### wallet_profiles_chains_mv
 
 Wallet profile data broken down by blockchain network. Each row represents a wallet’s activity on a specific chain.
@@ -467,8 +447,6 @@ GROUP BY address, chain_id, first_onchain, last_onchain
 ORDER BY net_worth_usd DESC
 LIMIT 50
 ```
-
----
 
 ### wallet_profiles_chains_tokens_mv
 
@@ -510,8 +488,6 @@ DeFi app usage data per wallet per chain. Each row represents a wallet’s inter
 | `balance_usd` | AggregateFunction(argMax, Float64, DateTime) | `argMaxMerge(balance_usd)` |
 | `updated_at` | SimpleAggregateFunction(max, DateTime) | Direct access |
 
----
-
 ### wallet_profiles_events
 
 Raw timestamped wallet profile data from blockchain analysis. Contains the unprocessed profile updates that feed into the `wallet_profiles_*` materialized views.
@@ -526,8 +502,6 @@ Raw timestamped wallet profile data from blockchain analysis. Contains the unpro
 | `version` | String | Profile data version |
 | `properties` | String | JSON with detailed profile data (tokens, balances, tx history) |
 | `timestamp` | DateTime | When the profile was captured |
-
----
 
 ### wallet_profiles_labels
 
@@ -544,8 +518,6 @@ Wallet labels and tags for categorizing and filtering wallet addresses. Each row
 | `source` | String | System that provided the label |
 | `timestamp` | DateTime | When the label was last updated |
 
----
-
 ### user_labels
 
 Project-scoped **labels and tags you assign to wallet addresses** (e.g. your own segments, scores, or categories). The latest value per `(tag_id, address, chain_id)` is kept automatically. This is the project-specific counterpart to `wallet_profiles_labels`, which holds **global** labels supplied by Formo's wallet profiler.
@@ -560,8 +532,6 @@ Project-scoped **labels and tags you assign to wallet addresses** (e.g. your own
 | `value` | String | Optional label value or score |
 | `source` | String | System that supplied the label |
 | `timestamp` | DateTime | When the label was last updated |
-
----
 
 ## Table relationships
 
@@ -582,7 +552,43 @@ users.address          ────▶  wallet_profiles_mv.address
 
 The **identities** table is the bridge between anonymous and identified users. It links `anonymous_id` and `session_id` to `address`, enabling you to track user behavior before and after wallet connection.
 
----
+## Variables
+
+Template variables are replaced with actual values at query time. Use them to build charts and dashboards that respond to a shared date picker instead of hardcoded ranges.
+
+### Date range variables
+
+#### `{{date_from}}`
+
+Start date of the selected date range. Replaced with a `YYYY-MM-DD` string at query time.
+
+**Example:**
+
+```sql
+WHERE timestamp >= '{{date_from}}'
+```
+
+#### `{{date_to}}`
+
+End date of the selected date range. Replaced with a `YYYY-MM-DD` string at query time.
+
+**Example:**
+
+```sql
+WHERE timestamp < '{{date_to}}'
+```
+
+**Combined example:**
+
+```sql
+SELECT
+    toDate(timestamp) AS date,
+    COUNT(*) AS events
+FROM events
+WHERE timestamp >= '{{date_from}}' AND timestamp < '{{date_to}}'
+GROUP BY date
+ORDER BY date
+```
 
 ## Functions
 
@@ -656,48 +662,6 @@ FROM revenue
 
 See the [Pyth Hermes API - Latest Price Updates](https://hermes.pyth.network/docs/#/rest/latest_price_updates) reference.
 
----
-
-## Variables
-
-Template variables are replaced with actual values at query time. Use them to build charts and dashboards that respond to a shared date picker instead of hardcoded ranges.
-
-### Date range variables
-
-#### `{{date_from}}`
-
-Start date of the selected date range. Replaced with a `YYYY-MM-DD` string at query time.
-
-**Example:**
-
-```sql
-WHERE timestamp >= '{{date_from}}'
-```
-
-#### `{{date_to}}`
-
-End date of the selected date range. Replaced with a `YYYY-MM-DD` string at query time.
-
-**Example:**
-
-```sql
-WHERE timestamp < '{{date_to}}'
-```
-
-**Combined example:**
-
-```sql
-SELECT
-    toDate(timestamp) AS date,
-    COUNT(*) AS events
-FROM events
-WHERE timestamp >= '{{date_from}}' AND timestamp < '{{date_to}}'
-GROUP BY date
-ORDER BY date
-```
-
----
-
 ## Working with aggregate tables
 
 Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`, `user_profiles_mv`) use ClickHouse [AggregateFunction](https://clickhouse.com/docs/en/sql-reference/data-types/aggregatefunction) types. These store intermediate aggregation states, not final values.
@@ -725,8 +689,6 @@ Several tables (`users`, `anonymous_users`, `sessions`, `sources`, `identities`,
 | `SimpleAggregateFunction(max, T)` | `max(col)` | `max(last_seen)` |
 | `SimpleAggregateFunction(sum, T)` | `sum(col)` | `sum(revenue)` |
 | `SimpleAggregateFunction(any, T)` | Direct access | `device` |
-
----
 
 ## Example queries
 
@@ -893,8 +855,6 @@ ORDER BY connected_at DESC
 LIMIT 20
 ```
 
----
-
 ## Next steps
 
 <CardGroup cols={2}>
@@ -904,8 +864,8 @@ LIMIT 20
   <Card title="Ask AI" icon="sparkles" href="/guides/ask-ai">
     Generate SQL with natural language
   </Card>
-  <Card title="BI Integration" icon="chart-mixed" href="/data/bi">
-    Connect Metabase, Grafana, and more
+  <Card title="BI integration" icon="chart-mixed" href="/data/bi">
+    Connect BI tools such as Metabase, Grafana, and PowerBI
   </Card>
   <Card title="Query API" icon="code" href="/api/query">
     Query data programmatically

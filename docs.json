@@ -61,8 +61,18 @@
                   "features/token-gated-forms/world-id"
                 ]
               },
-              "integrations/overview",
-              "integrations/dune",
+              {
+                "group": "Integrations",
+                "icon": "plug",
+                "pages": [
+                  "integrations/overview",
+                  {
+                    "anchor": "Dune",
+                    "icon": "database",
+                    "href": "integrations/dune"
+                  }
+                ]
+              },
               "chains/overview"
             ]
           }
