@@ -1,63 +1,26 @@
 ---
 title: 'Dashboards'
-sidebarTitle: 'Chartbuilder'
+sidebarTitle: 'Dashboards'
 description: 'Build custom dashboards with line, bar, pie, and funnel charts to visualize analytics data. Share boards with your team for collaborative reporting.'
 ---
 
 <Frame caption="Create custom charts and dashboards with your data.">
-	<img src="/images/chartbuilder.png" alt="Custom dashboard" />
+	<img src="/images/chartbuilder.png" alt="Custom dashboards" />
 </Frame>
 
-Create custom charts and reports. Turn your data into decisions with powerful visualizations and real-time insights.
+With Formo, your data is yours to query, transform, and export. You can:
 
-Easily share insights with your team. Export and distribute reports with a single click.
+- Create custom charts and reports. Turn your data into decisions with powerful visualizations and real-time insights.
+- Make custom boards public with a single click. Easily share insights with your team and external stakeholders.
+- Connect external [BI tools](/data/bi) directly to Formo.
 
-## Understanding dashboards
+## Core concepts
 
-- **Dashboards** is the section in the sidebar where you manage your visualizations
-- **Boards** are individual dashboard pages that contain multiple charts
-- **Charts** are the visualizations within each board
+**Dashboards** is the section in the sidebar where you manage your boards and charts:
+- **Boards** are individual dashboard pages that contain multiple charts.
+- **Charts** are the visualizations within each board.
 
-Click **Dashboards** in the sidebar to see your boards, or click **Add board** to create a new one.
-
-## SQL Editor Autocomplete
-
-Use a SQL editor to query your data however you want. The SQL editor supports autocomplete for:
-- Table names
-- Table columns
-- Clickhouse SQL keywords and functions
-
-<Frame caption="Easily write and fix SQL code in the SQL editor to query your data.">
-	<img src="/images/autocomplete.png" alt="Custom dashboard" />
-</Frame>
-
-With Formo, your data is yours to query, transform, and export. You can also connect external [BI tools](/data/bi) directly to Formo.
-
-## Ask AI
-
-Use the [Ask AI](/features/product-analytics/ai) feature (the AI assistant) from anywhere on the dashboard to build charts and explore your data. Ask AI to generate queries, explore patterns, surface anomalies, and recommend actions.
-
-<Frame caption="Say hello to your in-house AI data analyst.">
-	<img src="/images/ai.png" alt="Custom dashboard" />
-</Frame>
-
-Ask AI can:
-- Build custom charts and save them to your dashboard
-- Answer questions about your data
-- Generate SQL queries based on natural language
-- Surface hidden insights and patterns
-
-## Text to SQL
-
-Ask AI to write and fix SQL code based on your instructions.
-
-<Frame caption="You can ask AI to write and fix SQL code.">
-	<img src="/images/text-to-sql.png" alt="Custom dashboard" />
-</Frame>
-
-Select your query in the SQL editor and share your thoughts to get AI-assisted query generation and debugging.
-
-## Chart Types
+## Chart types
 
 Here is the current list of supported chart types on Formo:
 - Funnel
@@ -71,11 +34,62 @@ Here is the current list of supported chart types on Formo:
 - Area
 - Pie
 
-Add beautiful, interactive visualizations that make your data easy to understand.
+## Features
 
-## Export CSV
+### Autocomplete
 
-Export data into a CSV file for use elsewhere in your stack.
+The query editor supports autocomplete for SQL including:
+- Table names
+- Table columns
+- Clickhouse SQL keywords and functions
+
+<Frame caption="Easily write and fix SQL code in the SQL editor to query your data.">
+	<img src="/images/autocomplete.png" alt="Custom dashboard" />
+</Frame>
+
+### Text to SQL
+
+The query editor comes with tools to ask AI to write and fix SQL code for you.
+
+<Frame caption="You can ask AI to write and fix SQL code.">
+	<img src="/images/text-to-sql.png" alt="Custom dashboard" />
+</Frame>
+
+Select your query in the SQL editor to get AI-assisted query generation and debugging.
+
+### Ask AI
+
+Use [Ask AI](/features/product-analytics/ai) to have an agent build charts for you and explore your data with natural language. 
+
+<Frame caption="Say hello to your in-house AI data analyst.">
+	<img src="/images/ai.png" alt="Custom dashboard" />
+</Frame>
+
+Ask AI can:
+- Answer questions about your data
+- Generate SQL queries
+- Build custom charts and boards
+- Surface hidden insights and patterns
+
+### Export CSV
+
+Export the results of any query into a CSV file for use elsewhere in your data stack.
+
+### Dune Integration
+
+Charts can query on-chain data from [Dune](/integrations/dune).
+
+```sql
+SELECT date_trunc('day', block_time) AS day, count(*) AS txns
+FROM dune.ethereum.transactions
+WHERE block_time > now() - interval '7' day
+GROUP BY 1
+ORDER BY 1
+```
+
+Autocomplete switches to Dune (Trino) functions and tables while you're writing a `dune` query. 
+
+Dune charts require a Dune API key set in **Project Settings → Integrations** . See [Dune integration](/integrations/dune) for setup instructions. 
 
 ---
 

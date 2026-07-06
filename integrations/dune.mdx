@@ -1,0 +1,77 @@
+---
+title: "Dune"
+sidebarTitle: "Dune"
+icon: circle-half-stroke
+description: "Query on-chain data from Dune directly in your Formo dashboards and SQL Explorer, alongside your Formo analytics data."
+keywords: ["Dune", "Dune Analytics", "on-chain data", "Trino", "DuneSQL", "crypto SQL", "web3 analytics"]
+---
+
+Connect [Dune](https://dune.com) to query on-chain data (transactions, DEX trades, tokens, and more) directly inside Formo, in the SQL Explorer and in dashboard charts, right next to your first-party analytics.
+
+## How it works
+
+Formo's query editor talks to two data warehouses:
+
+- **Formo** (ClickHouse) queries your analytics and profiles data; this is the default.
+- **Dune** (Trino) queries on-chain data.
+
+All queries run on Formo by default. 
+
+Prefix a table with `dune` to query Dune. The table `dune.ethereum.transactions` queries as `ethereum.transactions` on Dune. See the [Dune data catalog](https://docs.dune.com/data-catalog/overview) for a full list of tables.
+
+
+```sql
+-- Runs on Formo
+SELECT * FROM events
+
+-- Runs on Dune (on-chain data)
+SELECT * FROM dune.ethereum.transactions
+```
+
+<Note>
+  A query can only use **one** engine. You can't join a `dune` table with a
+  Formo table in the same query; they're separate databases.
+</Note>
+
+## Add your Dune API key
+
+Dune queries run against **your** Dune account, so you need to add your API key once per project.
+
+<Steps>
+  <Step title="Get your API key">
+    Create an API key in your Dune account settings at [dune.com](https://dune.com).
+  </Step>
+  <Step title="Add it in Formo">
+    Go to **Project Settings → Integrations**, paste your key, and click **Save**. Formo validates the key against Dune and stores it encrypted.
+  </Step>
+</Steps>
+
+The key is stored encrypted and never shown again; you'll only see whether one is configured. Remove or replace it any time from the same screen.
+
+## Query Dune in the SQL Explorer
+
+Open **Explorer → Data**, then write a query that references a `dune.` table:
+
+```sql
+SELECT date_trunc('day', block_time) AS day, count(*) AS txns
+FROM dune.ethereum.transactions
+WHERE block_time > now() - interval '7' day
+GROUP BY 1
+ORDER BY 1
+```
+
+The editor shows a **Dune** badge, switches autocomplete and examples to Dune (Trino) SQL, and runs the query against your Dune account. The **Examples** dropdown includes ready-to-run Dune starters.
+
+## Build Dune charts
+
+In the chart builder, write a `dune.` query and save it like any other chart. Dune charts:
+
+- show a **Dune** badge on the dashboard,
+- load in the background (Dune queries can take up to a minute, so they never block the rest of the board),
+- require a Dune API key to be configured before you can save one.
+
+## Best practices
+
+- **Dialect.** Dune uses [Trino / DuneSQL](https://docs.dune.com/query-engine/Functions-and-operators/) (e.g. `date_trunc`, `approx_distinct`), which differs from Formo's ClickHouse SQL.
+- **Speed.** Dune queries are async and can take minutes, based on your plan. 
+- **Cost.** Query executions on your dashboard consumes your Dune credits.
