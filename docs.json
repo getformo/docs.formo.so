@@ -64,14 +64,7 @@
               {
                 "group": "Integrations",
                 "icon": "plug",
-                "pages": [
-                  "integrations/overview",
-                  {
-                    "anchor": "Dune",
-                    "icon": "database",
-                    "href": "integrations/dune"
-                  }
-                ]
+                "pages": ["integrations/overview", "integrations/dune"]
               },
               "chains/overview"
             ]
