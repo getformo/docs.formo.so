@@ -906,7 +906,7 @@ For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-11
 
 ## Proxy
 
-To avoid ad-blockers from blocking your requests, we recommend setting up a reverse proxy.
+To handle ad-blockers and privacy browsers, we recommend setting up a reverse proxy.
 
 <Frame caption="What happens under the hood when you forward the data to Formo via a reverse proxy">
   <img src="/images/proxy.png" alt="Reverse proxy data flow" />
@@ -916,13 +916,15 @@ Here are the domains used by Formo to load the SDK and send data:
 
 | Domain | Use case |
 |--------|----------|
-| cdn.formo.so | Loads the SDK (only for [Website installation](#html-snippet)) e.g. `https://cdn.formo.so/analytics@latest` |
 | events.formo.so | Receives data from the SDK (`https://events.formo.so/v0/raw_events`)|
+| cdn.formo.so | Loads the HTML snippet (only for [Website installation](#html-snippet)) e.g. `https://cdn.formo.so/analytics@latest` |
 
 ### CDN
 
-Some ad blockers block specific SDK-related downloads and API calls based on the domain name and URL. 
-To circumvent this issue you can download and serve the Formo SDK from `cdn.formo.so` to your own domain e.g. `yourdomain.com/formo.js`.
+Some ad blockers block specific scripts and API calls based on the domain name and URL. 
+To address this issue you can download and serve the Formo HTML Snippet from `cdn.formo.so` to your own domain e.g. `yourdomain.com/formo.js`.
+
+> If you use the Web SDK, you can skip this because they are not loaded from the CDN.
 
 ### Next.js rewrites
 
@@ -935,7 +937,7 @@ module.exports = {
     return [
       {
         source: "/formo.js",
-        destination: "https://cdn.formo.so/analytics@latest", // If using website install script
+        destination: "https://cdn.formo.so/analytics@latest", // Only if using HTML install script, skip if using the Web SDK
       },
       {
         source: "/api/ingest",
@@ -944,15 +946,6 @@ module.exports = {
     ];
   },
 };
-```
-
-Then, replace the website install script to:
-
-```javascript
-<script
-    src="https://yourdomain.com/formo.js"
-  ...
-></script>
 ```
 
 Then, configure the Formo SDK to send requests via your rewrite. Update the `apiHost` parameter in the Formo SDK:
@@ -967,6 +960,15 @@ Then, configure the Formo SDK to send requests via your rewrite. Update the `api
 ```
 
 > See an [example Next.js app](https://github.com/getformo/examples/tree/main/with-next-app-router) here.
+
+If you are using the HTML / website snippet, replace the install script to:
+
+```javascript
+<script
+    src="https://yourdomain.com/formo.js"
+  ...
+></script>
+```
 
 ### Next.js middleware
 
