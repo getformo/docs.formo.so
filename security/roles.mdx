@@ -1,52 +1,70 @@
 ---
 title: "Role Based Access Control (RBAC)"
-description: "Manage team permissions with role-based access control. Assign Owner, Admin, or Member roles to enforce least-privilege access across your workspace."
+description: "Manage team permissions with role-based access control. Assign Owner, Admin, Editor, or Viewer roles to enforce least-privilege access across your workspace."
 icon: "users"
 ---
 
 ## Overview
 
-- **Owner**: The creator of the team with full control over all aspects. Can transfer ownership and delete the team. Only one owner per team.
-- **Admin**: Help with managing the team. Can manage members, roles, and settings but cannot transfer ownership or delete the team.
-- **Editor**: Manage forms and submissions. Can create and edit content but cannot manage team members or settings.
-- **Member**: View projects and forms. Read-only access to view content and analytics.
+Formo uses workspace roles to control what each teammate can view or change.
+
+- **Owner**: Full access to the workspace. Owners can invite admins, transfer ownership, delete the workspace, and delete projects. Each workspace has one owner.
+- **Admin**: Full access to the workspace. Can manage members, roles, and settings but cannot invite admins or delete the workspace and projects.
+- **Editor**: Can manage projects, forms, contracts, charts, dashboards, and alerts. Editors cannot manage members, workspace settings, and key project settings.
+- **Viewer**: Read-only access to projects and forms.
 
 ## User Roles and Permissions
 
-| Action | Owner | Admin | Editor | Member |
+| Action | Owner | Admin | Editor | Viewer |
 |--------|-------|-------|--------|--------|
-| **Team Management** | | | | |
+| **Workspace** | | | | |
+| View workspace members | ✅ | ✅ | ❌ | ❌ |
 | Add, remove, and manage members | ✅ | ✅ | ❌ | ❌ |
 | Manage roles of members | ✅ | ✅ | ❌ | ❌ |
-| Manage workspace settings | ✅ | ✅ | ❌ | ❌ |
-| Update workspace tier | ✅ | ✅ | ❌ | ❌ |
+| Access and manage workspace settings | ✅ | ✅ | ❌ | ❌ |
+| Manage billing | ✅ | ✅ | ❌ | ❌ |
+| View workspace usage | ✅ | ✅ | ❌ | ❌ |
+| Upgrade / downgrade workspace | ✅ | ✅ | ❌ | ❌ |
 | Delete the workspace | ✅ | ❌ | ❌ | ❌ |
 | Transfer ownership to another member | ✅ | ❌ | ❌ | ❌ |
-| **Forms Management** | | | | |
-| View forms and responses | ✅ | ✅ | ✅ | ✅ |
-| Manage responses of forms | ✅ | ✅ | ✅ | ❌ |
-| Create and edit forms | ✅ | ✅ | ✅ | ❌ |
-| Archive forms | ✅ | ✅ | ✅ | ❌ |
-| Close forms | ✅ | ✅ | ✅ | ❌ |
 | **Projects** | | | | |
 | View projects | ✅ | ✅ | ✅ | ✅ |
-| Create and edit projects | ✅ | ✅ | ❌ | ❌ |
 | Verify projects | ✅ | ✅ | ✅ | ✅ |
+| Access project settings page | ✅ | ✅ | ✅ | ❌ |
+| Create & rename projects | ✅ | ✅ | ❌ | ❌ |
+| Manage project integrations | ✅ | ✅ | ❌ | ❌ |
+| Manage project notifications | ✅ | ✅ | ❌ | ❌ |
+| Edit lifecycle thresholds | ✅ | ✅ | ❌ | ❌ |
 | Delete projects | ✅ | ❌ | ❌ | ❌ |
+| **Contracts** | | | | |
+| View contracts | ✅ | ✅ | ✅ | ✅ |
+| Manage contracts | ✅ | ✅ | ✅ | ❌ |
+| Deploy contract events pipeline | ✅ | ✅ | ❌ | ❌ |
 | **Segments** | | | | |
 | View project segments | ✅ | ✅ | ✅ | ✅ |
 | Create, delete, edit project segments | ✅ | ✅ | ✅ | ❌ |
-| **Charts** | | | | |
-| View charts | ✅ | ✅ | ✅ | ✅ |
+| **Charts, Dashboards & Explorer** | | | | |
+| View charts and dashboards | ✅ | ✅ | ✅ | ✅ |
 | Create, delete, edit charts | ✅ | ✅ | ✅ | ❌ |
-| **Contracts** | | | | |
-| View project contracts | ✅ | ✅ | ✅ | ✅ |
-| Create, edit, delete project contracts | ✅ | ✅ | ✅ | ❌ |
-| Deploy/pause project pipeline | ✅ | ✅ | ❌ | ❌ |
+| Create dashboards | ✅ | ✅ | ✅ | ❌ |
+| Explorer (SQL editor and wallet search) | ✅ | ✅ | ✅ | ❌ |
+| **Users** | | | | |
+| View wallet profiles | ✅ | ✅ | ✅ | ✅ |
+| Import wallets | ✅ | ✅ | ✅ | ❌ |
+| Edit profile properties and labels | ✅ | ✅ | ✅ | ❌ |
 | **Alerts** | | | | |
 | View project alerts | ✅ | ✅ | ✅ | ✅ |
 | Create, delete, edit project alerts | ✅ | ✅ | ✅ | ❌ |
-| **Data Management** | | | | |
-| Import wallet addresses | ✅ | ✅ | ✅ | ❌ |
+| **Forms** | | | | |
+| View forms and responses | ✅ | ✅ | ✅ | ✅ |
+| Manage form responses | ✅ | ✅ | ✅ | ❌ |
+| Create and edit forms | ✅ | ✅ | ✅ | ❌ |
+| Archive forms | ✅ | ✅ | ✅ | ❌ |
+| Close forms | ✅ | ✅ | ✅ | ❌ |
+| **Data & Access** | | | | |
+| Manage API Keys | ✅ | ✅ | ❌ | ❌ |
+| MCP | ✅ | ✅ | ❌ | ❌ |
 | Create BI auth tokens | ✅ | ✅ | ❌ | ❌ |
 | View audit logs | ✅ | ✅ | ❌ | ❌ |
+| **Agent Memory (Ask AI)** | | | | |
+| Manage agent memory | ✅ | ✅ | ❌ | ❌ |
