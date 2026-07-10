@@ -7,18 +7,19 @@ icon: "users"
 ## Overview
 
 - **Owner**: The creator of the team with full control over all aspects. Can transfer ownership and delete the team. Only one owner per team.
-- **Admin**: Help with managing the team. Can manage members, roles, and settings but cannot transfer ownership or delete the team.
-- **Editor**: Manage forms and submissions. Can create and edit content but cannot manage team members or settings.
-- **Member**: View projects and forms. Read-only access to view content and analytics.
+- **Admin**: Help with managing the team. Can manage members, roles, workspace settings, and API keys / MCP, but cannot transfer ownership or delete the team.
+- **Editor**: Build and explore content. Can create and edit forms, segments, contracts, charts, dashboards, and alerts, use the Explorer (SQL query editor and wallet search), import wallets, and edit user profile properties and labels. Can open project settings to manage contracts, alerts, and lifecycle, but cannot manage members or roles, cannot access workspace settings or API keys / MCP, and cannot create or delete projects.
+- **Member**: Read-only access to view content and analytics. Cannot use the Explorer, create dashboards, or edit user profile properties and labels, and cannot view the members list, workspace or project settings, or API keys / MCP.
 
 ## User Roles and Permissions
 
 | Action | Owner | Admin | Editor | Member |
 |--------|-------|-------|--------|--------|
 | **Team Management** | | | | |
+| View workspace members list | ✅ | ✅ | ❌ | ❌ |
 | Add, remove, and manage members | ✅ | ✅ | ❌ | ❌ |
 | Manage roles of members | ✅ | ✅ | ❌ | ❌ |
-| Manage workspace settings | ✅ | ✅ | ❌ | ❌ |
+| Access and manage workspace settings | ✅ | ✅ | ❌ | ❌ |
 | Update workspace tier | ✅ | ✅ | ❌ | ❌ |
 | Delete the workspace | ✅ | ❌ | ❌ | ❌ |
 | Transfer ownership to another member | ✅ | ❌ | ❌ | ❌ |
@@ -30,15 +31,19 @@ icon: "users"
 | Close forms | ✅ | ✅ | ✅ | ❌ |
 | **Projects** | | | | |
 | View projects | ✅ | ✅ | ✅ | ✅ |
-| Create and edit projects | ✅ | ✅ | ❌ | ❌ |
 | Verify projects | ✅ | ✅ | ✅ | ✅ |
+| Access project settings page | ✅ | ✅ | ✅ | ❌ |
+| Create and edit projects (name, allowed URLs) | ✅ | ✅ | ❌ | ❌ |
+| Edit lifecycle thresholds | ✅ | ✅ | ✅ | ❌ |
 | Delete projects | ✅ | ❌ | ❌ | ❌ |
 | **Segments** | | | | |
 | View project segments | ✅ | ✅ | ✅ | ✅ |
 | Create, delete, edit project segments | ✅ | ✅ | ✅ | ❌ |
-| **Charts** | | | | |
-| View charts | ✅ | ✅ | ✅ | ✅ |
+| **Charts, Dashboards & Explorer** | | | | |
+| View charts and dashboards | ✅ | ✅ | ✅ | ✅ |
+| Access the Explorer (SQL query editor and wallet search) | ✅ | ✅ | ✅ | ❌ |
 | Create, delete, edit charts | ✅ | ✅ | ✅ | ❌ |
+| Create dashboards | ✅ | ✅ | ✅ | ❌ |
 | **Contracts** | | | | |
 | View project contracts | ✅ | ✅ | ✅ | ✅ |
 | Create, edit, delete project contracts | ✅ | ✅ | ✅ | ❌ |
@@ -46,7 +51,14 @@ icon: "users"
 | **Alerts** | | | | |
 | View project alerts | ✅ | ✅ | ✅ | ✅ |
 | Create, delete, edit project alerts | ✅ | ✅ | ✅ | ❌ |
-| **Data Management** | | | | |
+| **Users & Wallets** | | | | |
+| View user and wallet profiles | ✅ | ✅ | ✅ | ✅ |
 | Import wallet addresses | ✅ | ✅ | ✅ | ❌ |
+| Edit user profile properties and labels | ✅ | ✅ | ✅ | ❌ |
+| **Data & Access** | | | | |
+| Access API keys / MCP | ✅ | ✅ | ❌ | ❌ |
 | Create BI auth tokens | ✅ | ✅ | ❌ | ❌ |
 | View audit logs | ✅ | ✅ | ❌ | ❌ |
+| **Agent Memory (Ask AI)** | | | | |
+| View agent memory | ✅ | ✅ | ✅ | ✅ |
+| Curate / manage agent memory | ✅ | ✅ | ✅ | ❌ |
