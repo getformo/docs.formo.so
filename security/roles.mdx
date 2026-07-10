@@ -8,7 +8,7 @@ icon: "users"
 
 - **Owner**: The creator of the team with full control over all aspects. Can transfer ownership and delete the team. Only one owner per team.
 - **Admin**: Help with managing the team. Can manage members, roles, workspace settings, and API keys / MCP, but cannot transfer ownership or delete the team.
-- **Editor**: Build and explore content. Can create and edit forms, segments, contracts, charts, dashboards, and alerts, use the Explorer (SQL editor and wallet search), import wallets, edit user profile properties and labels, and manage agent memory. Can open project settings to manage contracts, alerts, and lifecycle, but cannot manage members or roles, cannot access workspace settings or API keys / MCP, and cannot create or delete projects.
+- **Editor**: Build and explore content. Can create and edit forms, segments, contracts, charts, dashboards, and alerts, use the Explorer (SQL editor and wallet search), import wallets, and edit user profile properties and labels. Can open project settings to manage contracts and alerts, but cannot edit lifecycle thresholds or project integrations, cannot manage members, roles, workspace settings, API keys / MCP, or agent memory, and cannot create or delete projects.
 - **Member**: Read-only access to view content and analytics. Cannot use the Explorer, create dashboards, or edit user profile properties and labels, and cannot view the members list, workspace or project settings, agent memory, or API keys / MCP.
 
 ## User Roles and Permissions
@@ -33,8 +33,10 @@ icon: "users"
 | View projects | ✅ | ✅ | ✅ | ✅ |
 | Verify projects | ✅ | ✅ | ✅ | ✅ |
 | Access project settings page | ✅ | ✅ | ✅ | ❌ |
-| Create and edit project settings | ✅ | ✅ | ❌ | ❌ |
-| Edit lifecycle thresholds | ✅ | ✅ | ✅ | ❌ |
+| Create & rename projects | ✅ | ✅ | ❌ | ❌ |
+| Manage project integrations (Dune API key) | ✅ | ✅ | ❌ | ❌ |
+| Manage project notifications | ✅ | ✅ | ❌ | ❌ |
+| Edit lifecycle thresholds | ✅ | ✅ | ❌ | ❌ |
 | Delete projects | ✅ | ❌ | ❌ | ❌ |
 | **Segments** | | | | |
 | View project segments | ✅ | ✅ | ✅ | ✅ |
@@ -61,7 +63,7 @@ icon: "users"
 | Create BI auth tokens | ✅ | ✅ | ❌ | ❌ |
 | View audit logs | ✅ | ✅ | ❌ | ❌ |
 | **Agent Memory (Ask AI)** | | | | |
-| Manage agent memory | ✅ | ✅ | ✅ | ❌ |
+| Manage agent memory | ✅ | ✅ | ❌ | ❌ |
 
 <Note>
 Owners implicitly have every permission. Admins have all workspace- and
