@@ -5,7 +5,7 @@ icon: bell
 description: "Manage project alerts from the terminal with the Formo CLI. Create, list, update, test, delete, and toggle alerts that notify your team about matching events or users."
 ---
 
-The `formo alerts` command group manages project alerts. Alerts can notify email, Slack, or webhook recipients when event or user filters match.
+The `formo alerts` command group manages project alerts. Alerts notify a webhook (including Slack, via a Slack incoming-webhook URL) when event or user filters match.
 
 ## `formo alerts list`
 
@@ -63,11 +63,10 @@ Requires `alerts:write` scope on your API key.
 
 ### Recipient Shape
 
-`--recipient` is a JSON array. Each entry should include a `type` such as `email`, `slack`, or `webhook`, plus a `value`.
+`--recipient` is a JSON array. Only `type: "webhook"` is currently delivered to; use a `hooks.slack.com` URL as the `value` to post to Slack. `email`/`slack` type values are accepted by the schema but not delivered - use `webhook` instead.
 
 ```json
 [
-  { "type": "email", "value": ["team@example.com"] },
   { "type": "webhook", "value": ["https://example.com/formo-webhook"] }
 ]
 ```
@@ -81,13 +80,13 @@ formo alerts create \
   --name "Whale activity" \
   --trigger-type user \
   --trigger-filters '[{"name":"net_worth_usd","operator":"gt","value":100000}]' \
-  --recipient '[{"type":"email","value":["team@example.com"]}]'
+  --recipient '[{"type":"webhook","value":["https://example.com/formo-webhook"]}]'
 
 formo alerts create \
   --name "Slack revenue alert" \
-  --trigger-type event \
+  --trigger-type user \
   --trigger-filters '[{"name":"revenue","operator":"gt","numericThreshold":1000}]' \
-  --recipient '[{"type":"slack","value":["#alerts"]}]' \
+  --recipient '[{"type":"webhook","value":["https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"]}]' \
   --slack-property-keys '["event","revenue","address"]'
 ```
 
@@ -161,7 +160,7 @@ Requires `alerts:write` scope on your API key.
 ```bash
 formo alerts test alert_abc123 \
   --sample-event '{"event":"transaction","revenue":250}' \
-  --recipient-overrides '[{"type":"email","value":["team@example.com"]}]'
+  --recipient-overrides '[{"type":"webhook","value":["https://example.com/formo-webhook"]}]'
 ```
 
 <Note>

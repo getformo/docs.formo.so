@@ -1,6 +1,6 @@
 ---
 title: "Alerts"
-description: "Set up real-time alerts for whale wallet connects, large transactions, and custom event thresholds with notifications delivered via webhook (including Slack via an incoming-webhook URL)."
+description: "Set up real-time alerts for high-value users, high-value transactions, and key user events, delivered via webhook or Slack."
 ---
 
 <Frame caption="Alerts">
@@ -37,13 +37,13 @@ Get real-time notifications when high-value users interact with your app. This g
 | Setting | Description |
 |---------|-------------|
 | **Name** | Descriptive name (e.g., "Whale Alert") |
-| **Trigger Type** | Event alerts (User alerts coming soon; see below) |
+| **Trigger Type** | Event or User (see below) |
 | **Conditions** | Filter conditions (optional) |
 | **Notification** | Webhook (generic HTTP or Slack via an incoming-webhook URL) |
 
 ### Step 3: Choose a trigger type
 
-Currently, **Event alerts** are the supported, working trigger type. **User alerts** are coming soon and the option is disabled in the dashboard.
+Formo supports two trigger types: **Event alerts**, which fire on individual matching events, and **User alerts**, which fire when a user profile matches your filters.
 
 <Tabs>
   <Tab title="Events">
@@ -56,11 +56,9 @@ Currently, **Event alerts** are the supported, working trigger type. **User aler
     | **page** | User visits a specific page |
     | **custom** | Your custom tracked events |
 
-    You can add conditions to filter on event properties (e.g., `chain_id = 8453`, `status = failed`).
+    You can add conditions to filter on the event's top-level fields: `type`, `event`, `address`, `user_id`, `anonymous_id`, `location`, `device`, `browser`, `os`, and `referrer`. Conditions support exact match, contains, starts with, ends with, and not-equals (e.g., `browser = Chrome`, `referrer contains twitter`). They can't filter on values nested in `properties` (like `chain_id` or a transaction's `status`) or use numeric comparisons (`>`, `<`) - use a User alert if you need to filter on a number.
   </Tab>
-  <Tab title="Users (coming soon)">
-    <Note>User alerts are not yet available; the User trigger type is disabled in the dashboard. The behavior below describes the planned functionality.</Note>
-
+  <Tab title="Users">
     Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your criteria.
 
     Each matching user is **notified once per 24 hours** - if the same user remains active and continues to match, they won't be re-sent until the dedup window expires.
@@ -70,9 +68,9 @@ Currently, **Event alerts** are the supported, working trigger type. **User aler
     | Filter | Description |
     |--------|-------------|
     | **net_worth_usd** | Wallet net worth (e.g., > $100,000) |
-    | **tx_count** | Number of transactions |
     | **volume** | Trading volume |
     | **revenue** | Revenue generated |
+    | **points** | Loyalty points |
     | **location** | Country code |
     | **device** | Device type (desktop, mobile) |
     | **browser** | Browser name |
@@ -84,6 +82,8 @@ Currently, **Event alerts** are the supported, working trigger type. **User aler
     | **labels** | Wallet labels (e.g., Coinbase verified) |
     | **lifecycle** | User lifecycle stage (New, Returning, etc.) |
     | **socials** | Social profiles (e.g., Farcaster) |
+
+    `net_worth_usd`, `volume`, `revenue`, and `points` support numeric comparisons (`>`, `>=`, `<`, `<=`, `=`); the rest match on equality.
   </Tab>
 </Tabs>
 
@@ -317,9 +317,7 @@ Each message includes:
 
 ---
 
-### User alerts (coming soon)
-
-<Note>User alerts are not yet available; the User trigger type is disabled in the dashboard. The payload format below documents the planned behavior.</Note>
+### User alerts
 
 When a user alert is triggered, Formo sends matching user profiles to your webhook.
 
@@ -562,16 +560,14 @@ For Slack incoming webhooks, Formo formats user profiles as a rich card layout:
 
 ## Examples
 
-### Whale detection alert (coming soon)
-
-<Note>This example uses the **User** trigger type, which is not yet available. It's included to show the planned workflow.</Note>
+### Whale detection alert
 
 Notify when high-value users visit:
 
 | Setting | Value |
 |---------|-------|
 | Name | Whale Alert |
-| Trigger type | Users (coming soon) |
+| Trigger type | Users |
 | Condition | net_worth_usd > 100000 |
 | Notification | Slack webhook |
 
@@ -585,10 +581,10 @@ Track when users encounter issues:
 |---------|-------|
 | Name | Failed TX Alert |
 | Trigger type | Events |
-| Condition | type = transaction, status = failed |
+| Condition | type = transaction |
 | Notification | Webhook |
 
-Get notified when transactions fail so you can investigate UX issues.
+`status` lives in the event's `properties` object, not a filterable top-level field, so this condition sends every transaction event. Filter for `properties.status = "failed"` on your webhook receiver to isolate failures.
 
 ### Webhook integration examples
 
