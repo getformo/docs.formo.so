@@ -94,8 +94,9 @@ The acquisition channel that brought a session to your app. Every session is ass
 | 2 | Paid Video | Paid signal + referrer is a video platform (YouTube, Vimeo, Twitch, Dailymotion, Loom, Wistia) |
 | 3 | Paid Social | Paid signal + referrer is a social platform (Meta, X, LinkedIn, Reddit, TikTok, Pinterest, Snapchat, Threads, Discord, Telegram, Farcaster, ...) |
 | 4 | Email | `utm_medium` ∈ \{`email`, `e-mail`, `e_mail`, `newsletter`\}, or referrer is a known email or newsletter domain (Gmail, Proton Mail, Yahoo Mail, Outlook, Substack, Beehiiv, Paragraph) |
-| 5 | Referrals | `utm_medium=affiliate` or non-empty `ref` query parameter |
-| 6 | Display | `utm_medium` ∈ \{`display`, `banner`, `expandable`, `interstitial`\} |
+| 5a | Display (network match) | Referrer domain or `utm_source` matches a known ad-network domain (checked before Referrals, so network-matched traffic is never misclassified as a referral) |
+| 5b | Referrals | `utm_medium` ∈ \{`affiliate`, `referral`\} or non-empty `ref` query parameter |
+| 6 | Display (medium match) | `utm_medium` ∈ \{`display`, `banner`, `expandable`, `interstitial`\} (checked after Referrals) |
 | 7 | Paid Other | Paid signal that matched none of the above: a paid `utm_medium` or click ID with no recognized source or ad format. A catch-all so paid traffic is never relabelled as organic or Direct. |
 | 8 | AI | Referrer is an AI assistant domain (ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, Phind, Poe, Mistral Chat, Meta AI, You.com, Pi, Grok, Qwen, Kimi, Hugging Face, Genspark) |
 | 9 | Organic Search | `utm_medium=organic` or referrer is a search engine with no paid signal |
@@ -120,7 +121,7 @@ How many users are using a particular device such as desktop, mobile, tablet, et
 
 ### Browsers
 
-Browser is the statistics of the browser used by the visitor. It is extracted from the User-Agent and Client Hints HTTP headers.
+Browser is the statistics of the browser used by the visitor. It is extracted from the User-Agent header.
 
 ### OS
 
@@ -136,7 +137,7 @@ The most recent date and time when a user or wallet was observed interacting wit
 
 ### User lifecycle
 
-The lifecycle stage of each wallet or visitor (New, Returning, Power User, Resurrected, At Risk, or Churned), computed from their activity recency and frequency relative to a reference date.
+The lifecycle stage of each wallet or visitor (New, Returning, Power user, Resurrected, At Risk, or Churned), computed from their activity recency and frequency relative to a reference date.
 
 See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds for each stage.
 

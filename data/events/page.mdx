@@ -39,7 +39,7 @@ On web, any non-UTM query-string parameters are also added as individual propert
 | `context.screen_density` | `window.devicePixelRatio` | `Dimensions.get("screen").scale` |
 | `context.viewport_width` | `window.innerWidth` | Not set |
 | `context.viewport_height` | `window.innerHeight` | Not set |
-| `context.os_name` | Not set | `iOS` or `Android` |
+| `context.os_name` | Not set | `ios` or `android` |
 | `context.os_version` | Not set | OS version string |
 | `context.device_model` | Not set | Device model (e.g., `iPhone 14 Pro`) |
 | `context.device_manufacturer` | Not set | Device manufacturer (e.g., `Apple`) |
@@ -113,7 +113,7 @@ Screen events from the [mobile SDK](/sdks/mobile) are sent as `page` events with
         "locale": "en-US",
         "timezone": "America/New_York",
         "location": "US",
-        "os_name": "iOS",
+        "os_name": "ios",
         "os_version": "17.0",
         "device_model": "iPhone 14 Pro",
         "device_manufacturer": "Apple",

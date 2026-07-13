@@ -101,6 +101,7 @@ The core event log. Contains all user interaction events - page views, custom ev
 | `volume` | Float32 | Transaction volume extracted from `properties.volume` at ingest. Values above 100M are zeroed as anomalies. Always query this flat column instead of `JSONExtractFloat(properties, 'volume')` |
 | `revenue` | Float32 | Revenue extracted from `properties.revenue` at ingest. Values above 100M are zeroed as anomalies. Always query this flat column instead of `JSONExtractFloat(properties, 'revenue')` |
 | `points` | Float32 | Points extracted from `properties.points` at ingest. Values above 100M are zeroed as anomalies. Always query this flat column instead of `JSONExtractFloat(properties, 'points')` |
+| `channel_type` | LowCardinality(String) | Marketing channel type derived from attribution data |
 
 **Example:**
 
@@ -163,7 +164,7 @@ This is an **aggregate table**. Most columns require `-Merge` functions. Always 
 | `activity_dates` | AggregateFunction(groupUniqArrayIf, Date, UInt8) | `groupUniqArrayIfMerge(activity_dates)` |
 
 **Lifecycle definitions** (based on `activity_dates`, computed against a reference date that defaults to today):
-- **New**: `first_seen` within the last 30 days
+- **New**: `first_seen` within the last 30 days and still active
 - **Power**: `first_seen` more than 30 days ago and 5+ unique active days in the last 30 days
 - **Resurrected**: `first_seen` more than 30 days ago and re-engaged within the last 30 days after a 30+ day gap
 - **At Risk**: `first_seen` more than 30 days ago, still active, but `last_seen` 14+ days ago with fewer than 5 active days in the last 30 days, no 30+ day gap, and 1+ active day in the prior window (days 30 to 60 ago)
@@ -202,7 +203,7 @@ Profiles for users who haven’t connected a wallet yet. Same structure as `user
 |--------|------|---------------|
 | `anonymous_id` | String | Direct access |
 
-All other columns are identical to the [users](#users) table, with `anonymous_id` replacing `address` as the primary key.
+All other columns are identical to the [users](#users) table, with `anonymous_id` replacing `address` as the primary key, except `activity_dates`. In `anonymous_users`, `activity_dates` is `AggregateFunction(groupUniqArray, Date)`, read with `groupUniqArrayMerge(activity_dates)`, not `groupUniqArrayIfMerge()` as in `users`.
 
 ### sessions
 
@@ -215,28 +216,28 @@ Aggregated session data with engagement metrics and attribution. Each row repres
 | `origin` | String | Direct access |
 | `session_id` | String | Direct access |
 | `date` | Date | Direct access |
-| `device` | SimpleAggregateFunction(any, String) | Direct access |
-| `browser` | SimpleAggregateFunction(any, String) | Direct access |
-| `os` | SimpleAggregateFunction(any, String) | Direct access |
-| `location` | SimpleAggregateFunction(any, String) | Direct access |
-| `referrer` | SimpleAggregateFunction(any, String) | Direct access |
-| `ref` | SimpleAggregateFunction(any, String) | Direct access |
-| `utm_medium` | SimpleAggregateFunction(any, String) | Direct access |
-| `utm_source` | SimpleAggregateFunction(any, String) | Direct access |
-| `utm_campaign` | SimpleAggregateFunction(any, String) | Direct access |
-| `utm_content` | SimpleAggregateFunction(any, String) | Direct access |
-| `utm_term` | SimpleAggregateFunction(any, String) | Direct access |
-| `gclid` | SimpleAggregateFunction(any, String) | Direct access |
-| `gad_source` | SimpleAggregateFunction(any, String) | Direct access |
-| `fbclid` | SimpleAggregateFunction(any, String) | Direct access |
-| `msclkid` | SimpleAggregateFunction(any, String) | Direct access |
-| `ttclid` | SimpleAggregateFunction(any, String) | Direct access |
-| `twclid` | SimpleAggregateFunction(any, String) | Direct access |
-| `li_fat_id` | SimpleAggregateFunction(any, String) | Direct access |
-| `rdt_cid` | SimpleAggregateFunction(any, String) | Direct access |
-| `first_hit` | SimpleAggregateFunction(min, DateTime) | Direct access |
-| `latest_hit` | SimpleAggregateFunction(max, DateTime) | Direct access |
+| `device` | AggregateFunction(argMin, LowCardinality(String), String) | `argMinMerge(device)` |
+| `browser` | AggregateFunction(argMin, LowCardinality(String), String) | `argMinMerge(browser)` |
+| `os` | AggregateFunction(argMin, LowCardinality(String), String) | `argMinMerge(os)` |
+| `location` | AggregateFunction(argMin, LowCardinality(String), String) | `argMinMerge(location)` |
+| `referrer` | AggregateFunction(argMin, String, String) | `argMinMerge(referrer)` |
+| `referrer_url` | AggregateFunction(argMin, String, String) | `argMinMerge(referrer_url)` |
+| `ref` | AggregateFunction(argMin, String, String) | `argMinMerge(ref)` |
+| `utm_medium` | AggregateFunction(argMin, String, String) | `argMinMerge(utm_medium)` |
+| `utm_source` | AggregateFunction(argMin, String, String) | `argMinMerge(utm_source)` |
+| `utm_campaign` | AggregateFunction(argMin, String, String) | `argMinMerge(utm_campaign)` |
+| `utm_content` | AggregateFunction(argMin, String, String) | `argMinMerge(utm_content)` |
+| `utm_term` | AggregateFunction(argMin, String, String) | `argMinMerge(utm_term)` |
+| `channel_type` | AggregateFunction(argMin, LowCardinality(String), String) | `argMinMerge(channel_type)` |
+| `paid_source` | AggregateFunction(argMin, String, String) | `argMinMerge(paid_source)` |
+| `click_id` | AggregateFunction(argMin, String, String) | `argMinMerge(click_id)` |
+| `first_hit` | SimpleAggregateFunction(min, DateTime) | `min(first_hit)` |
+| `latest_hit` | SimpleAggregateFunction(max, DateTime) | `max(latest_hit)` |
 | `hits` | AggregateFunction(count) | `countMerge(hits)` |
+
+<Note>
+`device`, `browser`, `os`, `location`, and the attribution columns (`referrer`, `referrer_url`, `ref`, `utm_*`, `channel_type`) are `argMin` states that resolve to the session's first-touch (entry) value. Read them with `argMinMerge(...)`, not by selecting the column directly. `paid_source` (acquiring ad network) and `click_id` (raw click ID) resolve independently at the first non-empty paid touch, so they can come from different events within the same session; don't assume `click_id` belongs to the `paid_source` network.
+</Note>
 
 **Example:**
 
@@ -305,11 +306,12 @@ Financial metrics with full attribution context. Tracks revenue, transaction vol
 | `rdt_cid` | String | Reddit Ads click ID |
 | `event` | String | Revenue-generating event name |
 | `rdns` | String | Wallet RDNS identifier |
-| `provider_name` | String | Wallet provider name |
+| `provider_name` | SimpleAggregateFunction(any, String) | Wallet provider name. `SimpleAggregateFunction` values don't need a `-Merge` function on read, so this still reads directly like a plain string (see [Working with Aggregate Tables](#working-with-aggregate-tables)) |
 | `chain_id` | String | Blockchain chain ID |
 | `volume` | Float32 | Transaction volume (capped at 1B) |
 | `revenue` | Float32 | Revenue value (capped at 1B) |
 | `points` | Float32 | Points value (capped at 1B) |
+| `channel_type` | LowCardinality(String) | Marketing channel type derived from attribution data |
 
 **Example:**
 
@@ -361,16 +363,16 @@ This is an **aggregate table** (`AggregatingMergeTree`). Each trait is stored as
 | Column | Type | Description |
 |--------|------|-------------|
 | `address` | String | Wallet address (primary key within your project) |
-| `user_id` | String | Your own external user identifier |
-| `display_name` | String | Display name |
-| `email` | String | Email address |
-| `farcaster`, `discord`, `twitter`, `telegram`, `instagram`, `github`, `linkedin`, `facebook`, `tiktok`, `youtube`, `reddit` | String | Social handles |
-| `website` | String | Website URL |
-| `ens`, `lens`, `basenames`, `linea` | String | Web3 name-service handles |
-| `avatar` | String | Avatar image URL |
-| `description` | String | Bio / description |
-| `location` | String | Location |
-| `updated_at` | DateTime | Last time any trait was updated |
+| `user_id` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Your own external user identifier |
+| `display_name` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Display name |
+| `email` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Email address |
+| `farcaster`, `discord`, `twitter`, `telegram`, `instagram`, `github`, `linkedin`, `facebook`, `tiktok`, `youtube`, `reddit` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Social handles |
+| `website` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Website URL |
+| `ens`, `lens`, `basenames`, `linea` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Web3 name-service handles |
+| `avatar` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Avatar image URL |
+| `description` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Bio / description |
+| `location` | AggregateFunction(argMaxIf, String, DateTime, UInt8) | Location |
+| `updated_at` | SimpleAggregateFunction(max, DateTime) | Last time any trait was updated. Read with `max(updated_at)` |
 
 **Example:**
 
@@ -744,7 +746,11 @@ ORDER BY total_revenue DESC
 
 ```sql
 SELECT location, COUNT(*) AS session_count
-FROM sessions
+FROM (
+    SELECT session_id, argMinMerge(location) AS location
+    FROM sessions
+    GROUP BY session_id
+)
 GROUP BY location
 ORDER BY session_count DESC
 LIMIT 20
@@ -753,15 +759,23 @@ LIMIT 20
 ### Sessions by device and browser
 
 ```sql
-WITH top_browsers AS (
-    SELECT browser
+WITH session_attrs AS (
+    SELECT
+        session_id,
+        argMinMerge(device) AS device,
+        argMinMerge(browser) AS browser
     FROM sessions
+    GROUP BY session_id
+),
+top_browsers AS (
+    SELECT browser
+    FROM session_attrs
     GROUP BY browser
     ORDER BY COUNT(*) DESC
     LIMIT 10
 )
 SELECT device, browser, COUNT(*) AS session_count
-FROM sessions
+FROM session_attrs
 WHERE browser IN (SELECT browser FROM top_browsers)
 GROUP BY device, browser
 ORDER BY session_count DESC

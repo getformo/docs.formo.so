@@ -8,35 +8,9 @@ keywords: ["crypto retention analytics", "DeFi user retention", "web3 churn anal
 
 Acquiring users is expensive. Keeping them is where the real growth happens. In crypto, a 10 percent improvement in Day 7 retention can be worth thousands in LTV. This guide shows you how to measure retention, spot churn, and re-engage at-risk users.
 
-## Part 1: View Retention on the Overview Page
+## Part 1: Build a Retention Cohort Chart
 
-The fastest way to see retention is on your **Overview** dashboard:
-
-<Steps>
-<Step>
-Open the **Overview** page in Formo.
-</Step>
-
-<Step>
-Scroll down to the **Retention** section. You'll see:
-- **Day 7 Retention**: Percent of users active on Day 7 (default 14-day window)
-- **Day 30 Retention**: Percent of users active on Day 30
-- **Day 90 Retention**: Percent of users active on Day 90
-- **Delta**: Week-over-week change (up or down)
-</Step>
-
-<Step>
-Compare your retention to your baseline. A 2-3 percent week-over-week improvement is excellent. A 5+ percent drop is a red flag.
-</Step>
-</Steps>
-
-<Frame caption="Retention metrics on the Overview page">
-<img src="/images/screenshots/overview.png" alt="Overview retention" />
-</Frame>
-
-## Part 2: Build a Retention Cohort Chart
-
-For deeper insights, create a retention cohort chart on a dashboard. This shows how each cohort of users (grouped by signup date) retains over time:
+Create a retention cohort chart on a dashboard. This shows how each cohort of users (grouped by signup week) retains over time:
 
 <Steps>
 <Step>
@@ -44,10 +18,10 @@ Click **Dashboards** → **Add Chart** → select **Retention** chart type.
 </Step>
 
 <Step>
-Choose your **cohort grouping**:
-- **Daily**: See retention of users who signed up on each day
-- **Weekly**: Group by signup week (cleaner view for smaller apps)
-- **Monthly**: For apps with high volume
+Configure the chart:
+- **Retention Type**: Recurring (any return counts) or Rolling (must retain consecutively)
+- **Signal**: Base retention on a specific event, or on a user label
+- Cohorts are grouped weekly
 </Step>
 
 <Step>
@@ -65,7 +39,7 @@ The retention table shows cohorts (rows) and retention days (columns). Green cel
 <img src="/images/retention.png" alt="Retention table" />
 </Frame>
 
-## Part 3: Identify Churn Patterns
+## Part 2: Identify Churn Patterns
 
 The **Insights** page uses AI to spot churn signals. Check it weekly:
 
@@ -91,7 +65,7 @@ Click on an insight to drill into the data. Ask: Is this a real problem or noise
 - A specific geography or device churning faster suggests a UX or localization problem
 - A cohort that performs poorly across all retention windows suggests they were bad-fit users to begin with
 
-## Part 4: Segment Churned and At-Risk Users
+## Part 3: Segment Churned and At-Risk Users
 
 To re-engage users, you must first identify them. Use the **Users** page to create segments:
 
@@ -103,7 +77,7 @@ Click **Users** in the sidebar to see all users.
 <Step>
 Apply filters to find at-risk users:
 - **Lifecycle = "Churned"**: Users inactive for 30+ days
-- **Lifecycle = "Resurrecting"**: Users who returned after being inactive
+- **Lifecycle = "Resurrected"**: Users who returned after being inactive
 - **Last Activity < 7 days ago**: Users who haven't returned this week
 </Step>
 
@@ -121,12 +95,12 @@ Once saved, you can export this segment as CSV for re-engagement campaigns or us
 </Frame>
 
 <Note>
-**User Lifecycle Stages:** New, Returning, Power User, Resurrected, At Risk, and Churned, assigned from each wallet's activity recency and frequency. See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds.
+**User Lifecycle Stages:** New, Returning, Power user, Resurrected, At Risk, and Churned, assigned from each wallet's activity recency and frequency. See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds.
 
 Use these stages to build segments for targeted campaigns.
 </Note>
 
-## Part 5: Export Your Segment for Re-Engagement
+## Part 4: Export Your Segment for Re-Engagement
 
 <Steps>
 <Step>
@@ -145,7 +119,7 @@ Use this list to:
 </Step>
 </Steps>
 
-## Part 6: Set Up Alerts for Key User Events
+## Part 5: Set Up Alerts for Key User Events
 
 Monitor important user activity with alerts. Get notified when high-value wallets connect or key events happen:
 
@@ -169,7 +143,7 @@ Save. You'll be alerted in real time when the event fires.
 
 See [Alerts documentation](/features/product-analytics/alerts) for full setup.
 
-## Part 7: Use Ask AI to Understand Churn
+## Part 6: Use Ask AI to Understand Churn
 
 Open **Ask AI** (the AI assistant) and ask natural language questions:
 
@@ -327,8 +301,8 @@ All three matter. Day 7 catches immediate churn. Day 30 shows if you built a hab
 
 <Accordion title="What user lifecycle stage should I re-engage first?">
 Priority order:
-1. **Resurrecting**: Users who just came back. Momentum is on your side.
-2. **At-risk Returning**: Users with only 2-3 sessions. Easy to convert to Power Users.
+1. **Resurrected**: Users who just came back. Momentum is on your side.
+2. **At-risk Returning**: Users with only 2-3 sessions. Easy to convert to Power users.
 3. **Recent Churned**: Users inactive for 30-60 days. Still remember your product.
 4. **Old Churned**: Users inactive for 6+ months. Hard to re-activate.
 

@@ -381,5 +381,18 @@ Array of token holdings:
 | 400 | `BAD_REQUEST` | Invalid address or ENS name, or the ENS name could not be resolved |
 | 401 | `UNAUTHORIZED` | Missing or invalid API key |
 | 403 | `FORBIDDEN` | API key does not have `profiles:read` permission |
-| 404 | `PROFILE_NOT_FOUND` | Profile does not exist |
+| 404 | `NOT_FOUND` | Profile does not exist |
 | 500 | `INTERNAL_SERVER_ERROR` | Failed to fetch wallet profile data |
+
+### Still processing
+
+On a cold or first-time wallet lookup, the profile may not be built yet. In that case the endpoint returns `202 Accepted` instead of an error:
+
+```json
+{
+  "status": "processing",
+  "retry_after": 3
+}
+```
+
+A `Retry-After` header is also set to the same value (in seconds). This is a normal, common path for first-time wallet lookups: wait `retry_after` seconds and request the same endpoint again.

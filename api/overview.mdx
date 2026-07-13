@@ -96,7 +96,7 @@ List endpoints use a Stripe-style envelope only because they need pagination met
 
 ## Idempotency
 
-Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE so retries can't double-create or double-charge. The first response is cached for 24 hours and replayed byte-for-byte on retry.
+Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE requests to the Alerts, Boards, Contracts, Segments, and Import APIs so retries can't double-create or double-charge. The first response is cached for 24 hours and replayed byte-for-byte on retry.
 
 ```http
 POST /v0/alerts HTTP/1.1

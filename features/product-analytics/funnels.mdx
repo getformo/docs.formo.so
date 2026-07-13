@@ -19,7 +19,7 @@ Visualize how users progress through a series of steps with Funnel Analysis.
 
 Specify a conversion window for your funnels to control the time period during which funnel steps must be completed.
 
-The default conversion window is 2 weeks, meaning all steps must be completed within that time. Longer windows will include more event completions.
+The default conversion window is 2 days, meaning all steps must be completed within that time. Longer windows will include more event completions.
 
 ## Step Order
 
@@ -44,7 +44,7 @@ Consider making the funnel less strict by removing some intermediate steps, or u
 
 Counts users who performed each event, regardless of sequence or timing.
 
-In this mode, users must complete all defined steps within the conversion window, but the order does not matter. The first step in your funnel could be the last action the user takes. This is useful when your funnel steps represent a set of actions rather than a linear journey.
+In this mode, users must complete all defined steps, but the order does not matter and the conversion window does not apply. Steps are matched across your full selected date range with no time constraint between them. The first step in your funnel could be the last action the user takes. This is useful when your funnel steps represent a set of actions rather than a linear journey.
 
 **When to use each mode:**
 
@@ -164,16 +164,9 @@ For each step, specify:
 
 ### Step 4: Set the conversion window
 
-Choose how long users have to complete all steps:
+Choose how long users have to complete all steps by entering a numeric value and selecting a unit (Hour, Day, or Week). The default is 2 days.
 
-| Window | Best for |
-|--------|----------|
-| 1 day | Immediate actions (mints, swaps) |
-| 7 days | Considered purchases |
-| 14 days (default) | Complex user journeys |
-| 30 days | Long sales cycles |
-
-Users must complete all steps within this window to count as converted.
+Users must complete all steps within this window to count as converted. Note that the conversion window only applies to Sequential (Closed) funnels; [Any Order (Open) funnels](#any-order-open-funnel) have no time constraint between steps.
 
 ### Step 5: Analyze your funnel
 

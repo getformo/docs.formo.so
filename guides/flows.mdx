@@ -26,7 +26,6 @@ In the flow builder, select your **starting event**. Common starting points for 
 
 - **First page view** (shows the complete user journey from landing)
 - **Connect wallet** (shows post-connection paths)
-- **Account Signup** (tracks authentication flow)
 
 For onboarding analysis, start with the **connect wallet event** to see what happens immediately after users authenticate.
 
@@ -72,11 +71,12 @@ Insight: If most successful users read your docs first, improve doc visibility o
 
 Click **Filter** to narrow the flow to specific user segments. Filter options:
 
-- **New Users Only** (lifecycle = New)
-- **By Referrer** (organic vs paid, specific campaigns)
 - **By Device** (mobile vs desktop dropoff patterns)
-- **By Wallet Label** (verified, high-net-worth wallets)
-- **By Chain** (Ethereum users vs Polygon users)
+- **By Country** (geographic patterns)
+- **By Browser**
+- **By OS**
+- **By Referrer** (organic vs paid, specific campaigns)
+- **By Referrer URL**
 
 Example: Compare flows for mobile users vs desktop. If mobile has 40% dropoff at wallet connect but desktop has 10%, your mobile UX needs work.
 
@@ -213,11 +213,11 @@ Yes. In the flow filter, add a condition like "Time Since Starting Event: < 24 h
 </Accordion>
 
 <Accordion title="What's the maximum number of steps a flow can show?">
-Flows can show up to 20 steps deep, though clarity typically degrades after 7-8 steps. If your flow is too complex, filter to new users only or segment by user property.
+Flows can show up to 5 steps deep. If your flow is too complex, segment by a user property like device or country to focus the view.
 </Accordion>
 
-<Accordion title="Can I export flow data as a CSV or JSON?">
-Yes. Click Export in the chart menu to download node and path data. Useful for reporting to stakeholders or further analysis in Excel.
+<Accordion title="Can I export flow data as a CSV?">
+Yes, but not the node and path structure itself. Click a node or path to select the users behind it, then export that user list as a CSV. There's no JSON export option. Useful for reporting to stakeholders or further analysis in Excel.
 </Accordion>
 
 </AccordionGroup>

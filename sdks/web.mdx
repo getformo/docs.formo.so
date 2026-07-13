@@ -462,7 +462,7 @@ The SDK skips tracking in localhost by default.
 To enable tracking locally during development, set `tracking` to `true`:
 
 ```tsx
-<AnalyticsProvider
+<FormoAnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
         tracking: true, // enable tracking on localhost
@@ -475,7 +475,7 @@ To enable tracking locally during development, set `tracking` to `true`:
 Control the level of logs the SDK prints to the console with the following logLevel settings:
 
 ```tsx
-<AnalyticsProvider
+<FormoAnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
         logger: {
@@ -486,13 +486,15 @@ Control the level of logs the SDK prints to the console with the following logLe
 >
 ```
 
+Logging is disabled by default (`logger.enabled: false`); no logs print unless you explicitly set `logger.enabled: true`. The `levels` array is matched exactly, not hierarchically: setting `levels: ["warn"]` shows only `warn` messages, not `warn` and `error` together. List every level you want to see.
+
 | Log Level | Description |
 |-----------|-------------|
 | trace | Shows the most detailed diagnostic information, useful for tracing program execution flow. |
 | debug | Shows all messages, including function context information for each public method the SDK invokes. |
 | info | Shows informative messages about normal application operation. |
-| warn | Default. Shows error and warning messages. |
-| error | Shows error messages only. |
+| warn | Shows warning messages. |
+| error | Shows error messages. |
 
 ### Autocapture
 
@@ -526,11 +528,11 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 To support high-performance environments, the SDK sends events in batches. 
 
 ```tsx
-<AnalyticsProvider
+<FormoAnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
         flushAt: 20, // defaults to batches of 20 events
-        flushInterval: 1000 * 60, // defaults to 1 min
+        flushInterval: 1000 * 30, // defaults to 30 seconds
     }}
 >
 ```
@@ -542,7 +544,7 @@ Customize this behavior with the `flushAt` and `flushInterval` configuration par
 The `ready` callback function executes once the Formo SDK is fully loaded and ready to use. This is useful for performing initialization tasks or calling SDK methods that require the SDK to be ready.
 
 ```tsx
-<AnalyticsProvider
+<FormoAnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
         ready: function(formo) {
@@ -719,14 +721,14 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 
 ### Referrals
 
-Formo autodetects `ref`, `referral`, and `refcode` query parameters in the URL. You can customize how referrals are detected by the SDK:
+Formo autodetects `ref`, `referral`, `refcode`, `af`, and `referrer` query parameters in the URL. You can customize how referrals are detected by the SDK:
 
 ```tsx
 <FormoAnalyticsProvider
   writeKey="<YOUR_WRITE_KEY>"
   options={{
     referral: {
-      queryParams: ['via', 'ref'],      // Query params to detect (default: ['ref', 'referral', 'refcode'])
+      queryParams: ['via', 'ref'],      // Query params to detect (default: ['ref', 'referral', 'refcode', 'af', 'referrer'])
       pathPattern: '/referral/([^/]+)', // Regex to extract referral code from the URL path
     },
   }}
@@ -951,7 +953,7 @@ module.exports = {
 Then, configure the Formo SDK to send requests via your rewrite. Update the `apiHost` parameter in the Formo SDK:
 
 ```javascript
-<AnalyticsProvider
+<FormoAnalyticsProvider
   writeKey={WRITE_KEY}
   options={{
     apiHost: "/api/ingest",
@@ -1006,7 +1008,7 @@ In this file, set up code to match requests to a custom route, set a new host he
 Once done, configure the Formo SDK to send requests via your rewrite:
 
 ```javascript
-<AnalyticsProvider
+<FormoAnalyticsProvider
   writeKey={WRITE_KEY}
   options={{
     apiHost: "https://your-host-url.com/ingest",

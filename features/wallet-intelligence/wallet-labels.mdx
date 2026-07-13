@@ -17,15 +17,15 @@ Each tracked user on Formo is assigned labels based on their onchain activity an
 
 ### User lifecycle labels
 
-Every wallet is assigned a lifecycle stage based on its recency and active days: **New**, **Returning**, **Power User**, **Resurrected**, **At Risk**, or **Churned**. See [User lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds.
+Every wallet is assigned a lifecycle stage based on its recency and active days: **New**, **Returning**, **Power user**, **Resurrected**, **At Risk**, or **Churned**. See [User lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds.
 
 ### Attestations
 
 | Label | Description |
 |-------|-------------|
-| **Sanctioned User** | OFAC-sanction status and designations |
+| **OFAC Sanctioned** | OFAC-sanction status and designations |
 | **Human Passport Unique Humanity Score** | [Human Passport score (0-100)](https://docs.passport.xyz/) |
-| **Human Passport Aggregate Model Score** | [Aggregate unique humanity score for EVM wallets (0-100)](https://docs.passport.xyz/building-with-passport/models/available-models#aggregate-unique-humanity-model) |
+| **Human Passport Aggregate Model Score** | [Aggregate unique humanity score for EVM wallets (0-100, or -1 if there's insufficient transaction history)](https://docs.passport.xyz/building-with-passport/models/available-models#aggregate-unique-humanity-model) |
 | **Coinbase Verified Account** | [Coinbase verified account attestations](https://www.coinbase.com/developer-platform/products/verifications) |
 | **Coinbase Verified Country** | Coinbase verified country attestations with country code extraction |
 | **Coinbase One** | Coinbase One subscription attestations |
@@ -36,7 +36,7 @@ Every wallet is assigned a lifecycle stage based on its recency and active days:
 | Label | Description |
 |-------|-------------|
 | **Merkl Campaigns** | Tracks participation in [Merkl](https://merkl.xyz) incentive campaigns. Formo automatically detects campaign IDs from the Merkl API and stores them as a label on the wallet profile. You can filter users by campaign ID to measure the quality of users acquired through specific Merkl campaigns. |
-| **ERC-8004 AI Agent** | Automatically detects wallets registered as AI agents via the [ERC-8004](https://erc8004.org) standard. Formo queries onchain registries across 11+ chains to identify agent wallets and surfaces the agent name, ID, and reputation score on the wallet profile. |
+| **ERC-8004 AI Agent** | Automatically detects wallets registered as AI agents via the [ERC-8004](https://erc8004.org) standard. Formo queries onchain registries across 11 chains to identify agent wallets (agent discovery runs via subgraph on 5 of them; the rest are used for RPC and reputation lookups once an agent is found) and surfaces the agent name, ID, and reputation score on the wallet profile. |
 
 ---
 
@@ -75,9 +75,9 @@ Use labels to find specific user types:
 
 | Goal | Label Filter |
 |------|--------------|
-| Find power users | Lifecycle = "Power User" |
+| Find power users | Lifecycle = "Power user" |
 | Find verified humans | Human Passport Score > 50 |
-| Exclude sanctioned wallets | Label != "Sanctioned User" |
+| Exclude sanctioned wallets | Label != "OFAC Sanctioned" |
 | Find Coinbase users | Label = "Coinbase Verified Account" |
 
 ### Step 3: Combine labels with other filters
@@ -89,7 +89,7 @@ Labels become powerful when combined with other criteria:
 |--------|-------|
 | Apps | Uniswap, Aave (or other DeFi protocols) |
 | Net Worth | > $50,000 |
-| Lifecycle | Power User |
+| Lifecycle | Power user |
 
 **Verified users from campaigns:**
 | Filter | Value |
@@ -122,12 +122,12 @@ Turn useful label combinations into reusable segments:
 4. Use it to find similar users
 
 **Compliance filtering:**
-1. Filter by Label != "Sanctioned User"
+1. Filter by Label != "OFAC Sanctioned"
 2. Add Human Passport Score > 20 for sybil resistance
 3. Export clean lists for marketing or rewards
 
 **Quality scoring:**
-1. Combine multiple positive labels (Power User + Coinbase Verified Account + Human Passport Score > 50)
+1. Combine multiple positive labels (Power user + Coinbase Verified Account + Human Passport Score > 50)
 2. Users matching more labels = higher quality
 3. Prioritize multi-label users for outreach
 
@@ -142,7 +142,7 @@ Set up alerts based on labels:
 
 1. Go to **Settings** > **Alerts**
 2. Create a **User** alert
-3. Add filters: Lifecycle = "Power User" AND net_worth_usd > 100000, or Labels = your target label
+3. Add filters: Lifecycle = "Power user" AND net_worth_usd > 100000, or Labels = your target label
 4. Get notified within 5 minutes when a wallet matching those filters becomes active
 
 ### Next Steps
