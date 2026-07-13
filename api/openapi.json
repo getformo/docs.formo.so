@@ -4517,10 +4517,12 @@
                   "type": "object",
                   "properties": {
                     "status": { "type": "string", "enum": ["processing"] },
+                    "address": { "type": "string" },
+                    "message": { "type": "string" },
                     "retry_after": { "type": "integer", "description": "Seconds to wait before retrying." }
                   }
                 },
-                "example": { "status": "processing", "retry_after": 5 }
+                "example": { "status": "processing", "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "message": "Wallet profile is being generated. Retry shortly.", "retry_after": 3 }
               }
             }
           },

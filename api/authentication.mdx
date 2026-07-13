@@ -44,15 +44,15 @@ When creating a Workspace API Key, select the scopes your key needs. Each API en
 | `mcp:read` | MCP protocol access | Scale / Enterprise |
 | `alerts:read` | List and get alerts | Scale / Enterprise |
 | `alerts:write` | Create, update, delete alerts (requires alerts:read) | Scale / Enterprise |
-| `boards:read` | List and get boards and charts | Growth / Scale / Enterprise |
-| `boards:write` | Create, update, delete boards and charts (requires boards:read) | Growth / Scale / Enterprise |
-| `contracts:read` | List contracts | Growth / Scale / Enterprise |
-| `contracts:write` | Create, update, delete contracts (requires contracts:read) | Growth / Scale / Enterprise |
-| `segments:read` | List segments | Growth / Scale / Enterprise |
-| `segments:write` | Create and delete segments (requires segments:read) | Growth / Scale / Enterprise |
+| `boards:read` | List and get boards and charts | Any plan |
+| `boards:write` | Create, update, delete boards and charts (requires boards:read) | Any plan |
+| `contracts:read` | List contracts | Any plan |
+| `contracts:write` | Create, update, delete contracts (requires contracts:read) | Any plan |
+| `segments:read` | List segments | Any plan |
+| `segments:write` | Create and delete segments (requires segments:read) | Any plan |
 
 <Note>
-  Write scopes automatically require the corresponding read scope. Profiles, Query, MCP, and Alerts scopes require a Scale or Enterprise plan; Boards, Contracts, and Segments scopes require Growth or above. Create keys with the required scopes in Team Settings &gt; API Keys.
+  Write scopes automatically require the corresponding read scope. Profiles, Query, MCP, and Alerts scopes require a Scale or Enterprise plan. Create keys with the required scopes in Team Settings &gt; API Keys.
 </Note>
 
 ## SDK Write Key
