@@ -56,7 +56,7 @@ Formo supports two trigger types: **Event alerts**, which fire on individual mat
     | **page** | User visits a specific page |
     | **custom** | Your custom tracked events |
 
-    You can add conditions to filter on the event's top-level fields: `type`, `event`, `address`, `user_id`, `anonymous_id`, `location`, `device`, `browser`, `os`, and `referrer`. Conditions support exact match, contains, starts with, ends with, and not-equals (e.g., `browser = Chrome`, `referrer contains twitter`). They can't filter on values nested in `properties` (like `chain_id` or a transaction's `status`) or use numeric comparisons (`>`, `<`) - use a User alert for numeric thresholds.
+    You can add conditions to filter on the event's top-level fields: `type`, `event`, `address`, `user_id`, `anonymous_id`, `location`, `device`, `browser`, `os`, and `referrer`. Conditions support exact match, contains, starts with, ends with, and not-equals (e.g., `browser = Chrome`, `referrer contains twitter`). They can't filter on values nested in `properties` (like `chain_id` or a transaction's `status`) or use numeric comparisons (`>`, `<`) - use a User alert if you need to filter on a number.
   </Tab>
   <Tab title="Users">
     Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your criteria.
