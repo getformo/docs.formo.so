@@ -74,7 +74,7 @@ curl -X POST https://api.formo.so/v0/alerts \
     "trigger_filters": [
       { "name": "event", "operator": "equals", "value": "transaction" }
     ],
-    "recipient": [{ "type": "email", "value": ["alerts@myapp.com"] }]
+    "recipient": [{ "type": "webhook", "value": ["https://myapp.com/formo-webhook"] }]
   }'
 ```
 
