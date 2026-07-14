@@ -49,9 +49,12 @@ Each event has a structured schema and type based on the [event specs](/data/eve
 | `page` | Page view with URL path |
 | `connect` | Wallet connection |
 | `disconnect` | Wallet disconnection |
+| `chain` | Chain switches |
 | `signature` | Message signing |
 | `transaction` | Onchain transaction |
 | `track` | Custom events |
+| `identify` | User identification |
+| `detect` | Wallet provider detection |
 | `decoded_log` | Smart contract events |
 
 Click any event to expand and see all properties.
@@ -77,7 +80,7 @@ Use filters to narrow down the feed:
 | Connects from Twitter | type = connect, referrer contains twitter |
 | Visitors from marketing campaign | utm_source = newsletter |
 | Events from mobile devices | device = mobile |
-| Failed transactions | type = transaction, status = failed |
+| Failed transactions | type = transaction, status = reverted |
 | Wallet connects from Twitter | type = connect, referrer contains twitter |
 | Specific user's activity | address = 0x... |
 | Events on a specific page | path = /swap |
@@ -118,7 +121,7 @@ When users report problems, use the Activity Feed to investigate:
 **Investigating a failed transaction:**
 
 <Steps>
-  <Step title="Filter by type = transaction and status = failed" />
+  <Step title="Filter by type = transaction and status = reverted" />
   <Step title="Find the user's transaction" />
   <Step title="Click to expand and see error details" />
   <Step title="Check the preceding events for context" />
@@ -161,7 +164,7 @@ When users report problems, use the Activity Feed to investigate:
 **"Which transactions are failing?"**
 
 <Steps>
-  <Step title="Filter: type = transaction, status = failed" />
+  <Step title="Filter: type = transaction, status = reverted" />
   <Step title="Group by error message or contract" />
   <Step title="Identify the most common failure reasons" />
   <Step title="Check if failures correlate with specific flows" />

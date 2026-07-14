@@ -33,7 +33,7 @@ Authorization: Bearer <your_workspace_api_key>
 Limits:
 - Query must be a single `SELECT`/`WITH` statement (read-only).
 - No comments or multiple statements.
-- `LIMIT` is required and must be `<= 1000`.
+- `LIMIT` is optional (defaults to 100 rows if omitted) and must be `<= 1000000`.
 
 ## Response
 
@@ -69,7 +69,7 @@ This endpoint uses `limit`/`offset` (not `page`/`size`) because the client contr
 
 Branch on `error.code`; see [Errors](/api/errors) for the full reference.
 
-- `400 BAD_REQUEST`: missing query, invalid SQL, `LIMIT` over 1000, or missing project id.
+- `400 BAD_REQUEST`: missing query, invalid SQL, `LIMIT` over 1,000,000, or missing project id.
 - `401 UNAUTHORIZED`: missing/invalid authorization header or API key.
 - `403 FORBIDDEN`: API key lacks `query:read` scope.
 - `404 NOT_FOUND`: project or read token not found.

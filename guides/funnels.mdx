@@ -57,7 +57,7 @@ Select **connect** from the events list.
 </Step>
 
 <Step>
-(Optional) Add a filter to track only specific chains: Chain = "ethereum".
+(Optional) Add a filter to track only specific chains: chain_id = 1 (Ethereum mainnet).
 </Step>
 </Steps>
 
@@ -73,7 +73,7 @@ Select **transaction** from the events list. This counts users who completed an 
 </Step>
 
 <Step>
-(Optional) Add a filter: Contract Address = "0x..." to track swaps on your DEX only.
+(Optional) Add a filter: to = "0x..." to track swaps on your DEX only.
 </Step>
 </Steps>
 
@@ -95,31 +95,30 @@ Scroll to **Conversion Window** in the settings panel.
 </Step>
 
 <Step>
-Choose your window based on your funnel:
-- **1 day**: Fast decisions (DEX swaps, quick stakes)
-- **7 days**: Deliberate decisions (pool deposits, farm selections)
-- **14 days**: Default (balances most use cases)
-- **30 days**: Long consideration cycles (lending protocols, governance)
+Enter a number and choose a unit (Hours, Days, or Weeks). The default window is 2 days, but you can tune it to your funnel:
+- Short windows (hours): Fast decisions (DEX swaps, quick stakes)
+- A few days: Deliberate decisions (pool deposits, farm selections)
+- Weeks: Long consideration cycles (lending protocols, governance)
 </Step>
 </Steps>
 
-## Part 4: Choose Funnel Type
+## Part 4: Choose Step Order
 
-Formo supports two funnel types:
+Formo supports two step order modes:
 
-**Closed Funnel**
+**Sequential**
 Each step must follow the previous step. User must view a page, then connect, then swap. Most common.
 
-**Open Funnel**
+**Any order**
 Each step is independent. User can swap without connecting first (e.g., batch transactions, programmatic access). Choose this if your funnel steps can happen in any order.
 
 <Steps>
 <Step>
-Click the **Funnel Type** dropdown (default: Closed).
+Click the **Step order** dropdown (default: Sequential).
 </Step>
 
 <Step>
-Select **Open** only if your user journey allows non-sequential steps.
+Select **Any order** only if your user journey allows non-sequential steps.
 </Step>
 </Steps>
 
@@ -153,7 +152,6 @@ Select a dimension:
 - **Country**: Geographic patterns?
 - **Device**: Mobile vs desktop conversion?
 - **UTM Source**: Which campaign drives best users?
-- **Chain**: Which blockchain has highest conversion?
 </Step>
 
 <Step>
@@ -165,13 +163,13 @@ The funnel splits into multiple bands, one per breakdown value. Compare conversi
 
 ## Part 7: Use Conversion Insights
 
-Formo uses statistical analysis to find what drives conversions. Click the **Insights** tab (next to the funnel chart) to see:
+Formo analyzes your funnel data to find what drives conversions. Click the **Insights** tab (next to the funnel chart) to see:
 
 - **Lift**: Which attributes increase conversion probability
 - **Odds ratio**: How much more (or less) likely users with this attribute convert
-- **Statistical significance**: Is this insight real or noise
+- **Penetration**: How common this attribute is among your users
 
-Example insight: "Users from Referrer=twitter have 2.3x lift in Step 2 conversion (wallet connect). This is statistically significant (p < 0.05)."
+Example insight: "Users from Referrer=twitter have 2.3x lift in Step 2 conversion (wallet connect), with an odds ratio of 3.1."
 
 Act on this: Double down on Twitter traffic if wallet conversion is your bottleneck.
 
@@ -236,9 +234,9 @@ Liquidity provision funnels are longer because users must approve two tokens, th
 |------|-------|--------|
 | 1 | page | path = "/pool" |
 | 2 | connect | - |
-| 3 | approval_1 | function = "approve", token = "tokenA" |
-| 4 | approval_2 | function = "approve", token = "tokenB" |
-| 5 | addLiquidity | function = "addLiquidity" |
+| 3 | approval_1 | function_name = "approve", token = "tokenA" |
+| 4 | approval_2 | function_name = "approve", token = "tokenB" |
+| 5 | addLiquidity | function_name = "addLiquidity" |
 
 Two approval steps cause most drop-off.
 
@@ -248,12 +246,12 @@ Track the full lending funnel (Deposit > Borrow > Repay):
 
 | Step | Event | Filter |
 |------|-------|--------|
-| 1 | deposit | function = "supply" |
-| 2 | borrow | function = "borrow" |
+| 1 | deposit | function_name = "supply" |
+| 2 | borrow | function_name = "borrow" |
 | 3 | swap | (optional) use borrowed assets |
-| 4 | repay | function = "repay" |
+| 4 | repay | function_name = "repay" |
 
-Use **Open Funnel** here (borrow and swap may happen out of order).
+Use **Any order** step order here (borrow and swap may happen out of order).
 
 ### Key DeFi Drop-Off Patterns
 
@@ -270,7 +268,7 @@ Common friction points and solutions:
 Monitor high-value swaps on your DEX:
 
 1. Create a funnel with step: **transaction** + filter **amount_usd > 100000**
-2. Add breakdown by **user_address** to spot repeat whale traders
+2. Add breakdown by **address** to spot repeat whale traders
 3. Set an [alert](/features/product-analytics/alerts) to get notified when whale wallets transact
 4. Use **Insights** to find attributes of whale traders and target similar users
 
@@ -300,18 +298,19 @@ Your conversion funnel is live. Next steps:
 Yes. If you've set up [Contract Events](/guides/contract-events), you can select any of them in the funnel builder. For example, a Uniswap funnel might be: "page" > "swap (contract event)" > "Transfer (contract event)".
 </Accordion>
 
-<Accordion title="What's the difference between closed and open funnels?">
-**Closed funnel**: User must complete steps in order. Page view, then wallet connect, then swap.
+<Accordion title="What's the difference between sequential and any-order step order?">
+**Sequential**: User must complete steps in order. Page view, then wallet connect, then swap.
 
-**Open funnel**: Steps are independent. User can swap without a page view event (e.g., direct contract calls, wallet batch operations). Use open funnels when your steps can happen in any sequence.
+**Any order**: Steps are independent. User can swap without a page view event (e.g., direct contract calls, wallet batch operations). Use any-order step order when your steps can happen in any sequence.
 </Accordion>
 
 <Accordion title="What conversion window should I use?">
-- **Swap, stake, claim**: 1 day (fast decisions)
-- **Pool deposits, farming**: 7 days (deliberate)
-- **Loans, governance**: 14-30 days (long consideration)
+Enter a number and pick a unit (Hours, Days, or Weeks):
+- **Swap, stake, claim**: hours (fast decisions)
+- **Pool deposits, farming**: a few days (deliberate)
+- **Loans, governance**: weeks (long consideration)
 
-Start with 14 days (default) and adjust based on your product.
+Start with the default of 2 days and adjust based on your product.
 </Accordion>
 
 </AccordionGroup>

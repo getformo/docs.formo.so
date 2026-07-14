@@ -6,7 +6,7 @@ openapi: "POST /v0/boards/{boardId}/charts"
 
 ## Overview
 
-Creates a new chart and attaches it to a board. Returns the new chart's ID on success.
+Creates a new chart and attaches it to a board. Returns the full chart object on success.
 
 The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
 
@@ -18,10 +18,10 @@ The `chart_type` field controls which other request body fields are required or 
 | ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
 | `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
 | `query`       | string        | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"`           |
-| `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
+| `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
 | `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
 | `description` | string        | No          | Optional description                                                                            |
-| `x_axis`      | string        | Conditional | Column for the X axis. Required for `bar`, `line`, `stacked`                                    |
+| `x_axis`      | string        | Conditional | Column for the X axis. Required for `bar`, `line`, `area`, `stacked`                             |
 | `y_axis`      | string[]      | Conditional | Column(s) for Y axis metrics. See per-type rules below                                          |
 | `group_by`    | string        | Conditional | Column to group/stack series by. Required for `stacked`                                         |
 | `steps`       | FunnelStep[]  | Conditional | Ordered funnel steps. Required for `funnel` (minimum 2)                                         |
@@ -61,9 +61,9 @@ Renders a single scalar value (KPI card). The query **must** return exactly **1 
 
 ---
 
-### `bar` and `line`
+### `bar`, `line`, and `area`
 
-Both require `x_axis` and at least **1** column in `y_axis`.
+All three require `x_axis` and at least **1** column in `y_axis`. `area` requires exactly **1** column in `y_axis` when `group_by` is set.
 
 ```json
 {
@@ -165,7 +165,7 @@ Each step in the `steps` array has the following shape:
 | Field              | Type                   | Default    | Description                                                                                                    |
 | ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
 | `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` - strict ordering, no events between steps; `open` - ordered but other events may occur between steps |
-| `conversionWindow` | `ConversionWindow`     | 1 day      | Max time from Step 1 for a user to complete all steps                                                          |
+| `conversionWindow` | `ConversionWindow`     | 2 days     | Max time from Step 1 for a user to complete all steps                                                          |
 | `breakdown`        | string                 | -          | Split each funnel bar by this dimension                                                                        |
 
 #### `ConversionWindow`
@@ -174,11 +174,11 @@ Each step in the `steps` array has the following shape:
 { "value": 7, "unit": "day" }
 ```
 
-`unit` must be one of: `minute` · `hour` · `day` · `week` (7 days) · `month` (30 days).
+`unit` must be one of: `hour` · `day` · `week` (7 days).
 
 #### `breakdown` values
 
-`device` · `browser` · `os` · `referrer` · `ref` · `utm_source` · `utm_medium` · `utm_campaign` · `utm_term` · `utm_content`
+`device` · `browser` · `os` · `location` · `referrer` · `ref` · `utm_source` · `utm_medium` · `utm_campaign` · `utm_term` · `utm_content` · `builder_codes`
 
 The top categories are shown individually. The rest collapse into **"Others"**.
 
@@ -295,8 +295,8 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 | ------------------ | ---------------------- | ------- | ------------------------------------------------------------------ |
 | `startStep`        | `FunnelStep`           | -       | **Required.** Event where the flow begins                          |
 | `endStep`          | `FunnelStep` \| `null` | `null`  | Optional ending event. `null` = open-ended                         |
-| `maxSteps`         | integer (2–10)         | `3`     | Max steps to show in the flow. Values above 10 are clamped to 10   |
-| `nodesPerStep`     | integer (2–10)         | `5`     | Max unique event nodes per step. Values above 10 are clamped to 10 |
+| `maxSteps`         | integer (2 to 5)       | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5     |
+| `nodesPerStep`     | integer (2 to 8)       | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8   |
 | `conversionWindow` | `ConversionWindow`     | -       | Time window to group the flow                                      |
 | `filters`          | string                 | -       | JSON-encoded string of additional path filters                     |
 
@@ -383,13 +383,21 @@ For all-user retention with no filters, omit `settings`:
 
 ## Response
 
-**`201 Created`** - returns the new chart's ID as a bare JSON string.
+**`201 Created`** - returns the full chart object.
 
 ```json
-"chart_1a2b3c4d"
+{
+  "id": "chart_1a2b3c4d",
+  "chart_type": "table",
+  "title": "Recent Events",
+  "description": null,
+  "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
+  "project_id": "proj_abc",
+  "board_id": "board_xyz"
+}
 ```
 
-Use the returned ID with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
+Use the returned `id` with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
 
 **`400 Bad Request`** - validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
 
@@ -405,7 +413,7 @@ Use the returned ID with the [Get Chart](/api/boards/get-chart), [Update Chart](
 
 ## Overview
 
-Creates a new chart and attaches it to a board. Returns the new chart's ID on success.
+Creates a new chart and attaches it to a board. Returns the full chart object on success.
 
 The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
 
@@ -417,10 +425,10 @@ The `chart_type` field controls which other request body fields are required or 
 | ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
 | `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
 | `query`       | string        | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"`           |
-| `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
+| `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
 | `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
 | `description` | string        | No          | Optional description                                                                            |
-| `x_axis`      | string        | Conditional | Column for the X axis. Required for `bar`, `line`, `stacked`                                    |
+| `x_axis`      | string        | Conditional | Column for the X axis. Required for `bar`, `line`, `area`, `stacked`                             |
 | `y_axis`      | string[]      | Conditional | Column(s) for Y axis metrics. See per-type rules below                                          |
 | `group_by`    | string        | Conditional | Column to group/stack series by. Required for `stacked`                                         |
 | `steps`       | FunnelStep[]  | Conditional | Ordered funnel steps. Required for `funnel` (minimum 2)                                         |
@@ -460,9 +468,9 @@ Renders a single scalar value (KPI card). The query **must** return exactly **1 
 
 ---
 
-### `bar` and `line`
+### `bar`, `line`, and `area`
 
-Both require `x_axis` and at least **1** column in `y_axis`.
+All three require `x_axis` and at least **1** column in `y_axis`. `area` requires exactly **1** column in `y_axis` when `group_by` is set.
 
 ```json
 {
@@ -564,7 +572,7 @@ Each step in the `steps` array has the following shape:
 | Field              | Type                   | Default    | Description                                                                                                    |
 | ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
 | `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` - strict ordering, no events between steps; `open` - ordered but other events may occur between steps |
-| `conversionWindow` | `ConversionWindow`     | 1 day      | Max time from Step 1 for a user to complete all steps                                                          |
+| `conversionWindow` | `ConversionWindow`     | 2 days     | Max time from Step 1 for a user to complete all steps                                                          |
 | `breakdown`        | string                 | -          | Split each funnel bar by this dimension                                                                        |
 
 #### `ConversionWindow`
@@ -573,11 +581,11 @@ Each step in the `steps` array has the following shape:
 { "value": 7, "unit": "day" }
 ```
 
-`unit` must be one of: `minute` · `hour` · `day` · `week` (7 days) · `month` (30 days).
+`unit` must be one of: `hour` · `day` · `week` (7 days).
 
 #### `breakdown` values
 
-`device` · `browser` · `os` · `referrer` · `ref` · `utm_source` · `utm_medium` · `utm_campaign` · `utm_term` · `utm_content`
+`device` · `browser` · `os` · `location` · `referrer` · `ref` · `utm_source` · `utm_medium` · `utm_campaign` · `utm_term` · `utm_content` · `builder_codes`
 
 The top categories are shown individually. The rest collapse into **"Others"**.
 
@@ -694,8 +702,8 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 | ------------------ | ---------------------- | ------- | ------------------------------------------------------------------ |
 | `startStep`        | `FunnelStep`           | -       | **Required.** Event where the flow begins                          |
 | `endStep`          | `FunnelStep` \| `null` | `null`  | Optional ending event. `null` = open-ended                         |
-| `maxSteps`         | integer (2–10)         | `3`     | Max steps to show in the flow. Values above 10 are clamped to 10   |
-| `nodesPerStep`     | integer (2–10)         | `5`     | Max unique event nodes per step. Values above 10 are clamped to 10 |
+| `maxSteps`         | integer (2 to 5)       | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5     |
+| `nodesPerStep`     | integer (2 to 8)       | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8   |
 | `conversionWindow` | `ConversionWindow`     | 2 weeks | Time window to group the flow                                      |
 | `filters`          | string                 | -       | JSON-encoded string of additional path filters                     |
 
@@ -782,13 +790,21 @@ For all-user retention with no filters, omit `settings`:
 
 ## Response
 
-**`201 Created`** - returns the new chart's ID as a bare JSON string.
+**`201 Created`** - returns the full chart object.
 
 ```json
-"chart_1a2b3c4d"
+{
+  "id": "chart_1a2b3c4d",
+  "chart_type": "table",
+  "title": "Recent Events",
+  "description": null,
+  "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
+  "project_id": "proj_abc",
+  "board_id": "board_xyz"
+}
 ```
 
-Use the returned ID with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
+Use the returned `id` with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
 
 **`400 Bad Request`** - validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
 

@@ -28,9 +28,8 @@ Click **Add Contract**. A modal opens.
 
 1. Paste your **contract address** (e.g., `0x6B175474E89094C44Da98b954EedeAC495271d0F` for DAI on Ethereum)
 2. Select the **chain** from the dropdown (Ethereum, Polygon, Arbitrum, Optimism, Base, etc.)
-3. Click **Auto-Detect ABI**
 
-Formo fetches the contract's ABI from Etherscan (or equivalent block explorer). If successful, you'll see a list of all events in the contract.
+Once both fields lose focus, Formo automatically fetches the contract's ABI in the background. If successful, you'll see a list of all events in the contract.
 
 If auto-detection fails, you can paste the ABI manually (copy from Etherscan, Hardhat build output, or your IDE).
 
@@ -56,11 +55,11 @@ Example: For a DEX, track Swap. For a token, track Transfer and Approval.
 
 Once events are selected, click **Deploy**. Formo provisions the pipeline in the background.
 
-Pipeline states progress as: **Draft** > **Initializing** > **Active**
+Pipeline states progress as: **Draft** > **Active** (shown as **Live** in the UI). A pipeline can also land in **Paused** or **Error** if something needs your attention.
 
 This typically takes a few minutes. Monitor the status in the Project Settings > Contracts panel.
 
-Once **Active**, your smart contract events will start flowing into your Formo project.
+Once **Live**, your smart contract events will start flowing into your Formo project.
 
 <Tip>
 You can add more contracts later. Just add it, select events, and deploy to update the pipeline.
@@ -182,7 +181,8 @@ Alerts notify you in real time, keeping you informed of important onchain activi
 
 In Project Settings > Contracts, each contract shows its pipeline state:
 - **Draft**: Not yet deployed
-- **Active**: Live and ingesting events
+- **Live**: Active and ingesting events
+- **Inactive**: Deployed but not currently ingesting events
 - **Paused**: Temporarily disabled
 - **Error**: Pipeline failed (check logs)
 
@@ -208,11 +208,11 @@ Once contract events are flowing, explore advanced use cases:
 <AccordionGroup>
 
 <Accordion title="What blockchains does Formo support for contract events?">
-Formo supports Ethereum, Polygon, Arbitrum, Optimism, Base, BNB Chain, Avalanche, Linea, Scroll, zkSync, Blast, and more. Full list at [Supported Chains](/chains/overview).
+Formo supports Ethereum, Polygon, Arbitrum, Optimism, Base, BNB Chain, Avalanche, Linea, Scroll, zkSync, and more. Full list at [Supported Chains](/chains/overview).
 </Accordion>
 
 <Accordion title="How does Formo detect contract ABIs automatically?">
-Formo queries Etherscan, Polygonscan, and other block explorers. If your contract is verified on the explorer, the ABI is detected instantly. If not, paste the ABI manually.
+Formo uses a single unified Etherscan API (selecting the chain via a chainId parameter) to fetch verified ABIs, with Sourcify as a fallback if the contract isn't verified there. If your contract is verified on either source, the ABI is detected instantly. If not, paste the ABI manually.
 </Accordion>
 
 <Accordion title="What happens if I add a contract that's not verified on Etherscan?">

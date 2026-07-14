@@ -4,4 +4,6 @@ description: "Top traffic sources by referrer or UTM dimension over the selected
 openapi: "GET /v0/top_sources"
 ---
 
-Returns the top traffic sources for the project. Pass `metric_column` to switch between `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, and `utm_content`. Defaults to `referrer`.
+Returns the top traffic sources for the project. Pass `metric_column` to switch between `referrer`, `referrer_url`, `ref`, `origin`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `device`, `browser`, `os`, and `channel`. Defaults to `referrer`.
+
+`channel` is a distinct option: instead of returning a raw dimension value, it classifies each session into a marketing acquisition channel (e.g. Organic Search, Paid Social, Direct, Referral) using Formo's channel classifier, so you can see top-level channel performance without building the grouping logic yourself.

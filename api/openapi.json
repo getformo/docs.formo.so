@@ -327,7 +327,7 @@
       },
       "ConversionWindow": {
         "type": "object",
-        "description": "Time window within which a user must complete all funnel steps (measured from Step 1). Defaults to 1 day if omitted.",
+        "description": "Time window within which a user must complete all funnel steps (measured from Step 1). Defaults to 2 days if omitted.",
         "properties": {
           "value": {
             "type": "integer",
@@ -337,13 +337,11 @@
           "unit": {
             "type": "string",
             "enum": [
-              "minute",
               "hour",
               "day",
-              "week",
-              "month"
+              "week"
             ],
-            "description": "Time unit. `month` = 30 days, `week` = 7 days."
+            "description": "Time unit. `week` = 7 days."
           }
         },
         "required": [
@@ -499,13 +497,15 @@
               "device",
               "browser",
               "os",
+              "location",
               "referrer",
               "ref",
               "utm_source",
               "utm_medium",
               "utm_campaign",
               "utm_term",
-              "utm_content"
+              "utm_content",
+              "builder_codes"
             ],
             "description": "**Funnel only.** Split each funnel bar by this dimension. The top categories are shown individually; the rest are collapsed into 'Others'."
           },
@@ -527,16 +527,16 @@
           "maxSteps": {
             "type": "integer",
             "minimum": 2,
-            "maximum": 10,
+            "maximum": 5,
             "default": 3,
-            "description": "**user_paths.** Maximum number of steps to show in the flow (2 to 10). Values above 10 are clamped to 10."
+            "description": "**user_paths.** Maximum number of steps to show in the flow (2 to 5). Values above 5 are clamped to 5."
           },
           "nodesPerStep": {
             "type": "integer",
             "minimum": 2,
-            "maximum": 10,
+            "maximum": 8,
             "default": 5,
-            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2 to 10). Values above 10 are clamped to 10."
+            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2 to 8). Values above 8 are clamped to 8."
           },
           "filters": {
             "type": "string",
@@ -596,12 +596,13 @@
               "funnel",
               "bar",
               "line",
+              "area",
               "pie",
               "stacked",
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
           },
           "title": {
             "type": "string",
@@ -670,12 +671,13 @@
               "funnel",
               "bar",
               "line",
+              "area",
               "pie",
               "stacked",
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
           },
           "title": {
             "type": "string",
@@ -735,6 +737,7 @@
               "funnel",
               "bar",
               "line",
+              "area",
               "pie",
               "stacked",
               "user_paths",
@@ -1281,8 +1284,7 @@
           "type",
           "anonymous_id",
           "version",
-          "channel",
-          "message_id"
+          "channel"
         ],
         "properties": {
           "type": {
@@ -1351,7 +1353,7 @@
           },
           "message_id": {
             "type": "string",
-            "description": "Unique ID for deduplication"
+            "description": "Unique ID for deduplication. Optional; a UUID is generated server-side when omitted."
           }
         }
       },
@@ -1991,7 +1993,7 @@
       "AnalyticsBehaviorFilters": {
         "name": "behavior_filters",
         "in": "query",
-        "description": "JSON array filtering users by event-based behavior with counts and either an absolute date range or a window relative to the user's first event. Each entry is `{ event, op, count, date_from?, date_to?, event_type?, relative_to?, window? }`. When `relative_to: \"first_seen\"` is set, the matching events must occur within `window.value` `window.unit` (`hour` | `day`) after the user's first event; `date_from`/`date_to` are ignored. `event_type` narrows matching to a specific event-type column (`page`, `connect`, `disconnect`, `chain`, `signature`, `transaction`, `track`, `decoded_log`, `detect`, `identify`); for `track` and `decoded_log` the `event` field is the named identifier; for other types only the `type` column is matched.",
+        "description": "JSON array filtering users by event-based behavior with counts and either an absolute date range or a window relative to the user's first event. Each entry is `{ event, op, times, date_from?, date_to?, event_type?, relative_to?, window? }`. When `relative_to: \"first_seen\"` is set, the matching events must occur within `window.value` `window.unit` (`hour` | `day`) after the user's first event; `date_from`/`date_to` are ignored. `event_type` narrows matching to a specific event-type column (`page`, `connect`, `disconnect`, `chain`, `signature`, `transaction`, `track`, `decoded_log`, `detect`, `identify`); for `track` and `decoded_log` the `event` field is the named identifier; for other types only the `type` column is matched.",
         "content": {
           "application/json": {
             "schema": {
@@ -2005,7 +2007,7 @@
                 "event": "swap",
                 "event_type": "track",
                 "op": "greaterOrEqual",
-                "count": 1,
+                "times": 1,
                 "relative_to": "first_seen",
                 "window": { "value": 24, "unit": "hour" }
               }
@@ -3443,8 +3445,8 @@
                         "type": "event",
                         "event": "page"
                       },
-                      "maxSteps": 8,
-                      "nodesPerStep": 10
+                      "maxSteps": 5,
+                      "nodesPerStep": 8
                     }
                   }
                 },
@@ -4501,6 +4503,29 @@
               }
             }
           },
+          "202": {
+            "description": "Wallet not yet profiled. Returned for a first-time lookup while the profile is still being built; retry after the given delay.",
+            "headers": {
+              "Retry-After": {
+                "schema": { "type": "integer" },
+                "description": "Seconds to wait before retrying."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "enum": ["processing"] },
+                    "address": { "type": "string" },
+                    "message": { "type": "string" },
+                    "retry_after": { "type": "integer", "description": "Seconds to wait before retrying." }
+                  }
+                },
+                "example": { "status": "processing", "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "message": "Wallet profile is being generated. Retry shortly.", "retry_after": 3 }
+              }
+            }
+          },
           "404": {
             "description": "Profile not found",
             "content": {
@@ -4731,8 +4756,7 @@
               "type": "string"
             },
             "description": "Wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
-          },
-          { "$ref": "#/components/parameters/IdempotencyKey" }
+          }
         ],
         "requestBody": {
           "required": true,
@@ -4954,8 +4978,7 @@
               "type": "string"
             },
             "description": "Wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
-          },
-          { "$ref": "#/components/parameters/IdempotencyKey" }
+          }
         ],
         "requestBody": {
           "required": true,
@@ -5061,8 +5084,7 @@
               "type": "string"
             },
             "description": "Wallet address. Accepts an EVM (0x...) or Solana address, or an ENS name (e.g. vitalik.eth) which is resolved to an address."
-          },
-          { "$ref": "#/components/parameters/IdempotencyKey" }
+          }
         ],
         "requestBody": {
           "required": true,

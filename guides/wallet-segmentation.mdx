@@ -23,7 +23,7 @@ Each row is a wallet. Every column is filterable. This is your segmentation star
 
 Click the **Filter** button to add conditions. You can filter by:
 
-- **Lifecycle**: New, Returning, Power User, Resurrected, At Risk, Churned
+- **Lifecycle**: New, Returning, Power user, Resurrected, At Risk, Churned
 - **Net Worth**: Exact ranges ($0-$10k, $10k-$100k, $100k+, custom)
 - **Wallet Labels**: Verified accounts, sanctions flags, passport scores
 - **Apps Used**: Filter to users who used specific dapps
@@ -88,7 +88,8 @@ Target high-net-worth users who are brand new.
 Filter config:
 - Net Worth: > $100,000
 - Lifecycle: New
-- Sessions: = 1
+
+Note: There's no "Sessions" filter in the Users page UI (session count is only queryable via [SQL Explorer](/guides/sql-explorer)). Lifecycle: New already narrows this to wallets in their first lifecycle stage.
 
 
 ### Recipe 2: Churned Power Users
@@ -97,8 +98,8 @@ Re-engage users who were once active but disappeared.
 
 Filter config:
 - Lifecycle: Churned
-- Sessions: > 10
-- No Activity: > 30 days
+
+Note: There's no "Sessions" or "No Activity" filter in the Users page UI. Lifecycle: Churned already selects wallets that have gone quiet; for a precise session-count or days-since-last-activity threshold, query `num_sessions` and `last_seen` via [SQL Explorer](/guides/sql-explorer).
 
 
 ### Recipe 3: Campaign Converts
@@ -127,7 +128,8 @@ Wake up large wallets that haven't returned recently.
 Filter config:
 - Net Worth: > $50,000
 - Lifecycle: Churned OR Returning
-- Last Activity: > 14 days ago
+
+Note: There's no "Last Activity" filter in the Users page UI. Lifecycle already reflects recency (Churned means gone quiet, Returning means recently reactivated); for a precise days-since-last-activity threshold, query `last_seen` via [SQL Explorer](/guides/sql-explorer).
 
 
 ## Targeting Recipes for Campaigns
@@ -149,7 +151,7 @@ Filter config:
 |--------|-----------|
 | Apps Used | Uniswap, Aave (or other DeFi protocols) |
 | Net Worth | > $50,000 |
-| Lifecycle | Power User OR Returning |
+| Lifecycle | Power user OR Returning |
 
 **Recipe: Churned Whales**
 
@@ -157,7 +159,6 @@ Filter config:
 |--------|-----------|
 | Net Worth | > $100,000 |
 | Lifecycle | Churned |
-| Last Activity | > 30 days ago |
 
 **Recipe: Competitor Users**
 

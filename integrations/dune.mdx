@@ -28,8 +28,11 @@ SELECT * FROM dune.ethereum.transactions
 ```
 
 <Note>
-  A query can only use **one** engine. You can't join a `dune` table with a
-  Formo table in the same query; they're separate databases.
+  Stick to **one** engine per query. Formo and Dune are separate databases,
+  so mixing `dune` tables with Formo tables in the same query (e.g. a join)
+  isn't meaningful. The editor shows a warning if it detects mixed engines,
+  but this is advisory: a cosmetic hint, not a rule the backend validates or
+  blocks.
 </Note>
 
 ## Add your Dune API key

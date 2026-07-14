@@ -591,7 +591,7 @@ curl -sS -X GET \
   -d '{
     "conditions": [
       { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
-      { "field": "users.ens", "op": "eq", "value": true },
+      { "field": "users.ens", "op": "eq", "value": "" },
       { "field": "chains.1.balance", "op": "gt", "value": 0 }
     ],
     "logic": "and"

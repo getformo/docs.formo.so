@@ -29,6 +29,10 @@ Every non-2xx response from the Formo Public API uses the same envelope:
 
 The HTTP status code carries success/failure; **success bodies are never wrapped** - `GET /v0/alerts/alrt_…` returns the alert directly.
 
+<Note>
+The events-gateway service (`events.formo.so`, used by [Track Event](/api/events/track) and `/v0/raw_events`) is a separate service and does not use this envelope. It returns a simpler plain-string error shape, for example `{"error": "Unauthorized"}`, with no `code`, `message`, or `doc_url`.
+</Note>
+
 ## Handling errors well
 
 1. **Branch on `code`, not `message` or status alone.** Status families collide (most validation issues are `400 BAD_REQUEST`); the `code` enum disambiguates.

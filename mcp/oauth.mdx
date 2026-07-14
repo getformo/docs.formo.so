@@ -24,7 +24,7 @@ https://api.formo.so/v0/mcp/
 </Note>
 
 <Note>
-  MCP requires a **Scale or Enterprise** plan. The plan is enforced during the OAuth flow: Free and Growth workspaces cannot complete authorization and receive a `403` error. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
+  MCP requires a **Scale or Enterprise** plan. The plan is enforced during the OAuth flow: Growth workspaces cannot complete authorization and receive a `403` error. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
 </Note>
 
 ## When to use OAuth
@@ -186,7 +186,7 @@ Use a Workspace API Key when your MCP client supports custom request headers and
 
 ## Troubleshooting
 
-**`403 MCP access requires a Scale or Enterprise plan`:** The signed-in workspace is on a Free or Growth plan. MCP authorization is gated server-side, so the OAuth flow will not complete. [Upgrade the workspace](https://app.formo.so) to a Scale or Enterprise plan, then reconnect.
+**`403 MCP access requires a Scale or Enterprise plan`:** The signed-in workspace is on a Growth plan. MCP authorization is gated server-side, so the OAuth flow will not complete. [Upgrade the workspace](https://app.formo.so) to a Scale or Enterprise plan, then reconnect.
 
 **Client does not start OAuth:** Confirm the MCP server URL is exactly `https://api.formo.so/v0/mcp/` and includes the trailing slash.
 

@@ -52,12 +52,17 @@ Flows can start from any event. Select what you want to analyze:
 
 ### Step 3: Configure the flow
 
-1. Select **Starting event** (e.g., `connect`)
-2. Choose **Direction**:
-   - **Forward**: What happens after this event
-   - **Backward**: What led to this event
-3. Set **Number of steps** (typically 3-5)
-4. Click **Generate**
+Flows are configured as a positional step list rather than a direction toggle. Each row's role is determined by its position:
+
+- **Start**: The first row is your starting event (e.g., `connect`)
+- **Anchor**: Middle rows are the events users pass through next
+- **End**: The last row is where the flow ends
+
+1. Add rows for each step you want to trace, in order
+2. Set **Number of steps** (typically 3-5)
+3. Click **Generate**
+
+Flows always trace forward from the starting event; there is no backward-tracing option.
 
 ### Step 4: Read the flow chart
 
@@ -93,7 +98,6 @@ Look for these insights:
 Analyze what users do after connecting their wallet:
 
 | Starting event | `connect` |
-| Direction | Forward |
 | Steps | 4 |
 
 **Typical findings:**
@@ -104,10 +108,10 @@ Analyze what users do after connecting their wallet:
 
 ### Example: Path to conversion
 
-See how users reach a conversion event:
+See what users do leading up to a conversion event by setting your conversion event as the last (End) step in the list, with earlier steps left open to discover common precursor actions:
 
-| Starting event | Your conversion event (e.g., `Swap`) |
-| Direction | Backward |
+| Starting event | A page view or wallet event that typically precedes conversion |
+| End event | Your conversion event (e.g., `Swap`) |
 | Steps | 3 |
 
 **Questions to answer:**
