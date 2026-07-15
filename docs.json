@@ -138,7 +138,6 @@
       },
       {
         "tab": "API",
-        "openapi": "api/openapi.json",
         "groups": [
           {
             "group": "API Documentation",
