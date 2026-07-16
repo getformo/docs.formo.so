@@ -1,0 +1,15 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://api.formo.so",
+      "service-desc": [{ "href": "https://api.formo.so/openapi.json", "type": "application/openapi+json" }],
+      "service-doc": [{ "href": "https://docs.formo.so/api", "type": "text/html" }],
+      "status": [{ "href": "https://status.formo.so" }]
+    },
+    {
+      "anchor": "https://api.formo.so/v0/mcp",
+      "service-desc": [{ "href": "https://api.formo.so/.well-known/mcp/server-card.json", "type": "application/json" }],
+      "service-doc": [{ "href": "https://docs.formo.so/mcp", "type": "text/html" }]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "serverInfo": {
+    "name": "formo-mcp",
+    "version": "1.0.0",
+    "description": "Formo MCP server: onchain product analytics, wallet intelligence, and Formo data querying.",
+    "websiteUrl": "https://docs.formo.so/mcp"
+  },
+  "remotes": [
+    { "url": "https://api.formo.so/v0/mcp", "transport": "http", "supportedProtocolVersions": ["2025-06-18"] }
+  ],
+  "capabilities": { "tools": true, "resources": false, "prompts": false }
+}
