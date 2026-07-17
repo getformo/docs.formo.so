@@ -190,6 +190,17 @@
             ]
           },
           {
+            "group": "Alerts API",
+            "pages": [
+              "api/alerts/list",
+              "api/alerts/get",
+              "api/alerts/create",
+              "api/alerts/update",
+              "api/alerts/delete",
+              "api/alerts/toggle"
+            ]
+          },
+          {
             "group": "Charts API",
             "pages": [
               "api/boards/list",
@@ -205,14 +216,6 @@
             ]
           },
           {
-            "group": "Segments API",
-            "pages": [
-              "api/segments/list",
-              "api/segments/create",
-              "api/segments/delete"
-            ]
-          },
-          {
             "group": "Contracts API",
             "pages": [
               "api/contracts/list",
@@ -223,14 +226,11 @@
             ]
           },
           {
-            "group": "Alerts API",
+            "group": "Segments API",
             "pages": [
-              "api/alerts/list",
-              "api/alerts/get",
-              "api/alerts/create",
-              "api/alerts/update",
-              "api/alerts/delete",
-              "api/alerts/toggle"
+              "api/segments/list",
+              "api/segments/create",
+              "api/segments/delete"
             ]
           }
         ]
