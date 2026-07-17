@@ -64,9 +64,12 @@ Once connected, try asking your AI assistant:
 
 ## Available tools
 
-The Formo MCP server exposes a curated set of tools, grouped below.
+The Formo MCP server exposes a curated set of tools, grouped below by the same
+categories as API key and OAuth permissions. Each tool is authorised against
+the matching permission on your API key (or on the OAuth consent you
+approved); a connection without it is denied with `insufficient scope`.
 
-**Core**
+**Query API** — SQL, exploration, and pre-built analytics endpoints. Permission: `query:read`.
 
 | Tool | Description |
 |:-----|:------------|
@@ -75,11 +78,6 @@ The Formo MCP server exposes a curated set of tools, grouped below.
 | `text_to_sql` | Convert natural language to SQL |
 | `list_endpoints` | List available API endpoints |
 | `list_datasources` | List available data sources |
-
-**Analytics endpoints**
-
-| Tool | Description |
-|:-----|:------------|
 | `kpis` | Get key performance indicators |
 | `distinct_values` | Get unique values for filtering |
 | `top_events` | View most common events |
@@ -100,26 +98,42 @@ The Formo MCP server exposes a curated set of tools, grouped below.
 | `cohort_analysis` | Cohort-based behavioral analysis |
 | `funnel` | Multi-step conversion funnels |
 | `flow` | User journey and path analysis |
+
+**Profiles API** — wallet enrichment. Permission: `profiles:read`.
+
+| Tool | Description |
+|:-----|:------------|
 | `search_profile` | Look up enrichment for a single wallet address (net worth, tokens, labels) |
 
-**Management**
-
-These read and change your project's configuration. Each one requires the
-matching permission on your API key (or on the OAuth consent you approved); a
-connection without it is denied with `insufficient scope`.
+**Alerts**
 
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
 | `list_alerts`, `get_alert` | Read alerts | `alerts:read` |
 | `create_alert`, `update_alert`, `toggle_alert`, `delete_alert` | Manage alerts | `alerts:write` |
-| `list_contracts`, `get_contract` | Read tracked contracts | `contracts:read` |
-| `create_contract`, `update_contract`, `toggle_contract_pipeline`, `delete_contract` | Manage tracked contracts | `contracts:write` |
+
+**Charts**
+
+| Tool | Description | Permission |
+|:-----|:------------|:-----------|
 | `list_boards`, `get_board`, `list_charts`, `get_chart` | Read boards and charts | `boards:read` |
 | `create_board`, `update_board`, `delete_board` | Manage boards | `boards:write` |
 | `create_chart`, `update_chart`, `delete_chart`, `duplicate_chart`, `move_chart` | Manage charts | `boards:write` |
+| `preview_chart` | Run a chart's SQL without saving | `query:read` |
+
+**Contracts**
+
+| Tool | Description | Permission |
+|:-----|:------------|:-----------|
+| `list_contracts`, `get_contract` | Read tracked contracts | `contracts:read` |
+| `create_contract`, `update_contract`, `toggle_contract_pipeline`, `delete_contract` | Manage tracked contracts | `contracts:write` |
+
+**Segments**
+
+| Tool | Description | Permission |
+|:-----|:------------|:-----------|
 | `list_segments` | Read segments | `segments:read` |
 | `create_segment`, `delete_segment` | Manage segments | `segments:write` |
-| `preview_chart` | Run a chart's SQL without saving | `query:read` |
 
 <Warning>
   The `delete_*` tools permanently remove data. They will not run unless the
@@ -127,7 +141,7 @@ connection without it is denied with `insufficient scope`.
   than delete on its own. Grant write permissions only to clients you trust.
 </Warning>
 
-**Docs**
+**Docs** — public Formo documentation; no permission required.
 
 | Tool | Description |
 |:-----|:------------|
@@ -159,13 +173,10 @@ connection without it is denied with `insufficient scope`.
 
 ## Troubleshooting
 
-**`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans. [Upgrade your workspace](https://app.formo.so) to connect MCP.
-
-**Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart or refresh your AI assistant after configuration changes.
-
-**OAuth issues:** See [MCP OAuth](/mcp/oauth) for OAuth setup, metadata, and troubleshooting.
-
-**API key issues:** See [MCP API Key](/mcp/api-key) for API key setup and troubleshooting.
+- **`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans. [Upgrade your workspace](https://app.formo.so) to connect MCP.
+- **Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart or refresh your AI assistant after configuration changes.
+- **OAuth issues:** See [MCP OAuth](/mcp/oauth) for OAuth setup, metadata, and troubleshooting.
+- **API key issues:** See [MCP API Key](/mcp/api-key) for API key setup and troubleshooting.
 
 ### Security
 
