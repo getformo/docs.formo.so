@@ -15,6 +15,10 @@ You'll need to include the key or token in the request headers for all API calls
 
 Find your API key in your workspace settings. Create one with the appropriate scope if you don't have one yet.
 
+<Info>
+  Workspace API keys require a **Scale or Enterprise** plan. [Upgrade your workspace](https://app.formo.so) to create one.
+</Info>
+
 <Frame>
 	<img
 		src="/images/workspace-api-key.png"
@@ -36,22 +40,22 @@ Authorization: Bearer <your_workspace_api_key>
 
 When creating a Workspace API Key, select the scopes your key needs. Each API endpoint requires a specific scope.
 
-| Scope | Description | Required Plan |
-|-------|-------------|---------------|
-| `profiles:read` | Search and get wallet profiles | Scale / Enterprise |
-| `profiles:write` | Import wallet addresses (requires profiles:read) | Scale / Enterprise |
-| `query:read` | Execute SQL analytics queries | Scale / Enterprise |
-| `alerts:read` | List and get alerts | Scale / Enterprise |
-| `alerts:write` | Create, update, delete alerts (requires alerts:read) | Scale / Enterprise |
-| `boards:read` | List and get boards and charts | Any plan |
-| `boards:write` | Create, update, delete boards and charts (requires boards:read) | Any plan |
-| `contracts:read` | List contracts | Any plan |
-| `contracts:write` | Create, update, delete contracts (requires contracts:read) | Any plan |
-| `segments:read` | List segments | Any plan |
-| `segments:write` | Create and delete segments (requires segments:read) | Any plan |
+| Scope | Description |
+|-------|-------------|
+| `profiles:read` | Search and get wallet profiles |
+| `profiles:write` | Import wallet addresses (requires profiles:read) |
+| `query:read` | Execute SQL analytics queries |
+| `alerts:read` | List and get alerts |
+| `alerts:write` | Create, update, delete alerts (requires alerts:read) |
+| `boards:read` | List and get boards and charts |
+| `boards:write` | Create, update, delete boards and charts (requires boards:read) |
+| `contracts:read` | List contracts |
+| `contracts:write` | Create, update, delete contracts (requires contracts:read) |
+| `segments:read` | List segments |
+| `segments:write` | Create and delete segments (requires segments:read) |
 
 <Note>
-  Write scopes automatically require the corresponding read scope. Profiles, Query, and Alerts scopes require a Scale or Enterprise plan. Create keys with the required scopes in Team Settings &gt; API Keys.
+  Write scopes automatically require the corresponding read scope. Create keys with the required scopes in Team Settings &gt; API Keys.
 </Note>
 
 ## SDK Write Key
