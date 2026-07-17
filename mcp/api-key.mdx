@@ -30,7 +30,7 @@ https://api.formo.so/v0/mcp/
 1. Go to your [Formo workspace settings](https://app.formo.so)
 2. Navigate to **Settings** → **API Keys**
 3. Click **Create API Key**
-4. Enable the permissions you need. **Analytics API** read covers analytics and SQL; add **Alerts**, **Charts**, **Contracts** or **Segments** to let it read or manage those.
+4. Enable the permissions you need. **Query API** read covers analytics and SQL; add **Alerts**, **Charts**, **Contracts** or **Segments** to let it read or manage those.
 5. Copy the generated key
 
 Use the API key as a Bearer token:
@@ -208,7 +208,7 @@ Select your client below to configure Formo with API key authentication.
 
 **Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart your AI assistant after configuration changes.
 
-**`insufficient scope` on a tool call:** the key is missing that tool's permission. Analytics and SQL tools need **Analytics API** read; managing alerts, charts, contracts or segments needs the matching permission. There is no separate MCP scope to enable.
+**`insufficient scope` on a tool call:** the key is missing that tool's permission. Analytics and SQL tools need **Query API** read; managing alerts, charts, contracts or segments needs the matching permission. There is no separate MCP scope to enable.
 
 **Authentication errors:** Ensure the API key is sent as `Authorization: Bearer YOUR_API_KEY`. Check that the API key has not been revoked.
 

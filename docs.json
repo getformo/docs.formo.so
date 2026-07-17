@@ -167,7 +167,7 @@
             ]
           },
           {
-            "group": "Analytics API",
+            "group": "Query API",
             "pages": [
               "api/query",
               "api/query/kpis",
