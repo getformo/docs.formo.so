@@ -16,7 +16,7 @@ Set `group_by` to a dimension (`device`, `browser`, `os`, `location`, `referrer`
 
 ## Defining steps
 
-The `steps` query parameter is a JSON-encoded array of 2–10 step specs. Each step is `{type, event, name, filters?: [...]}`:
+The `steps` query parameter is a JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [...]}`:
 
 - **`type`** - event type (`event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`).
 - **`event`** - the event name to match.

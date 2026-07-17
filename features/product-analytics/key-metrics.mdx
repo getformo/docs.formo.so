@@ -94,7 +94,7 @@ The Formo SDK automatically adds the following UTM parameters present on the pag
 
 ### Referrer URL tracking
 
-Referrer URL tracking lets you understand the specific URL where your users are coming from – as long as the site has the correct `Referer-Policy` header set.
+Referrer URL tracking lets you understand the specific URL where your users are coming from, as long as the site has the correct `Referer-Policy` header set.
 
 We recommend setting the `no-referrer-when-downgrade` <a target="_blank" rel="noopener noreferrer" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#no-referrer-when-downgrade">policy</a>, which will only send the domain, path, and query parameters to the destination URL as long as the protocol security level stays the same (i.e. `HTTP` → `HTTP`, or `HTTPS` → `HTTPS`).
 
