@@ -7,17 +7,14 @@ description: 'Connect AI agents, coding tools, and your own apps to Formo with M
 
 ## Overview
 
-The Formo MCP Server lets AI assistants, code editors, and custom integrations query your analytics data directly. Ask questions about your users, events, and metrics in natural language.
-
-The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open standard that allows AI assistants to connect to external data sources and tools. With Formo's MCP server, you can ask:
+The Formo MCP Server lets AI assistants, code editors, and custom integrations query your analytics data in natural language, using [MCP](https://modelcontextprotocol.io/), an open standard for connecting AI assistants to external data. For example:
 
 - "How many daily active users did we have last week?"
 - "What are the top acquisition sources this month?"
 - "Show me user retention by cohort"
-- "Which pages have the highest bounce rate?"
 
 <Warning>
-  The Formo MCP server requires a **Scale or Enterprise** plan. This applies to both OAuth and Workspace API key connections. Growth workspaces cannot connect to MCP and will receive a `403` error (`MCP access requires a Scale or Enterprise plan`). [Upgrade your workspace](https://app.formo.so) to enable MCP access.
+  The Formo MCP server requires a **Scale or Enterprise** plan. This applies to both OAuth and Workspace API key connections.
 </Warning>
 
 ## Getting started
@@ -26,37 +23,30 @@ The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open 
 
 Formo supports two authentication methods for MCP:
 
-- **OAuth** for clients that manage user sign-in. Users sign in to Formo, select a project on the consent page, and choose which permissions to approve.
+- **OAuth (Recommended)** for clients that manage user sign-in. Users sign in to Formo, select a project on the consent page, and choose which permissions to approve.
 - **Workspace API keys** for clients that let you configure an `Authorization` header manually.
 
-<Note>
-  The MCP server URL is always `https://api.formo.so/v0/mcp/`. Keep the trailing slash and do not use the API root URL.
-</Note>
-
 <CardGroup cols={2}>
-  <Card title="OAuth setup" icon="key" href="/mcp/oauth">
+  <Card title="OAuth" icon="key" href="/mcp/oauth">
     Connect OAuth-capable MCP clients to Formo.
   </Card>
-  <Card title="API key setup" icon="brackets-curly" href="/mcp/api-key">
-    Configure local clients, editors, and CLI bridges with a Workspace API Key.
+  <Card title="API Key" icon="brackets-curly" href="/mcp/api-key">
+    Configure local clients, editors, and tools with an API Key.
   </Card>
 </CardGroup>
 
 ## Example questions
 
-Once connected, try asking your AI assistant:
-
 **Product analytics**
 - "What are my KPIs for the last 7 days?"
-- "What are my top traffic sources?"
-- "Which pages have the highest engagement?"
-- "Show me traffic by country"
-- "What are the most common events?"
-
-**SQL Explorer**
-- "How many users signed up this week?"
 - "Show me daily active users for the past month"
+- "Which lifecycle stage are most of my users in?"
 - "What's the conversion rate from page view to wallet connection?"
+
+**Marketing attribution**
+- "What are my top traffic sources?"
+- "Show me conversion by UTM source"
+- "Which countries are my users coming from?"
 
 **Wallet intelligence**
 - "Look up the profile for this wallet address, including its net worth"
@@ -64,12 +54,13 @@ Once connected, try asking your AI assistant:
 
 ## Available tools
 
-The Formo MCP server exposes a curated set of tools, grouped below by the same
-categories as API key and OAuth permissions. Each tool is authorised against
-the matching permission on your API key (or on the OAuth consent you
-approved); a connection without it is denied with `insufficient scope`.
+Tools are grouped below by the permission they require. A connection without
+that permission is denied with `insufficient scope`.
 
-**Query API** — SQL, exploration, and pre-built analytics endpoints. Permission: `query:read`.
+### Query API
+
+SQL, exploration, and pre-built analytics endpoints.
+Permission: `query:read`.
 
 | Tool | Description |
 |:-----|:------------|
@@ -99,20 +90,23 @@ approved); a connection without it is denied with `insufficient scope`.
 | `funnel` | Multi-step conversion funnels |
 | `flow` | User journey and path analysis |
 
-**Profiles API** — wallet enrichment. Permission: `profiles:read`.
+### Profiles API
+
+Wallet enrichment.
+Permission: `profiles:read`.
 
 | Tool | Description |
 |:-----|:------------|
 | `search_profile` | Look up enrichment for a single wallet address (net worth, tokens, labels) |
 
-**Alerts**
+### Alerts
 
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
 | `list_alerts`, `get_alert` | Read alerts | `alerts:read` |
 | `create_alert`, `update_alert`, `toggle_alert`, `delete_alert` | Manage alerts | `alerts:write` |
 
-**Charts**
+### Charts
 
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
@@ -121,14 +115,14 @@ approved); a connection without it is denied with `insufficient scope`.
 | `create_chart`, `update_chart`, `delete_chart`, `duplicate_chart`, `move_chart` | Manage charts | `boards:write` |
 | `preview_chart` | Run a chart's SQL without saving | `query:read` |
 
-**Contracts**
+### Contracts
 
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
 | `list_contracts`, `get_contract` | Read tracked contracts | `contracts:read` |
 | `create_contract`, `update_contract`, `toggle_contract_pipeline`, `delete_contract` | Manage tracked contracts | `contracts:write` |
 
-**Segments**
+### Segments
 
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
@@ -141,7 +135,9 @@ approved); a connection without it is denied with `insufficient scope`.
   than delete on its own. Grant write permissions only to clients you trust.
 </Warning>
 
-**Docs** — public Formo documentation; no permission required.
+### Docs
+
+Public Formo documentation; no permission required.
 
 | Tool | Description |
 |:-----|:------------|
@@ -149,22 +145,20 @@ approved); a connection without it is denied with `insufficient scope`.
 | `query_docs_filesystem_formo_docs` | Query the Formo docs filesystem |
 
 <Note>
-  The exact set of tools depends on your project's configured endpoints. Use `list_endpoints` to discover what's available for your project.
+  The exact set of tools depends on your project's configured endpoints. Use `list_endpoints` to discover what's available for your project, or `text_to_sql` + `execute_query` for anything beyond them.
 </Note>
-
-`lifecycle`, `retention`, `frequency`, and `project_users` are first-class MCP tools. For cohort exports or anything beyond these endpoints, use `text_to_sql` + `execute_query` to query the datasources directly.
 
 ## FAQ
 
 <AccordionGroup>
   <Accordion title="Which AI tools support the Formo MCP Server?">
-    The Formo MCP Server works with OAuth-capable MCP clients, Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any AI client that supports HTTP or stdio MCP transports. See the OAuth and API key setup pages above for configuration instructions.
+    Any OAuth-capable or HTTP/stdio MCP client. See [Getting started](#getting-started) for the supported client list and setup instructions.
   </Accordion>
   <Accordion title="What analytics data can I query through the MCP Server?">
-    You can query KPIs, traffic sources, top pages, top events, geographic distribution, revenue, lifecycle, retention, frequency, cohorts, funnels, and wallet enrichment. Most of these are available as first-class tools (see [Available tools](#available-tools)).
+    Anything in the [Available tools](#available-tools) table: KPIs, traffic sources, pages, events, geography, revenue, lifecycle, retention, cohorts, funnels, and wallet enrichment.
   </Accordion>
   <Accordion title="Is my analytics data secure when using the MCP Server?">
-    Access is scoped to one Formo project and to the permissions you grant. OAuth users select the project and approve permissions on the consent page; API keys are project-specific and carry their own permissions. A connection can only read analytics if it has `query:read`, and can only change alerts, charts, contracts or segments if you granted the matching write permission, so read-only access is what you get unless you opt in. Deletions additionally require an explicit confirmation. No data is stored by the MCP server itself.
+    Yes, access is scoped to one project and the permissions you grant. See [Security](#security) for details.
   </Accordion>
   <Accordion title="Can I still use an API key?">
     Yes. OAuth is additive. Existing Workspace API Key configurations continue to work with `Authorization: Bearer YOUR_API_KEY`.
@@ -173,15 +167,15 @@ approved); a connection without it is denied with `insufficient scope`.
 
 ## Troubleshooting
 
-- **`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans. [Upgrade your workspace](https://app.formo.so) to connect MCP.
+- **`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans.
 - **Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart or refresh your AI assistant after configuration changes.
 - **OAuth issues:** See [MCP OAuth](/mcp/oauth) for OAuth setup, metadata, and troubleshooting.
 - **API key issues:** See [MCP API Key](/mcp/api-key) for API key setup and troubleshooting.
 
 ### Security
 
-The Formo MCP server is scoped to a single project and to the permissions granted to the connection. OAuth access is scoped to the project selected on the Formo consent page; API key access is scoped to the project attached to the key.
-
-Every tool call is authorised against the granted per-resource permissions, so a connection with only `query:read` can read analytics and nothing else. Tools that change your project require the matching write permission (`alerts:write`, `boards:write`, `contracts:write`, `segments:write`), and tools that delete require an explicit `"confirm": true` on the call.
-
-You can review and change what a connected app is allowed to do, or disconnect it, under **Settings** → **Connected apps**. Disconnecting takes effect on the app's next request. Changing permissions applies when the app reconnects. MCP sessions expire after 1 hour of inactivity.
+- **Project-scoped:** each connection is limited to one project, either selected on the OAuth consent page or attached to the API key.
+- **Permission-scoped:** every tool call requires the matching permission (e.g. `query:read` to read analytics, `alerts:write` to change alerts); deletes additionally require `"confirm": true`.
+- **Owner/admin only:** only a workspace owner or admin can create a connection.
+- **Nothing retained:** the MCP server itself stores no data.
+- **Manage anytime:** review, change, or revoke access under **Settings** → **Connected apps**. Disconnects apply immediately; permission changes apply on reconnect. Sessions expire after 1 hour of inactivity.

@@ -22,10 +22,12 @@ https://api.formo.so/v0/mcp/
 </Note>
 
 <Note>
-  MCP requires a **Scale or Enterprise** plan. Connections from Growth workspaces are rejected with a `403` error, even with a valid API key. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
+  MCP requires a **Scale or Enterprise** plan. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
 </Note>
 
-## Create an API key
+## Prerequisites
+
+Requires an owner or admin role on the workspace.
 
 1. Go to your [Formo workspace settings](https://app.formo.so)
 2. Navigate to **Settings** → **API Keys**
@@ -204,14 +206,9 @@ Select your client below to configure Formo with API key authentication.
 
 ## Troubleshooting
 
-**`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans. A valid API key is not sufficient on a Growth workspace. [Upgrade your workspace](https://app.formo.so) to connect MCP.
-
-**Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart your AI assistant after configuration changes.
-
-**`insufficient scope` on a tool call:** the key is missing that tool's permission. Analytics and SQL tools need **Query API** read; managing alerts, charts, contracts or segments needs the matching permission. There is no separate MCP scope to enable.
-
-**Authentication errors:** Ensure the API key is sent as `Authorization: Bearer YOUR_API_KEY`. Check that the API key has not been revoked.
-
-**Wrong project data:** Workspace API keys are project-specific. Create or use a key attached to the project you want the MCP client to query.
-
-**Claude Desktop not connecting:** Ensure Node.js is installed and accessible from the command line. Check Claude Desktop logs: `~/Library/Logs/Claude/` on macOS.
+- **`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans. A valid API key is not sufficient on a Growth workspace. [Upgrade your workspace](https://app.formo.so) to connect MCP.
+- **Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart your AI assistant after configuration changes.
+- **`insufficient scope` on a tool call:** the key is missing that tool's permission. Analytics and SQL tools need **Query API** read; managing alerts, charts, contracts or segments needs the matching permission. There is no separate MCP scope to enable.
+- **Authentication errors:** Ensure the API key is sent as `Authorization: Bearer YOUR_API_KEY`. Check that the API key has not been revoked.
+- **Wrong project data:** Workspace API keys are project-specific. Create or use a key attached to the project you want the MCP client to query.
+- **Claude Desktop not connecting:** Ensure Node.js is installed and accessible from the command line. Check Claude Desktop logs: `~/Library/Logs/Claude/` on macOS.
