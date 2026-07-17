@@ -13,27 +13,23 @@ Formo supports OAuth for remote MCP clients that can discover and complete an OA
   <img src="/images/mcp-oauth-claude.png" alt="Formo OAuth consent page for MCP clients" />
 </Frame>
 
-The MCP endpoint does not change:
+The MCP endpoint is:
 
 ```text
 https://api.formo.so/v0/mcp/
 ```
 
 <Note>
-  Always configure the MCP endpoint as `/v0/mcp/` with the trailing slash. Do not use `https://api.formo.so/` as the MCP server URL.
+  Keep the trailing slash in `/v0/mcp/`. Do not use `https://api.formo.so/` as the MCP server URL.
 </Note>
 
 <Note>
-  MCP requires a **Scale or Enterprise** plan. The plan is enforced during the OAuth flow: Growth workspaces cannot complete authorization and receive a `403` error. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
+  MCP requires a **Scale or Enterprise** plan. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
 </Note>
-
-## When to use OAuth
-
-Use OAuth when the MCP client manages authentication for users. The setup examples below cover common hosted web clients.
 
 ## Setup
 
-Select your web client below to configure Formo with OAuth authentication.
+Select your client below.
 
 <Tabs>
   <Tab title="Claude.ai">
@@ -130,8 +126,8 @@ Select your web client below to configure Formo with OAuth authentication.
   </Tab>
 </Tabs>
 
-<Card title="Example queries" icon="message-question" href="/mcp/overview#example-queries">
-  Try prompts you can ask once Formo is connected.
+<Card title="Example questions" icon="message-question" href="/mcp/overview#example-questions">
+  Try questions you can ask once Formo is connected.
 </Card>
 
 ## Scopes
@@ -140,19 +136,29 @@ Formo MCP OAuth supports only these scopes:
 
 | Scope | Description |
 |:------|:------------|
+| `profiles:read` / `profiles:write` | Read or manage wallet profiles |
 | `query:read` | Analytics and SQL tools for the selected project |
 | `alerts:read` / `alerts:write` | Read or manage alerts |
 | `boards:read` / `boards:write` | Read or manage charts and boards |
 | `contracts:read` / `contracts:write` | Read or manage tracked contracts |
 | `segments:read` / `segments:write` | Read or manage segments |
-| `profiles:read` / `profiles:write` | Read or manage wallet profiles |
 | `offline_access` | Allows the MCP client to refresh access without asking the user to sign in again |
 
 Formo does not expose `mcp:tools` or `mcp:resources` scopes. Each tool call is authorised against the granted per-resource scopes above.
 
 OAuth access is bound to the project selected on the Formo consent page. The MCP server validates that the user still has access to that project before serving requests.
 
-## Advanced details
+## Troubleshooting
+
+- **`403 MCP access requires a Scale or Enterprise plan`:** The signed-in workspace is on a Growth plan. MCP authorization is gated server-side, so the OAuth flow will not complete. [Upgrade the workspace](https://app.formo.so) to a Scale or Enterprise plan, then reconnect.
+- **Client does not start OAuth:** Confirm the MCP server URL is exactly `https://api.formo.so/v0/mcp/` and includes the trailing slash.
+- **Invalid scope:** Request supported scopes only (see the table above), plus `offline_access` when refresh is needed.
+- **Consent page asks you to sign in again:** Sign in to Formo and you will be returned to the same OAuth authorization flow.
+- **No projects are available:** The signed-in Formo account must be an owner or admin of a team with at least one project.
+- **Project access denied after connecting:** Reconnect and choose a project that your Formo user can still access.
+- **API key stopped working:** OAuth does not replace API keys. Check that the key has the permission the failing tool needs (analytics and SQL need `query:read`), has not been revoked, and is sent as `Authorization: Bearer <workspace_api_key>`.
+
+## OAuth discovery
 
 Most OAuth-capable MCP clients discover Formo's OAuth configuration automatically from the MCP server URL:
 
@@ -171,36 +177,3 @@ Unauthenticated requests return a `401` with a `WWW-Authenticate` challenge that
 
   The `openid-configuration` path is an alias that returns the same OAuth authorization-server metadata for clients that look there. Formo MCP is OAuth 2.0 only and does not implement full OpenID Connect.
 </Accordion>
-
-## API key compatibility
-
-OAuth and API key authentication both use the same MCP endpoint:
-
-```text
-https://api.formo.so/v0/mcp/
-```
-
-The backend accepts either:
-
-- `Authorization: Bearer <oauth_access_token>`
-- `Authorization: Bearer <workspace_api_key>`
-
-Existing Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and `mcp-remote` configurations do not need to change. For setup instructions, see [MCP API Key](/mcp/api-key).
-
-Use a Workspace API Key when your MCP client supports custom request headers and you want to manage credentials yourself, such as local developer tools, CLI bridges, and editor integrations.
-
-## Troubleshooting
-
-**`403 MCP access requires a Scale or Enterprise plan`:** The signed-in workspace is on a Growth plan. MCP authorization is gated server-side, so the OAuth flow will not complete. [Upgrade the workspace](https://app.formo.so) to a Scale or Enterprise plan, then reconnect.
-
-**Client does not start OAuth:** Confirm the MCP server URL is exactly `https://api.formo.so/v0/mcp/` and includes the trailing slash.
-
-**Invalid scope:** Request supported scopes only (see the table above), plus `offline_access` when refresh is needed.
-
-**Consent page asks you to sign in again:** Sign in to Formo and you will be returned to the same OAuth authorization flow.
-
-**No projects are available:** The signed-in Formo account must belong to at least one team with a project.
-
-**Project access denied after connecting:** Reconnect and choose a project that your Formo user can still access.
-
-**API key stopped working:** OAuth does not replace API keys. Check that the key has the permission the failing tool needs (analytics and SQL need `query:read`), has not been revoked, and is sent as `Authorization: Bearer <workspace_api_key>`.

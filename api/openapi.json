@@ -5231,7 +5231,7 @@
       "post": {
         "operationId": "importWallets",
         "summary": "Import wallet addresses",
-        "description": "Import wallet addresses into the project. Requires profiles:write scope and Scale/Enterprise plan.",
+        "description": "Import wallet addresses into the project. Requires profiles:write scope.",
         "tags": [
           "Profiles"
         ],
