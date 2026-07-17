@@ -26,7 +26,7 @@ The [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) is an open 
 
 Formo supports two authentication methods for MCP:
 
-- **OAuth** for clients that manage user sign-in. Users sign in to Formo, select a project on the consent page, and approve read-only MCP access.
+- **OAuth** for clients that manage user sign-in. Users sign in to Formo, select a project on the consent page, and choose which permissions to approve.
 - **Workspace API keys** for clients that let you configure an `Authorization` header manually.
 
 <Note>
@@ -102,6 +102,31 @@ The Formo MCP server exposes a curated set of tools, grouped below.
 | `flow` | User journey and path analysis |
 | `search_profile` | Look up enrichment for a single wallet address (net worth, tokens, labels) |
 
+**Management**
+
+These read and change your project's configuration. Each one requires the
+matching permission on your API key (or on the OAuth consent you approved); a
+connection without it is denied with `insufficient scope`.
+
+| Tool | Description | Permission |
+|:-----|:------------|:-----------|
+| `list_alerts`, `get_alert` | Read alerts | `alerts:read` |
+| `create_alert`, `update_alert`, `toggle_alert`, `delete_alert` | Manage alerts | `alerts:write` |
+| `list_contracts`, `get_contract` | Read tracked contracts | `contracts:read` |
+| `create_contract`, `update_contract`, `toggle_contract_pipeline`, `delete_contract` | Manage tracked contracts | `contracts:write` |
+| `list_boards`, `get_board`, `list_charts`, `get_chart` | Read boards and charts | `boards:read` |
+| `create_board`, `update_board`, `delete_board` | Manage boards | `boards:write` |
+| `create_chart`, `update_chart`, `delete_chart`, `duplicate_chart`, `move_chart` | Manage charts | `boards:write` |
+| `list_segments` | Read segments | `segments:read` |
+| `create_segment`, `delete_segment` | Manage segments | `segments:write` |
+| `preview_chart` | Run a chart's SQL without saving | `query:read` |
+
+<Warning>
+  The `delete_*` tools permanently remove data. They will not run unless the
+  call passes `"confirm": true`, so an assistant has to ask you first rather
+  than delete on its own. Grant write permissions only to clients you trust.
+</Warning>
+
 **Docs**
 
 | Tool | Description |
@@ -125,7 +150,7 @@ The Formo MCP server exposes a curated set of tools, grouped below.
     You can query KPIs, traffic sources, top pages, top events, geographic distribution, revenue, lifecycle, retention, frequency, cohorts, funnels, and wallet enrichment. Most of these are available as first-class tools (see [Available tools](#available-tools)).
   </Accordion>
   <Accordion title="Is my analytics data secure when using the MCP Server?">
-    Yes. The MCP Server provides read-only access scoped to one Formo project. OAuth users select the project during consent, and API keys are project-specific. No data is stored by the MCP server itself.
+    Access is scoped to one Formo project and to the permissions you grant. OAuth users select the project and approve permissions on the consent page; API keys are project-specific and carry their own permissions. A connection can only read analytics if it has `query:read`, and can only change alerts, charts, contracts or segments if you granted the matching write permission, so read-only access is what you get unless you opt in. Deletions additionally require an explicit confirmation. No data is stored by the MCP server itself.
   </Accordion>
   <Accordion title="Can I still use an API key?">
     Yes. OAuth is additive. Existing Workspace API Key configurations continue to work with `Authorization: Bearer YOUR_API_KEY`.
@@ -144,4 +169,8 @@ The Formo MCP server exposes a curated set of tools, grouped below.
 
 ### Security
 
-The Formo MCP server provides read-only access to analytics data. OAuth access is scoped to the project selected on the Formo consent page. API key access is scoped to the project attached to the key. MCP sessions expire after 1 hour of inactivity.
+The Formo MCP server is scoped to a single project and to the permissions granted to the connection. OAuth access is scoped to the project selected on the Formo consent page; API key access is scoped to the project attached to the key.
+
+Every tool call is authorised against the granted per-resource permissions, so a connection with only `query:read` can read analytics and nothing else. Tools that change your project require the matching write permission (`alerts:write`, `boards:write`, `contracts:write`, `segments:write`), and tools that delete require an explicit `"confirm": true` on the call.
+
+You can review and change what a connected app is allowed to do, or disconnect it, under **Settings** → **Connected apps**. Disconnecting takes effect on the app's next request. Changing permissions applies when the app reconnects. MCP sessions expire after 1 hour of inactivity.
