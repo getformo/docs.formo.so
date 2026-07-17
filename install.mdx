@@ -207,7 +207,7 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
 
   ## **5. CRITICAL INSTRUCTIONS FOR AI MODELS**
 
-  ### **5.1 – ALWAYS DO THE FOLLOWING**
+  ### **5.1: ALWAYS DO THE FOLLOWING**
   1. **Detect the framework** (Wagmi, React, Next.js App Router, or Next.js Pages Router) and use the matching approach.
   2. **Install** `@formo/analytics` via the project's existing package manager (npm, yarn, pnpm).
   3. **Wrap** the app with `<FormoAnalyticsProvider>`. For Wagmi, place it inside `<WagmiProvider>` and `<QueryClientProvider>`.
@@ -219,7 +219,7 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
   9. **Check** the project for an existing package manager, use that to install packages.
   10. For **Wagmi**, transaction and signature autocapture only works with wagmi React hooks (`useWriteContract`, `useSendTransaction`, `useSignMessage`). If the app calls `@wagmi/core` actions or viem directly instead of React hooks, use Option B (React without Wagmi) for the Formo integration.
 
-  ### **5.2 – NEVER DO THE FOLLOWING**
+  ### **5.2: NEVER DO THE FOLLOWING**
   1. **Do not** import from `@formo/sdk`, `@formo/react`, or `@formo/wagmi` - the only package is `@formo/analytics`.
   2. **Do not** use `useAnalytics()` - the correct hook is `useFormo()`.
   3. **Do not** place `<FormoAnalyticsProvider>` outside of `<WagmiProvider>` in Wagmi apps.
@@ -227,7 +227,7 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
   5. **Do not** use `useFormo()` in Next.js Server Components - it only works in Client Components.
   6. **Do not** mix App Router (`app/layout.tsx`) and Pages Router (`pages/_app.tsx`) patterns.
 
-  ### **5.3 – OUTDATED PATTERNS TO AVOID**
+  ### **5.3: OUTDATED PATTERNS TO AVOID**
   // ❌ Wrong packages:
   import { FormoAnalytics } from '@formo/sdk'
   import { FormoProvider } from '@formo/react'
