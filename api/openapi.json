@@ -5288,7 +5288,7 @@
         "summary": "Execute SQL query",
         "description": "Execute a SQL query against the project's analytics data. Only SELECT and WITH statements are allowed. LIMIT is capped at 1,000,000. Forbidden keywords: INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, etc.",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "requestBody": {
           "required": true,
@@ -5411,7 +5411,7 @@
         "summary": "Get KPIs (sessions, pageviews, bounce rate, session duration)",
         "description": "Time-series traffic KPIs with optional dimension breakdown. Returns `sessions` (session count), pageviews, bounce rate and average session length. When `include_previous_period=true` without `group_by`, the response also includes `visitors` (unique visitors), `visitors_current` and `visitors_previous`.",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5559,7 +5559,7 @@
         "summary": "Get top pages by sessions or visitors, optionally restricted to entry or exit pages",
         "description": "Returns the most visited pages with traffic metrics. Pass `mode=entry` to restrict to the first page of each session (with `bounce_rate`) or `mode=exit` for the last page (with `exit_rate`). Default `mode=all` returns project-wide page metrics with anon-per-session visitor counts.",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5684,7 +5684,7 @@
         "operationId": "getAnalyticsTopSources",
         "summary": "Get top traffic sources (referrers / utm)",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5822,7 +5822,7 @@
         "operationId": "getAnalyticsTopLocations",
         "summary": "Get top countries",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -5937,7 +5937,7 @@
         "operationId": "getAnalyticsTopWallets",
         "summary": "Get top wallet types",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6044,7 +6044,7 @@
         "operationId": "getAnalyticsTopChains",
         "summary": "Get top blockchain chains",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6151,7 +6151,7 @@
         "operationId": "getAnalyticsTopEvents",
         "summary": "Get top events by frequency",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6276,7 +6276,7 @@
         "operationId": "getAnalyticsRevenueByMetric",
         "summary": "Get revenue grouped by a chosen column",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6401,7 +6401,7 @@
         "operationId": "getAnalyticsVolumeByMetric",
         "summary": "Get transaction volume grouped by a chosen column",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6526,7 +6526,7 @@
         "operationId": "getAnalyticsRevenueOverview",
         "summary": "Get revenue and transaction volume time-series",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6651,7 +6651,7 @@
         "summary": "Get per-event revenue and volume trend for a single wallet",
         "description": "Returns daily per-event revenue and volume rows for the given wallet `address`. Scoped per wallet; there is no project-wide aggregate mode on this endpoint.",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6777,7 +6777,7 @@
         "operationId": "getAnalyticsEventTimeseries",
         "summary": "Get event count time-series",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -6897,7 +6897,7 @@
         "summary": "Get user lifecycle stages (New / Returning / Power user / Resurrected / At Risk / Churned)",
         "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -7054,7 +7054,7 @@
         "operationId": "getAnalyticsFrequency",
         "summary": "Get visit-frequency distribution",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -7194,7 +7194,7 @@
         "operationId": "getAnalyticsRetention",
         "summary": "Get user retention cohorts",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -7409,7 +7409,7 @@
         "summary": "Get multi-step conversion funnel",
         "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | startsWith | endsWith | includes`. `operand` may target a standard event column or a JSON property on `properties`.",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -7645,7 +7645,7 @@
         "summary": "Get session-scoped user-flow transitions (Sankey)",
         "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the endpoint rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour; every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).",
         "tags": [
-          "Query"
+          "Analytics"
         ],
         "x-required-scope": "query:read",
         "parameters": [
@@ -8147,7 +8147,7 @@
       "description": "Wallet profiles and import"
     },
     {
-      "name": "Query",
+      "name": "Analytics",
       "description": "Execute SQL queries and call pre-built analytics endpoints (KPIs, top pages, lifecycle, retention, revenue). Requires the query:read scope."
     },
     {

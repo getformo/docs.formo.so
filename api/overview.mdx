@@ -1,7 +1,7 @@
 ---
 title: 'API overview'
 sidebarTitle: 'Overview'
-description: 'Explore the Formo API suite including the Events API for data ingestion, Query API for SQL analytics, and Profiles API for wallet data and personalization.'
+description: 'Explore the Formo API suite including the Events API for data ingestion, Analytics API for SQL queries, and Profiles API for wallet data and personalization.'
 icon: square-info
 iconType: solid
 ---
@@ -25,7 +25,7 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 - Real-time activation API for personalized user experiences
 - Available via [x402](https://www.x402.org/) (`formo.x402.paysponge.com`) and [MPP](https://mpp.dev/) (`formo.mpp.paysponge.com`): pay per request, no API key required
 
-## Query API
+## Analytics API
 
 - Connect BI tools and SQL clients via [BI integration](/data/bi).
 - Query and filter raw analytics events, materialized views, and metrics.
@@ -96,7 +96,7 @@ List endpoints use a Stripe-style envelope only because they need pagination met
 
 ## Idempotency
 
-Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE requests to the Alerts, Boards, Contracts, Segments, and Import APIs so retries can't double-create or double-charge. The first response is cached for 24 hours and replayed byte-for-byte on retry.
+Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE requests to the Alerts, Charts, Contracts, Segments, and Import APIs so retries can't double-create or double-charge. The first response is cached for 24 hours and replayed byte-for-byte on retry.
 
 ```http
 POST /v0/alerts HTTP/1.1

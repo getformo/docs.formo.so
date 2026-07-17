@@ -5,7 +5,7 @@ icon: rotate
 iconType: solid
 ---
 
-Public unsafe methods (POST / PUT / PATCH / DELETE) on the Alerts, Boards, Contracts, Segments, and Import APIs honour an optional `Idempotency-Key` header. When present, Formo de-duplicates retries so a flaky network or a crashed client never causes a double-write.
+Public unsafe methods (POST / PUT / PATCH / DELETE) on the Alerts, Charts, Contracts, Segments, and Import APIs honour an optional `Idempotency-Key` header. When present, Formo de-duplicates retries so a flaky network or a crashed client never causes a double-write.
 
 The header is **opt-in** - omit it and every request is processed independently.
 
