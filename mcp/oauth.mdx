@@ -146,7 +146,6 @@ Formo MCP OAuth supports only these scopes:
 | `contracts:read` / `contracts:write` | Read or manage tracked contracts |
 | `segments:read` / `segments:write` | Read or manage segments |
 | `profiles:read` | Wallet profile lookup |
-| `mcp:read` | Deprecated. No longer required; accepted so existing connections keep working |
 | `offline_access` | Allows the MCP client to refresh access without asking the user to sign in again |
 
 Formo does not expose `mcp:tools` or `mcp:resources` scopes. Each tool call is authorised against the granted per-resource scopes above.
@@ -186,7 +185,7 @@ The backend accepts either:
 - `Authorization: Bearer <oauth_access_token>`
 - `Authorization: Bearer <workspace_api_key>`
 
-Workspace API keys need the permissions the tools you call require. Existing Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and `mcp-remote` configurations do not need to change. For setup instructions, see [MCP API Key](/mcp/api-key).
+Existing Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and `mcp-remote` configurations do not need to change. For setup instructions, see [MCP API Key](/mcp/api-key).
 
 Use a Workspace API Key when your MCP client supports custom request headers and you want to manage credentials yourself, such as local developer tools, CLI bridges, and editor integrations.
 
