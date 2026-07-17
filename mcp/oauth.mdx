@@ -126,7 +126,7 @@ Select your web client below to configure Formo with OAuth authentication.
     5. Save or connect the server
     6. Sign in to Formo, select a project, and approve access
 
-    If the client asks for scopes, request only `mcp:read` and `offline_access`.
+    If the client asks for scopes, request the permissions you need (for example `query:read`) plus `offline_access` if it needs to refresh.
   </Tab>
 </Tabs>
 
@@ -140,10 +140,16 @@ Formo MCP OAuth supports only these scopes:
 
 | Scope | Description |
 |:------|:------------|
-| `mcp:read` | Read-only MCP access to the selected Formo project |
+| `query:read` | Analytics and SQL tools for the selected project |
+| `alerts:read` / `alerts:write` | Read or manage alerts |
+| `boards:read` / `boards:write` | Read or manage charts and boards |
+| `contracts:read` / `contracts:write` | Read or manage tracked contracts |
+| `segments:read` / `segments:write` | Read or manage segments |
+| `profiles:read` | Wallet profile lookup |
+| `mcp:read` | Deprecated. No longer required; accepted so existing connections keep working |
 | `offline_access` | Allows the MCP client to refresh access without asking the user to sign in again |
 
-Formo does not expose `mcp:tools` or `mcp:resources` scopes. Tool permission decisions are handled by the MCP client.
+Formo does not expose `mcp:tools` or `mcp:resources` scopes. Each tool call is authorised against the granted per-resource scopes above.
 
 OAuth access is bound to the project selected on the Formo consent page. The MCP server validates that the user still has access to that project before serving requests.
 
@@ -180,7 +186,7 @@ The backend accepts either:
 - `Authorization: Bearer <oauth_access_token>`
 - `Authorization: Bearer <workspace_api_key>`
 
-Workspace API keys must include the MCP scope. Existing Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and `mcp-remote` configurations do not need to change. For setup instructions, see [MCP API Key](/mcp/api-key).
+Workspace API keys need the permissions the tools you call require. Existing Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and `mcp-remote` configurations do not need to change. For setup instructions, see [MCP API Key](/mcp/api-key).
 
 Use a Workspace API Key when your MCP client supports custom request headers and you want to manage credentials yourself, such as local developer tools, CLI bridges, and editor integrations.
 
@@ -190,7 +196,7 @@ Use a Workspace API Key when your MCP client supports custom request headers and
 
 **Client does not start OAuth:** Confirm the MCP server URL is exactly `https://api.formo.so/v0/mcp/` and includes the trailing slash.
 
-**Invalid scope:** Request only `mcp:read` and, when refresh is needed, `offline_access`.
+**Invalid scope:** Request supported scopes only (see the table above), plus `offline_access` when refresh is needed.
 
 **Consent page asks you to sign in again:** Sign in to Formo and you will be returned to the same OAuth authorization flow.
 
@@ -198,4 +204,4 @@ Use a Workspace API Key when your MCP client supports custom request headers and
 
 **Project access denied after connecting:** Reconnect and choose a project that your Formo user can still access.
 
-**API key stopped working:** OAuth does not replace API keys. Check that the key has MCP scope, has not been revoked, and is sent as `Authorization: Bearer <workspace_api_key>`.
+**API key stopped working:** OAuth does not replace API keys. Check that the key has the permission the failing tool needs (analytics and SQL need `query:read`), has not been revoked, and is sent as `Authorization: Bearer <workspace_api_key>`.
