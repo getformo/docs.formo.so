@@ -6,9 +6,8 @@ description: 'Define and track custom events like swaps, deposits, and quests wi
 ## Overview
 
 The Formo SDK offers an easy-to-use event collection library that allows you to track custom events in your crypto app.
-Ensure high quality, structured data with Formo.
 
-Start tracking custom events with the [Web SDK](/sdks/web#track-events) to get started. Custom events work with [Wallet Intelligence](/features/wallet-intelligence/overview) and [Funnels](/features/product-analytics/funnels) to give you a complete picture of each user's journey.
+See the [Web SDK](/sdks/web#track-events) docs to get started. Custom events work with [Wallet Intelligence](/features/wallet-intelligence/overview) and [Funnels](/features/product-analytics/funnels) to connect user actions to lifecycle and conversion analysis.
 
 ---
 
@@ -31,7 +30,7 @@ Track actions that aren't captured automatically:
 ### Step 1: Import the Formo SDK
 
 <Tabs>
-  <Tab title="Wagmi / React">
+  <Tab title="React / Next.js">
     ```tsx
     import { useFormo } from '@formo/analytics';
 
@@ -70,23 +69,18 @@ analytics.track('Swap Completed', {
 
 ### Step 3: Track with volume, revenue, or points
 
-For events with monetary value, use special properties:
+For events with monetary value, use the reserved `volume`, `revenue`, and `points` properties:
 
 ```typescript
 analytics.track('Swap Completed', {
   pair: 'ETH/USDC',
-  token_in: 'ETH',
-  token_out: 'USDC',
-  volume: 5000,    // USD value of the swap
-  revenue: 25,     // Revenue earned (e.g., fees)
-  points: 100      // Loyalty/reward points
+  volume: 5000,   // volume of the swap; can be positive or negative
+  revenue: 25,    // revenue earned (e.g., fees); must be non-negative
+  points: 100     // loyalty/reward points
 });
 ```
 
-These values appear in your dashboard metrics and can be used for:
-- Revenue attribution by traffic source
-- Volume tracking per user
-- Points/rewards leaderboards
+See [Tracking volume, revenue, points](/data/events/track#tracking-volume-revenue-points) for the full field reference, including `currency` (defaults to USD). These values power revenue attribution, volume tracking, and points/rewards leaderboards in your dashboard.
 
 ### Step 4: View custom events
 
@@ -190,12 +184,7 @@ analytics.track('Liquidity Added', {
 
 ### Using custom events in funnels
 
-Custom events can be funnel steps:
-
-1. Go to **Funnels** > **Create Funnel**
-2. Add a step with **Event type**: Custom
-3. Select your custom event name
-4. Optionally add property filters
+Custom events can be funnel steps: add a step and pick your event from the **Custom Events** list, then optionally add property filters. See [Funnels](/features/product-analytics/funnels) for the full walkthrough of adding a Funnel chart to a dashboard.
 
 **Example funnel:**
 | Step | Event |

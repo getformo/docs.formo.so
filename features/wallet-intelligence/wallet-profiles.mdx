@@ -7,10 +7,7 @@ description: 'View unified wallet profiles that combine offchain and onchain dat
 	<img src="/images/screenshots/wallet-profile-activity.png" alt="Wallet Intelligence Wallet Profile Apps Tokens" />
 </Frame>
 
-Formo's **Wallet Profiles** unifies data from offchain and onchain data sources to give you a 360° view of your users.
-Turn anonymous wallets into actionable, onchain personas. Capture the full user journey to understand how users use your app.
-
-Gain a complete view of each user's behaviour across chains and platforms:
+Formo's **Wallet Profiles** unifies offchain and onchain data into 360° profiles of your users:
 - Wallet address, ENS profile, net worth, and transaction frequency
 - Real-time feed of what each user is doing on your crypto app, with full attribution through referrers and UTM sources
 - DeFi positions and token balances of the user across multiple chains
@@ -160,11 +157,13 @@ The profile header shows key information at a glance:
 | Field | What it shows |
 |-------|---------------|
 | **Address** | Wallet address with copy button |
-| **ENS/Identity** | ENS name, Farcaster, Lens, or other identity |
+| **ENS** | ENS name, if resolved (falls back to a shortened address) |
 | **Net Worth** | Total value across all chains |
 | **Lifecycle** | New, Returning, Power user, Resurrected, At Risk, or Churned |
 | **First Seen** | When they first visited your app |
 | **Last Seen** | Most recent activity |
+
+Any auto-generated labels (verifications, campaign participation, agent detection) appear as badges next to the wallet's name. See the [full list of labels](/features/wallet-intelligence/wallet-labels) for details.
 
 ### Step 3: Review the activity timeline
 
@@ -196,18 +195,14 @@ The **Apps** and **Tokens** tabs show the user's onchain footprint:
 - All tokens held across supported chains
 - Token amounts, USD values, and portfolio percentages
 
-### Step 5: Check labels and attributes
+### Step 5: Check properties and custom labels
 
-The **Labels** section shows auto-generated tags:
+The **Properties** tab shows:
 
-| Label Type | Examples |
-|------------|----------|
-| **Lifecycle** | New, Returning, Power user |
-| **Attestations** | OFAC Sanctioned, Human Passport score, Coinbase Verified Account, Coinbase Verified Country, Coinbase One |
-| **Campaigns** | Merkl Campaigns |
-| **Agents** | ERC-8004 AI Agent |
+- Editable user properties: display name, user ID, email, socials, ENS/Basenames/Linea, website, location
+- Custom user labels you or your team have added, separate from the auto-generated labels shown in Step 2
 
-See the [full list of labels](/features/wallet-intelligence/wallet-labels) for details. Use labels to understand user personas without manual research.
+Use this tab to enrich a profile with known information or tag it for later segmentation.
 
 ### Common use cases
 

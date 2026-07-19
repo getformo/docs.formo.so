@@ -1,16 +1,15 @@
 ---
 title: 'Activity feed'
-description: 'View a real-time event stream of user actions including page views, wallet connects, signatures, and transactions to understand product usage.'
+description: 'View a real-time event stream of everything users do on your app, from page views to onchain transactions.'
 ---
 
-Track every user interaction with powerful real-time event analytics. Formo automatically captures page views, wallet connects, signatures, and transactions on your app.
-You can also track [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
+The Activity page shows a real-time view into what users are doing on your app. You can also track [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
 
-<Frame caption="The activity feed shows you what users are doing in real-time.">
+<Frame caption="Every event, as it happens.">
 	<img src="/images/dapp-analytics-activity-1.png" alt="Product Analytics Activity" />
 </Frame>
 
-Get full visibility on key touchpoints in the user lifecycle to identify drop-off points and boost retention. You can see what users do, full event properties, and other data without sampling.
+Every event includes full properties and is captured without sampling.
 
 ## Filter by event properties
 
@@ -20,13 +19,13 @@ Filter the activity feed by event properties to focus on specific user actions o
 	<img src="/images/filter-properties.png" alt="Product Analytics Activity" />
 </Frame>
 
-Use filters to narrow down events by any property, making it easy to investigate specific user journeys or troubleshoot issues.
+Use filters to narrow events by any property to investigate a specific user journey or troubleshoot an issue.
 
 ---
 
 ## How to use the activity feed
 
-The Activity Feed is your real-time view into what users are doing on your app. This guide shows you how to use it for investigation and user research.
+This section covers using the Activity Feed for investigation and user research.
 
 ### Step 1: Open the Activity Feed
 
@@ -78,13 +77,10 @@ Use filters to narrow down the feed:
 | Goal | Filters |
 |------|---------|
 | Connects from Twitter | type = connect, referrer contains twitter |
-| Visitors from marketing campaign | utm_source = newsletter |
+| Visitors from a marketing campaign | utm_source contains newsletter |
 | Events from mobile devices | device = mobile |
-| Failed transactions | type = transaction, status = reverted |
-| Wallet connects from Twitter | type = connect, referrer contains twitter |
-| Specific user's activity | address = 0x... |
-| Events on a specific page | path = /swap |
-| High-value transactions | type = transaction, value > 1000 |
+| Events on a specific page | page = /swap |
+| High-volume wallets | volume > 1000 |
 
 <Frame caption="Filter by any property to focus your investigation.">
 	<img src="/images/filter-properties.png" alt="Activity Filters" />
@@ -106,10 +102,10 @@ To see everything a specific user did:
 	<img src="/images/screenshots/wallet-profile-activity.png" alt="Wallet Profile Activity Feed" />
 </Frame>
 
-Or filter the Activity Feed:
+Or search the Activity Feed directly:
 
 <Steps>
-  <Step title="Add filter: address = [wallet address]" />
+  <Step title="Use the search box" />
   <Step title="See all events from this user in chronological order" />
 </Steps>
 
@@ -120,8 +116,8 @@ When users report problems, use the Activity Feed to investigate:
 **Investigating a failed transaction:**
 
 <Steps>
-  <Step title="Filter by type = transaction and status = reverted" />
-  <Step title="Find the user's transaction" />
+  <Step title="Filter by type = transaction" />
+  <Step title="Look for the rejected status icon, or search by the user's address" />
   <Step title="Click to expand and see error details" />
   <Step title="Check the preceding events for context" />
 </Steps>
@@ -129,7 +125,7 @@ When users report problems, use the Activity Feed to investigate:
 **Investigating a drop-off:**
 
 <Steps>
-  <Step title="Filter by the user's address" />
+  <Step title="Search by the user's address" />
   <Step title="Look at their event sequence" />
   <Step title="Identify where they stopped (last event before leaving)" />
   <Step title="Check for errors or unusual patterns" />
@@ -141,7 +137,7 @@ When users report problems, use the Activity Feed to investigate:
 **Investigating a flow issue:**
 
 <Steps>
-  <Step title="Filter by a specific page path" />
+  <Step title="Filter by a specific page" />
   <Step title="Look at what users do after visiting that page" />
   <Step title="Identify unexpected patterns" />
   <Step title="Use Flows to visualize common paths users take">
@@ -154,7 +150,7 @@ When users report problems, use the Activity Feed to investigate:
 **"Why are users bouncing from our swap page?"**
 
 <Steps>
-  <Step title="Filter: path = /swap" />
+  <Step title="Filter: page = /swap" />
   <Step title="Look at events that follow page views" />
   <Step title="Count how many lead to connect vs. leaving" />
   <Step title="Check for errors or unusual device/browser patterns" />
@@ -163,8 +159,8 @@ When users report problems, use the Activity Feed to investigate:
 **"Which transactions are failing?"**
 
 <Steps>
-  <Step title="Filter: type = transaction, status = reverted" />
-  <Step title="Group by error message or contract" />
+  <Step title="Filter: type = transaction" />
+  <Step title="Look for rejected transactions and expand each to review error details" />
   <Step title="Identify the most common failure reasons" />
   <Step title="Check if failures correlate with specific flows" />
 </Steps>
@@ -173,7 +169,7 @@ When users report problems, use the Activity Feed to investigate:
 
 <Steps>
   <Step title="Identify a power user from the Users list" />
-  <Step title="Filter Activity by their address" />
+  <Step title="Search Activity by their address" />
   <Step title="Study their event sequence" />
   <Step title="Compare to average user patterns" />
 </Steps>
@@ -181,7 +177,7 @@ When users report problems, use the Activity Feed to investigate:
 **"Is our new feature being used?"**
 
 <Steps>
-  <Step title="Filter by your custom event or page path" />
+  <Step title="Filter by your custom event or page" />
   <Step title="See adoption over time" />
   <Step title="Check which user segments are using it" />
   <Step title="Look at the referrer to see how users find it" />

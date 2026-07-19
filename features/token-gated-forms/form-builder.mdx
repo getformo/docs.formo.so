@@ -3,11 +3,11 @@ title: 'Form builder'
 description: 'Build and customize token-gated forms, waitlists, and surveys for your web3 community with drag-and-drop fields and wallet-connected responses.'
 ---
 
-<Frame caption="Use Formo's Form Builder to create and customize forms for your community.">
+<Frame caption="Drag-and-drop fields, no code required.">
 	<img src="/images/token-gated-forms-form-builder-0.png" alt="Token Gated Form Builder" />
 </Frame>
 
-Launch forms, waitlists, and surveys for your community with the best form builder in web3.
+Launch token-gated forms, waitlists, and surveys for your community.
 
 - 🔑 <a href="/features/token-gated-forms/token-gating">**Token gating.**</a> Gate access by token ownership, NFT collections, or other onchain credentials.
 - ✅ **Verified socials.** Verify Twitter accounts, Discord usernames, and more.
@@ -48,16 +48,13 @@ The form builder uses a drag-and-drop interface. Add fields by clicking the **+*
 
 **Available field types:**
 
-| Field | Use case |
-|-------|----------|
-| **Wallet** | Capture connected wallet address (required for token gating) |
-| **Email** | Collect email addresses |
-| **Short Text** | Single-line responses |
-| **Long Text** | Multi-line responses |
-| **Single Choice** | Select one option from a list |
-| **Checkboxes** | Select multiple options |
-| **Twitter** | Verify and capture Twitter handle |
-| **Discord** | Verify and capture Discord username |
+| Category | Fields |
+|----------|--------|
+| **Basic** | Short Text, Long Text, Email, Link, Heading, Paragraph, Image |
+| **Advanced** | Single Choice, Dropdown, Checkboxes, File, Rating |
+| **Verification** | Connect Wallet (EVM), Connect Wallet (Solana), Connect Discord, Connect X, Connect Telegram |
+
+A Connect Wallet field is required if you want to gate the form by token or NFT ownership. Connect Discord, Connect X, and Connect Telegram fields verify and capture the respective account.
 
 ### Step 3: Enable token gating (optional)
 
@@ -69,20 +66,20 @@ To restrict form access based on token ownership:
 4. Configure your requirement:
 
 <Tabs>
-  <Tab title="ERC-20 Token">
-    - Select **ERC-20** as the type
+  <Tab title="ERC-20 / Native Token">
+    - Select **ERC20 Token** (or **Native Token** for ETH, SOL, and other gas tokens)
     - Choose the chain (Ethereum, Base, Arbitrum, etc.)
-    - Paste the token contract address
-    - Set minimum balance (e.g., 100 tokens)
+    - Paste the token contract address (not needed for native tokens)
+    - Set the minimum amount
   </Tab>
-  <Tab title="NFT Collection">
-    - Select **NFT** as the type
+  <Tab title="NFT">
+    - Select **NFT** as the condition
     - Choose the chain
     - Paste the NFT contract address
-    - Optionally set minimum quantity
+    - Set the minimum quantity
   </Tab>
   <Tab title="Contract Read">
-    - Select **Contract Read** as the type
+    - Select **Contract Read** as the condition
     - Choose the chain
     - Paste the contract address and ABI
     - Select a read function (e.g., `balanceOf`, `stakedAmount`)
@@ -90,11 +87,13 @@ To restrict form access based on token ownership:
     - See [Contract Read guide](/features/token-gated-forms/token-gating#contract-read)
   </Tab>
   <Tab title="World ID">
-    - Select **World ID** as the type
+    - Add **Connect World ID** as a requirement
     - Users must verify with World ID before submitting
     - See [World ID integration](/features/token-gated-forms/world-id)
   </Tab>
 </Tabs>
+
+Wallet requirements support both EVM chains and Solana (NFT, SPL Token, Native Token). You can also gate by Human Passport score.
 
 You can add multiple requirements with AND/OR logic.
 
@@ -111,8 +110,8 @@ Make your form match your brand:
 
 ### Step 5: Publish and share
 
-1. Click **Publish** in the top right
-2. Copy your form URL (e.g., `forms.formo.so/your-form`)
+1. Click **Publish** in the form builder toolbar
+2. Copy your form URL (e.g., `app.formo.so/your-form-id`), download a QR code, or use the embed and social share options
 3. Share the link with your community
 
 <Frame caption="Share your form via direct link, embed, or social media.">
