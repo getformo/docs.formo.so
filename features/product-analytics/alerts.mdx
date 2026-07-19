@@ -47,7 +47,7 @@ Formo supports two trigger types: **Event alerts**, which fire on individual mat
 
 <Tabs>
   <Tab title="Events">
-    Triggers when a new event matches your filters. Each matching event is sent to your webhook.
+    Triggers when a new event matches your filters. Formo checks for matching events every 5 minutes; each matching event since the last check is sent to your webhook.
 
     | Event Type | When it fires |
     |------------|--------------|
@@ -59,7 +59,7 @@ Formo supports two trigger types: **Event alerts**, which fire on individual mat
     You can add conditions to filter on the event's top-level fields: `type`, `event`, `address`, `user_id`, `anonymous_id`, `location`, `device`, `browser`, `os`, and `referrer`. Conditions support exact match, contains, starts with, ends with, and not-equals (e.g., `browser = Chrome`, `referrer contains twitter`). They can't filter on values nested in `properties` (like `chain_id` or a transaction's `status`) or use numeric comparisons (`>`, `<`) - use a User alert if you need to filter on a number.
   </Tab>
   <Tab title="Users">
-    Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your criteria.
+    Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your filters.
 
     Each matching user is **notified once per 24 hours** - if the same user remains active and continues to match, they won't be re-sent until the dedup window expires.
 
@@ -83,7 +83,7 @@ Formo supports two trigger types: **Event alerts**, which fire on individual mat
     | **lifecycle** | User lifecycle stage (New, Returning, etc.) |
     | **socials** | Social profiles (e.g., Farcaster) |
 
-    `net_worth_usd`, `volume`, `revenue`, and `points` support numeric comparisons (`>`, `>=`, `<`, `<=`, `=`); the rest match on equality.
+    `net_worth_usd`, `volume`, `revenue`, `points`, **apps**, **tokens**, and **chains** support numeric comparisons (`>`, `>=`, `<`, `<=`, `=`) against a usage threshold (e.g. chain activity > 10 transactions); the rest match on equality.
   </Tab>
 </Tabs>
 
@@ -254,11 +254,9 @@ For Slack incoming webhooks (`hooks.slack.com`), Formo formats each event as an 
 
 Each message includes:
 - A **header** with the alert name
-- A **user** link (clickable link to Formo profile)
-- **Event properties** (key-value pairs from the event, up to 10 properties)
+- A **user** link (clickable link to Formo profile, if available)
+- **Event properties** (key-value pairs from the event)
 - **Metadata fields**: Country, Device, Browser, OS, Referrer, Referral, UTM Source, UTM Medium, UTM Campaign, UTM Term, UTM Content - only shown when non-empty
-- A **timestamp** and **View User** button
-- Up to **25 events** per batch, with an overflow summary if more were found
 
 **Sample Slack Block Kit payload (one event = one message):**
 
@@ -293,23 +291,6 @@ Each message includes:
         "type": "mrkdwn",
         "text": "*Country:* Vietnam\n*Device:* Desktop\n*Browser:* Chrome\n*OS:* MacOS\n*Referrer:* google.com\n*UTM Source:* google\n*UTM Medium:* cpc\n*UTM Campaign:* whale-acquisition"
       }
-    },
-    {
-      "type": "context",
-      "elements": [
-        { "type": "mrkdwn", "text": ":clock1: Feb 9, 06:42 AM" }
-      ]
-    },
-    {
-      "type": "actions",
-      "elements": [
-        {
-          "type": "button",
-          "text": { "type": "plain_text", "emoji": true, "text": "View User" },
-          "style": "primary",
-          "url": "https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc"
-        }
-      ]
     }
   ]
 }

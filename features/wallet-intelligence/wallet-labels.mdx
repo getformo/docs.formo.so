@@ -3,13 +3,13 @@ title: 'Wallet labels'
 description: 'Understand user interests and behavior with automatically generated wallet labels based on onchain activity, reputation, and user properties.'
 ---
 
-<Frame caption="Turn anonymous visitors into high-value users with wallet labels.">
+<Frame caption="Enrich user profiles with wallet labels.">
 	<img src="/images/wallet-intelligence-wallet-labels.png" alt="Wallet Labels" />
 </Frame>
 
-**Wallet Labels** provide valuable context and clarity to blockchain addresses, enhancing the readability and understanding of onchain data.
+**Wallet Labels** annotate blockchain addresses with attributes like verification status, lifecycle stage, and reputation scores.
 
-Labels help you understand your users so you can create granular [segments](/features/wallet-intelligence/segments) to target qualified users in your Ideal Customer Profile (ICP).
+Use labels to build [segments](/features/wallet-intelligence/segments) that target users matching your Ideal Customer Profile (ICP).
 
 ## List of Labels
 
@@ -42,31 +42,32 @@ Every wallet is assigned a lifecycle stage based on its recency and active days:
 
 ## How to use labels for targeting
 
-Wallet labels turn anonymous addresses into actionable user profiles. This guide shows you how to use labels to identify and target specific user types.
+This section covers using labels to identify and target specific user types.
 
 ### How labels work
 
-Formo automatically analyzes each wallet's onchain activity and assigns relevant labels. Labels update as users' behavior changes.
+Formo automatically analyzes each wallet's onchain activity and assigns relevant labels. Labels update as users' behavior changes. You can also add your own custom labels to a wallet for information Formo can't detect on its own.
 
 **Label sources:**
 - **Lifecycle** - Engagement stage derived from each wallet's recency and active days
 - **Attestations** - Verified credentials from Coinbase, Binance, Human Passport, and OFAC sanction lists
 - **Campaigns** - Participation in incentive campaigns such as Merkl
 - **Onchain registries** - Standards such as ERC-8004 that identify AI agent wallets
+- **Custom** - Labels you add manually to a wallet's profile
 
 ### Step 1: View labels on a user profile
 
 1. Go to **Users** and click any wallet address
-2. Scroll to the **Labels** section
-3. See all labels assigned to this user
+2. Open the **Properties** tab
+3. See all labels assigned to this user in the **User Labels** section
 
-Labels appear as tags you can click to filter by.
+Auto-generated labels (lifecycle, attestations, campaigns, registries) are read-only. Click **+ Add Label** to add, edit, or remove a custom label. To filter users by label, use **Add Filter** (see Step 2 below).
 
 ### Step 2: Filter users by label
 
 Use labels to find specific user types:
 
-1. Go to **Users** or **Audience Insights**
+1. Go to **Users**
 2. Click **Add Filter**
 3. Select **Label** as the filter type
 4. Choose the label(s) you want
@@ -82,7 +83,7 @@ Use labels to find specific user types:
 
 ### Step 3: Combine labels with other filters
 
-Labels become powerful when combined with other criteria:
+Combine labels with other filters to narrow further:
 
 **High-value DeFi users:**
 | Filter | Value |
@@ -109,7 +110,7 @@ Labels become powerful when combined with other criteria:
 Turn useful label combinations into reusable segments:
 
 1. Apply your label + other filters
-2. Click **Save as Segment**
+2. Click **Save Segment**
 3. Name it descriptively (e.g., "Verified DeFi Whales")
 4. Use the segment for analysis, exports, or alerts
 

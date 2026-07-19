@@ -220,7 +220,7 @@ Formo automatically classifies every session into a channel at ingestion time, u
 
 ### Key metrics by source
 
-For each traffic source, track:
+For each traffic source, the Channels/Referrers/Referrals/UTM tabs show raw counts:
 
 | Metric | What it tells you |
 |--------|-------------------|
@@ -228,12 +228,12 @@ For each traffic source, track:
 | **Wallet connects** | Engagement quality |
 | **Transactions** | Conversion performance |
 | **Volume** | Revenue contribution |
-| **Connect rate** | Visitor → Wallet conversion |
-| **Transaction rate** | Wallet → Transaction conversion |
+
+These tabs show one metric at a time, not a percentage. To see an actual connect rate (visitor → wallet) or transaction rate (wallet → transaction) by source, build a [funnel](/features/product-analytics/funnels) with a breakdown dimension, covered below.
 
 ### Create custom attribution charts
 
-Beyond the built-in tabs, build custom charts to track attribution over time. Use **Ask AI** for quick answers, or the SQL editor for full control. See [Dashboards](/features/product-analytics/charts) for the full guide to creating, organizing, and sharing charts.
+Beyond the built-in tabs, build custom charts to track attribution over time. Use **Ask AI** for quick answers, or the SQL editor for full control. See [Charts](/features/product-analytics/charts) for the full guide to creating, organizing, and sharing charts.
 
 **Ask AI examples:**
 
@@ -259,8 +259,8 @@ Beyond the built-in tabs, build custom charts to track attribution over time. Us
 <Steps>
   <Step title="Go to Dashboards, click Add Chart, and select the Funnel chart type" />
   <Step title="Add steps: Visit → Connect → Transaction" />
-  <Step title="Add breakdown by UTM Source" />
-  <Step title="Compare conversion rates across channels" />
+  <Step title="Add a breakdown dimension: Referrer, Referral, UTM Source/Medium/Campaign/Content/Term, Builder Codes, Device, Country, Browser, or OS" />
+  <Step title="Compare conversion rates across each value" />
 </Steps>
 
 ### Calculate true ROI
