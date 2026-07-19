@@ -1,47 +1,43 @@
 ---
 title: 'Core concepts'
 icon: lightbulb
-description: 'Understand the three core Formo data concepts: events that capture user actions, users identified by wallet address, and properties that add context.'
+description: 'Understand the three core concepts in analytics: events that capture key touchpoints, users behind those events, and properties that add context.'
 ---
 
 ### Overview
 
 Here are the 3 core concepts you need to know:
 
-1. **Events** are the things that happen in your app.
-2. **Users** are the people who use your app.
-3. **Properties** are the attributes of your users and events.
+1. **Events** are the actions that happen in your app.
+2. **Users** are the people who performed those actions.
+3. **Properties** are attributes that add context to your users and events.
 
 ### 1. Events
 
-An event is **a data point that represents an interaction between a user and your product.**
+An event is **a data point that represents an interaction between a user and your app.**
 
-[Events](/data/events/overview) can be a wide range of interactions. For example, every time a user connects a wallet or performs a transaction on your app, there are details which describe that action the moment it happens.
+[Events](/data/events/overview) capture the details of an action the moment it happens, whether that's a user viewing a page, connecting a wallet, or submitting a transaction on a DeFi app.
 
-Actions like visiting a page, connecting a wallet, and depositing on a DeFi protocol can all be tracked as an event in Formo.
-
-The Formo SDK automatically captures and tracks page and wallet events. You can also track [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
+The Formo SDK automatically captures and tracks web and wallet events. You can also track [custom in-app events](/features/product-analytics/custom-events) and [smart contract events](/features/product-analytics/contract-events).
 
 ### 2. Users
 
-A user is **the specific individual who completed an interaction with your product.**
+A user is **the specific individual who completed an interaction within your app.**
 
 Each user has a unique identifier that you can use to track their activity. Formo distinguishes between anonymous users and wallets:
 
 - Anonymous users aren't tied to any wallets. All users start as anonymous users until they connect a wallet.
 - Wallets are tied to a unique Ethereum or Solana address. When the user connects to these identities, their wallets are identified and tracked.
 
-Wallets are automatically linked to the user when multiple wallets are connected in the same session. Linked addresses are visible in the wallet profile.
+Multiple wallets that belong to the same user are automatically linked when they are used in the same session. You can see wallet clusters and linked addresses on the Users page. 
 
 ### 3. Properties
 
-Properties are **additional information about users and events.**
-- Event properties are attributes that describe details specific to the particular instance of an event. For example, if you had a Swap Completed event, you could specify the token pair, input amount, output amount, volume, and protocol fee.
-- User properties are traits describing the user and apply across all their future events until the properties are modified. Formo's SDK captures several user properties by default, and you can also set up your own properties to track.
+Properties capture **additional context about events and users.**
+- Event properties are attributes that describe details specific to a particular action. For example, a Swap Completed event may include the token pair, input amount, output amount, volume, and protocol fee as event properties.
+- User properties describing a wallet or user and apply across all their future events until the properties are modified. Formo's SDK captures user properties automatically, and you can also set your own custom properties.
 
-Properties examples:
-- A Connect Wallet event has wallet address and chain ID (Ethereum, Base, etc.) 
-- A Page View event has page URL, referrer URL, and other metadata.
-- A User has net worth and first-touch UTM parameter properties.
-
-When you track custom events, you can also set properties to describe the event. For example, if you had a Swap Completed event, you could specify the token pair, input amount, output amount, volume, and protocol fee.
+Examples:
+- A Connect Wallet event has wallet address and chain ID properties.
+- A Page View event has page URL, referrer, and other page properties.
+- A User has net worth, social handles, lifetime revenue, and attribution (referrers, referral, UTM) properties.

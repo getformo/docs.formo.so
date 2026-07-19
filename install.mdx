@@ -1,10 +1,8 @@
 ---
 title: "Install Formo"
-description: "Step-by-step guide to installing the Formo SDK on your website and app."
+description: "Step-by-step guide to installing the Formo SDK."
 icon: rocket-launch
 ---
-
-<Info>For best results, install Formo on both your website (example.com) and your app (app.example.com) using the same project / write key.</Info>
 
 ## Install with AI
 
@@ -254,12 +252,12 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
 
 ## Instructions
 
-Set up Formo for both your website and your app on the same project.
+For best results, install Formo on both your website (example.com) and your app (app.example.com) on the same project to get end-to-end attribution:
 
-- For static websites (example.com), we recommend using the HTML snippet.
-- For apps (app.example.com) with wallet connection, we recommend using the Wagmi integration.
+- For apps (app.example.com), use the Wagmi integration.
+- For static websites (example.com), use the HTML snippet.
 
-Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find the write key in your Formo project settings.
+Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find it in your Formo project settings after creating a project.
 
 <Tabs>
   <Tab icon="star" title="Wagmi">
@@ -313,9 +311,11 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
     Replace `<YOUR_WRITE_KEY>` with the SDK Write key found in your project settings.
 
-    <Warning>
-    Transaction and signature autocapture requires the use of [wagmi React hooks](https://wagmi.sh/react/api/hooks) (`useWriteContract`, `useSendTransaction`, `useSignMessage`). Calls via `@wagmi/core` or viem directly bypass the mutation cache and won't be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.
-    </Warning>
+    <Note>
+    If you are not using [wagmi hooks](https://wagmi.sh/react/api/hooks) (`useWriteContract`, `useSendTransaction`, `useSignMessage`), follow the **non-wagmi React or Next.js instructions** instead.
+
+    Transaction and signature autocapture requires the use of wagmi hooks. Direct calls to `@wagmi/core` or viem won't be tracked automatically. 
+    </Note>
 
     #### 3. Identify users
 
@@ -339,9 +339,9 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
     #### 4. Track custom events
 
-    Formo autocaptures wallet events (connect, disconnect, signature, transaction, chain changes) automatically via Wagmi.
+    Formo autocaptures wallet events (connect, disconnect, signature, transaction, chain changes). You do not need to track them manually.
 
-    Use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+    For other in-app actions, use the [`track`](/sdks/web#track-events) function to track custom events specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
@@ -386,9 +386,9 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
     #### 2. Track custom events
 
-    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
+    Formo autocaptures wallet events (connect, disconnect, signature, transaction, chain changes). You do not need to track them manually.
 
-    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+    For other in-app actions, use the [`track`](/sdks/web#track-events) function to track custom events specific to your app.
 
     ```html
     <button type="button" onclick="window.formo.track('Swap Completed', { volume: 100 })">
@@ -455,9 +455,9 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
     #### 4. Track custom events
 
-    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
+    Formo autocaptures wallet events (connect, disconnect, signature, transaction, chain changes). You do not need to track them manually.
 
-    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+    For other in-app actions, use the [`track`](/sdks/web#track-events) function to track custom events specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
@@ -615,9 +615,9 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
     #### 4. Track custom events
 
-    Formo autocaptures events like page views, wallet connects, signatures, and transactions for you.
+    Formo autocaptures wallet events (connect, disconnect, signature, transaction, chain changes). You do not need to track them manually.
 
-    For everything else, use the [`track`](/data/events/track) function to track custom user actions specific to your app.
+    For other in-app actions, use the [`track`](/sdks/web#track-events) function to track custom events specific to your app.
 
     ```tsx
       import { useFormo } from '@formo/analytics';
@@ -782,15 +782,13 @@ Make sure you use the same `<SDK_WRITE_KEY>` for both your website and your app.
 
 <CardGroup>
   <Card title="Example Apps" icon="globe" iconType="solid" href="https://github.com/getformo/examples">
-    Working examples for Privy, Dynamic, React, and Next.js
+    Working examples for Privy, Dynamic, React, Next.js, and more
   </Card>
 </CardGroup>
 
 ## Autocapture
 
-The Formo SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.)
-
-You do not need to configure anything to track these events.
+The Formo SDK automatically captures key events (page views, sessions) and wallet events (connect, disconnect, signature, transaction) with full attribution data (channel, campaign, referrer, UTM, referrals.)
 
 ## Verification
 
@@ -798,13 +796,13 @@ To verify that the SDK is installed correctly, navigate to your site and open th
 
 Go to your browser's Network tab and look for successful 'raw_events' request in the network console. Check that the request returns a 202 response status. (Note that it may take up to a minute due to the flush interval.)
 
-Events that are tracked correctly should also show up in the Activity page of your Formo workspace.
+Events that are tracked correctly will show up in the [Activity page](/features/product-analytics/activity) of your Formo workspace.
 
 ## SDK
 
 <CardGroup>
   <Card title="Web SDK" icon="globe" iconType="regular" href="/sdks/web">
-    HTML, React, Next.js
+    HTML, React, Next.js, Angular
   </Card>
   <Card title="Mobile SDK" icon="mobile" iconType="regular" href="/sdks/mobile">
     React Native
@@ -824,13 +822,13 @@ Events that are tracked correctly should also show up in the Activity page of yo
     When using the Wagmi integration, transaction and signature tracking requires your app to use the wagmi `useWriteContract` hooks. Contract calls via `@wagmi/core` or `viem` directly bypass the mutation cache and won’t be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.
   </Accordion>
   <Accordion title="How do I verify that the Formo SDK is installed correctly?">
-    After installing, visit your site and open [Live View](/features/product-analytics/live-view) in the Formo dashboard. You should see your pageview appear in real-time. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent successfully.
+    After installing the Formo SDK, visit your site and open the [Activity page](/features/product-analytics/activity) in the Formo dashboard. You should see your pageview appear under the most recent events. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent successfully with a 2XX status code.
   </Accordion>
   <Accordion title="Does the Formo SDK work on localhost during development?">
-    The SDK skips tracking in localhost by default. For testing, you can enable [local testing](/sdks/web#local-testing) and [logging](/sdks/web#logging) in the SDK configuration.
+    The SDK skips tracking in localhost by default. For testing purposes, you can enable [local testing](/sdks/web#local-testing) and [logging](/sdks/web#logging) in the SDK configuration.
   </Accordion>
-  <Accordion title="How do I prevent ad blockers from blocking Formo?">
-    Set up a [reverse proxy](/sdks/web#proxy) to route Formo requests through your own domain. This prevents ad blockers from blocking events sent to Formo.
+  <Accordion title="How do I prevent ad blockers and privacy browsers from blocking analytics?">
+    Set up a [reverse proxy](/sdks/web#proxy) to route analytics data through your own domain. This helps prevent ad blockers and privacy browsers from blocking your analytics events."
   </Accordion>
 </AccordionGroup>
 
