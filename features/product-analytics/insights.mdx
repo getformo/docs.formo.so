@@ -3,7 +3,7 @@ title: 'Insights'
 description: 'Receive AI-powered insights that surface acquisition quality, revenue trends, and churn signals from your analytics data.'
 ---
 
-Track how user behavior evolves over time across different dimensions with AI-powered cohort analysis. Insights refreshes when you open the page and surfaces actionable findings across acquisition, revenue, and churn.
+Insights runs AI-powered cohort analysis on your user behavior, surfacing findings across acquisition, revenue, and churn.
 
 <Frame caption="Insights surfaces cohort analysis across three key dimensions.">
   <img src="/images/insights.png" alt="Insights page showing acquisition quality, revenue, and churn prediction" />
@@ -32,13 +32,13 @@ Each channel shows:
 
 ### Revenue Insights
 
-**Are recent customers more valuable?**
+**Is revenue, volume, or points growing week over week?**
 
-Revenue Insights compares per-user value across weekly cohorts so you can spot whether your product changes are attracting higher-value users or if value is declining.
+Revenue Insights tracks whichever value metric your project actually records (revenue, transaction volume, or points) over the last 7 days versus the prior 7, using whichever has the strongest signal if more than one is tracked.
 
 The chart displays:
-- **Weekly cohorts** on the x-axis
-- **Average value per user** on the y-axis
+- **Weeks** on the x-axis
+- **Total value for that week** (revenue, volume, or points) on the y-axis
 - **Trend analysis** highlighting spikes and declines
 
 ### Churn Prediction
@@ -59,27 +59,26 @@ For example:
 
 ## Summary
 
-In addition to cohort analysis, the Insights page provides a summary organized into four sections:
+In addition to cohort analysis, the Insights page provides a summary organized into three sections:
 
 - 🏆 **Wins** - Metrics that improved recently, with deltas and baselines
 - ⚠️ **Issues** - Performance drops or problems that need attention
 - 📈 **Opportunities** - Untapped segments or behaviors with estimated upside
-- ✅ **Actions** - Concrete action items with priority levels (High/Med/Low) and success metrics
 
 ## How to use Insights
 
 1. Navigate to the [Formo Dashboard](https://app.formo.so)
 2. Select your project
 3. Click **Insights** in the left navigation (✨ sparkle icon)
-4. Insights refresh when you open the page (or once per day if you've already viewed it today) - review the latest analysis and take action
+4. Review the latest analysis and take action
 
-<Info>Insights are generated using AI analysis of your actual analytics data. Insights refresh when you open the page and are then cached in your browser for the rest of the day, so reopening the page later the same day won't trigger a new analysis.</Info>
+<Info>Insights are generated the first time you open the page each day, then cached for the rest of that day. Reopening the page later that same day shows the cached report; your next visit on a new day generates a fresh one.</Info>
 
 ## Combining Insights with other features
 
 | Insight | Follow-up action |
 |---------|------------------|
 | **Low-quality acquisition channel** | Create a [segment](/features/wallet-intelligence/segments) of users from that channel to investigate |
-| **Revenue decline in recent cohorts** | Use [retention analysis](/features/product-analytics/retention) to understand drop-off patterns |
+| **Revenue decline week over week** | Use [retention analysis](/features/product-analytics/retention) to understand drop-off patterns |
 | **High churn signal detected** | Set up an [alert](/features/product-analytics/alerts) to notify you when users exhibit that behavior |
 | **Behavioral gap between power and casual users** | Explore the gap using [Ask AI](/features/product-analytics/ai) or the [Explorer](/features/product-analytics/explore) |

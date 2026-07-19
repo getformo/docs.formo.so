@@ -42,35 +42,33 @@ Retention is a chart type you add to a dashboard (board), not a separate nav pag
 3. Open **Dashboards** in the left navigation, then open or create a board
 4. Click **Add Chart** and choose the **Retention** chart type
 
-### Step 2: Choose the retention event
+### Step 2: Choose the entry and retention events
 
-Select which event defines "active" for retention tracking:
+Configure how cohorts are formed and what counts as "coming back":
 
-| Event | What it measures |
-|-------|------------------|
-| **connect** | Users who connected their wallet again |
-| **transaction** | Users who transacted again |
-| **page** | Users who visited any page |
-| **Custom event** | Users who performed a specific action |
+| Setting | What it does |
+|---------|--------------|
+| **Entry event** | Defines the cohort: users are grouped by the week they first performed this event (defaults to wallet connect; "Any event" groups everyone) |
+| **Retention event** | The action that counts as returning in a later week (e.g. `connect`, `transaction`, `page`, or a custom event) |
+| **Retention type** | **Rolling** (default): a user counts toward week N if active in week N or any later week, giving a smooth curve. **Recurring**: counts only if active in exactly week N, so the curve can dip and recover |
 
 <Tip>For crypto apps, `transaction` retention is usually the most meaningful metric because it shows who's actually using your protocol.</Tip>
+
+You can also narrow the cohort with the **Segment** filter: device, browser, OS, country, volume, revenue, points, referrer, referral, builder codes, UTM parameters, or a wallet label. Alternatively, switch **Retention by** to **User label** to retain on a wallet label value (e.g. `open_interest > 10000`) instead of an event.
 
 ### Step 3: Read the retention matrix
 
 The retention chart displays:
 
-- **Rows**: Cohorts (grouped by start week/month)
-- **Columns**: Time periods after start
-- **Cells**: Percentage of cohort still active
+- **Rows**: Cohorts, grouped by start week, plus a pinned "Mean retention" row (the unweighted average across all visible cohorts)
+- **Columns**: Weeks after the cohort's start (Week 0 through however many weeks have fully elapsed)
+- **Cells**: Percentage of the cohort still active in that week
 
 <Frame caption="Cohort retention shows which user groups stick around.">
   <img src="/images/retention.png" alt="Retention Chart" />
 </Frame>
 
-**Color coding:**
-- 🟢 Green = above average retention
-- 🟡 Yellow = average retention
-- 🔴 Red = below average retention
+**Color coding:** cells shade from light to dark green as the retention percentage increases (darkest at 100%). Week 0 is always 100% by definition. Weeks whose observation window hasn't fully elapsed yet are shown blank or dashed rather than colored.
 
 ### Step 4: Identify patterns
 
@@ -94,6 +92,8 @@ Look for cohorts with better or worse retention:
 - Is there seasonal variation in retention?
 
 ### Retention benchmarks for crypto apps
+
+These are general industry rules of thumb to gauge whether your numbers are healthy, not figures measured across Formo's dataset. Use them as a rough reference point rather than a target.
 
 | App Type | Week 1 | Week 4 | Week 8 |
 |-----------|--------|--------|--------|
@@ -126,5 +126,5 @@ Based on your retention analysis:
 |---------|----------------|
 | **Segments** | Create segments of retained vs. churned users |
 | **Funnels** | Measure conversion for retained users |
-| **Alerts** | Get notified when retention drops |
+| **Alerts** | Notify when a user's lifecycle status changes to Churned |
 | **Wallet Profiles** | Investigate high-retention users |

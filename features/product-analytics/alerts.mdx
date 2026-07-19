@@ -47,7 +47,7 @@ Formo supports two trigger types: **Event alerts**, which fire on individual mat
 
 <Tabs>
   <Tab title="Events">
-    Triggers when a new event matches your filters. Each matching event is sent to your webhook.
+    Triggers when a new event matches your filters. Formo checks for matching events every 5 minutes; each matching event since the last check is sent to your webhook.
 
     | Event Type | When it fires |
     |------------|--------------|
@@ -83,7 +83,7 @@ Formo supports two trigger types: **Event alerts**, which fire on individual mat
     | **lifecycle** | User lifecycle stage (New, Returning, etc.) |
     | **socials** | Social profiles (e.g., Farcaster) |
 
-    `net_worth_usd`, `volume`, `revenue`, and `points` support numeric comparisons (`>`, `>=`, `<`, `<=`, `=`); the rest match on equality.
+    `net_worth_usd`, `volume`, `revenue`, `points`, **apps**, **tokens**, and **chains** support numeric comparisons (`>`, `>=`, `<`, `<=`, `=`) against a usage threshold (e.g. chain activity > 10 transactions); the rest match on equality.
   </Tab>
 </Tabs>
 
@@ -254,10 +254,9 @@ For Slack incoming webhooks (`hooks.slack.com`), Formo formats each event as an 
 
 Each message includes:
 - A **header** with the alert name
-- A **user** link (clickable link to Formo profile)
+- A **user** link (clickable link to Formo profile, if available)
 - **Event properties** (key-value pairs from the event, up to 10 properties)
 - **Metadata fields**: Country, Device, Browser, OS, Referrer, Referral, UTM Source, UTM Medium, UTM Campaign, UTM Term, UTM Content - only shown when non-empty
-- A **timestamp** and **View User** button
 - Up to **25 events** per batch, with an overflow summary if more were found
 
 **Sample Slack Block Kit payload (one event = one message):**
@@ -293,23 +292,6 @@ Each message includes:
         "type": "mrkdwn",
         "text": "*Country:* Vietnam\n*Device:* Desktop\n*Browser:* Chrome\n*OS:* MacOS\n*Referrer:* google.com\n*UTM Source:* google\n*UTM Medium:* cpc\n*UTM Campaign:* whale-acquisition"
       }
-    },
-    {
-      "type": "context",
-      "elements": [
-        { "type": "mrkdwn", "text": ":clock1: Feb 9, 06:42 AM" }
-      ]
-    },
-    {
-      "type": "actions",
-      "elements": [
-        {
-          "type": "button",
-          "text": { "type": "plain_text", "emoji": true, "text": "View User" },
-          "style": "primary",
-          "url": "https://app.formo.so/teams/team_1/projects/proj_123/users/0xF04bC8FdFC8b1c03Fa77885574Ae6Ea041E26bdc"
-        }
-      ]
     }
   ]
 }

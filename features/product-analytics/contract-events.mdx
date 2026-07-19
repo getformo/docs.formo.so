@@ -39,8 +39,8 @@ Monitor your smart contract activity in real-time. This guide walks you through 
 |-------|-------------|---------|
 | **Chain** | The blockchain network | Ethereum, Base, Arbitrum |
 | **Contract Address** | Your contract's address | `0x1234...abcd` |
-| **Name** (optional) | Friendly name for reference | "Swap Router" |
-| **ABI** (optional) | Formo automatically fetches the contract ABI from Etherscan to decode events. |  |
+| **Name** | Friendly name for reference. Auto-filled from the verified contract source when available; edit if you want a different label. | "Swap Router" |
+| **ABI** | Required to decode events. Formo automatically fetches it once the address and chain are set (Etherscan, then Sourcify as a fallback); paste it manually if auto-detection fails. |  |
 
 3. Click **Add contract**
 
@@ -57,17 +57,29 @@ After adding a contract, select one or more events to ingest into Formo:
 1. Click on your contract in the list
 2. Switch on the **Ingest contract events** toggle
 3. You'll see all available events from the ABI
-4. Toggle on the events you want to track from the list
+4. Toggle on the events you want to track from the list (up to 10 events per contract)
 
-### Step 4: View events in Activity Feed
+<Note>Event ingestion requires a paid plan. On the Free plan, you can still add a contract to decode transactions, but event selection is locked until you upgrade.</Note>
 
-Once configured, contract events appear in your Activity Feed:
+### Step 4: Deploy the pipeline
+
+Selecting events and saving the contract doesn't start ingestion by itself; the events pipeline needs to be deployed.
+
+1. Click **Add contract** (or **Save**) to save your event selection
+2. In the Contracts settings page, click **Deploy** (or **Redeploy** if a pipeline is already live)
+3. Track progress via the pipeline status badge: **Draft**, **Live**, **Paused**, **Inactive**, or **Error**
+
+See the [contract events guide](/guides/contract-events#pipeline-management) for details on managing pipeline state.
+
+### Step 5: View events in Activity Feed
+
+Once the pipeline is live, contract events appear in your Activity Feed:
 
 1. Go to **Activity** in the left navigation
 2. Filter by the **Contract Event** event type to see contract events
 3. Click any event to see decoded parameters including transaction hash, block number, function name and function parameters
 
-### Step 5: Use contract events in funnels
+### Step 6: Use contract events in funnels
 
 Build funnels that include onchain actions:
 

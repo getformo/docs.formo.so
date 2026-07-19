@@ -1,6 +1,6 @@
 ---
-title: 'Dashboards'
-sidebarTitle: 'Dashboards'
+title: 'Charts'
+sidebarTitle: 'Charts'
 description: 'Build custom dashboards with line, bar, pie, and funnel charts to visualize analytics data. Share boards with your team for collaborative reporting.'
 ---
 
@@ -8,10 +8,10 @@ description: 'Build custom dashboards with line, bar, pie, and funnel charts to 
 	<img src="/images/chartbuilder.png" alt="Custom dashboards" />
 </Frame>
 
-With Formo, your data is yours to query, transform, and export. You can:
+You can query, transform, and export your data:
 
-- Create custom charts and reports. Turn your data into decisions with powerful visualizations and real-time insights.
-- Make custom boards public with a single click. Easily share insights with your team and external stakeholders.
+- Create custom charts and reports that update in real time.
+- Make custom boards public with a single click, to share with your team or external stakeholders.
 - Connect external [BI tools](/data/bi) directly to Formo.
 
 ## Core concepts
@@ -59,9 +59,9 @@ Select your query in the SQL editor to get AI-assisted query generation and debu
 
 ### Ask AI
 
-Use [Ask AI](/features/product-analytics/ai) to have an agent build charts for you and explore your data with natural language. 
+Use [Ask AI](/features/product-analytics/ai) to build charts and explore your data with natural language.
 
-<Frame caption="Say hello to your in-house AI data analyst.">
+<Frame caption="Ask AI to build a chart or explore your data.">
 	<img src="/images/ai.png" alt="Custom dashboard" />
 </Frame>
 
@@ -69,7 +69,7 @@ Ask AI can:
 - Answer questions about your data
 - Generate SQL queries
 - Build custom charts and boards
-- Surface hidden insights and patterns
+- Surface patterns in your data
 
 ### Export CSV
 
@@ -115,7 +115,7 @@ The easiest way to create charts is using natural language:
    - "What are my top 10 referrers by transaction count?"
    - "Chart wallet connects by country this month"
 3. AI generates the SQL query and chart
-4. Click **Save to Dashboard**
+4. Click **Add to Dashboard**
 
 <Frame caption="Ask AI to generate charts from natural language.">
 	<img src="/images/ai.png" alt="Ask AI" />
@@ -133,11 +133,11 @@ The easiest way to create charts is using natural language:
 
 For more control, write SQL directly:
 
-1. Click **New Chart** > **SQL Editor**
+1. Click **Add Chart** > **Blank chart**
 2. Write your query using Formo's schema
 3. Click **Run** to preview results
 4. Choose your visualization type
-5. Click **Save**
+5. Click **Save Chart**
 
 **Example: Daily active wallets**
 
@@ -172,6 +172,7 @@ After running your query, select the chart type that best represents your data:
 | **Number** | Single KPI metric |
 | **Table** | Detailed data exploration |
 | **Funnel** | Conversion analysis |
+| **Flow** | User path exploration |
 | **Retention** | Cohort retention |
 
 ### Step 5: Organize your board
@@ -179,14 +180,11 @@ After running your query, select the chart type that best represents your data:
 Arrange charts into a dashboard layout:
 
 1. Open your board from **Dashboards** in the sidebar
-2. Drag charts to rearrange
-3. Resize charts by dragging corners
-4. Group related metrics together
+2. Open the board actions menu and select **Edit layout**
+3. Use the up and down arrows on each chart to reorder it
+4. Click **Save layout** when you're done
 
-**Recommended dashboard layout:**
-- **Top row**: Key numbers (DAU, revenue, transactions)
-- **Middle**: Time-series trends
-- **Bottom**: Breakdowns and tables
+Number charts are grouped automatically into their own row at the top of the board; other chart types follow in the order you set.
 
 ### Step 6: Share your dashboard
 
