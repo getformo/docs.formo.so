@@ -325,9 +325,10 @@
   "footer": {
     "socials": {
       "website": "https://formo.so",
-      "github": "https://github.com/getformo",
       "x": "https://x.com/getformo",
-      "linkedin": "https://linkedin.com/company/getformo"
+      "linkedin": "https://linkedin.com/company/getformo",
+      "github": "https://github.com/getformo",
+      "youtube": "https://www.youtube.com/@getformo"
     }
   },
   "integrations": {
