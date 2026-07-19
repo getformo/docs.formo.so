@@ -5,7 +5,7 @@ description: "Build multi-step conversion funnels to track user journeys from fi
 keywords: ["onchain funnel", "crypto conversion tracking", "DeFi funnel analytics", "wallet connect funnel", "web3 conversion rate"]
 ---
 
-Funnels show you exactly where your drop-offs are, and Conversion Insights reveal the underlying why.
+Funnels show where users drop off. Conversion Insights show why.
 
 ## Part 1: Navigate to the Chart Builder
 
@@ -159,7 +159,9 @@ The funnel splits into multiple bands, one per breakdown value. Compare conversi
 </Step>
 </Steps>
 
-**Pro tip**: If your iOS users convert at 5 percent but web at 25 percent, you have a mobile UX problem. If users from Twitter convert at 40 percent but Discord at 15 percent, adjust your acquisition strategy.
+<Tip>
+If your iOS users convert at 5 percent but web at 25 percent, that points to a mobile UX problem. If users from Twitter convert at 40 percent but Discord at 15 percent, that points to your acquisition mix.
+</Tip>
 
 ## Part 7: Use Conversion Insights
 
@@ -171,7 +173,7 @@ Formo analyzes your funnel data to find what drives conversions. Click the **Ins
 
 Example insight: "Users from Referrer=twitter have 2.3x lift in Step 2 conversion (wallet connect), with an odds ratio of 3.1."
 
-Act on this: Double down on Twitter traffic if wallet conversion is your bottleneck.
+If wallet conversion is your bottleneck, this points to prioritizing Twitter traffic.
 
 ## Part 8: Save Your Funnel to a Dashboard
 
@@ -282,15 +284,6 @@ Track when transactions fail to identify UX issues that cause drop-off:
 4. Set a destination to a webhook or Slack
 5. Filter the delivered events for `properties.status = "failed"` on your receiver (status isn't a filterable alert condition), and investigate spikes - they often correlate with funnel drop-off at the transaction step
 
-## Next Steps
-
-Your conversion funnel is live. Next steps:
-
-- **[Analyze Segments](/features/wallet-intelligence/segments)**: Create a segment of high-converting users and re-target similar users.
-- **[Set Alerts](/features/product-analytics/alerts)**: Get notified when high-value users connect or transact.
-- **[Read the Funnel Guide](/features/product-analytics/funnels)**: Deep dive into advanced funnel features.
-- **[Measure Retention](/guides/retention)**: Track if high-converting cohorts also retain well.
-
 ## FAQ
 
 <AccordionGroup>
@@ -315,5 +308,4 @@ Start with the default of 2 days and adjust based on your product.
 
 </AccordionGroup>
 
-
-**Ready to dive deeper?** See the complete [Funnel Analytics documentation](/features/product-analytics/funnels) or email us at support@formo.so.
+See the [Funnel Analytics documentation](/features/product-analytics/funnels) for full detail, or email support@formo.so with questions.

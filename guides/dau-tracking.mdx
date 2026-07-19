@@ -4,9 +4,7 @@ sidebarTitle: 'How to Track DAU'
 description: 'Measure daily, weekly, and monthly active users for your onchain app with wallet-based analytics. Build DAU, WAU, and MAU dashboards and charts.'
 ---
 
-Track daily active users (DAU), weekly active users (WAU), and monthly active users (MAU) for your crypto app with Formo's wallet-native analytics.
-
-Unlike traditional analytics that count page views, Formo tracks actual wallet engagement, giving you accurate user metrics for onchain applications.
+Formo measures DAU, WAU, and MAU by unique wallet address instead of page views or cookies. This guide covers viewing these metrics in the dashboard, building custom charts, and segmenting active users by lifecycle and behavior.
 
 ## What you'll learn
 
@@ -43,8 +41,6 @@ Traditional web analytics count "active users" by sessions or page views. For cr
 
 ## Part 2: How to View Core Metrics
 
-Formo provides core metrics for tracking user engagement out of the box.
-
 ### Step 1: Open the Overview dashboard
 
 <Steps>
@@ -77,7 +73,6 @@ The overview chart shows daily unique wallets over time. Look for:
 - **Growth trends**: Is DAU increasing week-over-week?
 - **Weekly patterns**: Which days have highest engagement?
 - **Anomalies**: Sudden spikes or drops to investigate
-
 
 ## Part 3: How to Create a Custom DAU Dashboard
 
@@ -138,7 +133,6 @@ ORDER BY date
 
 <Note>For a true rolling 7-day WAU, you'll need a window function. The Ask AI assistant can help generate this query.</Note>
 
-
 ## Part 4: How to Segment Active Users
 
 Not all active users are equal. Segment by behavior and value.
@@ -174,7 +168,6 @@ Track which channels drive the most engaged users:
   <Step title="Compare conversion rates across sources" />
 </Steps>
 
-
 ## Part 5: How to Track Active Users Over Time
 
 ### Week-over-week comparison
@@ -208,7 +201,6 @@ A healthy pattern:
 - Stabilization in weeks 2-4
 - Consistent long-term retention
 
-
 ## Part 6: Example DAU Dashboard
 
 Here's a complete dashboard setup for tracking active users:
@@ -224,7 +216,6 @@ Here's a complete dashboard setup for tracking active users:
 | **Active by Referrer** | Bar | DAU breakdown by traffic source |
 | **Active by Country** | Pie | Geographic distribution |
 
-
 ## Summary
 
 You've learned how to:
@@ -234,13 +225,6 @@ You've learned how to:
 3. **Create custom dashboards** with SQL or Ask AI
 4. **Segment active users** by lifecycle and engagement
 5. **Track trends** with week-over-week comparisons
-
-## Next Steps
-
-- **[Measure Retention](/guides/retention)**: Track week-over-week retention.
-- **[Segment Wallets](/guides/wallet-segmentation)**: Create behavioral segments.
-- **[Build a Dashboard](/guides/custom-dashboard)**: Build a complete metrics dashboard.
-- **[Explore with SQL](/guides/sql-explorer)**: Run custom SQL queries.
 
 ## FAQ
 

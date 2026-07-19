@@ -4,7 +4,7 @@ sidebarTitle: 'How to Set Up Attribution'
 description: 'Capture the complete user journey from first touch to onchain conversion with multi-touch attribution for crypto marketing campaigns.'
 ---
 
-Understand which marketing channels actually drive onchain conversions, not just clicks. This guide shows you how to set up attribution tracking, compare models, and optimize your marketing spend.
+This guide covers setting up attribution tracking, comparing attribution models, and analyzing which channels drive onchain conversions.
 
 ## What you'll learn
 
@@ -37,7 +37,6 @@ A typical onchain user touches multiple channels:
 5. **Conversion**: Connects wallet and transacts
 
 Each touchpoint matters. The question is: which one gets credit?
-
 
 ## Part 2: How to Set Up UTM Tracking
 
@@ -98,10 +97,9 @@ Use consistent naming to make analysis easier:
 - Underscores for spaces
 - Include date/month for campaigns: `campaign_name_mmyy`
 
-
 ## Part 3: How to Set Up Referral Tracking
 
-Referral programs are a powerful growth channel for crypto apps. Formo automatically captures referral codes alongside UTM parameters.
+Formo automatically captures referral codes alongside UTM parameters.
 
 ### Referral code basics
 
@@ -158,7 +156,6 @@ GROUP BY referrer
 ORDER BY wallets DESC
 ```
 
-
 ## Part 4: Understand Attribution Models
 
 Formo supports multiple attribution models. Each gives credit differently.
@@ -196,18 +193,30 @@ Formo supports multiple attribution models. Each gives credit differently.
 | Grow awareness | First-touch | Shows which channels introduce new users |
 | Optimize conversions | Last-touch | Shows what pushes users to convert |
 
-
 ## Part 5: How to Analyze Attribution in Formo
 
 ### View attribution in Overview
 
 <Steps>
   <Step title="Go to Overview in the Formo Dashboard" />
-  <Step title="See the Referrers chart in the tabs" />
+  <Step title="Find the Channels, Referrers, Referrals, and UTM tabs">
+    These sit alongside your other traffic breakdowns (Pages, Countries, Devices).
+  </Step>
   <Step title="Select different units (users, volume, revenue)" />
 </Steps>
 
 <Tip>You can apply filters on the overview page to see attribution by different segments.</Tip>
+
+Each tab answers a different attribution question:
+
+| Tab | Shows |
+|-----|-------|
+| **Channels** | Traffic auto-classified into one of 13 acquisition channels (Paid Search, Organic Social, Direct, etc.) |
+| **Referrers** | The specific referring domain (twitter.com, google.com, defillama.com) |
+| **Referrals** | Traffic from `ref` codes, plus `affiliate`/`referral` UTM traffic |
+| **UTM** | Breakdown by `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and `utm_term` |
+
+Formo automatically classifies every session into a channel at ingestion time, using a priority-ordered ladder over the referrer domain, `utm_medium`, and ad-platform click IDs. See the full [channel classification table](/features/product-analytics/key-metrics#channels) for how each of the 13 channels is detected.
 
 ### Key metrics by source
 
@@ -221,6 +230,38 @@ For each traffic source, track:
 | **Volume** | Revenue contribution |
 | **Connect rate** | Visitor → Wallet conversion |
 | **Transaction rate** | Wallet → Transaction conversion |
+
+### Create custom attribution charts
+
+Beyond the built-in tabs, build custom charts to track attribution over time. Use **Ask AI** for quick answers, or the SQL editor for full control. See [Dashboards](/features/product-analytics/charts) for the full guide to creating, organizing, and sharing charts.
+
+**Ask AI examples:**
+
+> "Compare wallet connects by utm_source for the last 30 days"
+
+> "Show me transactions and volume by utm_campaign this month"
+
+> "What are the top 5 first-touch sources for users who transacted?"
+
+> "Which utm_source has the highest transaction volume per visitor?"
+
+**Attribution chart ideas:**
+
+| Chart | Query |
+|-------|-------|
+| **Visitors by Source** | Daily visitors grouped by utm_source |
+| **Conversion by Source** | Transaction rate by first-touch source |
+| **Revenue by Campaign** | Volume grouped by utm_campaign |
+| **Source Trend** | Weekly wallet connects by top 5 sources |
+
+**Attribution funnel:**
+
+<Steps>
+  <Step title="Go to Dashboards, click Add Chart, and select the Funnel chart type" />
+  <Step title="Add steps: Visit → Connect → Transaction" />
+  <Step title="Add breakdown by UTM Source" />
+  <Step title="Compare conversion rates across channels" />
+</Steps>
 
 ### Calculate true ROI
 
@@ -240,49 +281,7 @@ Cost per Transaction = Campaign Spend / Transactions from Campaign
 
 In this example, Twitter Ads has the best ROI.
 
-
-## Part 6: How to Create Attribution Reports
-
-### Using Ask AI for attribution analysis
-
-Get quick attribution insights with Ask AI (click **Ask AI** in the sidebar):
-
-**Channel comparison:**
-> "Compare wallet connects by utm_source for the last 30 days"
-
-**Campaign performance:**
-> "Show me transactions and volume by utm_campaign this month"
-
-**First vs last touch:**
-> "What are the top 5 first-touch sources for users who transacted?"
-
-**ROI analysis:**
-> "Which utm_source has the highest transaction volume per visitor?"
-
-### Build an attribution dashboard
-
-Create a dedicated attribution dashboard:
-
-| Chart | Query |
-|-------|-------|
-| **Visitors by Source** | Daily visitors grouped by utm_source |
-| **Conversion by Source** | Transaction rate by first-touch source |
-| **Revenue by Campaign** | Volume grouped by utm_campaign |
-| **Source Trend** | Weekly wallet connects by top 5 sources |
-
-### Attribution funnel
-
-Create funnels filtered by source:
-
-<Steps>
-  <Step title="Go to Dashboards, click Add Chart, and select the Funnel chart type" />
-  <Step title="Add steps: Visit → Connect → Transaction" />
-  <Step title="Add breakdown by UTM Source" />
-  <Step title="Compare conversion rates across channels" />
-</Steps>
-
-
-## Part 7: How to Optimize Your Marketing
+## Part 6: How to Optimize Your Marketing
 
 ### Identify your best channels
 
@@ -333,8 +332,7 @@ Twitter (awareness) → DeFiLlama (research) → Direct (conversion)
 
 All three channels contributed. Cutting Twitter would reduce DeFiLlama traffic.
 
-
-## Part 8: Advanced Attribution Tactics
+## Part 7: Advanced Attribution Tactics
 
 ### Cross-channel attribution
 
@@ -359,7 +357,6 @@ Compare user quality by acquisition cohort:
 | Discord | 25% | $120 |
 | DeFiLlama | 35% | $200 |
 
-
 ## Attribution checklist
 
 - [ ] UTM parameters on all social links
@@ -371,7 +368,6 @@ Compare user quality by acquisition cohort:
 - [ ] Attribution dashboard created
 - [ ] Weekly review of channel performance
 
-
 ## Summary
 
 You've learned how to:
@@ -379,16 +375,9 @@ You've learned how to:
 1. **Set up UTM tracking** across all marketing channels
 2. **Set up referral tracking** with ref codes
 3. **Understand attribution models** and when to use each
-4. **Analyze attribution** in Formo with Overview
+4. **Analyze attribution** in Formo with Channels, Referrers, Referrals, and UTM, plus custom charts
 5. **Calculate true ROI** including conversion and user quality
 6. **Optimize budget allocation** based on data
-
-## Next Steps
-
-- **[Key Metrics](/features/product-analytics/key-metrics)**: Deep dive on traffic analysis.
-- **[Build Funnels](/guides/funnels)**: Build conversion funnels by source.
-- **[Segment Wallets](/guides/wallet-segmentation)**: Target high-value user segments.
-- **[Attribution Methodology](/data/attribution)**: Technical attribution details.
 
 ## FAQ
 

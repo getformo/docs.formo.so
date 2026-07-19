@@ -719,6 +719,48 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
   </Tab>
 </Tabs>
 
+### Referrer URL tracking
+
+Referrer URL tracking lets you understand the specific URL where your users are coming from, as long as the site has the correct `Referer-Policy` header set.
+
+We recommend setting the `no-referrer-when-downgrade` <a target="_blank" rel="noopener noreferrer" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#no-referrer-when-downgrade">policy</a>, which will only send the domain, path, and query parameters to the destination URL as long as the protocol security level stays the same (i.e. `HTTP` → `HTTP`, or `HTTPS` → `HTTPS`).
+
+If the protocol security level is downgraded (i.e. `HTTPS` → `HTTP`), the referrer will not be sent. This is a good compromise to make sure your users' privacy is respected while still getting a good amount of data.
+
+Here's how to configure this:
+
+<Tabs>
+  <Tab icon="rectangle-terminal" title="Next.js">
+    If you are using Next.js, you can use the headers property in your `next.config.js` file to configure the referrer policy:
+
+    ```javascript
+    module.exports = {
+      async headers() {
+        return [
+          {
+            source: "/:path*",
+            headers: [
+              {
+                key: "Referrer-Policy",
+                value: "no-referrer-when-downgrade",
+              },
+            ],
+          },
+        ];
+      },
+    };
+    ```
+
+  </Tab>
+  <Tab icon="code" title="HTML">
+    You can set the referrer policy using a meta tag in the `<head>` section of your HTML:
+
+    ```html
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    ```
+  </Tab>
+</Tabs>
+
 ### Referrals
 
 Formo autodetects `ref`, `referral`, `refcode`, `af`, and `referrer` query parameters in the URL. You can customize how referrals are detected by the SDK:

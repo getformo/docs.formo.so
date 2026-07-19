@@ -5,8 +5,7 @@ description: "Measure Day 7, 30, and 90 retention rates for your crypto app with
 keywords: ["crypto retention analytics", "DeFi user retention", "web3 churn analysis", "cohort retention", "onchain retention tracking"]
 ---
 
-
-Acquiring users is expensive. Keeping them is where the real growth happens. In crypto, a 10 percent improvement in Day 7 retention can be worth thousands in LTV. This guide shows you how to measure retention, spot churn, and re-engage at-risk users.
+This guide covers measuring retention cohorts, identifying churn patterns, and building segments to re-engage at-risk users.
 
 ## Part 1: Build a Retention Cohort Chart
 
@@ -65,7 +64,7 @@ Click on an insight to drill into the data. Ask: Is this a real problem or noise
 - A specific geography or device churning faster suggests a UX or localization problem
 - A cohort that performs poorly across all retention windows suggests they were bad-fit users to begin with
 
-## Part 3: Segment Churned and At-Risk Users
+## Part 3: Segment Churned and At Risk Users
 
 To re-engage users, you must first identify them. Use the **Users** page to create segments:
 
@@ -158,46 +157,38 @@ Formo analyzes your data and provides insights with supporting numbers.
 <img src="/images/ai.png" alt="Ask AI" />
 </Frame>
 
-## Real-World Example: Improving Retention by 5%
-
-**Scenario**: Your DEX app has 25% Day 7 retention. You want to hit 30%.
+## Real-World Example: Diagnosing a Retention Drop
 
 <Steps>
 <Step>
-**Identify the problem** (Week 1): Create a retention cohort chart. See that mobile users churn 15 points faster than web.
+**Identify**: A retention cohort chart shows mobile users churn 15 points faster than web.
 </Step>
 
 <Step>
-**Understand the why** (Week 2): Use Ask AI: "Why are mobile users churning faster?" Discover: mobile users have 3x higher transaction failures due to a timeout issue.
+**Diagnose**: Ask AI "Why are mobile users churning faster?" surfaces a timeout issue causing 3x more failed transactions on mobile.
 </Step>
 
 <Step>
-**Build a fix** (Week 3): Increase timeout from 30s to 60s. Roll out to 10% of mobile users.
+**Test a fix**: Increase the timeout from 30s to 60s, roll it out to 10% of mobile users, and compare that segment's Day 7 retention against older cohorts.
 </Step>
 
 <Step>
-**Measure impact** (Week 4): Create a segment of "mobile users who upgraded on Day 3". Compare their Day 7 retention vs old cohorts. See 8% improvement in that segment.
-</Step>
-
-<Step>
-**Roll out fully** (Week 5): Deploy 60s timeout to all. Your Day 7 retention climbs from 25% to 28%. Repeat for other friction points.
+**Roll out**: If the test segment's retention improves, deploy the fix to all mobile users and keep monitoring Day 7 retention.
 </Step>
 </Steps>
 
-By the end of 6 weeks, you've hit 30% Day 7 retention. That's a 20% improvement in user value.
-
 ## Best Practices
 
-- **Weekly deep dives**: Check Insights every Monday. Act on red flags immediately.
-- **Cohort comparisons**: Compare Week 1 vs Week 2 cohorts. Which is healthier? Why?
-- **Segment tests**: Create two segments (e.g., "High fee payers" vs "Low fee payers"). Compare retention. High spenders often retain better, revealing your value lever.
+- **Weekly review**: Check Insights every Monday and act on red flags immediately.
+- **Cohort comparisons**: Compare consecutive weekly cohorts to see if retention is trending up or down, and investigate why.
+- **Segment tests**: Compare retention between segments (e.g., high fee payers vs. low fee payers) to find what predicts retention.
 - **Pair with conversion**: High conversion doesn't mean high retention. A user who swaps once and never returns is not a retained user. Optimize for both.
-- **Monitor by source**: Create segments by referrer. Which traffic sources give best-retaining users? Double down there.
+- **Monitor by source**: Segment by referrer to see which traffic sources produce the best-retaining users.
 - **Check wallet labels**: If you use [Wallet Intelligence](/features/wallet-intelligence/overview), segment by wallet label (e.g., "Verified Coinbase User"). Some labels correlate with higher retention.
 
 ## Churn Prevention Playbook
 
-Churn isn't just "users who left." It's a measurable, predictable pattern. Use this playbook to define, detect, and prevent churn in your specific app.
+Churn is a measurable, predictable pattern, not just "users who left." Use this playbook to define, detect, and prevent churn in your app.
 
 **Churn Definition by App Type**
 
@@ -222,13 +213,13 @@ GROUP BY cohort_month
 ORDER BY cohort_month DESC
 ```
 
-**At-Risk Segments to Build**
+**At Risk Segments to Build**
 
 <Note>
 Create these three segments in the Users page and save them for weekly monitoring:
 </Note>
 
-1. **At-Risk Power Users** (High priority)
+1. **At Risk Power Users** (High priority)
    - Filter: `Sessions > 20` AND `Last Activity 7-14 days ago`
    - Why: These users have proven value. Re-engage before they churn.
 
@@ -250,11 +241,11 @@ Set up these alerts in Project Settings:
 
 **Re-engagement Campaign Strategies**
 
-| Segment | Trigger | Action | Expected Lift |
-|---------|---------|--------|---|
-| Power users going quiet | 7 days of inactivity | VIP email + bonus points | 15-25% return |
-| New users stalling | 3 days, fewer than 5 sessions | In-app nudge + tutorial replay | 20-30% return |
-| Recently churned | 30-45 days inactive | "We miss you" discount offer | 10-15% return |
+| Segment | Trigger | Action |
+|---------|---------|--------|
+| Power users going quiet | 7 days of inactivity | VIP email + bonus points |
+| New users stalling | 3 days, fewer than 5 sessions | In-app nudge + tutorial replay |
+| Recently churned | 30-45 days inactive | "We miss you" discount offer |
 
 **Analyze Churned User Behavior with Flows**
 
@@ -269,16 +260,6 @@ Compare churned vs. retained users side by side:
 - **Retained cohort**: Active 60+ days ago, has returned in the last 30 days
 
 Compare their first-week behavior: sessions count, features used, transaction volume, and entry referrer. This reveals what retained users do differently - and what to optimize in onboarding.
-
-## Next Steps
-
-You've set up retention tracking. Here's what to do next:
-
-- **[Create a Conversion Funnel](/guides/funnels)**: High retention is good, but you need high conversion first.
-- **[Use Segments for Re-engagement](/features/wallet-intelligence/segments)**: Build audiences of churned users for campaigns.
-- **[Build a Custom Dashboard](/guides/custom-dashboard)**: Track retention alongside other key metrics in one view.
-- **[Set Up Alerts](/features/product-analytics/alerts)**: Get notified when high-value users or key events happen.
-- **[Explore Your Users](/features/wallet-intelligence/wallet-profiles)**: Click on a user in the Users page to see their full profile, including lifecycle stage and activity feed.
 
 ## FAQ
 
@@ -302,7 +283,7 @@ All three matter. Day 7 catches immediate churn. Day 30 shows if you built a hab
 <Accordion title="What user lifecycle stage should I re-engage first?">
 Priority order:
 1. **Resurrected**: Users who just came back. Momentum is on your side.
-2. **At-risk Returning**: Users with only 2-3 sessions. Easy to convert to Power users.
+2. **At Risk / Returning**: Users with only 2-3 sessions. Easy to convert to Power users.
 3. **Recent Churned**: Users inactive for 30-60 days. Still remember your product.
 4. **Old Churned**: Users inactive for 6+ months. Hard to re-activate.
 

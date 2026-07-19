@@ -821,14 +821,14 @@ Events that are tracked correctly will show up in the [Activity page](/features/
   <Accordion title="How do I verify that the Formo SDK is installed correctly?">
     After installing the Formo SDK, visit your site and open the [Activity page](/features/product-analytics/activity) in the Formo dashboard. You should see your pageview appear under the most recent events. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent successfully with a 2XX status code.
   </Accordion>
+  <Accordion title="What events does Formo autocapture?">
+    After installing the SDK, Formo automatically tracks [pageviews](/data/events/page), sessions, [wallet connects](/data/events/connect), [disconnects](/data/events/disconnect), [chain switches](/data/events/chain), [transactions](/data/events/transaction), and [signatures](/data/events/signature). You can also define [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
+  </Accordion>
   <Accordion title="Does the Formo SDK work on localhost during development?">
     The SDK skips tracking in localhost by default. For testing purposes, you can enable [local testing](/sdks/web#local-testing) and [logging](/sdks/web#logging) in the SDK configuration.
   </Accordion>
   <Accordion title="How do I stop ad blockers or privacy browsers from blocking analytics?">
     Set up a [reverse proxy](/sdks/web#proxy) to route analytics data through your own domain. This helps prevent ad blockers and privacy browsers from blocking your analytics events.
-  </Accordion>
-  <Accordion title="What events does Formo autocapture?">
-    After installing the SDK, Formo automatically tracks [pageviews](/data/events/page), sessions, [wallet connects](/data/events/connect), [disconnects](/data/events/disconnect), [chain switches](/data/events/chain), [transactions](/data/events/transaction), and [signatures](/data/events/signature). You can also define [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
   </Accordion>
 </AccordionGroup>
 

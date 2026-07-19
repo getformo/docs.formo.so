@@ -1,29 +1,29 @@
 ---
 title: "Key metrics"
-description: "Track key growth metrics like visitors, wallets, transactions, and user acquisition channels to understand your product performance."
+description: "Track key growth metrics like visitors, wallets, transactions, sessions, page views, volume, and revenue to understand your product performance."
 ---
 
-## Visitors, wallets, transactions
+These are the core metrics on your project's Overview page in the Formo dashboard: how many people show up, how many connect a wallet, and how much they transact, spend, and earn you.
 
-Measure the number of visitors, wallets, and transactions to discover which tactics drive product adoption and growth.
+## Visitors
 
-<Frame caption="Key metrics for crypto teams.">
-  <img
-    src="/images/screenshots/overview.png"
-    alt="Product Analytics Overview"
-  />
-</Frame>
+Unique visitors interacting with your site or app over the selected period. See [Visitors](/data/metrics#visitors) for exactly how this is counted.
 
-### Breakdown by referrer
+## Page views
 
-<Frame caption="See a breakdown of your visitors, wallets, transactions, volume, and revenue by top referrers.">
-  <img
-    src="/images/referrer-breakdown.png"
-    alt="Product Analytics Referrer Breakdown"
-  />
-</Frame>
+How many times a page has been viewed across your site or app. See [Pages](#pages) below for a breakdown by URL.
 
-See what's moving the needle with a breakdown of your metrics by referrers. Easily understand where your onchain users come from and how they find you.
+## Wallets
+
+Unique wallet addresses that connected during the selected period. See [Wallets](/data/metrics#wallets) for details.
+
+## Transactions
+
+How many onchain transactions were made across your site or app.
+
+## Sessions
+
+A session groups the actions a visitor takes in one visit. See [Sessions](/data/metrics#sessions) for how Formo counts them.
 
 ## Session duration
 
@@ -33,48 +33,50 @@ See the average session duration of visitors and users on your app. Understand h
 
 Track your bounce rate to understand how many visitors leave after viewing only one page. A high bounce rate may indicate issues with your landing page or user experience.
 
+## Volume
+
+Total transaction volume (USD) tracked through your [custom events](/features/product-analytics/custom-events#step-3-track-with-volume-revenue-or-points), like the dollar value of a swap.
+
+## Revenue
+
+Total revenue (USD) tracked through your [custom events](/features/product-analytics/custom-events#step-3-track-with-volume-revenue-or-points), like a protocol fee.
+
+<Frame caption="Revenue tracking.">
+  <img src="/images/revenue.png" alt="Revenue tracking" />
+</Frame>
+
+## Breakdowns
+
+Break down visitors, page views, wallets, transactions, sessions, volume, or revenue by acquisition channel, referrer, referral, UTM parameter, device, browser, OS, or country, plus onchain builder codes for wallets, transactions, volume, and revenue. Session duration and bounce rate are not breakdown-eligible. Click any item in a breakdown to drill down into the [users](/features/wallet-intelligence/overview) behind it.
+
+<Frame caption="See a breakdown of your visitors, wallets, transactions, volume, and revenue by any dimension.">
+  <img
+    src="/images/referrer-breakdown.png"
+    alt="Product Analytics Referrer Breakdown"
+  />
+</Frame>
+
 ## Pages
 
-See the top pages that your users are visiting. See which pages are driving the most traffic and conversions.
+See the top pages, entry pages, exit pages, and origins that your users are visiting. See which pages are driving the most traffic and conversions.
 
 <Frame caption="Understand what users are seeing on your site or app.">
   <img src="/images/pages.png" alt="Product Analytics Pages" />
 </Frame>
 
-### Entry and exit pages
-
-View Entry and Exit page analytics for your site and app.
+### Entry, exit, and origin pages
 
 - **Entry pages** are the first pages visitors land on when they come to your website. Think of them as digital front doors where your user's journey begins.
 - **Exit pages** are the last pages users view before leaving your site. They represent the end of a visitor's session, whether it's after completing a goal or bouncing before engaging further.
+- **Origins** groups traffic by the full page origin (protocol and domain), useful if your app spans multiple subdomains or environments.
 
-Understanding both gives you a clear window into how people interact with your site and where you might be losing them.
+Understanding these gives you a clear window into how people interact with your site and where you might be losing them.
 
-## Channels, Referrers, UTM, referrals
-
-See where your users are coming from by acquisition channel, referrer, UTM parameters, and referrals.
-
-### Channels
+## Channels
 
 Formo automatically classifies every session into one of 13 acquisition channels using a priority-ordered ladder over the referrer domain, `utm_medium`, and 8 ad-platform click IDs (`gclid`, `gad_source`, `fbclid`, `msclkid`, `ttclid`, `twclid`, `li_fat_id`, `rdt_cid`). Classification happens at ingestion time.
 
-The 13 channels (first match wins):
-
-1. **Paid Search** - paid traffic from Google, Bing, DuckDuckGo, Yahoo, Yandex, Baidu, Brave, Kagi, Naver, etc.
-2. **Paid Video** - paid traffic from YouTube, Vimeo, Twitch, Dailymotion, Loom, Wistia.
-3. **Paid Social** - paid traffic from Meta, X/Twitter, LinkedIn, Reddit, TikTok, Pinterest, Snapchat, Threads, Discord, Telegram, Farcaster, etc.
-4. **Email** - `utm_medium` of `email`, `e-mail`, `e_mail`, or `newsletter`.
-5. **Referrals** - `utm_medium` is `affiliate` or `referral`, or any non-empty `ref` query parameter.
-6. **Display** - `utm_medium` of `display`, `banner`, `expandable`, or `interstitial`.
-7. **Paid Other** - a paid signal (paid `utm_medium` or click ID) that matched none of the above, with no recognized source or ad format. A catch-all so paid traffic is never relabelled as organic or Direct.
-8. **AI** - traffic from ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, Phind, Poe, Mistral Chat, Meta AI, You.com, Pi. (No other analytics tool surfaces this yet.)
-9. **Organic Search** - unpaid traffic from search engines (`utm_medium=organic` or referrer matches a search domain with no paid signal).
-10. **Organic Social** - unpaid traffic from social platforms.
-11. **Organic Video** - unpaid traffic from video platforms.
-12. **Referrers** - any other non-empty referrer not matched above.
-13. **Direct** - no referrer, no UTM, no click ID (typed URL, bookmark, or stripped referrer).
-
-Paid is detected from any of: paid pricing mediums (`cpc`, `cpm`, `cpv`, `cpa`, `ppc`, `paidsearch`, `paidsocial`, `sem`, `retargeting`), any `utm_medium` starting with `paid`, or any of the 8 click IDs above. Sub-classification (Search vs Social vs Video) uses the referrer domain.
+See [Channel](/data/metrics#channel) for the full priority list and detection rules.
 
 <Frame caption="Understand where your users are coming from.">
   <img
@@ -83,6 +85,18 @@ Paid is detected from any of: paid pricing mediums (`cpc`, `cpm`, `cpv`, `cpa`, 
   />
 </Frame>
 
+## Referrers
+
+See what's moving the needle with a breakdown of your metrics by referrer. Easily understand where your onchain users come from and how they find you. See [Referrers / Sources](/data/metrics#referrers-sources) for details.
+
+Getting the specific referrer URL (not just the domain) requires the right `Referrer-Policy` header on your site. See [Referrer URL tracking](/sdks/web#referrer-url-tracking) for how to configure it.
+
+## Builder codes
+
+For wallets, transactions, volume, and revenue, Formo defaults to breaking down by [builder codes](/data/events/transaction#builder-codes), an onchain attribution standard (ERC-8021) that lets apps identify themselves directly in transaction calldata.
+
+## UTM
+
 The Formo SDK automatically adds the following UTM parameters present on the page to events fired from that page load:
 
 - utm_source
@@ -90,49 +104,12 @@ The Formo SDK automatically adds the following UTM parameters present on the pag
 - utm_medium
 - utm_term
 - utm_content
-- ref
 
-### Referrer URL tracking
+Break down any metric by UTM source, medium, campaign, content, or term. See [UTM parameters](/data/metrics#utm-parameters) for details, and use Formo's [UTM Generator](https://formo.so/utm-generator) to generate your marketing links.
 
-Referrer URL tracking lets you understand the specific URL where your users are coming from, as long as the site has the correct `Referer-Policy` header set.
+## Referrals
 
-We recommend setting the `no-referrer-when-downgrade` <a target="_blank" rel="noopener noreferrer" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy#no-referrer-when-downgrade">policy</a>, which will only send the domain, path, and query parameters to the destination URL as long as the protocol security level stays the same (i.e. `HTTP` → `HTTP`, or `HTTPS` → `HTTPS`).
-
-If the protocol security level is downgraded (i.e. `HTTPS` → `HTTP`), the referrer will not be sent. This is a good compromise to make sure your users' privacy is respected while still getting a good amount of data.
-
-Here's how to configure this:
-
-<Tabs>
-  <Tab icon="rectangle-terminal" title="Next.js">
-    If you are using Next.js, you can use the headers property in your `next.config.js` file to configure the referrer policy:
-
-    ```javascript
-    module.exports = {
-      async headers() {
-        return [
-          {
-            source: "/:path*",
-            headers: [
-              {
-                key: "Referrer-Policy",
-                value: "no-referrer-when-downgrade",
-              },
-            ],
-          },
-        ];
-      },
-    };
-    ```
-
-  </Tab>
-  <Tab icon="code" title="HTML">
-    You can set the referrer policy using a meta tag in the `<head>` section of your HTML:
-
-    ```html
-    <meta name="referrer" content="no-referrer-when-downgrade" />
-    ```
-  </Tab>
-</Tabs>
+See how many users arrive through a referral link, tracked via the `ref` query parameter (or `utm_medium=affiliate`/`referral`). See [Referrals](/data/metrics#referrals) for details.
 
 ## Countries
 
@@ -145,7 +122,7 @@ See where your users are coming from by country.
   />
 </Frame>
 
-## Devices, browsers, OS
+## Devices
 
 <Frame caption="Understand what devices, browsers, and operating system users are on.">
   <img
@@ -154,9 +131,17 @@ See where your users are coming from by country.
   />
 </Frame>
 
-## Wallets
+## Browsers
 
-See the top wallets of your visitors and users.
+See the breakdown of browsers your users are on, in the same view as [Devices](#devices), just switch tabs.
+
+## OS
+
+See the breakdown of operating systems your users are on, in the same view as [Devices](#devices), just switch tabs.
+
+## Wallet
+
+See the top wallet providers (MetaMask, Coinbase Wallet, Phantom, etc.) your users connect with. See [Wallet Type](/data/metrics#wallet-type) for details.
 
 <Frame caption="Understand what wallets are being used on your crypto app.">
   <img
@@ -165,144 +150,10 @@ See the top wallets of your visitors and users.
   />
 </Frame>
 
+## Chains
+
+See the top chains your wallets and transactions are active on. Formo supports Ethereum and all major EVM chains, plus Solana. See [Chains](/chains/overview) for the full list and feature availability per chain.
+
 ---
 
-## How to analyze traffic sources
-
-Understand where your users come from and which channels drive the most value. This guide walks you through analyzing traffic sources and optimizing user acquisition.
-
-### Step 1: Open Formo
-
-1. Go to the [Formo Dashboard](https://app.formo.so)
-2. Select your project
-3. Click **Overview** in the left navigation
-
-You'll see the overview with visitors, wallets, and transactions over time.
-
-### Step 2: Review the referrer breakdown
-
-View your core metrics by referrer to see where traffic originates:
-
-<Frame caption="Breakdown by referrer shows which sources drive real conversions.">
-  <img src="/images/referrer-breakdown.png" alt="Referrer Breakdown" />
-</Frame>
-
-| Data | What it shows |
-|--------|---------------|
-| **Referrer** | The source domain (twitter.com, google.com, direct) |
-| **Sessions** | Session visits from this source (the session count, not the overview's unique-visitor **Visitors** metric) |
-| **Wallets** | Wallet connects from this source |
-| **Transactions** | Completed transactions from this source |
-| **Volume** | Total transaction volume (USD) |
-
-You get full attribution for users, volume, and revenue by referrer, referral, and UTM parameters in the Referrers chart.
-
-<Frame caption="The Referrers chart shows you where users come from.">
-  <img
-    src="/images/dapp-analytics-referrers.png"
-    alt="Product Analytics Referrers"
-  />
-</Frame>
-
-You can click on any item to drill down into the data, showing you the list of [users](/features/wallet-intelligence/overview) that came from that source.
-
-
-### Step 3: Measure conversion rates by source
-
-The overview page shows your **conversion rates by source**:
-
-```
-Conversion Rate = Transactions / Visitors × 100
-```
-
-**Example analysis:**
-
-| Referrer | Visitors | Transactions | Conversion |
-|----------|----------|--------------|------------|
-| twitter.com | 1,000 | 50 | 5% |
-| discord.com | 500 | 75 | 15% |
-| defillama.com | 200 | 60 | 30% |
-
-In this example, DefiLlama drives 6x better conversion than Twitter despite lower volume.
-
-### Step 4: Analyze UTM campaigns
-
-If you use UTM parameters in your marketing links, you can drill deeper:
-
-1. See your breakdown by UTM campaign, source, medium
-2. Identify which specific campaigns perform best on user acquisition and volume
-
-**UTM parameter guide:**
-
-| Parameter | Purpose | Example |
-|-----------|---------|---------|
-| `utm_source` | Platform | twitter, discord, newsletter |
-| `utm_medium` | Channel type | social, email, paid |
-| `utm_campaign` | Campaign name | launch_promo, airdrop_2024 |
-| `utm_content` | Ad variation | banner_a, banner_b |
-| `utm_term` | Keywords (for paid) | defi, swap |
-
-You can use Formo's [UTM Generator](https://formo.so/utm-generator) to generate your marketing links.
-
-**Example URL:**
-```
-https://yourapp.xyz/?utm_source=twitter&utm_medium=social&utm_campaign=launch_promo
-```
-
-Once Formo is installed, any incoming clicks with UTM parameters leading to wallet connects or transactions in your app will be attributed automatically.
-
-### Step 5: Analyze by device and geography
-
-Check the **Devices** and **Countries** sections:
-
-**Device insights:**
-- High mobile traffic but low mobile conversion? Mobile UX issue.
-- Desktop dominates? Your users are power users.
-
-**Geographic insights:**
-- Unexpected traffic from certain countries? Potential new markets.
-- Low conversion from specific regions? Localization opportunities.
-
-### Optimizing based on data
-
-**Double down on high-converting sources:**
-- Identify your top 3 converting referrers
-- Allocate more budget/effort to these channels
-- Create content tailored to these audiences
-
-**Investigate low-converting sources:**
-- High traffic but low conversion = landing page issue
-- Check if these visitors bounce or explore but don't convert
-- Consider if this traffic is actually relevant
-
-**UTM best practices:**
-- Use consistent naming conventions
-- Track all paid campaigns with unique UTMs
-- Add UTMs to social media links, emails, and partner links
-
-### Attribution models
-
-Formo supports multiple attribution models. Learn more in the [Attribution guide](/data/attribution).
-
-| Model | Best for |
-|-------|----------|
-| **First Touch** | Understanding discovery channels |
-| **Last Touch** | Understanding conversion drivers |
-| **Custom** | Use the [Explorer](/features/product-analytics/explore) to build your own attribution model |
-
-### Next Steps
-
-<CardGroup cols={2}>
-  <Card title="Activity" icon="bolt" href="/features/product-analytics/activity">
-    View real-time events and Live View
-  </Card>
-  <Card title="Explorer" icon="compass" href="/features/product-analytics/explore">
-    Run custom SQL queries
-  </Card>
-  <Card title="Funnels" icon="filter" href="/features/product-analytics/funnels">
-    Track conversion by source through funnels
-  </Card>
-  <Card title="Attribution Guide" icon="bullseye" href="/guides/onchain-attribution">
-    Complete attribution workflow
-  </Card>
-</CardGroup>
+For a complete walkthrough of analyzing traffic sources, setting up UTM and referral tracking, comparing attribution models, and optimizing acquisition spend, see [How to Set Up Attribution](/guides/onchain-attribution).

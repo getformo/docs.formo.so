@@ -5,7 +5,7 @@ description: "Create a custom dashboard with charts for users, transactions, rev
 keywords: ["custom dashboard", "DeFi metrics dashboard", "crypto analytics dashboard", "onchain KPIs", "web3 reporting"]
 ---
 
-A dashboard is your protocol's cockpit. It's where you see everything that matters at a glance: user growth, transaction volume, revenue trends, and whether your acquisition channels are working. Let's build one.
+A dashboard brings your key metrics (user growth, transaction volume, revenue, and acquisition channels) into one place. This guide walks through building one from scratch.
 
 ## Part 1: Create Your Custom Board
 
@@ -32,7 +32,7 @@ Create a new chart:
    - Step 4: Repeat Transaction (optional)
 3. Set your time range (30 days)
 
-This chart answers the hardest question: how many users actually convert? Where do people drop off?
+This chart shows the conversion rate at each step and where users drop off.
 
 <Frame>
   <img src="/images/funnels.png" alt="Conversion funnel visualization" />
@@ -46,7 +46,7 @@ Create another chart:
 2. Choose the retention event (e.g., wallet connect)
 3. Optionally add user filters to segment cohorts
 
-Retention is the metric most protocols ignore until they need it. This chart shows whether users stick around or ghost after their first transaction.
+This chart shows whether users return after their first transaction.
 
 <Frame>
   <img src="/images/retention.png" alt="Day 7 and Day 30 retention rates" />
@@ -60,7 +60,7 @@ Create another chart:
 2. Configure: Page (or custom event) flows
 3. Limit to top 5-10 paths for clarity
 
-This shows the most common user journeys through your protocol. Do users go straight to swap? Do they explore first? Which paths lead to transactions?
+This shows the most common paths users take through your protocol, and which ones lead to transactions.
 
 <Frame>
   <img src="/images/flows.png" alt="Sankey user path visualization" />
@@ -87,21 +87,13 @@ Click **Share** in the top right to generate a public link. Copy it and share wi
 
 ## Recommended Custom Charts
 
-| Chart | Metric | Why It Matters |
+| Chart | Metric | What it shows |
 |-------|--------|---|
-| **Key Metrics Line Chart** | DAU, Transactions | Your protocol's growth trajectory |
-| **Funnel Chart** | Page view > Connect > Transaction | Where users drop off and your biggest opportunity |
-| **Retention Chart** | D7, D30 cohort retention | Whether users actually come back (stickiness) |
-| **Traffic Sources** | Referrer breakdown | Best acquisition channels to double down on |
-| **Flow (Sankey)** | Common flows | How real users navigate your protocol |
-
-## Next Steps
-
-- [Create a conversion funnel](/guides/funnels) to dig deeper into user acquisition
-- [Track retention cohorts](/guides/retention) by wallet label or geography
-- [Use Ask AI](/guides/ask-ai) to surface insights from your dashboard data
-- [Set up contract events](/guides/contract-events) to track onchain activity beyond SDK events
-- [View your Insights page](/features/product-analytics/ai) for AI-generated growth opportunities
+| **Key Metrics Line Chart** | DAU, Transactions | Growth over time |
+| **Funnel Chart** | Page view > Connect > Transaction | Where users drop off |
+| **Retention Chart** | D7, D30 cohort retention | Whether users come back |
+| **Traffic Sources** | Referrer breakdown | Which acquisition channels convert best |
+| **Flow (Sankey)** | Common flows | How users navigate your protocol |
 
 ## FAQ
 

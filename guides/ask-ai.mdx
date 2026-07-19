@@ -1,13 +1,11 @@
 ---
-title: "How to Use Ask AI to Surface Growth Insights"
+title: "How to Use Ask AI"
 sidebarTitle: "How to use Ask AI"
-description: "Use Formo's AI assistant to explore analytics data with natural language questions, generate SQL queries automatically, and uncover hidden growth insights."
+description: "Use Formo's AI assistant to explore analytics data with natural language questions and generate SQL queries automatically."
 keywords: ["AI analytics", "natural language analytics", "crypto data AI", "DeFi insights AI", "ask formo", "text to SQL"]
 ---
 
-What if you could just ask your data a question? No SQL, no dashboard hunting, no waiting for an analyst. With Ask AI, you can.
-
-Ask natural language questions about your protocol and get instant answers. The AI generates SQL queries, runs them, and shows you charts and summaries. It's like having a data analyst on call.
+Ask natural language questions about your protocol and get instant answers. The AI generates SQL queries, runs them, and returns a chart and summary.
 
 ## Part 1: Open Ask AI
 
@@ -35,8 +33,6 @@ Hit enter. The AI will:
 3. Run the query against your data
 4. Return a summary, a chart, and the generated SQL
 
-You'll see the answer instantly. No waiting for a data analyst.
-
 <Frame>
   <img src="/images/text-to-sql.png" alt="AI generates SQL and shows chart result" />
 </Frame>
@@ -53,7 +49,7 @@ You can click "View in Explorer" to open the SQL editor if you want to tweak the
 
 ## Part 4: Ask Follow-Up Questions
 
-This is where Ask AI gets powerful. Ask follow-ups without repeating context:
+Ask follow-ups without repeating context:
 
 **You:** "How many unique wallets connected this week?"
 **AI:** [Shows 12,453 wallets]
@@ -68,44 +64,31 @@ The AI maintains conversation memory, so each question builds on the previous on
 
 ## Part 5: Use the Insights Page for Automated Analysis
 
-Beyond Ask AI, visit **Insights** in the sidebar for AI-generated analysis of your entire protocol:
-
+Beyond Ask AI, visit **Insights** in the sidebar for AI-generated analysis of your protocol. It has two parts: a summary of wins, issues, opportunities, and actions, and a cohort analysis across acquisition, revenue, and churn. See [Insights](/features/product-analytics/insights) for the full breakdown.
 
 <Frame>
   <img src="/images/insights.png" alt="AI-generated insights page" />
 </Frame>
 
-### Wins
-Positive trends the AI detected (e.g., "DAU up 25% this week")
-
-### Issues
-Problems worth investigating (e.g., "Retention dropped below historical average")
-
-### Opportunities
-Actionable insights (e.g., "Traffic from Twitter is converting 3x better than Discord")
-
-### Actions
-Recommended next steps based on your data
-
-### Acquisition Quality
-Which channels bring the best LTV users?
-
-### Revenue
-Which cohorts spend the most onchain?
-
-### Churn Prediction
-Which users are at risk of churning?
+| Section | Answers |
+|---------|---------|
+| **Wins** | What improved recently, with deltas |
+| **Issues** | What's underperforming and needs attention |
+| **Opportunities** | Untapped segments or behaviors |
+| **Actions** | What to do next, with priority |
+| **Acquisition Quality** | Which channels bring in the most valuable users |
+| **Revenue Insights** | Whether recent cohorts are more valuable than older ones |
+| **Churn Prediction** | Which behaviors signal a user is about to churn |
 
 ## Part 6: Save Your Questions as Dashboards
 
-Found a question you want to check weekly? Save it:
+To check a question weekly instead of re-asking it:
 
 1. Ask your question in Ask AI
 2. Click **Save as Chart**
 3. Name it and choose your board
-4. It's now on your dashboard, auto-updating with new data
 
-Now your whole team sees those insights every time they open your dashboard.
+The chart stays on your dashboard and updates with new data whenever anyone on your team opens it.
 
 ## Example Questions
 
@@ -247,7 +230,6 @@ Be specific with dates and metrics. Instead of "How are we doing?" try "What's m
 **Platform comparison:**
 > "How does mobile vs desktop conversion compare?"
 
-
 ## Best Practices
 
 <Tip>
@@ -263,20 +245,12 @@ Be specific with dates and metrics. Instead of "How are we doing?" try "What's m
 </Tip>
 
 <Tip>
-**Copy SQL for custom charts.** If the AI generates a query you love, copy it and paste it into the Explorer or a SQL chart on your dashboard. Now you have a reusable analysis.
+**Copy SQL for custom charts.** If a generated query is useful beyond this one answer, copy it into the Explorer or a SQL chart on your dashboard.
 </Tip>
 
 <Tip>
-**Check Insights daily.** The Insights page updates automatically. Make it part of your morning routine to spot issues before they become crises.
+**Check Insights daily.** The Insights page updates automatically, so reviewing it each morning surfaces issues early.
 </Tip>
-
-## Next Steps
-
-- [Create a custom dashboard](/guides/custom-dashboard) to visualize key metrics
-- [Build a funnel](/guides/funnels) to understand your acquisition flow
-- [Use the Explorer](/guides/sql-explorer) to write custom SQL queries for deeper analysis
-- [Set up wallet segmentation](/guides/wallet-segmentation) to analyze user cohorts
-- [See AI prompts for DeFi marketers](https://formo.so/blog/ai-prompts-defi-marketers) for more question ideas
 
 ## FAQ
 

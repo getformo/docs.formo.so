@@ -24,13 +24,18 @@ Formo helps you capture the user journey from page visits offchain to transactio
 - 🔔 <a href="/features/product-analytics/alerts">**Alerts.**</a> Get notified of high-value users and important events in realtime.
 - 💡 <a href="/features/product-analytics/insights">**Insights.**</a> Get weekly product insights on acquisition, activation, and churn.
 - ✨ <a href="/features/product-analytics/ai">**Ask AI.**</a> Use natural language to ask any questions about your data.
-- ⚙️ <a href="/install">**Autocapture.**</a> Automatically track page views, wallet connects, and transactions with zero code.
 
 ## FAQ
 
 <AccordionGroup>
+  <Accordion title="What's the difference between Product Analytics and Wallet Intelligence?">
+    Product Analytics tracks user behavior and traffic, like pageviews, events, funnels, and retention. [Wallet Intelligence](/features/wallet-intelligence/overview) focuses on identity: wallet profiles, net worth, lifecycle stages, and segmentation for onchain user targeting.
+  </Accordion>
   <Accordion title="Can I track users across my website and my app?">
     Yes. Cross-subdomain tracking is enabled by default (`crossSubdomainCookies: true`), so visitor identity is shared across all subdomains of your root domain out of the box. See the [Web SDK documentation](/sdks/web#cross-subdomain-tracking) for details.
+  </Accordion>
+  <Accordion title="Which blockchains does Formo support?">
+    Formo supports Ethereum and all major EVM chains, plus Solana. See the [Chains](/chains/overview) page for the full list and feature availability per chain.
   </Accordion>
   <Accordion title="How does Formo count unique visitors?">
     Formo generates an anonymous visitor ID (UUID) stored in a first-party cookie on your domain. This ID is not linked to any personal information - no IP addresses or device fingerprints are used. A server-side daily-rotating hash is also used for session deduplication. See [what we collect](/data/what-we-collect) for details.
@@ -39,20 +44,3 @@ Formo helps you capture the user journey from page visits offchain to transactio
     Yes. Use the [Explorer](/features/product-analytics/explore) to run SQL queries directly against your analytics data. You can also use the [Query API](/api/query) or connect [BI tools](/data/bi) like Metabase or Grafana.
   </Accordion>
 </AccordionGroup>
-
-## Next steps
-
-<CardGroup cols={2}>
-  <Card title="Create a Funnel" icon="filter" href="/features/product-analytics/funnels">
-    Track conversion from first visit to onchain transaction
-  </Card>
-  <Card title="Explorer" icon="compass" href="/features/product-analytics/explore">
-    Run custom SQL queries on your data
-  </Card>
-  <Card title="Dashboards" icon="chart-line" href="/features/product-analytics/charts">
-    Create custom charts for your team
-  </Card>
-  <Card title="Track Contract Events" icon="file-contract" href="/features/product-analytics/contract-events">
-    Monitor smart contract activity in real-time
-  </Card>
-</CardGroup>
