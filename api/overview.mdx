@@ -54,7 +54,7 @@ You can use the Profiles API for real-time personalization. Once you fetch a pro
 
 ## Response shape
 
-Successful responses return the **resource directly** - there is no envelope, no `isSuccess` discriminator. HTTP status alone (`200/201/204` vs `4xx/5xx`) carries success.
+Successful responses return the **resource directly** - there is no envelope, no `isSuccess` discriminator. HTTP status alone (`200/201/204` vs `4xx/5xx`) carries success. For example, creating an alert returns the alert itself:
 
 ```json
 {
@@ -142,14 +142,3 @@ Within a version we may add new endpoints, new optional request fields, new resp
     | Workspace | 100 requests | 1 second |
   </Accordion>
 </AccordionGroup>
-
-## Support
-
-<CardGroup cols={2}>
-  <Card title="Live support" icon="headset" href="https://formo.so/support">
-    Chat with our support team
-  </Card>
-  <Card title="Email" icon="envelope" href="mailto:yos@formo.so">
-    Email our founder at yos@formo.so
-  </Card>
-</CardGroup>
