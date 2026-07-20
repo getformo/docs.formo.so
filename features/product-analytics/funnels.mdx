@@ -7,13 +7,12 @@ description: "Build multi-step conversion funnels that track user journeys from 
   <img src="/images/funnels.png" alt="Funnels" />
 </Frame>
 
-Visualize how users progress through a series of steps with Funnel Analysis.
+A funnel tracks how visitors move through a sequence of steps, from an initial action to a conversion event.
 
-- Analyze the user flow across pages, domains, and subdomains throughout your site and app.
-- Go beyond pageviews and track [contract events](/features/product-analytics/contract-events) and [custom events](/features/product-analytics/custom-events) to build a funnel.
-- Measure the conversion rate to understand the percentage of visitors who started the user flow and ended with a conversion event.
-- Measure the percentage drop-off between the individual funnel steps to spot where you lose the most users.
-- Use filters to segment your audience. Filter conversion funnels by marketing campaign, traffic source, device, and more.
+- Track page views, [contract events](/features/product-analytics/contract-events), and [custom events](/features/product-analytics/custom-events) as funnel steps.
+- **Conversion rate**: the percentage of visitors who completed the funnel.
+- **Drop-off rate**: the percentage of visitors lost between each step.
+- Filter funnels by campaign, traffic source, device, and more.
 
 ## Conversion Windows
 
@@ -72,7 +71,7 @@ Break down funnel steps by key dimensions to understand how different user segme
 
 ## Conversion Insights
 
-Discover which events or user properties are most strongly associated with conversion. We prioritize two key metrics to help you identify meaningful drivers:
+[Insights](/features/product-analytics/insights) surfaces which events or user properties are most strongly associated with conversion. We prioritize two key metrics to help you identify meaningful drivers:
 
 - **Lift**: Measures the impact of an event. A lift > 1 means users who perform the event are more likely to convert.
 - **Odds Ratio**: Measures the strength of the association. Useful for verifying that an observed lift is not just due to random chance, especially for rare events.
@@ -184,9 +183,9 @@ After creating your funnel, you'll see:
   <img src="/images/funnels.png" alt="Funnel Analysis" />
 </Frame>
 
-### Step 6: Add breakdowns
+### Step 6: Add a breakdown
 
-Click **Add Breakdown** to compare conversion across segments:
+Select a dimension from **Breakdown by** to compare conversion across segments:
 
 | Breakdown | What you learn |
 |-----------|---------------|
@@ -206,15 +205,13 @@ Track users from landing to completed swap:
 | 3 | Approve token | 70-80% |
 | 4 | Complete swap | 85-95% |
 
-If you see a big drop between steps 1 and 2, focus on improving wallet connection UX.
+A big drop between steps 1 and 2 points to friction in the wallet connection step.
 
 ### Using Conversion Insights
 
-After running your funnel, check the **Insights** tab to see which user behaviors correlate with conversion:
+After running your funnel, go to the [Insights](/features/product-analytics/insights) page to see which user behaviors correlate with conversion:
 
 - **High lift events**: Users who did X are 2x more likely to convert
 - **Negative indicators**: Users who did Y are 50% less likely to convert
 
-Use these insights to:
-- Encourage high-lift behaviors in your UX
-- Reduce friction that causes negative behaviors
+Use these insights to prioritize which behaviors to encourage and which friction points to remove.

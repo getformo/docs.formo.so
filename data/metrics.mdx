@@ -19,6 +19,10 @@ In the overview, the **Visitors** chart shows the daily unique-visitor count (a 
 
 Comparable to Google Analytics' "Active users".
 
+### Page Views
+
+How many times a page has been viewed across your site or app.
+
 ### Wallets
 
 Unique wallet addresses active with at least one session during the selected period.
@@ -36,10 +40,6 @@ Total transaction volume (USD) tracked through your [custom events](/features/pr
 ### Revenue
 
 Total revenue (USD) tracked through your [custom events](/features/product-analytics/custom-events#step-3-track-with-volume-revenue-or-points), for example a protocol fee.
-
-### Page Views
-
-How many times a page has been viewed across your site or app.
 
 ### Sessions
 
@@ -74,25 +74,7 @@ For most purposes, this calculation method provides an accurate and useful measu
 The bounce rate is the percentage of sessions that bounce, measured over sessions (not unique visitors).
 Formo counts a "bounce" when a session has a single pageview, no engagement events, and less than 10 seconds of observed activity. Engagement events are wallet connects, transactions, tracked custom events, and smart contract events (decoded logs).
 
-### Referrers / Sources
-
-How many users are referred to your site or app by a particular source such as a search engine, social media platform, etc.
-
-Referrers are the statistics for the referring site. The data is extracted from the Referrers (with a r) HTTP header and may not be set by the browser. In these cases it will be listed as unknown.
-
-### UTM parameters
-
-How many users come to your site or app from a particular source. We track these UTM codes:
-
-- `utm_source` (e.g.: google.com)
-- `utm_medium` (e.g.: search)
-- `utm_campaign` (e.g.: summer_sale)
-- `utm_content`
-- `utm_term`
-
-To minimize the amount of traffic that falls within the "Direct / None" category, you can add special query parameters (UTMs) to your links.
-
-### Channel
+### Channels
 
 The acquisition channel that brought a session to your app. Every session is assigned to exactly one of 13 channels when its events are ingested, using a priority-ordered ladder over referrer domain, `utm_source`, `utm_medium`, and 8 ad-platform click IDs (`gclid`, `gad_source`, `fbclid`, `msclkid`, `ttclid`, `twclid`, `li_fat_id`, `rdt_cid`). The channel is stored on the event, so queries read it back without recomputing.
 
@@ -114,6 +96,24 @@ The acquisition channel that brought a session to your app. Every session is ass
 | 13 | Direct | No referrer, no UTM, no click ID (typed URL, bookmark, or stripped referrer) |
 
 A session has a **paid signal** when any of the following is true: `utm_medium` is one of `cpc`, `cpm`, `cpv`, `cpa`, `ppc`, `paidsearch`, `paidsocial`, `sem`, `retargeting`; `utm_medium` starts with `paid`; or any of the 8 click IDs above is non-empty. Same-domain referrers (e.g. `blog.example.com` referred from `app.example.com`) are stripped before classification so internal navigation rolls up to **Direct** instead of **Referrers**.
+
+### Referrers
+
+How many users are referred to your site or app by a particular source such as a search engine, social media platform, etc.
+
+Referrers are the statistics for the referring site. The data is extracted from the Referrers (with a r) HTTP header and may not be set by the browser. In these cases it will be listed as unknown.
+
+### UTM parameters
+
+How many users come to your site or app from a particular source. We track these UTM codes:
+
+- `utm_source` (e.g.: google.com)
+- `utm_medium` (e.g.: search)
+- `utm_campaign` (e.g.: summer_sale)
+- `utm_content`
+- `utm_term`
+
+To minimize the amount of traffic that falls within the "Direct / None" category, you can add special query parameters (UTMs) to your links.
 
 ### Referrals
 
@@ -196,6 +196,10 @@ A profile includes a list of properties such as their address, type, net worth, 
 ### Wallet Address
 
 Formo uses the wallet address as a persistent identifier for a visitor where available.
+
+### Linked Addresses
+
+Other wallet addresses linked to the same user session. See [Wallet Profiles](/features/wallet-intelligence/wallet-profiles#user-wallet-metadata) for details on how wallets are clustered.
 
 ### Wallet Type
 

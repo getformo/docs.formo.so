@@ -9,12 +9,7 @@ Ask natural language questions about your app and get instant answers. The AI ge
 
 ## Part 1: Open Ask AI
 
-You can access Ask AI in two ways:
-
-1. **Click "Ask AI"** in the left sidebar (chat bubble icon)
-2. **Click the chat bubble** in the bottom right corner of any page
-
-Both open the same chat interface. You'll see your conversation history on the left and the chat window on the right.
+Click **"Ask AI"** in the left sidebar (chat bubble icon) to open the chat interface. You'll see your conversation history on the left and the chat window on the right.
 
 <Frame>
   <img src="/images/ai.png" alt="Ask AI interface with chat history" />
@@ -31,7 +26,7 @@ Hit enter. The AI will:
 1. Parse your question
 2. Generate a SQL query from it
 3. Run the query against your data
-4. Return a summary, a chart, and the generated SQL
+4. Return an answer, with a chart when relevant
 
 <Frame>
   <img src="/images/text-to-sql.png" alt="AI generates SQL and shows chart result" />
@@ -41,11 +36,9 @@ Hit enter. The AI will:
 
 Each Ask AI response includes:
 
-- **Summary:** A plain English explanation of what the data shows
-- **Chart:** A visualization of the results (line, bar, pie, etc.)
-- **SQL:** The exact query the AI ran (you can copy and edit it)
-
-You can click "View in Explorer" to open the SQL editor if you want to tweak the query or save it as a chart.
+- **A plain English answer** summarizing what the data shows
+- **A chart or dashboard proposal**, when the question calls for one
+- **"How I calculated this"**: a collapsible section showing the SQL and tool calls the AI used to get the answer
 
 ## Part 4: Ask Follow-Up Questions
 
@@ -84,8 +77,8 @@ Beyond Ask AI, visit **Insights** in the sidebar for AI-generated analysis of yo
 To check a question weekly instead of re-asking it:
 
 1. Ask your question in Ask AI
-2. Click **Save as Chart**
-3. Name it and choose your board
+2. Click **Add to Dashboard**
+3. Choose an existing board (or it saves directly if you only have one)
 
 The chart stays on your dashboard and updates with new data whenever anyone on your team opens it.
 

@@ -48,6 +48,7 @@ Flows can start from any event. Select what you want to analyze:
 | **First visit** | Where users go after landing |
 | **Wallet connect** | What users do after connecting |
 | **Specific page** | Paths from a key page |
+| **Contract event** | Behavior after an onchain action |
 | **Custom event** | Behavior after a conversion point |
 
 ### Step 3: Configure the flow
@@ -59,8 +60,11 @@ Flows are configured as a positional step list rather than a direction toggle. E
 - **End**: The last row is where the flow ends
 
 1. Add rows for each step you want to trace, in order
-2. Set **Steps count** (2 to 5; default 3), the number of nodes shown between each pair of anchor events
-3. Click **Save Chart**
+2. Set **Steps count** (2 to 5; default 3), the number of steps shown between each pair of anchor events
+3. Set **Nodes per step** (2 to 8; default 5), the number of distinct events shown per step before the rest are grouped into "Others"
+4. Optionally set a **Conversion window** (value + unit), the time allowed for the next steps to happen after the starting event
+5. Optionally add **Exclude events** to drop specific events from the path so transitions collapse around them
+6. Click **Save Chart**
 
 Flows always trace forward from the starting event; there is no backward-tracing option.
 

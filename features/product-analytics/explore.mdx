@@ -1,9 +1,7 @@
 ---
 title: 'Explorer'
-description: 'Run custom ClickHouse SQL queries against your analytics data warehouse to build advanced reports, export results, and answer questions beyond dashboards.'
+description: 'Run custom SQL queries against your analytics data warehouse to build reports, export results, and answer questions beyond dashboards.'
 ---
-
-The Explorer gives you direct SQL access to your analytics data. Run custom queries, build complex analyses, and answer questions that go beyond pre-built dashboards.
 
 <Frame caption="The Explorer query editor lets you run SQL against your analytics data.">
   <img src="/images/explore.png" alt="Explorer SQL Editor" />
@@ -19,7 +17,7 @@ Use the Explorer when you need:
 - **Testing queries** for custom charts and dashboards
 - **Data validation** to verify metrics
 
-## Running queries
+## How to use the explorer
 
 ### Step 1: Open the Explorer
 
@@ -57,28 +55,13 @@ ORDER BY date
 
 ## Available tables
 
-See the [Data Catalog](/data/catalog) for full column definitions, query patterns, and example queries for each table.
-
-| Table | Description |
-|-------|-------------|
-| `events` | All user interaction events (page views, wallet events, custom events, contract events) |
-| `users` | Aggregated wallet user profiles identified by `address`, with attribution and engagement metrics |
-| `anonymous_users` | Profiles for users who haven't connected a wallet yet, identified by `anonymous_id` |
-| `identities` | Identity graph linking anonymous user IDs to wallet addresses and user IDs |
-| `revenue` | Financial metrics and revenue with full attribution context |
-| `sessions` | Aggregated user session data with engagement metrics and attribution |
-| `sources` | Daily aggregated traffic source metrics and attribution data |
-| `wallet_profiles_mv` | Comprehensive global wallet profile data aggregated across all chains |
-| `wallet_profiles_chains_mv` | Wallet profile data broken down by individual blockchain networks |
-| `wallet_profiles_chains_apps_mv` | Wallet DeFi application usage data broken down by blockchain |
-| `wallet_profiles_chains_tokens_mv` | Wallet token holdings data broken down by blockchain |
-| `wallet_profiles_events` | Timestamped wallet profiling events from external offchain and onchain analysis |
+See the [Data Catalog](/data/catalog#tables) for the full list of tables, column definitions, query patterns, and example queries.
 
 ## Best practices
 
 - Use `LIMIT` to control result size. Default is 100 rows; maximum is 1,000,000 rows
 - Use date filters to improve query performance
-- Reference the [Event Spec](/data/events/overview) for available event properties
+- See the [Event Spec](/data/events/overview) for available event properties
 - Use **Ask AI** to help write and fix queries
 
 ## Saving queries
