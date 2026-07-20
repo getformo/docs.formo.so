@@ -7,13 +7,13 @@ description: 'Define and track custom events like swaps, deposits, and quests wi
 
 The Formo SDK offers an easy-to-use event collection library that allows you to track custom events in your crypto app.
 
-See the [Web SDK](/sdks/web#track-events) docs to get started. Custom events work with [Wallet Intelligence](/features/wallet-intelligence/overview) and [Funnels](/features/product-analytics/funnels) to connect user actions to lifecycle and conversion analysis.
+See the [Web SDK](/sdks/web#track-events) docs to get started.
 
 ---
 
 ## How to track custom events
 
-While Formo autocaptures page views, wallet connects, and transactions, custom events let you track specific actions that matter to your app. This guide shows you how.
+While Formo autocaptures page views, wallet connects, and transactions, custom events let you track specific actions that matter to your app.
 
 ### When to use custom events
 
@@ -95,40 +95,9 @@ Custom events also appear in:
 - [**Funnels**](/features/product-analytics/funnels): as conversion steps
 - [**Charts**](/features/product-analytics/charts): query with SQL
 
-### Best practices
+## Examples
 
-**Naming conventions:**
-
-| Good | Bad |
-|------|-----|
-| `Swap Completed` | `swap` |
-| `Position Opened` | `click` |
-| `Referral Shared` | `event1` |
-
-Use descriptive, past-tense names that describe what happened.
-
-**Properties to include:**
-
-```typescript
-// Good: specific, useful properties
-analytics.track('Position Opened', {
-  pool_id: 'LINK/ETH',
-  amount: 1200,
-  leverage: '2x',
-  source: 'dashboard'  // Where the action originated
-});
-
-// Bad: vague or missing properties
-analytics.track('Position Opened', {
-  data: 'some data'
-});
-```
-
-**When to track:**
-- Track at the moment the action completes (not when a button is clicked)
-- For async actions, track on success (and optionally on failure)
-
-### Example: Tracking a swap flow
+### Tracking a swap flow
 
 Track multiple events throughout a user flow:
 
@@ -136,19 +105,24 @@ Track multiple events throughout a user flow:
 // User clicks swap button
 analytics.track('Swap Started', {
   pair: 'ETH/USDC',
+  token_in: '0x...',
+  token_out: '0x...',
   amount_in: 1,
   amount_out_estimate: 3000
 });
 
 // User approves token (if needed)
 analytics.track('Token Approved', {
-  token: 'ETH',
+  token: '0x...',
+  amount: 1,
   spender: '0x...'
 });
 
 // Swap completes successfully
 analytics.track('Swap Completed', {
   pair: 'ETH/USDC',
+  token_in: '0x...',
+  token_out: '0x...',
   amount_in: 1,
   amount_out: 2998,
   volume: 2998,
@@ -158,38 +132,30 @@ analytics.track('Swap Completed', {
 // Or if swap fails
 analytics.track('Swap Failed', {
   pair: 'ETH/USDC',
+  token_in: '0x...',
+  token_out: '0x...',
   error: 'Insufficient liquidity',
   error_code: 'INSUFF_LIQ'
 });
 ```
 
-### Example: Tracking DeFi feature adoption
+### Tracking DeFi feature adoption
 
-Measure which protocol features users engage with:
+Measure which features users engage with:
 
 ```typescript
 // User opens a liquidity pool
 analytics.track('Pool Opened', {
   pool_id: 'ETH/USDC',
+  pool_address: '0x...',
   source: 'sidebar'
 });
 
 // User completes a key action in the pool
 analytics.track('Liquidity Added', {
   pool_id: 'ETH/USDC',
-  token_0: 'ETH',
-  token_1: 'USDC'
+  pool_address: '0x...',
+  token_in: 'ETH',
+  token_out: 'USDC'
 });
 ```
-
-### Using custom events in funnels
-
-Custom events can be funnel steps: add a step and pick your event from the **Custom Events** list, then optionally add property filters. See [Funnels](/features/product-analytics/funnels) for the full walkthrough of adding a Funnel chart to a dashboard.
-
-**Example funnel:**
-| Step | Event |
-|------|-------|
-| 1 | `page` (visit /swap) |
-| 2 | `connect` |
-| 3 | `Swap Started` (custom) |
-| 4 | `Swap Completed` (custom) |
