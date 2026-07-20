@@ -26,7 +26,7 @@ Monitor your smart contract activity in real-time. This guide walks you through 
 3. Click **Settings** in the left navigation
 4. Select the **Contracts** tab
 
-### Step 2: Add a contract
+### Step 2: Add a contract and select events to track
 
 1. Click **Add Contract**
 2. Fill in the contract details:
@@ -38,42 +38,34 @@ Monitor your smart contract activity in real-time. This guide walks you through 
 | **Name** | Friendly name for reference. Auto-filled from the verified contract source when available; edit if you want a different label. | "Swap Router" |
 | **ABI** | Required to decode events. Formo automatically fetches it once the address and chain are set (Etherscan, then Sourcify as a fallback); paste it manually if auto-detection fails. |  |
 
-3. Click **Add contract**
+3. Switch on the **Ingest contract events** toggle to reveal the list of available events from the ABI
+4. Toggle on the events you want to track
+5. Click **Add contract**
 
 <Frame caption="Adding a contract to your project.">
 	<img src="/images/contract-events.png" alt="Adding a Contract and selecting Contract Events" />
 </Frame>
 
-<Tip>For verified contracts, Formo auto-detects the ABI. For unverified contracts, you can paste the ABI manually.</Tip>
+<Tip>For verified contracts, Formo auto-detects the ABI. For unverified contracts, you can paste the ABI manually. You can also come back and change your event selection later by reopening the contract from the list.</Tip>
 
-### Step 3: Select smart contract events to track
-
-After adding a contract, select one or more events to ingest into Formo:
-
-1. Click on your contract in the list
-2. Switch on the **Ingest contract events** toggle
-3. You'll see all available events from the ABI
-4. Toggle on the events you want to track from the list
-
-### Step 4: Deploy the pipeline
+### Step 3: Deploy the pipeline
 
 Selecting events and saving the contract doesn't start ingestion by itself; the events pipeline needs to be deployed.
 
-1. Click **Add contract** (or **Save**) to save your event selection
-2. In the Contracts settings page, click **Deploy** (or **Redeploy** if a pipeline is already live)
-3. Track progress via the pipeline status badge: **Draft**, **Live**, **Paused**, **Inactive**, or **Error**
+1. In the Contracts settings page, click **Deploy** (or **Redeploy** if a pipeline is already live)
+2. Track progress via the pipeline status badge: **Draft**, **Live**, **Paused**, **Inactive**, or **Error**
 
 See the [contract events guide](/guides/contract-events#pipeline-management) for details on managing pipeline state.
 
-### Step 5: View events in Activity Feed
+### Step 4: View events in Activity Feed
 
 Once the pipeline is live, contract events appear in your Activity Feed:
 
 1. Go to **Activity** in the left navigation
-2. Filter by the **Contract Event** event type to see contract events
+2. Filter by the **Contract event** event type to see contract events
 3. Click any event to see decoded parameters including transaction hash, block number, function name and function parameters
 
-### Step 6: Use contract events in funnels
+### Step 5: Use contract events in funnels
 
 Build funnels that include onchain actions:
 
