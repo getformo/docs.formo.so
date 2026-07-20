@@ -30,7 +30,7 @@ Formo supports token gating, giving you full control over who can access your fo
   </Step>
 </Steps>
 
-Your form will verify that responders fulfill your requirements before continuing. Formo currently supports [40+ chains](/chains/overview).
+Your form will verify that responders fulfill your requirements before continuing. Formo currently supports [35 chains](/chains/overview) for token gating.
 
 <Frame>
 	<img src="/images/token-gated-forms-token-gate-1.png" alt="Token Gated Form Builder" />
@@ -97,7 +97,7 @@ Require responders to hold one or more NFTs from a specific collection (ERC-721 
 1. In your form settings, click **Add Requirement** and select **NFT**
 2. Choose the **chain** where the NFT collection is deployed
 3. Paste the **NFT contract address**
-4. Set the **minimum quantity** (defaults to 1)
+4. Set the **minimum quantity** required
 
 ### Example
 
@@ -196,3 +196,58 @@ Contract Read supports any `view` or `pure` function that:
 - Takes scalar input parameters (no arrays or structs)
 
 Common use cases include `balanceOf`, `stakedBalance`, `getVotes`, `isWhitelisted`, `hasRole`, and any custom getter function on your contract.
+
+## World ID
+
+Require responders to verify with World ID's proof-of-personhood check before submitting. See [World ID integration](/features/token-gated-forms/world-id) for setup.
+
+Optionally enable **Require unique World ID** to block the same verified human from submitting more than once.
+
+## Human Passport
+
+Require a minimum [Human Passport](https://docs.passport.xyz/) Unique Humanity Score to filter out bots and sybil accounts.
+
+### Setup
+
+1. In your form settings, click **Add Requirement** and select **Human Passport**
+2. Set the **minimum Unique Humanity Score** (0-100; defaults to 20)
+
+Only one Human Passport requirement is allowed per form.
+
+### Example
+
+| Field | Value |
+|-------|-------|
+| Type | Human Passport |
+| Minimum score | 20 |
+
+## X Verified
+
+Require responders to have a verified X (formerly Twitter) account, indicated by the blue checkmark.
+
+### Setup
+
+In your form settings, click **Add Requirement**, select **Connect X**, then **X Verified**. No further configuration is required.
+
+## Discord
+
+Require responders to connect a Discord account before submitting.
+
+### Setup
+
+In your form settings, click **Add Requirement** and select **Connect Discord**. No further configuration is required.
+
+## Telegram
+
+Require responders to connect a Telegram account before submitting.
+
+### Setup
+
+In your form settings, click **Add Requirement** and select **Connect Telegram**. No further configuration is required.
+
+## Combining requirements
+
+Under **Access gating** in your form settings, choose how many requirements a responder must meet:
+
+- **Should meet all** (default): responders must satisfy every requirement you've added
+- **Should meet some**: responders must satisfy at least N of your requirements, where you set N

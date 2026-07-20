@@ -15,8 +15,15 @@ List all user segments for the project.
 Requires `segments:read` scope on your API key.
 </Note>
 
+### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `--page` | `number` | ❌ | Page number, 1-indexed |
+| `--size` | `number` | ❌ | Page size |
+
 ```bash
-formo segments list
+formo segments list --size 25
 ```
 
 ---

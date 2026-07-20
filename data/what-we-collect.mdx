@@ -9,6 +9,7 @@ description: 'Understand exactly what data the Formo SDK collects, how it flows 
 This diagram shows how data flows from the user's browser through the Formo SDK to our infrastructure.
 
 ```mermaid
+%%{init: {'themeVariables': {'background': '#ffffff'}}}%%
 flowchart TD
     subgraph Browser ["User's Browser"]
         SDK["Formo SDK"]
@@ -230,13 +231,10 @@ You are responsible for ensuring that sensitive data is not collected through fo
 ## FAQ
 
 <AccordionGroup>
-  <Accordion title="Are wallet addresses considered personal data under GDPR?">
-    The classification of wallet addresses under GDPR depends on context. Formo treats wallet addresses as pseudonymous identifiers - they are not linked to names, emails, or IP addresses in our system. We recommend consulting your legal counsel for guidance specific to your jurisdiction and use case.
-  </Accordion>
   <Accordion title="How does Formo determine a visitor's country without storing IP addresses?">
     Formo resolves the visitor's country server-side at the network edge, which performs an IP lookup and passes only the resolved ISO 3166-1 alpha-2 country code to our servers. The raw IP address never reaches Formo and is never stored. We collect country only: never region or city. (Earlier versions inferred country from the browser timezone on the client side; edge geolocation replaced this because a single timezone can span multiple countries.)
   </Accordion>
   <Accordion title="Does Formo set any cookies?">
-    Formo uses first-party cookies for anonymous visitor identification and cross-subdomain tracking (e.g., an `anonymous-id` cookie and session cookies). These are first-party cookies scoped to your domain only - Formo does **not** set any third-party cookies or cross-site tracking cookies. Because Formo does not use third-party cookies, most jurisdictions do not require a cookie consent banner, but consult your legal counsel for your specific case.
+    Formo uses first-party cookies for anonymous visitor identification and cross-subdomain tracking (e.g., an `anonymous-id` cookie and session cookies). These are first-party cookies scoped to your domain only. Formo does **not** set any third-party cookies or cross-site tracking cookies. Because Formo does not use third-party cookies, most jurisdictions do not require a cookie consent banner, but consult your legal counsel for your specific case.
   </Accordion>
 </AccordionGroup>

@@ -53,7 +53,7 @@ Example: For a DEX, track Swap. For a token, track Transfer and Approval.
 
 Once events are selected, click **Deploy**. Formo provisions the pipeline in the background.
 
-Pipeline states progress as: **Draft** > **Active** (shown as **Live** in the UI). A pipeline can also land in **Paused** or **Error** if something needs your attention.
+Pipeline states progress as: **Draft** > **Active** (shown as **Live** in the UI). A pipeline can also land in **Inactive**, **Paused**, or **Error** if something needs your attention.
 
 This typically takes a few minutes. Monitor the status in the Project Settings > Contracts panel.
 
@@ -200,10 +200,6 @@ Formo supports Ethereum, Polygon, Arbitrum, Optimism, Base, BNB Chain, Avalanche
 
 <Accordion title="How does Formo detect contract ABIs automatically?">
 Formo uses a single unified Etherscan API (selecting the chain via a chainId parameter) to fetch verified ABIs, with Sourcify as a fallback if the contract isn't verified there. If your contract is verified on either source, the ABI is detected instantly. If not, paste the ABI manually.
-</Accordion>
-
-<Accordion title="What happens if I add a contract that's not verified on Etherscan?">
-You can paste the ABI manually. Formo will use it to decode transactions and events.
 </Accordion>
 
 <Accordion title="Can I track events from multiple contracts in a single funnel?">

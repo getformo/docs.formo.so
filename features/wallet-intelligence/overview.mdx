@@ -11,15 +11,13 @@ description: 'Explore wallet intelligence features including wallet profiles, au
 
 ## Features
 
-Wallet intelligence helps you **understand and target users onchain with crypto-native segmentation**:
+Wallet intelligence helps you **understand and target users with crypto-native segmentation based on unified offchain and onchain data**:
 
 - 🔍 <a href="/features/wallet-intelligence/search">**Wallet search.**</a> Look up any wallet address to generate a full profile on demand.
-- 🕵️‍♀️ <a href="/features/wallet-intelligence/wallet-profiles">**Wallet profiles.**</a> Build onchain profiles for pseudonymous wallets.
+- 🕵️‍♀️ <a href="/features/wallet-intelligence/wallet-profiles">**Wallet profiles.**</a> Turn wallet addresses into user profiles.
 - 👥 <a href="/features/wallet-intelligence/audience-insights">**Audience insights.**</a> See your users' lifecycle, apps, tokens, chains, revenue, and retention.
 - 🤩 <a href="/features/wallet-intelligence/segments">**User segments.**</a> Target segments based on wallet properties and in-app activity.
 - 🏷️ <a href="/features/wallet-intelligence/wallet-labels">**Wallet labels.**</a> Further enrich wallet profiles with wallet labels.
-
-Formo unifies offchain and onchain data per user.
 
 Profile data is available for querying and export in the [Profiles API](/api/overview#profiles-api).
 
@@ -28,8 +26,6 @@ Profile data is available for querying and export in the [Profiles API](/api/ove
 ## How to explore your users
 
 This guide walks you through viewing wallet profiles, understanding your audience, and creating your first user segment.
-
-<Note>Wallet Intelligence requires the Formo SDK to be installed. Complete the [Product Analytics setup](/features/product-analytics/overview) first if you haven't already.</Note>
 
 ### Step 1: View the Users page
 
@@ -71,7 +67,9 @@ Formo automatically categorizes users by lifecycle stage based on their activity
 | **At Risk** | Still active but going quiet |
 | **Churned** | Needs re-engagement |
 
-Use the lifecycle filter on the Users page to focus on specific user groups. See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds behind each stage.
+Use the lifecycle filter on the Users page to focus on specific user groups.
+
+See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds behind each stage.
 
 ### Step 4: Create your first segment
 
@@ -108,15 +106,15 @@ Export this segment as CSV to run targeted re-engagement campaigns on social cha
 
 <AccordionGroup>
   <Accordion title="Where does Formo get onchain data for wallet profiles?">
-    Formo aggregates onchain data across all major EVM chains to build wallet profiles. This includes token holdings, DeFi positions, wallet age, transaction frequency, and net worth. Data is refreshed periodically to keep profiles current.
+    Formo aggregates onchain data across major EVM chains and Solana to build wallet profiles. This includes token holdings, DeFi positions, wallet age, transaction frequency, and net worth. Data is refreshed periodically to keep profiles current.
   </Accordion>
-  <Accordion title="How are wallet lifecycle stages calculated?">
-    Wallet lifecycle stages (New, Returning, Power user, Resurrected, At Risk, Churned) are calculated based on activity recency and frequency on your app, relative to a reference date that defaults to today. For example, a wallet last seen at least 30 days ago is classified as "Churned," while a wallet first seen more than 30 days ago and active on 5+ of the last 30 days is a "Power user." Default thresholds can be customized in Settings → Lifecycle. See [wallet profiles](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for details.
+  <Accordion title="How are wallet lifecycle stages determined?">
+    Lifecycle stages are calculated from a wallet's activity recency and frequency on your app, relative to a reference date that defaults to today. Default thresholds can be customized in Settings → Lifecycle. See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules.
   </Accordion>
-  <Accordion title="Can I export wallet profiles and segments for marketing campaigns?">
+  <Accordion title="Can I export wallet profiles and segments?">
     Yes. You can export any [segment](/features/wallet-intelligence/segments) as a CSV file for use in targeted re-engagement campaigns. You can also query profiles programmatically via the [Profiles API](/api/profiles/get).
   </Accordion>
   <Accordion title="Does Formo link multiple wallets belonging to the same user?">
-    Formo tracks each wallet address as a separate profile. If a user connects multiple wallets in the same session, those events are linked to the same anonymous visitor. You can also use [formo.identify()](/data/events/identify) to associate wallets with a common user ID.
+    Yes. Formo automatically groups wallets that share a session or a common user ID into clusters. Each wallet's profile lists its **Linked Addresses**, and the **Clusters** tab on the Users page shows every multi-wallet group with its member wallets. You can also use [formo.identify()](/data/events/identify) to associate wallets with a common user ID.
   </Accordion>
 </AccordionGroup>

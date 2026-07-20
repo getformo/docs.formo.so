@@ -11,7 +11,7 @@ icon: "shield-check"
 </Card>
 
 Our SDK explicitly does **not** collect:
-- IP addresses (country is derived from timezone, not IP geolocation)
+- IP addresses (country is resolved server-side at the network edge, and the raw IP never reaches our servers)
 - Device fingerprints (no Canvas, WebGL, or storage-based fingerprinting)
 - Social profiles (no Twitter, Discord, or email collection)
 - Third-party cookies

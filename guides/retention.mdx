@@ -1,7 +1,7 @@
 ---
 title: "How to Track and Improve User Retention"
 sidebarTitle: "How to Improve Retention"
-description: "Measure Day 7, 30, and 90 retention rates for your crypto app with cohort analysis, identify churn patterns, and build segments to re-engage at-risk users."
+description: "Measure Week 1, 4, and 12 retention rates for your crypto app with cohort analysis, identify churn patterns, and build segments to re-engage at-risk users."
 keywords: ["crypto retention analytics", "DeFi user retention", "web3 churn analysis", "cohort retention", "onchain retention tracking"]
 ---
 
@@ -18,7 +18,7 @@ Click **Dashboards** → **Add Chart** → select **Retention** chart type.
 
 <Step>
 Configure the chart:
-- **Retention Type**: Recurring (any return counts) or Rolling (must retain consecutively)
+- **Retention Type**: Rolling (default; counts toward week N if active in week N or any later week, giving a smooth curve) or Recurring (counts only if active in exactly week N, so the curve can dip and recover)
 - **Signal**: Base retention on a specific event, or on a user label
 - Cohorts are grouped weekly
 </Step>
@@ -28,13 +28,13 @@ Click **Save to Dashboard**. This cohort chart is now live.
 </Step>
 </Steps>
 
-The retention table shows cohorts (rows) and retention days (columns). Green cells mean high retention. Red means churn. Look for diagonal patterns:
+The retention table shows cohorts (rows) and retention weeks (columns). Green cells mean high retention. Red means churn. Look for diagonal patterns:
 
 - **Declining diagonal**: Older cohorts have worse retention. (Possible: product degraded, new cohorts are higher quality)
 - **Level diagonal**: Consistent retention across all cohorts. (Healthy.)
 - **Rising diagonal**: Newer cohorts retain better. (Possible: product improvements are working)
 
-<Frame caption="Retention cohort table showing Day 7, 30, 90">
+<Frame caption="Retention cohort table showing Week 1, 4, 12">
 <img src="/images/retention.png" alt="Retention table" />
 </Frame>
 
@@ -50,8 +50,8 @@ Click **Insights** in the sidebar.
 <Step>
 Look for the **Issues** section. Formo flags patterns like:
 - "Users from country=US are churning 25% faster than average"
-- "Mobile users have 40% lower Day 7 retention"
-- "Cohort from Week 3 of March dropped 15% on Day 5"
+- "Mobile users have 40% lower Week 1 retention"
+- "Cohort from Week 3 of March dropped 15% in Week 1"
 </Step>
 
 <Step>
@@ -60,7 +60,7 @@ Click on an insight to drill into the data. Ask: Is this a real problem or noise
 </Steps>
 
 **Red flags to act on immediately:**
-- A sudden drop in Day 7 retention (5%+ week-over-week) usually means a bug or product issue
+- A sudden drop in Week 1 retention (5%+ week-over-week) usually means a bug or product issue
 - A specific geography or device churning faster suggests a UX or localization problem
 - A cohort that performs poorly across all retention windows suggests they were bad-fit users to begin with
 
@@ -146,7 +146,7 @@ See [Alerts documentation](/features/product-analytics/alerts) for full setup.
 
 Open **Ask AI** (the AI assistant) and ask natural language questions:
 
-- "Why is Day 7 retention down 10% this week?"
+- "Why is Week 1 retention down 10% this week?"
 - "Which countries have the worst retention?"
 - "Do mobile users churn faster than web?"
 - "What do my highest-retaining users have in common?"
@@ -169,11 +169,11 @@ Formo analyzes your data and provides insights with supporting numbers.
 </Step>
 
 <Step>
-**Test a fix**: Increase the timeout from 30s to 60s, roll it out to 10% of mobile users, and compare that segment's Day 7 retention against older cohorts.
+**Test a fix**: Increase the timeout from 30s to 60s, roll it out to 10% of mobile users, and compare that segment's Week 1 retention against older cohorts.
 </Step>
 
 <Step>
-**Roll out**: If the test segment's retention improves, deploy the fix to all mobile users and keep monitoring Day 7 retention.
+**Roll out**: If the test segment's retention improves, deploy the fix to all mobile users and keep monitoring Week 1 retention.
 </Step>
 </Steps>
 
@@ -265,38 +265,38 @@ Compare their first-week behavior: sessions count, features used, transaction vo
 
 <AccordionGroup>
 <Accordion title="How is retention calculated?">
-Day 7 retention = (Users active on Day 7 / Users who signed up on Day 0) * 100
+Week 1 retention = (Users active in Week 1 / Users in the Week 0 cohort) * 100
 
-A user is considered active if they have at least one session (page view or transaction) on that day.
+A user is considered active in a week if they have at least one session (page view or transaction) during that week.
 
-Example: 1000 users sign up on Monday. 250 of them return and are active on the following Monday. Day 7 retention = 25%.
+Example: 1000 users enter the cohort in Week 0. 250 of them return and are active in Week 1. Week 1 retention = 25%.
 </Accordion>
 
-<Accordion title="What's the difference between Day 7, 30, and 90 retention?">
-- **Day 7**: Users who returned within 7 days of signup. Measures short-term activation.
-- **Day 30**: Users active within 30 days. Measures habit formation.
-- **Day 90**: Users active within 90 days. Measures long-term value.
+<Accordion title="What's the difference between Week 1, 4, and 12 retention?">
+- **Week 1**: Users active in the week after their cohort's start. Measures short-term activation.
+- **Week 4**: Users active a month in. Measures habit formation.
+- **Week 12**: Users active a quarter in. Measures long-term value.
 
-All three matter. Day 7 catches immediate churn. Day 30 shows if you built a habit. Day 90 shows if users stick around.
+All three matter. Week 1 catches immediate churn. Week 4 shows if you built a habit. Week 12 shows if users stick around.
 </Accordion>
 
 <Accordion title="What user lifecycle stage should I re-engage first?">
 Priority order:
 1. **Resurrected**: Users who just came back. Momentum is on your side.
 2. **At Risk / Returning**: Users with only 2-3 sessions. Easy to convert to Power users.
-3. **Recent Churned**: Users inactive for 30-60 days. Still remember your product.
-4. **Old Churned**: Users inactive for 6+ months. Hard to re-activate.
+3. **Churned, inactive 30-60 days**: Still remember your product.
+4. **Churned, inactive 6+ months**: Hard to re-activate.
 
-Focus on 1 and 2 first for best ROI.
+Focus on 1 and 2 first for best ROI. Note that 3 and 4 are both the **Churned** lifecycle stage; the day ranges are just a way to prioritize within it, not separate filterable stages.
 </Accordion>
 
 <Accordion title="Can I compare retention across different UTM sources?">
-Yes. Create two retention charts (or use breakdowns). Filter the first by UTM Source = "twitter" and the second by UTM Source = "discord". Compare Day 7 retention across both. You'll likely see significant differences.
+Yes. Create two retention charts (or use breakdowns). Filter the first by UTM Source = "twitter" and the second by UTM Source = "discord". Compare Week 1 retention across both. You'll likely see significant differences.
 
 If one source has 2x better retention, invest more in that channel.
 </Accordion>
 
-<Accordion title="Can I set a custom retention window?">
-By default, retention is measured from signup date. You can create custom cohort charts by setting a custom event (e.g., "first_transaction") as your cohort start. Contact support if you need help.
+<Accordion title="Can I set a custom cohort entry event?">
+Yes. By default, cohorts are grouped by wallet connect. You can set any event (e.g., "first_transaction") as the entry event instead, so cohorts are grouped by when users first performed that event.
 </Accordion>
 </AccordionGroup>

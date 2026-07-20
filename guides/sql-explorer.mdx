@@ -15,7 +15,7 @@ Click **Explorer** in the sidebar and select **Data**. You'll see:
 - **Center panel**: SQL editor with syntax highlighting
 - **Bottom panel**: Results table with pagination and export options
 - **Examples**: Working SQL examples you can modify to fit your use case
-- **Tools**: Explain this Query, Generate SQL, and Format SQL helps you iterate faster
+- **Tools**: Explain Query, an AI SQL generator, and Format SQL help you iterate faster
 
 <Frame>
   <img src="/images/explore.png" alt="SQL Explorer with schema browser on left, editor in center, results at bottom" />
@@ -23,7 +23,7 @@ Click **Explorer** in the sidebar and select **Data**. You'll see:
 
 ## Part 2: Browse the Schema
 
-The schema browser includes 3 main tables:
+The schema browser shows every table in your project. See the [Data Catalog](/data/catalog#tables) for the full list; the three most commonly used are:
 
 ### events
 All tracked events (page views, contract events, custom events)
@@ -244,7 +244,7 @@ ORDER BY total_volume DESC
 LIMIT 10
 ```
 
-Note: Wallet labels are stored in the separate `wallet_profiles` table, not in the users table.
+Note: Wallet labels are stored in the separate `wallet_profiles_labels` table, not in the users table.
 
 ### Query 9: Volume by UTM Campaign
 
@@ -320,14 +320,14 @@ See [How to use Ask AI](/guides/ask-ai) for details.
 Formo's SQL engine integrates with external BI tools via the **Query API**.
 
 Supported tools:
-- Metabase
 - Grafana
-- Tableau
-- Looker
+- Hex
+- Metabase
+- Superset
 - Power BI
-- Custom integrations
+- Tableau
 
-Configuration details are at [/data/bi](/data/bi). You'll need your BI Read Key from Project Settings → Credentials (this is separate from your workspace API key).
+Configuration details are at [/data/bi](/data/bi). You'll need your BI Read Key, found in the project settings page under "Credentials" (this is separate from your workspace API key).
 
 Example Metabase connection:
 1. In Metabase, click Settings > Databases > Add Database
@@ -407,7 +407,7 @@ No. Each project has its own isolated database. Write queries for one project at
 </Accordion>
 
 <Accordion title="What's the maximum query runtime?">
-Queries timeout after 120 seconds. Most queries finish in seconds. If yours is slow, add a `WHERE timestamp >= ...` filter to reduce the dataset.
+Queries timeout after 30 seconds. Most queries finish in seconds. If yours is slow, add a `WHERE timestamp >= ...` filter to reduce the dataset.
 </Accordion>
 
 <Accordion title="Can I join events and users tables?">
@@ -418,14 +418,6 @@ SELECT e.type, e.event, u.address
 FROM events e
 JOIN users u ON e.address = u.address
 ```
-</Accordion>
-
-<Accordion title="Does Ask AI generate ClickHouse-specific SQL?">
-Yes. Ask AI understands ClickHouse syntax and functions. If you ask for something like "top 10 items", it generates optimized ClickHouse queries automatically.
-</Accordion>
-
-<Accordion title="Can I use subqueries and CTEs?">
-Yes. Both subqueries and CTEs (WITH clauses) are supported. CTEs are recommended for readability in complex queries.
 </Accordion>
 
 <Accordion title="How do I query custom events?">
