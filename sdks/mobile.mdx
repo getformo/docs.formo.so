@@ -531,21 +531,12 @@ The SDK automatically enriches every event with mobile-specific context:
 
 ## Session management
 
-The SDK automatically assigns a `session_id` to every event. A session groups one user's burst of activity into a single visit, and powers the Sessions, Session duration, and Bounce rate metrics on your dashboard. No configuration is required.
-
-| Behavior | Detail |
-|:---------|:------------|
-| Session start | The first event after install, or the first event after a session expires. |
-| Session timeout | 30 minutes of inactivity. The next event after that starts a new session. |
-| Persistence | A session survives app restarts — it expires on inactivity, not on close. |
-| Reset | `reset()` ends the current session and starts a new one. |
-
 Reset the current user session:
 
 ```tsx
 const formo = useFormo();
 
-// Clear current user identifiers (anonymous_id, session_id, user_id)
+// Clear current user session (anonymous_id, user_id, etc.)
 formo.reset();
 ```
 
