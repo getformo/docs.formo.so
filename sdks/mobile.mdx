@@ -136,7 +136,9 @@ formo.screen(name: string, category?: string, properties?: object)
 Include `formo` in the dependency array. The SDK initializes asynchronously, so including it ensures the screen event fires once initialization completes.
 </Note>
 
-Screen views are sent as `page` events so they flow through the same analytics as web page views. The screen name becomes the page path, under a stable origin taken from your app's `bundleId`. For example, `formo.screen('Wallet')` in an app with a `bundleId` of `com.example.app` is recorded with a `page_url` of `app://com.example.app/Wallet` — so every screen shares one origin, and each screen has its own path.
+Screen views are sent as `page` events so they flow through the same analytics as web page views. The screen name is recorded in the `app://` scheme — `formo.screen('Wallet')` is sent with a `page_url` of `app://Wallet`, and a router-style name like `formo.screen('/tabs/leaderboard')` is sent as `app:///tabs/leaderboard`.
+
+Formo derives the rest for you: your app becomes the equivalent of a web origin (from the app name or bundle ID in the event context), and the screen name becomes the page path — so screens appear alongside web pages in reports like Top Pages.
 
 ### With React Navigation
 
