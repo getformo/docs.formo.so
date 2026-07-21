@@ -19,20 +19,10 @@ The MCP endpoint is:
 https://api.formo.so/v0/mcp/
 ```
 
-<Note>
-  Keep the trailing slash in `/v0/mcp/`. Do not use `https://api.formo.so/` as the MCP server URL.
-</Note>
-
-<Note>
-  MCP requires a **Scale or Enterprise** plan. [Upgrade your workspace](https://app.formo.so) to enable MCP access.
-</Note>
-
 ## Setup
 
-Select your client below.
-
 <Tabs>
-  <Tab title="Claude.ai">
+  <Tab title="Claude">
     1. Open **Customize** → **Connectors**
     2. Add a custom connector
     3. Enter the connector details:
@@ -109,7 +99,7 @@ Select your client below.
 
     Formo can be configured as a data-only MCP app; no extra app UI is required to query analytics.
   </Tab>
-  <Tab title="Other clients">
+  <Tab title="Others">
     1. Open your MCP client's connector or app settings
     2. Add a remote MCP server
     3. Enter the Formo MCP server URL:
@@ -126,13 +116,9 @@ Select your client below.
   </Tab>
 </Tabs>
 
-<Card title="Example questions" icon="message-question" href="/mcp/overview#example-questions">
-  Try questions you can ask once Formo is connected.
-</Card>
-
 ## Scopes
 
-Formo MCP OAuth supports only these scopes:
+Formo MCP OAuth supports the following scopes:
 
 | Scope | Description |
 |:------|:------------|
@@ -144,9 +130,7 @@ Formo MCP OAuth supports only these scopes:
 | `segments:read` / `segments:write` | Read or manage segments |
 | `offline_access` | Allows the MCP client to refresh access without asking the user to sign in again |
 
-Formo does not expose `mcp:tools` or `mcp:resources` scopes. Each tool call is authorised against the granted per-resource scopes above.
-
-OAuth access is bound to the project selected on the Formo consent page. The MCP server validates that the user still has access to that project before serving requests.
+> OAuth access is bound to the project selected on the Formo consent page. The MCP server validates that the user still has access to that project before serving requests.
 
 ## Troubleshooting
 
