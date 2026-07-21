@@ -30,6 +30,14 @@ npm install react-native-device-info
 
 If neither is installed, provide app metadata via the `app` option instead.
 
+For **Android install attribution** (knowing which site or campaign a user came from before installing), also install:
+
+```bash
+npm install react-native-play-install-referrer
+```
+
+This one requires a native rebuild of your Android app. Without it the SDK still works — install attribution is simply skipped, and a warning is logged on startup. See [Web-to-mobile attribution](#web-to-mobile-attribution).
+
 ### iOS Setup (bare React Native only)
 
 If you're using bare React Native (not Expo), run pod install after adding native dependencies:
@@ -135,6 +143,10 @@ formo.screen(name: string, category?: string, properties?: object)
 <Note>
 Include `formo` in the dependency array. The SDK initializes asynchronously, so including it ensures the screen event fires once initialization completes.
 </Note>
+
+Screen views are sent as `page` events so they flow through the same analytics as web page views. The screen name is recorded in the `app://` scheme — `formo.screen('Wallet')` is sent with a `page_url` of `app://Wallet`, and a router-style name like `formo.screen('/tabs/leaderboard')` is sent as `app:///tabs/leaderboard`.
+
+Formo derives the rest for you: your app becomes the equivalent of a web origin (from the app name or bundle ID in the event context), and the screen name becomes the page path — so screens appear alongside web pages in reports like Top Pages.
 
 ### With React Navigation
 
@@ -295,6 +307,55 @@ The SDK automatically extracts and stores:
 - Referral codes (`ref`, `referral`, `refcode`, `referrer_code`)
 
 Example deep link: `myapp://home?utm_source=twitter&utm_campaign=launch&ref=friend123`
+
+## Web-to-mobile attribution
+
+Deep link attribution tells you where a user came from once the app is *already installed*. Web-to-mobile attribution answers the earlier question: **which site or campaign led someone to install the app in the first place.**
+
+### Android
+
+Google Play passes a referrer through the install, so this is captured reliably. Point your marketing links at your Play Store listing with a `referrer` parameter:
+
+```
+https://play.google.com/store/apps/details?id=<your.package>&referrer=utm_source%3Dexample.com%26utm_campaign%3Dspring
+```
+
+On first launch the SDK reads that value and attaches it to the [`Application Installed`](#mobile-lifecycle-events) event, and to the traffic source used by subsequent events:
+
+```json
+{
+  "event": "Application Installed",
+  "properties": {
+    "version": "1.1.0",
+    "build": "42",
+    "utm_source": "example.com",
+    "utm_campaign": "spring"
+  }
+}
+```
+
+Requires `react-native-play-install-referrer` and a native rebuild — see [Installation](#optional-dependencies). The lookup runs once, on the first launch after install.
+
+### iOS
+
+<Note>
+Not supported. Apple does not expose an install-referrer API, so an install cannot be attributed to a referring website from within the SDK. This requires a third-party attribution service such as Branch or AppsFlyer. On iOS this capture is a no-op — deep link attribution still works normally.
+</Note>
+
+### Disabling
+
+Both attribution sources are on by default and can be turned off individually:
+
+```tsx
+options={{
+  attribution: {
+    deeplinks: true,        // capture UTM/ref from deep links
+    installReferrer: false, // skip the Play Install Referrer lookup
+  },
+}}
+```
+
+Passing `attribution: false` disables both.
 
 ## Configuration
 
@@ -512,6 +573,7 @@ The SDK automatically enriches every event with mobile-specific context:
 | `device_model` | Device model (iPhone 14 Pro, Pixel 8). |
 | `device_manufacturer` | Device manufacturer (Apple, Google, Samsung). |
 | `device_type` | Device type (mobile, tablet). |
+| `user_agent` | Device user agent. Taken from the platform when available, otherwise derived from the device and OS above. Used to resolve device and OS in analytics. |
 | `screen_width` | Screen width in pixels. |
 | `screen_height` | Screen height in pixels. |
 | `screen_density` | Pixel density (devicePixelRatio). |
@@ -526,12 +588,25 @@ The SDK automatically enriches every event with mobile-specific context:
 
 ## Session management
 
+The SDK assigns a `session_id` to every event. A session groups one user's burst of activity into a single visit, and powers the Sessions, Session duration, and Bounce rate metrics on your dashboard. No configuration is required.
+
+| Behavior | Detail |
+|:---------|:------------|
+| Session start | The first event after install, or the first event after a session expires. |
+| Session timeout | 30 minutes of inactivity. The next event after that starts a new session. |
+| Persistence | A session survives app restarts — it expires on inactivity, not on close. |
+| Reset | `reset()` ends the current session and starts a new one. |
+
+<Note>
+This differs from the web SDK, where `session_id` is derived server-side as a daily-changing value. That derivation relies on the request's origin, IP and browser user agent — signals a native app does not provide meaningfully — so the mobile SDK supplies its own session instead.
+</Note>
+
 Reset the current user session:
 
 ```tsx
 const formo = useFormo();
 
-// Clear current user session (anonymous_id, user_id, etc.)
+// Clear current user identifiers (anonymous_id, session_id, user_id)
 formo.reset();
 ```
 
@@ -570,3 +645,4 @@ To verify the SDK is working:
 | `expo-application` | >=5.0.0 | No (for auto version/build detection in Expo) |
 | `expo-device` | >=5.0.0 | No (for device info in Expo) |
 | `react-native-device-info` | >=10.0.0 | No (for auto version/build detection in bare RN) |
+| `react-native-play-install-referrer` | >=1.1.8 | No (for Android web-to-mobile install attribution) |
