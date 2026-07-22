@@ -14,17 +14,18 @@ The Formo MCP Server lets AI assistants, code editors, and custom integrations q
 - "Show me user retention by cohort"
 
 <Warning>
-  The Formo MCP server requires a **Scale or Enterprise** plan. This applies to both OAuth and Workspace API key connections.
+    MCP requires a **Scale or Enterprise** plan. [Upgrade your workspace](https://app.formo.so) to get access.
 </Warning>
+
 
 ## Getting started
 
-**Supported clients:** OAuth-capable MCP clients, Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, Codex, and any client that supports HTTP or stdio MCP transports.
+**Supported clients:** OAuth-capable MCP clients such as ChatGPT, Claude Desktop, Cursor, Claude Code, Windsurf, VS Code, or any client that supports HTTP or stdio MCP transports.
 
 Formo supports two authentication methods for MCP:
 
 - **OAuth (Recommended)** for clients that manage user sign-in. Users sign in to Formo, select a project on the consent page, and choose which permissions to approve.
-- **Workspace API keys** for clients that let you configure an `Authorization` header manually.
+- **Workspace API Keys** for clients that let you configure an `Authorization` header manually.
 
 <CardGroup cols={2}>
   <Card title="OAuth" icon="key" href="/mcp/oauth">
@@ -53,9 +54,6 @@ Formo supports two authentication methods for MCP:
 - "What are my top wallets and chains?"
 
 ## Available tools
-
-Tools are grouped below by the permission they require. A connection without
-that permission is denied with `insufficient scope`.
 
 ### Query API
 
@@ -137,16 +135,25 @@ Permission: `profiles:read`.
 
 ### Docs
 
-Public Formo documentation; no permission required.
-
 | Tool | Description |
 |:-----|:------------|
 | `search_formo_docs` | Search the Formo documentation |
 | `query_docs_filesystem_formo_docs` | Query the Formo docs filesystem |
 
-<Note>
-  The exact set of tools depends on your project's configured endpoints. Use `list_endpoints` to discover what's available for your project, or `text_to_sql` + `execute_query` for anything beyond them.
-</Note>
+## Troubleshooting
+
+- **`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans.
+- **Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart or refresh your AI assistant after configuration changes.
+- **OAuth issues:** See [MCP OAuth](/mcp/oauth) for OAuth setup, metadata, and troubleshooting.
+- **API key issues:** See [MCP API Key](/mcp/api-key) for API key setup and troubleshooting.
+
+### Security
+
+- **Project-scoped:** each connection is limited to one project, either selected on the OAuth consent page or attached to the API key.
+- **Permission-scoped:** every tool call requires the matching permission (e.g. `query:read` to read analytics, `alerts:write` to change alerts); deletes additionally require `"confirm": true`.
+- **Owner/admin only:** only a workspace owner or admin can create a connection.
+- **Nothing retained:** the MCP server itself stores no data.
+- **Manage anytime:** review, change, or revoke access under **Settings** → **Connected apps**. Disconnects apply immediately; permission changes apply on reconnect. Sessions expire after 1 hour of inactivity.
 
 ## FAQ
 
@@ -164,18 +171,3 @@ Public Formo documentation; no permission required.
     Yes. OAuth is additive. Existing Workspace API Key configurations continue to work with `Authorization: Bearer YOUR_API_KEY`.
   </Accordion>
 </AccordionGroup>
-
-## Troubleshooting
-
-- **`403 MCP access requires a Scale or Enterprise plan`:** MCP is available only on Scale and Enterprise plans.
-- **Tools not appearing:** Check that the URL ends with a trailing slash: `https://api.formo.so/v0/mcp/`. Restart or refresh your AI assistant after configuration changes.
-- **OAuth issues:** See [MCP OAuth](/mcp/oauth) for OAuth setup, metadata, and troubleshooting.
-- **API key issues:** See [MCP API Key](/mcp/api-key) for API key setup and troubleshooting.
-
-### Security
-
-- **Project-scoped:** each connection is limited to one project, either selected on the OAuth consent page or attached to the API key.
-- **Permission-scoped:** every tool call requires the matching permission (e.g. `query:read` to read analytics, `alerts:write` to change alerts); deletes additionally require `"confirm": true`.
-- **Owner/admin only:** only a workspace owner or admin can create a connection.
-- **Nothing retained:** the MCP server itself stores no data.
-- **Manage anytime:** review, change, or revoke access under **Settings** → **Connected apps**. Disconnects apply immediately; permission changes apply on reconnect. Sessions expire after 1 hour of inactivity.

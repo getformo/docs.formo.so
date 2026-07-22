@@ -13,15 +13,52 @@ Formo supports OAuth for remote MCP clients that can discover and complete an OA
   <img src="/images/mcp-oauth-claude.png" alt="Formo OAuth consent page for MCP clients" />
 </Frame>
 
-The MCP endpoint is:
-
-```text
-https://api.formo.so/v0/mcp/
-```
-
 ## Setup
 
 <Tabs>
+    <Tab title="ChatGPT">
+    1. Open ChatGPT settings
+    2. Go to **Apps**
+    3. Click **Advanced settings**
+    4. Enable **Developer mode**
+    
+    <Frame>
+        <img src="/images/chatgpt-developer-mode.png" alt="Enable Developer mode in ChatGPT app settings" />
+    </Frame>
+    
+    5. Go back to Apps
+    6. Click **Create app**
+    7. Enter the app details:
+    
+        **Name**
+    
+        ```text
+        Formo
+        ```
+    
+        **MCP server URL**
+    
+        ```text
+        https://api.formo.so/v0/mcp/
+        ```
+    
+        - **Description:** optional
+        - **Authentication:** OAuth
+    
+    <Frame>
+        <img src="/images/chatgpt-apps-add.png" alt="Create a Formo MCP app in ChatGPT" />
+    </Frame>
+    
+    8. Click **Create**
+    9. Sign in to Formo, select a project, and approve access
+    10. Start asking ChatGPT questions about your Formo analytics
+    
+    <Note>
+        ChatGPT Developer mode is a beta feature. ChatGPT apps created in Developer mode also cannot use memory.
+    </Note>
+    
+    Formo can be configured as a data-only MCP app; no extra app UI is required to query analytics.
+    </Tab>
   <Tab title="Claude">
     1. Open **Customize** → **Connectors**
     2. Add a custom connector
@@ -55,49 +92,6 @@ https://api.formo.so/v0/mcp/
     <Note>
       Claude.ai stores and refreshes the OAuth connection for the signed-in user. In managed workspaces, an owner or admin may need to add the remote MCP server before members can connect it individually.
     </Note>
-  </Tab>
-  <Tab title="ChatGPT">
-    1. Open ChatGPT settings
-    2. Go to **Apps**
-    3. Click **Advanced settings**
-    4. Enable **Developer mode**
-
-    <Frame>
-      <img src="/images/chatgpt-developer-mode.png" alt="Enable Developer mode in ChatGPT app settings" />
-    </Frame>
-
-    5. Go back to Apps
-    6. Click **Create app**
-    7. Enter the app details:
-
-       **Name**
-
-       ```text
-       Formo
-       ```
-
-       **MCP server URL**
-
-       ```text
-       https://api.formo.so/v0/mcp/
-       ```
-
-       - **Description:** optional
-       - **Authentication:** OAuth
-
-    <Frame>
-      <img src="/images/chatgpt-apps-add.png" alt="Create a Formo MCP app in ChatGPT" />
-    </Frame>
-
-    8. Click **Create**
-    9. Sign in to Formo, select a project, and approve access
-    10. Start asking ChatGPT questions about your Formo analytics
-
-    <Note>
-      ChatGPT Developer mode is a beta feature. ChatGPT apps created in Developer mode also cannot use memory.
-    </Note>
-
-    Formo can be configured as a data-only MCP app; no extra app UI is required to query analytics.
   </Tab>
   <Tab title="Others">
     1. Open your MCP client's connector or app settings
