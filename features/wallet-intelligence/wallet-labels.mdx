@@ -31,6 +31,16 @@ Every wallet is assigned a lifecycle stage based on its recency and active days:
 | **Coinbase One** | Coinbase One subscription attestations |
 | **Binance Verified** | Holds a [Binance Account Bound Token (BABT)](https://www.binance.com/en/babt), attesting the wallet completed Binance KYC |
 
+### Sybil
+
+Wallets that appear on published airdrop sybil / farmer lists. These are one-time historical snapshots from past airdrop investigations, so a wallet is labelled only if it was named in the original list.
+
+| Label | Description |
+|-------|-------------|
+| **Sybil (LayerZero)** | Named in the [LayerZero airdrop sybil list](https://github.com/psrvere/layerzero-sybil-checker) as a suspected airdrop farmer |
+| **Sybil (Hop)** | Listed as an eliminated sybil attacker in the [Hop Protocol airdrop](https://github.com/hop-protocol/hop-airdrop/blob/master/src/data/eliminatedSybilAttackers.csv) |
+| **Sybil (Optimism)** | Removed from the [Optimism airdrop](https://community.optimism.io/citizens-house/airdrops/airdrop-1) for sybil activity |
+
 ### Others
 
 | Label | Description |
@@ -51,6 +61,7 @@ Formo automatically analyzes each wallet's onchain activity and assigns relevant
 **Label sources:**
 - **Lifecycle** - Engagement stage derived from each wallet's recency and active days
 - **Attestations** - Verified credentials from Coinbase, Binance, Human Passport, and OFAC sanction lists
+- **Sybil lists** - Membership in published airdrop sybil / farmer lists (LayerZero, Hop, Optimism)
 - **Campaigns** - Participation in incentive campaigns such as Merkl
 - **Onchain registries** - Standards such as ERC-8004 that identify AI agent wallets
 - **Custom** - Labels you add manually to a wallet's profile
