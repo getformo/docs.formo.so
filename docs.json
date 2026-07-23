@@ -58,7 +58,8 @@
                 "pages": [
                   "features/token-gated-forms/form-builder",
                   "features/token-gated-forms/token-gating",
-                  "features/token-gated-forms/world-id"
+                  "features/token-gated-forms/world-id",
+                  "features/token-gated-forms/webhooks"
                 ]
               },
               {
