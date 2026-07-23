@@ -1,13 +1,13 @@
 ---
 title: 'Webhooks'
-description: 'Send each new form response to an external URL as it arrives — Zapier, Make, n8n, your own server, or straight into a Slack channel.'
+description: 'Send each new form response to an external URL as it arrives: Zapier, Make, n8n, your own server, or straight into a Slack channel.'
 ---
 
-Webhooks let you react to form responses in real time. Add a webhook to a form and Formo will `POST` every new submission to the URL you choose — the moment it arrives.
+Webhooks let you react to form responses in real time. Add a webhook to a form and Formo will `POST` every new submission to the URL you choose, the moment it arrives.
 
-- 🔌 **Integrations.** Point it at Zapier, Make, n8n, or your own backend to push responses into a CRM, spreadsheet, or internal tool.
-- 💬 **Slack out of the box.** Paste a Slack incoming-webhook URL and responses show up as a formatted message in your channel — no extra setup.
-- 🔒 **Signed & secure.** Optionally sign every payload so your server can verify it genuinely came from Formo.
+- **Integrations.** Point it at Zapier, Make, n8n, or your own backend to push responses into a CRM, spreadsheet, or internal tool.
+- **Slack out of the box.** Paste a Slack incoming-webhook URL and responses show up as a formatted message in your channel, with no extra setup.
+- **Signed and secure.** Optionally sign every payload so your server can verify it genuinely came from Formo.
 
 ---
 
@@ -21,22 +21,22 @@ Webhooks let you react to form responses in real time. Add a webhook to a form a
     Click **Add webhook** and paste your endpoint URL. Give it an optional name so it's easy to recognize later.
   </Step>
   <Step title="Keep the signing secret">
-    A signing secret is generated for you. Copy it now — it's stored encrypted and never shown again. You'll use it to verify incoming requests (see [Verifying the signature](#verifying-the-signature)).
+    A signing secret is generated for you. Copy it now; it's stored encrypted and never shown again. You'll use it to verify incoming requests (see [Verifying the signature](#verifying-the-signature)).
   </Step>
   <Step title="Test it">
     Click **Test** to send a sample response to your endpoint and confirm it's wired up. Then toggle the webhook on.
   </Step>
 </Steps>
 
-<Tip>A form can have up to 10 webhooks. Disable one anytime with its toggle — disabled webhooks stop receiving responses but can still be tested.</Tip>
+<Tip>A form can have up to 10 webhooks. Disable one anytime with its toggle. Disabled webhooks stop receiving responses but can still be tested.</Tip>
 
 ---
 
 ## Slack
 
-To post responses into a Slack channel, create a [Slack incoming webhook](https://api.slack.com/messaging/webhooks) and paste its URL (it looks like `https://hooks.slack.com/services/…`). Formo detects Slack automatically and sends a formatted Block Kit message with the response's answers — no signing secret needed.
+To post responses into a Slack channel, create a [Slack incoming webhook](https://api.slack.com/messaging/webhooks) and paste its URL (it looks like `https://hooks.slack.com/services/...`). Formo detects Slack automatically and sends a formatted Block Kit message with the response's answers. No signing secret needed.
 
-<Warning>A Slack incoming-webhook URL is itself a credential — anyone with it can post to your channel. Keep it private, and if it leaks, revoke it in Slack and generate a new one.</Warning>
+<Warning>A Slack incoming-webhook URL is itself a credential: anyone with it can post to your channel. Keep it private, and if it leaks, revoke it in Slack and generate a new one.</Warning>
 
 ---
 
@@ -46,13 +46,13 @@ Non-Slack endpoints receive a JSON envelope:
 
 ```json
 {
-  "id": "evt_9f8c…",
+  "id": "evt_9f8c...",
   "type": "form.response.created",
   "created": 1767225600,
   "data": {
     "form_id": "aBcD1234",
     "form_title": "Beta signup",
-    "response_id": "6f1e…",
+    "response_id": "6f1e...",
     "submitted_at": "2026-01-01T00:00:00.000Z",
     "answers": [
       { "id": "q_name", "label": "Full name", "value": "Ada" },
@@ -63,7 +63,7 @@ Non-Slack endpoints receive a JSON envelope:
 }
 ```
 
-`answers` keeps the order and human labels the respondent saw; `fields` is a flat `id → value` map that's easy to bind in automation tools. Field **ids** are stable across label edits — key on `id`, not `label`.
+`answers` keeps the order and human labels the respondent saw; `fields` is a flat `id` to `value` map that's easy to bind in automation tools. Field **ids** are stable across label edits, so key on `id`, not `label`.
 
 ### Headers
 
@@ -71,7 +71,7 @@ Non-Slack endpoints receive a JSON envelope:
 | --- | --- | --- |
 | `X-Formo-Event` | always | Event type (`form.response.created`) |
 | `X-Formo-Webhook-Id` | always | Which configured webhook fired |
-| `X-Formo-Test` | test sends | `true` — a "Send test", not a real response |
+| `X-Formo-Test` | test sends | `true`, a "Send test" rather than a real response |
 | `X-Webhook-Timestamp` | when signed | Unix seconds, part of the signed material |
 | `X-Webhook-Signature` | when signed | `HMAC-SHA256` over `{timestamp}.{body}`, hex |
 
@@ -79,27 +79,27 @@ Non-Slack endpoints receive a JSON envelope:
 
 ## How the security works
 
-Your webhook URL is just an address on the internet — without protection, anyone who discovers or guesses it could send fake submissions that look exactly like Formo's. The signing secret is a **shared secret, known only to Formo and your server**, that solves this. For each request, Formo mixes the secret with the payload to produce a unique fingerprint — the `X-Webhook-Signature` — and your server recomputes the same fingerprint to check it matches.
+Your webhook URL is just an address on the internet. Without protection, anyone who discovers or guesses it could send fake submissions that look exactly like Formo's. The signing secret is a **shared secret, known only to Formo and your server**, that solves this. For each request, Formo mixes the secret with the payload to produce a unique fingerprint (the `X-Webhook-Signature`), and your server recomputes the same fingerprint to check it matches.
 
 This gives you three guarantees:
 
-- **Authenticity** — a valid signature can only be produced with the secret, so a matching request genuinely came from Formo.
-- **Integrity** — the signature covers the exact body. Change one byte in transit and it no longer matches.
-- **Replay protection** — the signed material includes a timestamp (`X-Webhook-Timestamp`), so your server can reject requests that are too old to be legitimate.
+- **Authenticity.** A valid signature can only be produced with the secret, so a matching request genuinely came from Formo.
+- **Integrity.** The signature covers the exact body. Change one byte in transit and it no longer matches.
+- **Replay protection.** The signed material includes a timestamp (`X-Webhook-Timestamp`), so your server can reject requests that are too old to be legitimate.
 
 <Note>
-**Why is the signature different every time — even for the same test?**
+**Why is the signature different every time, even for the same test?**
 
-That's expected. The signature is `HMAC-SHA256(secret, "{timestamp}.{body}")`, and both inputs change on every send: the timestamp is the current second, and the body carries a fresh event `id` and `submitted_at`. So the fingerprint is different each time — that's precisely what makes replays detectable.
+That's expected. The signature is `HMAC-SHA256(secret, "{timestamp}.{body}")`, and both inputs change on every send: the timestamp is the current second, and the body carries a fresh event `id` and `submitted_at`. So the fingerprint is different each time, which is precisely what makes replays detectable.
 
-You never compare the signature to a previous or stored value. For each request you **recompute** it from that request's own timestamp + body + your secret, and compare to the header it arrived with. Done that way it matches every time for a genuine request, and fails the moment the body is tampered with. The only thing that must stay constant is your **secret** — if you regenerate it in the dialog, update it on your server too.
+You never compare the signature to a previous or stored value. For each request you **recompute** it from that request's own timestamp + body + your secret, and compare to the header it arrived with. Done that way it matches every time for a genuine request, and fails the moment the body is tampered with. The only thing that must stay constant is your **secret**. If you regenerate it in the dialog, update it on your server too.
 </Note>
 
 Two more layers protect you and Formo:
 
-- **Secrets are encrypted at rest** and never returned by the API — the plaintext is shown once, when you create the webhook. Copy it then.
+- **Secrets are encrypted at rest** and never returned by the API. The plaintext is shown once, when you create the webhook, so copy it then.
 - **Only public `http(s)` endpoints are allowed.** URLs that resolve to private, loopback, link-local, or internal-cloud addresses are rejected, so a webhook can't be used to probe internal infrastructure.
-- **Slack** incoming webhooks don't use the secret — they authenticate by the secrecy of their URL. Keep the URL private and rotate it in Slack if it leaks.
+- **Slack** incoming webhooks don't use the secret. They authenticate by the secrecy of their URL, so keep the URL private and rotate it in Slack if it leaks.
 
 ## Verifying the signature
 
@@ -126,7 +126,7 @@ app.post('/formo-webhook', express.raw({ type: 'application/json' }), (req, res)
     .update(`${timestamp}.${rawBody}`)
     .digest('hex');
 
-  // Constant-time compare — a plain === leaks the signature byte by byte.
+  // Constant-time compare. A plain === leaks the signature byte by byte.
   const a = Buffer.from(signature ?? '', 'hex');
   const b = Buffer.from(expected, 'hex');
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
@@ -134,7 +134,7 @@ app.post('/formo-webhook', express.raw({ type: 'application/json' }), (req, res)
   }
 
   const payload = JSON.parse(rawBody); // safe to trust now
-  // …handle the submission…
+  // handle the submission
   res.status(200).end();
 });
 ```
@@ -159,15 +159,15 @@ def verify(raw_body: bytes, timestamp: str, signature: str, secret: str) -> bool
 
 ### Inspecting the signature with webhook.site
 
-Testing against [webhook.site](https://webhook.site) is the quickest way to see what Formo sends. Open the request in the left-hand list and look at the **Headers** section — you'll see `X-Webhook-Signature` and `X-Webhook-Timestamp` alongside the raw body. webhook.site only *displays* requests; to confirm a signature is valid, feed the body and those headers into the verifier above.
+Testing against [webhook.site](https://webhook.site) is the quickest way to see what Formo sends. Open the request in the left-hand list and look at the **Headers** section, where you'll see `X-Webhook-Signature` and `X-Webhook-Timestamp` alongside the raw body. webhook.site only *displays* requests; to confirm a signature is valid, feed the body and those headers into the verifier above.
 
 ---
 
 ## Delivery
 
-- **Never blocks the respondent.** Delivery happens after the response is saved and isn't awaited — a slow or dead endpoint can't fail or delay a submission.
+- **Never blocks the respondent.** Delivery happens after the response is saved and isn't awaited, so a slow or dead endpoint can't fail or delay a submission.
 - **Retries.** Up to 3 attempts on network errors, timeouts, `5xx`, `408`, and `429`. Other `4xx` responses are treated as a permanent rejection and not retried.
 - **Timeout.** 10 seconds per attempt; redirects aren't followed.
 - **Deduplicate** on `data.response_id` if a retry could double-process on your side.
 
-<Tip>Only public `http(s)` URLs are allowed. Endpoints on private, loopback, or internal addresses are rejected — so you can't test against `localhost`; use a tunnel (e.g. ngrok) or webhook.site instead.</Tip>
+<Tip>Only public `http(s)` URLs are allowed. Endpoints on private, loopback, or internal addresses are rejected, so you can't test against `localhost`. Use a tunnel (e.g. ngrok) or webhook.site instead.</Tip>
