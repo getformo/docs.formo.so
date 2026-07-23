@@ -1,0 +1,134 @@
+---
+title: 'Webhooks'
+description: 'Send each new form response to other tools as it arrives: Zapier, Make, n8n, or Slack.'
+---
+
+Webhooks let you react to form responses in real time. Add a webhook to a form and Formo will `POST` every new submission to the URL you choose, the moment it arrives.
+
+- **Integrations.** Point it at Zapier, Make, n8n, or your own backend to push responses into a CRM, spreadsheet, or internal tool.
+- **Slack out of the box.** Paste a Slack incoming-webhook URL and responses show up as a formatted message in your channel, with no extra setup.
+- **Signed and secure.** Optionally sign every payload so your server can verify it genuinely came from Formo.
+
+## Setup
+
+<Steps>
+  <Step title="Open form settings">
+    Open your form in the builder and go to **Settings → Webhooks**.
+  </Step>
+  <Step title="Add the endpoint">
+    Click **Add webhook** and paste your endpoint URL. Give it an optional name so it's easy to recognize later.
+  </Step>
+  <Step title="Keep the signing secret">
+    A signing secret is generated for you. Copy it now; it's stored encrypted and never shown again. Use it to verify incoming requests (see [Verifying signatures](#verifying-signatures)).
+  </Step>
+  <Step title="Test it">
+    Click **Test** to send a sample response to your endpoint and confirm it's wired up, then toggle the webhook on.
+  </Step>
+</Steps>
+
+A form can have up to 10 webhooks, and you can disable any of them with its toggle.
+
+### Slack
+
+To post responses into a Slack channel, create a [Slack incoming webhook](https://api.slack.com/messaging/webhooks) and paste its URL (it looks like `https://hooks.slack.com/services/...`). Formo detects Slack automatically and sends a formatted Block Kit message. No signing secret is needed; keep the URL private, since anyone who has it can post to your channel.
+
+## Sample Payload
+
+Non-Slack endpoints receive a JSON envelope:
+
+```json
+{
+  "id": "evt_9f8c...",
+  "type": "form.response.created",
+  "created": 1767225600,
+  "data": {
+    "form_id": "aBcD1234",
+    "form_title": "Beta signup",
+    "response_id": "6f1e...",
+    "submitted_at": "2026-01-01T00:00:00.000Z",
+    "answers": [
+      { "id": "q_name", "label": "Full name", "value": "Ada" },
+      { "id": "q_langs", "label": "Languages", "value": ["ts", "go"] }
+    ],
+    "fields": { "q_name": "Ada", "q_langs": ["ts", "go"] }
+  }
+}
+```
+
+`answers` keeps the order and human labels the respondent saw; `fields` is a flat `id` to `value` map that's easy to bind in automation tools. Field ids are stable across label edits, so key on `id`, not `label`.
+
+### Headers
+
+| Header | When | Meaning |
+| --- | --- | --- |
+| `X-Formo-Event` | always | Event type (`form.response.created`) |
+| `X-Formo-Webhook-Id` | always | Which configured webhook fired |
+| `X-Formo-Test` | test sends | `true`, a "Send test" rather than a real response |
+| `X-Webhook-Timestamp` | when signed | Unix seconds, part of the signed material |
+| `X-Webhook-Signature` | when signed | `HMAC-SHA256` over `{timestamp}.{body}`, hex |
+
+## Security
+
+When a signing secret is set, Formo signs each request so your server can prove it genuinely came from Formo and wasn't tampered with. A valid signature can only be produced with the secret (authenticity), it covers the exact body (integrity), and it includes a timestamp your server can use to reject old requests (replay protection).
+
+Secrets are encrypted at rest and never returned by the API. Only public `http(s)` endpoints are allowed; URLs that resolve to private or internal addresses are rejected.
+
+The signature is different on every request because it covers both the timestamp and the body, which carries a fresh event `id`. Don't compare it to a stored value: recompute it per request from that request's timestamp, body, and your secret, then compare to the `X-Webhook-Signature` header.
+
+### Verifying signatures
+
+<CodeGroup>
+
+```ts Node.js (Express)
+import crypto from 'crypto';
+
+app.post('/formo-webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const secret = process.env.FORMO_WEBHOOK_SECRET;
+  const timestamp = req.header('X-Webhook-Timestamp');
+  const signature = req.header('X-Webhook-Signature');
+  const rawBody = req.body.toString('utf8');
+
+  // Reject stale replays (timestamp is inside the signed material).
+  if (!timestamp || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) {
+    return res.status(401).end();
+  }
+
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest('hex');
+
+  // Constant-time compare. A plain === leaks the signature byte by byte.
+  const a = Buffer.from(signature ?? '', 'hex');
+  const b = Buffer.from(expected, 'hex');
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    return res.status(401).end();
+  }
+
+  const payload = JSON.parse(rawBody); // safe to trust now
+  // handle the submission
+  res.status(200).end();
+});
+```
+
+```python Python
+import hmac, hashlib, time
+
+def verify(raw_body: bytes, timestamp: str, signature: str, secret: str) -> bool:
+    if not timestamp or abs(time.time() - int(timestamp)) > 300:
+        return False
+    expected = hmac.new(
+        secret.encode(),
+        f"{timestamp}.".encode() + raw_body,
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature or "")
+```
+
+</CodeGroup>
+
+Verify against the raw request body, before parsing JSON. Re-serializing changes whitespace and key order, and the signature won't match. When testing on [webhook.site](https://webhook.site), the `X-Webhook-Signature` and `X-Webhook-Timestamp` headers appear in the request's Headers section.
+
+## Delivery
+
+Delivery happens after the response is saved and never blocks the submitter, so a slow or dead endpoint can't fail or delay a submission. Failed deliveries are retried a few times on transient errors (network issues, timeouts, `5xx`). Deduplicate on `data.response_id` if a retry could double-process on your side.
