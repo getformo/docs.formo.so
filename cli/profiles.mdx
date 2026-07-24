@@ -125,7 +125,9 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 ### Filter Operators
 
-`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`
+`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `notEmpty`, `isEmpty`
+
+The long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are deprecated aliases — still accepted by the API, but new usage should stick to the canonical operators above.
 
 ---
 

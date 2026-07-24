@@ -168,7 +168,8 @@
                   "type": "string"
                 },
                 "operator": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Comparison operator for the trigger filter. Both the canonical filter operators (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty`) and their legacy aliases (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`, `like`, `=`, `!=`) are accepted; the value is normalized to canonical form before the alert condition is evaluated."
                 },
                 "value": {
                   "type": "string"
@@ -262,24 +263,26 @@
       },
       "StepFilterCondition": {
         "type": "object",
-        "description": "A filter condition for an event property on a funnel step. The `op` field specifies the comparison operator and `value` is the value to compare against. For `in` and `notIn` operators the value is a pipe-delimited string (e.g. `\"metamask|rainbow|coinbase\"`).",
+        "description": "A filter condition for an event property on a funnel step. The `op` field specifies the comparison operator and `value` is the value to compare against. For `in` and `nin` operators the value is a pipe-delimited string (e.g. `\"metamask|rainbow|coinbase\"`).",
         "properties": {
           "op": {
             "type": "string",
             "enum": [
-              "equals",
-              "notEquals",
+              "eq",
+              "neq",
               "in",
-              "notIn",
+              "nin",
               "gt",
               "gte",
               "lt",
               "lte",
               "startsWith",
               "endsWith",
-              "includes"
+              "contains",
+              "notEmpty",
+              "isEmpty"
             ],
-            "description": "Comparison operator. Use `in` / `notIn` for multi-value matching (pipe-delimited value string)."
+            "description": "Comparison operator. The terse comparison tokens (`gt`, `gte`, `lt`, `lte`) are canonical; the legacy long forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) remain accepted and equivalent (deprecated). Use `in` / `nin` for multi-value matching (pipe-delimited value string). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on the property; the `value` is ignored. Existence checks are rejected on the numeric event columns `volume`/`revenue`/`points` — a number has no emptiness semantics."
           },
           "value": {
             "oneOf": [
@@ -290,7 +293,7 @@
                 "type": "number"
               }
             ],
-            "description": "The comparison value. For `in` / `notIn`, use a pipe-delimited string: `\"metamask|rainbow|coinbase\"`."
+            "description": "The comparison value. For `in` / `nin`, use a pipe-delimited string: `\"metamask|rainbow|coinbase\"`."
           }
         },
         "required": [
@@ -300,7 +303,7 @@
       },
       "FunnelStep": {
         "type": "object",
-        "description": "A single step in a funnel or user-path flow.\n\n`type` and `event` are required. Any additional property key becomes a filter condition using the `StepFilterCondition` schema (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`).\n\nStandard filterable columns: `origin`, `device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`. Any other key is treated as a JSON event property and extracted via `JSONExtractString(properties, '<key>')`.",
+        "description": "A single step in a funnel or user-path flow.\n\n`type` and `event` are required. Any additional property key becomes a filter condition using the `StepFilterCondition` schema (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`).\n\nStandard filterable columns: `origin`, `device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`. Any other key is treated as a JSON event property and extracted via `JSONExtractString(properties, '<key>')`.",
         "properties": {
           "type": {
             "type": "string",
@@ -351,7 +354,7 @@
       },
       "AnalyticsFilterCondition": {
         "type": "object",
-        "description": "A single analytics filter condition. Use `in` / `notIn` with a pipe-delimited string value (e.g. `\"a|b|c\"`) for multi-value matches.",
+        "description": "A single analytics filter condition. Use `in` / `nin` with a pipe-delimited string value (e.g. `\"a|b|c\"`) for multi-value matches.",
         "properties": {
           "field": {
             "type": "string",
@@ -360,19 +363,21 @@
           "op": {
             "type": "string",
             "enum": [
-              "equals",
-              "notEquals",
-              "greater",
-              "less",
-              "greaterOrEqual",
-              "lessOrEqual",
+              "eq",
+              "neq",
+              "gt",
+              "lt",
+              "gte",
+              "lte",
               "in",
-              "notIn",
+              "nin",
               "startsWith",
               "endsWith",
-              "includes"
+              "contains",
+              "notEmpty",
+              "isEmpty"
             ],
-            "description": "Comparison operator. `startsWith` / `endsWith` / `includes` are substring matches on text columns (e.g. `referrer`, `ref`, `utm_*`, `origin`, `builder_codes`)."
+            "description": "Comparison operator. `startsWith` / `endsWith` / `contains` are substring matches on text columns (e.g. `referrer`, `ref`, `utm_*`, `origin`, `builder_codes`). `notEmpty` matches rows where the column has any non-empty value, and `isEmpty` is its complement (the column is empty/unset); both ignore `value` (pass any placeholder). Existence checks are rejected on the numeric event columns `volume`/`revenue`/`points`."
           },
           "value": {
             "oneOf": [
@@ -386,7 +391,7 @@
                 "type": "boolean"
               }
             ],
-            "description": "Value to compare against. For `in` / `notIn`, pass a pipe-delimited string (e.g. `\"chrome|firefox\"`)."
+            "description": "Value to compare against. For `in` / `nin`, pass a pipe-delimited string (e.g. `\"chrome|firefox\"`)."
           }
         },
         "required": [
@@ -406,19 +411,18 @@
           "op": {
             "type": "string",
             "enum": [
-              "equals",
-              "notEquals",
+              "eq",
+              "neq",
               "in",
-              "notIn",
+              "nin",
               "gt",
               "gte",
               "lt",
               "lte",
-              "startsWith",
-              "endsWith",
-              "includes"
+              "notEmpty",
+              "isEmpty"
             ],
-            "description": "Comparison operator."
+            "description": "Comparison operator. The terse numeric tokens (`gt`, `gte`, `lt`, `lte`) are canonical; the legacy long forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) remain accepted and equivalent (deprecated). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on a string user property; the `value` is ignored. Substring operators (`startsWith` / `endsWith` / `contains`) are not supported on retention user filters."
           },
           "value": {
             "oneOf": [
@@ -449,13 +453,13 @@
           "op": {
             "type": "string",
             "enum": [
-              "greater",
-              "greaterOrEqual",
-              "less",
-              "lessOrEqual",
-              "equals"
+              "gt",
+              "gte",
+              "lt",
+              "lte",
+              "eq"
             ],
-            "default": "greater",
+            "default": "gt",
             "description": "Comparison operator. Numeric operators coerce both sides via toFloat64OrZero, so a numeric op on a non-numeric value yields no match (not an error)."
           },
           "value": {
@@ -634,7 +638,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -709,7 +713,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"equals\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -1631,8 +1635,7 @@
         "type": "object",
         "required": [
           "field",
-          "op",
-          "value"
+          "op"
         ],
         "properties": {
           "field": {
@@ -1649,11 +1652,23 @@
               "lt",
               "lte",
               "in",
-              "nin"
-            ]
+              "nin",
+              "contains",
+              "notEmpty",
+              "isEmpty",
+              "equals",
+              "notEquals",
+              "greater",
+              "greaterOrEqual",
+              "less",
+              "lessOrEqual",
+              "notIn",
+              "includes"
+            ],
+            "description": "Comparison operator. The terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `notEmpty`, `isEmpty`) are canonical; the long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are deprecated aliases that remain accepted and are folded to canonical at the boundary. `contains` (case-insensitive substring) is only supported on social fields (e.g. `users.twitter`, `users.email`). `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/…) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
           },
           "value": {
-            "description": "Filter value (string, number, boolean, or array)"
+            "description": "Filter value (string, number, boolean, or array). Required for every operator except the existence checks `notEmpty` and `isEmpty`, which ignore it."
           },
           "scope": {
             "type": "string",
@@ -1766,7 +1781,7 @@
       "AnalyticsFilters": {
         "name": "filters",
         "in": "query",
-        "description": "Array of filter conditions, JSON-encoded in the query string. Each entry is `{ field, op, value }`. Use `in` / `notIn` with a pipe-delimited `value` (e.g. `\"chrome|firefox\"`) for multi-value matching.",
+        "description": "Array of filter conditions, JSON-encoded in the query string. Each entry is `{ field, op, value }`. Use `in` / `nin` with a pipe-delimited `value` (e.g. `\"chrome|firefox\"`) for multi-value matching.",
         "content": {
           "application/json": {
             "schema": {
@@ -1778,7 +1793,7 @@
             "example": [
               {
                 "field": "location",
-                "op": "equals",
+                "op": "eq",
                 "value": "US"
               },
               {
@@ -1893,7 +1908,7 @@
             "example": [
               {
                 "field": "net_worth_usd",
-                "op": "greater",
+                "op": "gt",
                 "value": "1000"
               }
             ]
@@ -1936,7 +1951,7 @@
                 "protocol",
                 1,
                 "uniswap-v3",
-                "greater",
+                "gt",
                 "0"
               ]
             ]
@@ -1961,7 +1976,7 @@
                 1,
                 "",
                 "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                "greater",
+                "gt",
                 "100"
               ]
             ]
@@ -1983,7 +1998,7 @@
             "example": [
               [
                 1,
-                "greater",
+                "gt",
                 "0"
               ]
             ]
@@ -2006,7 +2021,7 @@
               {
                 "event": "swap",
                 "event_type": "track",
-                "op": "greaterOrEqual",
+                "op": "gte",
                 "times": 1,
                 "relative_to": "first_seen",
                 "window": { "value": 24, "unit": "hour" }
@@ -2018,7 +2033,7 @@
       "AnalyticsSourceFilter": {
         "name": "source_filter",
         "in": "query",
-        "description": "JSON object filtering users by raw event source; which SDK/integration the event was sent from (the raw `channel` column). Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `web`, `api`, `import`, `mobile`, `server`, `onchain` (pipe-delimited for `in`/`notIn`). Distinct from `channel_filter`, which matches the classified acquisition channel.",
+        "description": "JSON object filtering users by raw event source; which SDK/integration the event was sent from (the raw `channel` column). Format: `{ op, value }` where `op` is one of `eq`, `neq`, `in`, `nin` and `value` is one of `web`, `api`, `import`, `mobile`, `server`, `onchain` (pipe-delimited for `in`/`nin`). Distinct from `channel_filter`, which matches the classified acquisition channel.",
         "content": {
           "application/json": {
             "schema": {
@@ -2034,7 +2049,7 @@
       "AnalyticsChannelFilter": {
         "name": "channel_filter",
         "in": "query",
-        "description": "JSON object filtering users by classified acquisition channel; the precomputed `channel_type` column (GA4-style attribution). Format: `{ op, value }` where `op` is one of `equals`, `notEquals`, `in`, `notIn` and `value` is one of `Direct`, `Organic Search`, `Organic Social`, `Organic Video`, `Paid Search`, `Paid Social`, `Paid Video`, `Email`, `Referrals`, `Display`, `AI`, `Referrers` (pipe-delimited for `in`/`notIn`). Distinct from `source_filter`, which matches the raw SDK source.",
+        "description": "JSON object filtering users by classified acquisition channel; the precomputed `channel_type` column (GA4-style attribution). Format: `{ op, value }` where `op` is one of `eq`, `neq`, `in`, `nin` and `value` is one of `Direct`, `Organic Search`, `Organic Social`, `Organic Video`, `Paid Search`, `Paid Social`, `Paid Video`, `Email`, `Referrals`, `Display`, `AI`, `Referrers` (pipe-delimited for `in`/`nin`). Distinct from `source_filter`, which matches the raw SDK source.",
         "content": {
           "application/json": {
             "schema": {
@@ -2063,7 +2078,7 @@
               [
                 "whale",
                 1,
-                "equals",
+                "eq",
                 "true"
               ]
             ]
@@ -2281,7 +2296,7 @@
                       "trigger_filters": [
                         {
                           "name": "event",
-                          "operator": "equals",
+                          "operator": "eq",
                           "value": "transaction"
                         },
                         {
@@ -2351,7 +2366,8 @@
                           "type": "string"
                         },
                         "operator": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Comparison operator for the trigger filter. Both the canonical filter operators (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty`) and their legacy aliases (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`, `like`, `=`, `!=`) are accepted; the value is normalized to canonical form before the alert condition is evaluated."
                         },
                         "value": {
                           "type": "string"
@@ -2409,17 +2425,17 @@
                       {
                         "name": "type",
                         "value": "swap",
-                        "operator": "equals"
+                        "operator": "eq"
                       },
                       {
                         "name": "device",
                         "value": "mobile",
-                        "operator": "equals"
+                        "operator": "eq"
                       },
                       {
                         "name": "volume",
                         "value": "1000",
-                        "operator": "greater",
+                        "operator": "gt",
                         "numericThreshold": "1000"
                       }
                     ],
@@ -2453,12 +2469,12 @@
                       {
                         "name": "utm_source",
                         "value": "google",
-                        "operator": "equals"
+                        "operator": "eq"
                       },
                       {
                         "name": "utm_medium",
                         "value": "cpc",
-                        "operator": "equals"
+                        "operator": "eq"
                       }
                     ],
                     "recipient": [
@@ -2480,12 +2496,12 @@
                       {
                         "name": "location",
                         "value": "US",
-                        "operator": "equals"
+                        "operator": "eq"
                       },
                       {
                         "name": "net_worth_usd",
                         "value": "10000",
-                        "operator": "greaterOrEqual",
+                        "operator": "gte",
                         "numericThreshold": "10000"
                       }
                     ],
@@ -2508,13 +2524,13 @@
                       {
                         "name": "apps",
                         "value": "uniswap",
-                        "operator": "greater",
+                        "operator": "gt",
                         "numericThreshold": "5"
                       },
                       {
                         "name": "chains",
                         "value": "1",
-                        "operator": "greaterOrEqual",
+                        "operator": "gte",
                         "numericThreshold": "3"
                       }
                     ],
@@ -2580,7 +2596,7 @@
                   "trigger_filters": [
                     {
                       "name": "event",
-                      "operator": "equals",
+                      "operator": "eq",
                       "value": "transaction"
                     },
                     {
@@ -3245,11 +3261,11 @@
                         "type": "event",
                         "event": "connect",
                         "rdns": {
-                          "op": "equals",
+                          "op": "eq",
                           "value": "io.metamask"
                         },
                         "chain_id": {
-                          "op": "equals",
+                          "op": "eq",
                           "value": "1"
                         }
                       },
@@ -3310,7 +3326,7 @@
                         "type": "event",
                         "event": "page",
                         "device": {
-                          "op": "equals",
+                          "op": "eq",
                           "value": "mobile"
                         }
                       },
@@ -3464,7 +3480,7 @@
                       "retentionUserFilters": [
                         {
                           "field": "device",
-                          "op": "equals",
+                          "op": "eq",
                           "value": "desktop"
                         }
                       ]
@@ -4100,7 +4116,7 @@
                       "projectId": "proj_abc123",
                       "title": "High net worth desktop users",
                       "filterSet": [
-                        "{\"field\":\"device\",\"op\":\"equals\",\"value\":\"desktop\"}",
+                        "{\"field\":\"device\",\"op\":\"eq\",\"value\":\"desktop\"}",
                         "{\"field\":\"net_worth_usd\",\"op\":\"greaterOrEqual\",\"value\":100000}"
                       ]
                     }
@@ -4152,9 +4168,9 @@
                   "value": {
                     "title": "High-value mobile users",
                     "filterSets": [
-                      "device::equals::mobile",
-                      "net_worth_usd::greaterOrEqual::10000",
-                      "utm_source::equals::paid_ads"
+                      "device::eq::mobile",
+                      "net_worth_usd::gte::10000",
+                      "utm_source::eq::paid_ads"
                     ]
                   }
                 },
@@ -4172,7 +4188,7 @@
                   "value": {
                     "title": "Non-US users",
                     "filterSets": [
-                      "location::notEquals::US"
+                      "location::neq::US"
                     ]
                   }
                 },
@@ -4181,9 +4197,9 @@
                   "value": {
                     "title": "Organic power users",
                     "filterSets": [
-                      "net_worth_usd::greater::1000",
-                      "utm_source::notIn::google_ads|facebook_ads",
-                      "lifecycle::equals::power"
+                      "net_worth_usd::gt::1000",
+                      "utm_source::nin::google_ads|facebook_ads",
+                      "lifecycle::eq::power"
                     ]
                   }
                 },
@@ -4192,19 +4208,19 @@
                   "value": {
                     "title": "Multi-chain whales",
                     "filterSets": [
-                      "chains::greaterOrEqual::3",
-                      "net_worth_usd::greater::100000",
-                      "apps::greater::5"
+                      "chains::gte::3",
+                      "net_worth_usd::gt::100000",
+                      "apps::gt::5"
                     ]
                   }
                 },
                 "behavioralFilterSimple": {
                   "summary": "Users who performed 'signature' event at least once in last 30 days",
-                  "description": "Behavioural filters use the 'events' filter key with a base64-encoded JSON array as the value. The JSON contains event name, frequency operator (greater/greaterOrEqual/equals/lessOrEqual/less), times count, and date range.",
+                  "description": "Behavioural filters use the 'events' filter key with a base64-encoded JSON array as the value. The JSON contains event name, frequency operator (gt/gte/eq/lte/lt), times count, and date range.",
                   "value": {
                     "title": "Recent signers",
                     "filterSets": [
-                      "events::equals::W3siZXZlbnQiOiAic2lnbmF0dXJlIiwgIm9wZXJhdG9yIjogImdyZWF0ZXJPckVxdWFsIiwgInRpbWVzIjogMSwgInByZXNldCI6ICJsYXN0XzMwZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0wOS0xOSIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifV0="
+                      "events::eq::W3siZXZlbnQiOiAic2lnbmF0dXJlIiwgIm9wZXJhdG9yIjogImdyZWF0ZXJPckVxdWFsIiwgInRpbWVzIjogMSwgInByZXNldCI6ICJsYXN0XzMwZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0wOS0xOSIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifV0="
                     ]
                   }
                 },
@@ -4214,8 +4230,8 @@
                   "value": {
                     "title": "Indian MetaMask users",
                     "filterSets": [
-                      "events::equals::W3siZXZlbnQiOiAiY29ubmVjdCIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5IiwgInJkbnMiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICJpby5tZXRhbWFzayJ9LCAiY2hhaW5faWQiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICIxIn19XQ==",
-                      "location::equals::IN"
+                      "events::eq::W3siZXZlbnQiOiAiY29ubmVjdCIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5IiwgInJkbnMiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICJpby5tZXRhbWFzayJ9LCAiY2hhaW5faWQiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICIxIn19XQ==",
+                      "location::eq::IN"
                     ]
                   }
                 },
@@ -4225,8 +4241,8 @@
                   "value": {
                     "title": "Active transactors",
                     "filterSets": [
-                      "events::equals::W3siZXZlbnQiOiAicGFnZSIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDUsICJwcmVzZXQiOiAibGFzdF83ZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0xMC0xMiIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifSwgeyJldmVudCI6ICJ0cmFuc2FjdGlvbiIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5In1d",
-                      "device::equals::desktop"
+                      "events::eq::W3siZXZlbnQiOiAicGFnZSIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDUsICJwcmVzZXQiOiAibGFzdF83ZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0xMC0xMiIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifSwgeyJldmVudCI6ICJ0cmFuc2FjdGlvbiIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5In1d",
+                      "device::eq::desktop"
                     ]
                   }
                 }
@@ -7274,7 +7290,7 @@
                 "example": [
                   {
                     "field": "device",
-                    "op": "equals",
+                    "op": "eq",
                     "value": "desktop"
                   }
                 ]
@@ -7407,7 +7423,7 @@
       "get": {
         "operationId": "getAnalyticsFunnel",
         "summary": "Get multi-step conversion funnel",
-        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | startsWith | endsWith | includes`. `operand` may target a standard event column or a JSON property on `properties`.",
+        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | greater | greaterOrEqual | less | lessOrEqual | startsWith | endsWith | includes | notEmpty | isEmpty` (the short numeric aliases `gt`/`gte`/`lt`/`lte` and their canonical long forms are equivalent; `notEmpty`/`isEmpty` are value-less existence checks, rejected on the numeric event columns `volume`/`revenue`/`points`). `operand` may target a standard event column or a JSON property on `properties`.",
         "tags": [
           "Query"
         ],
@@ -7442,7 +7458,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `includes`. For `in`/`notIn`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `startsWith`, `endsWith`, `includes`, `notEmpty`, `isEmpty` (the short numeric aliases and their canonical long forms are equivalent; `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`notIn`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
                 "summary": "Simple 3-step funnel: page → connect → swap",
@@ -7678,7 +7694,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `includes`. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `startsWith`, `endsWith`, `includes`, `notEmpty`, `isEmpty` (the short numeric aliases and their canonical long forms are equivalent; `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "anyPageView": {
                 "summary": "Match any page view as the start step",

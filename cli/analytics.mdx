@@ -52,7 +52,7 @@ Requires `query:read` scope on your API key.
 
 ### `--filters`
 
-A JSON array of `{ field, op, value }` conditions, e.g. `[{"field":"location","op":"equals","value":"US"}]`. For multi-value matching, use `in` / `notIn` with a pipe-delimited `value` (e.g. `"chrome|firefox"`).
+A JSON array of `{ field, op, value }` conditions, e.g. `[{"field":"location","op":"eq","value":"US"}]`. For multi-value matching, use `in` / `nin` with a pipe-delimited `value` (e.g. `"chrome|firefox"`).
 
 ### `--params` (pipe-specific)
 
@@ -87,7 +87,7 @@ formo analytics funnel \
 formo analytics top_wallets --date-from 2026-04-01 --date-to 2026-04-30 --params '{"limit":10}'
 
 # Retention restricted to US visitors
-formo analytics retention --filters '[{"field":"location","op":"equals","value":"US"}]'
+formo analytics retention --filters '[{"field":"location","op":"eq","value":"US"}]'
 
 # Revenue timeseries for a specific wallet
 formo analytics revenue_timeseries \

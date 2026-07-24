@@ -146,6 +146,12 @@ Each condition in the `conditions` array has:
 | `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
 | `nin` | Not in array | `{"field": "users.location", "op": "nin", "value": ["US", "UK"]}` |
 | `contains` | Case-insensitive substring match for social fields only | `{"field": "users.twitter", "op": "contains", "value": "vitalik"}` |
+| `notEmpty` | Field is set (non-empty). String fields only — value is ignored | `{"field": "users.email", "op": "notEmpty"}` |
+| `isEmpty` | Field is not set (empty). String user attributes only — value is ignored | `{"field": "users.utm_source", "op": "isEmpty"}` |
+
+<Note>
+**Deprecated aliases.** The long-form spellings `equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, and `includes` are deprecated but still accepted on this endpoint — they are folded to the canonical operators above at the input boundary, so existing integrations keep working. Use the canonical operators for new integrations; the aliases may be retired in a future release. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only — not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
+</Note>
 
 ---
 
@@ -263,8 +269,8 @@ Filter by user lifecycle stage. Valid values: `At Risk`, `Churned`, `New`, `Powe
 
 Social fields support two modes:
 
-- Presence checks: use an empty string value to match profiles where the field is present.
-- Value matching: use `eq`, `neq`, or `contains` with a non-empty string to match the actual social value.
+- Presence checks: use `notEmpty` to match profiles where the field is set (or `isEmpty` for the opposite). The value is ignored.
+- Value matching: use `eq`, `neq`, or `contains` (case-insensitive substring) with a non-empty string to match the actual social value.
 
 | Field | Description |
 |-------|-------------|
@@ -291,7 +297,7 @@ Social fields support two modes:
 ```json
 {
   "conditions": [
-    { "field": "users.email", "op": "eq", "value": "" }
+    { "field": "users.email", "op": "notEmpty" }
   ],
   "logic": "and"
 }
@@ -302,8 +308,8 @@ Social fields support two modes:
 ```json
 {
   "conditions": [
-    { "field": "users.ens", "op": "eq", "value": "" },
-    { "field": "users.farcaster", "op": "eq", "value": "" }
+    { "field": "users.ens", "op": "notEmpty" },
+    { "field": "users.farcaster", "op": "notEmpty" }
   ],
   "logic": "and"
 }
@@ -591,7 +597,7 @@ curl -sS -X GET \
   -d '{
     "conditions": [
       { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
-      { "field": "users.ens", "op": "eq", "value": "" },
+      { "field": "users.ens", "op": "notEmpty" },
       { "field": "chains.1.balance", "op": "gt", "value": 0 }
     ],
     "logic": "and"
