@@ -108,7 +108,7 @@ The search endpoint supports rich filtering capabilities through a JSON request 
   "conditions": [
     {
       "field": "users.net_worth_usd",
-      "op": "greater",
+      "op": "gt",
       "value": 1000
     }
   ],
@@ -137,20 +137,20 @@ Each condition in the `conditions` array has:
 
 | Operator | Description | Example |
 |----------|-------------|---------|
-| `equals` | Equals | `{"field": "users.device", "op": "equals", "value": "Desktop"}` |
-| `notEquals` | Not equals | `{"field": "users.os", "op": "notEquals", "value": "Windows"}` |
-| `greater` | Greater than | `{"field": "users.net_worth_usd", "op": "greater", "value": 1000}` |
-| `greaterOrEqual` | Greater than or equal | `{"field": "users.volume", "op": "greaterOrEqual", "value": 100}` |
-| `less` | Less than | `{"field": "users.net_worth_usd", "op": "less", "value": 50000}` |
-| `lessOrEqual` | Less than or equal | `{"field": "chains.1.balance", "op": "lessOrEqual", "value": 10000}` |
+| `eq` | Equals | `{"field": "users.device", "op": "eq", "value": "Desktop"}` |
+| `neq` | Not equals | `{"field": "users.os", "op": "neq", "value": "Windows"}` |
+| `gt` | Greater than | `{"field": "users.net_worth_usd", "op": "gt", "value": 1000}` |
+| `gte` | Greater than or equal | `{"field": "users.volume", "op": "gte", "value": 100}` |
+| `lt` | Less than | `{"field": "users.net_worth_usd", "op": "lt", "value": 50000}` |
+| `lte` | Less than or equal | `{"field": "chains.1.balance", "op": "lte", "value": 10000}` |
 | `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
-| `notIn` | Not in array | `{"field": "users.location", "op": "notIn", "value": ["US", "UK"]}` |
-| `includes` | Case-insensitive substring match for social fields only | `{"field": "users.twitter", "op": "includes", "value": "vitalik"}` |
+| `nin` | Not in array | `{"field": "users.location", "op": "nin", "value": ["US", "UK"]}` |
+| `contains` | Case-insensitive substring match for social fields only | `{"field": "users.twitter", "op": "contains", "value": "vitalik"}` |
 | `notEmpty` | Field is set (non-empty). String fields only — value is ignored | `{"field": "users.email", "op": "notEmpty"}` |
 | `isEmpty` | Field is not set (empty). String user attributes only — value is ignored | `{"field": "users.utm_source", "op": "isEmpty"}` |
 
 <Note>
-**Operator compatibility.** The short aliases `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `nin`, and `contains` are **no longer accepted** and return `400`. Use the canonical operators above. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only — not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
+**Deprecated aliases.** The long-form spellings `equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, and `includes` are deprecated but still accepted on this endpoint — they are folded to the canonical operators above at the input boundary, so existing integrations keep working. Use the canonical operators for new integrations; the aliases may be retired in a future release. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only — not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
 </Note>
 
 ---
@@ -175,7 +175,7 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 ```json
 {
   "conditions": [
-    { "field": "users.net_worth_usd", "op": "greater", "value": 10000 }
+    { "field": "users.net_worth_usd", "op": "gt", "value": 10000 }
   ],
   "logic": "and"
 }
@@ -186,7 +186,7 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 ```json
 {
   "conditions": [
-    { "field": "users.volume", "op": "greater", "value": 5000 }
+    { "field": "users.volume", "op": "gt", "value": 5000 }
   ],
   "logic": "and"
 }
@@ -206,8 +206,8 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 ```json
 {
   "conditions": [
-    { "field": "users.device", "op": "equals", "value": "Mobile" },
-    { "field": "users.location", "op": "equals", "value": "US" }
+    { "field": "users.device", "op": "eq", "value": "Mobile" },
+    { "field": "users.location", "op": "eq", "value": "US" }
   ],
   "logic": "and"
 }
@@ -239,8 +239,8 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 ```json
 {
   "conditions": [
-    { "field": "users.first_utm_source", "op": "equals", "value": "google" },
-    { "field": "users.first_utm_medium", "op": "equals", "value": "cpc" }
+    { "field": "users.first_utm_source", "op": "eq", "value": "google" },
+    { "field": "users.first_utm_medium", "op": "eq", "value": "cpc" }
   ],
   "logic": "and"
 }
@@ -270,7 +270,7 @@ Filter by user lifecycle stage. Valid values: `At Risk`, `Churned`, `New`, `Powe
 Social fields support two modes:
 
 - Presence checks: use `notEmpty` to match profiles where the field is set (or `isEmpty` for the opposite). The value is ignored.
-- Value matching: use `equals`, `notEquals`, or `includes` (case-insensitive substring) with a non-empty string to match the actual social value.
+- Value matching: use `eq`, `neq`, or `contains` (case-insensitive substring) with a non-empty string to match the actual social value.
 
 | Field | Description |
 |-------|-------------|
@@ -320,7 +320,7 @@ Social fields support two modes:
 ```json
 {
   "conditions": [
-    { "field": "users.twitter", "op": "includes", "value": "bob" }
+    { "field": "users.twitter", "op": "contains", "value": "bob" }
   ],
   "logic": "and"
 }
@@ -331,7 +331,7 @@ Social fields support two modes:
 ```json
 {
   "conditions": [
-    { "field": "users.email", "op": "equals", "value": "alice@formo.so" }
+    { "field": "users.email", "op": "eq", "value": "alice@formo.so" }
   ],
   "logic": "and"
 }
@@ -352,7 +352,7 @@ Use `chains.balance` to filter across all chains (returns profiles where **any**
 ```json
 {
   "conditions": [
-    { "field": "chains.balance", "op": "greater", "value": 1000 }
+    { "field": "chains.balance", "op": "gt", "value": 1000 }
   ],
   "logic": "and"
 }
@@ -376,7 +376,7 @@ Common chain IDs:
 ```json
 {
   "conditions": [
-    { "field": "chains.1.balance", "op": "greater", "value": 5000 }
+    { "field": "chains.1.balance", "op": "gt", "value": 5000 }
   ],
   "logic": "and"
 }
@@ -387,8 +387,8 @@ Common chain IDs:
 ```json
 {
   "conditions": [
-    { "field": "chains.1.balance", "op": "greater", "value": 1000 },
-    { "field": "chains.137.balance", "op": "greater", "value": 1000 }
+    { "field": "chains.1.balance", "op": "gt", "value": 1000 },
+    { "field": "chains.137.balance", "op": "gt", "value": 1000 }
   ],
   "logic": "and"
 }
@@ -409,7 +409,7 @@ Use `apps.{app_id}.balance` to filter by app balance across all chains.
 ```json
 {
   "conditions": [
-    { "field": "apps.uniswap.balance", "op": "greater", "value": 1000 }
+    { "field": "apps.uniswap.balance", "op": "gt", "value": 1000 }
   ],
   "logic": "and"
 }
@@ -424,7 +424,7 @@ Use `apps.{chain_id}.{app_id}.balance` to filter by app balance on a specific ch
 ```json
 {
   "conditions": [
-    { "field": "apps.1.aave.balance", "op": "greater", "value": 500 }
+    { "field": "apps.1.aave.balance", "op": "gt", "value": 500 }
   ],
   "logic": "and"
 }
@@ -454,7 +454,7 @@ Use `tokens.{token_address}.balance` to filter by token balance across all chain
   "conditions": [
     {
       "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
-      "op": "greater",
+      "op": "gt",
       "value": 1000
     }
   ],
@@ -473,7 +473,7 @@ Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a 
   "conditions": [
     {
       "field": "tokens.1.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
-      "op": "greater",
+      "op": "gt",
       "value": 500
     }
   ],
@@ -492,7 +492,7 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
   "conditions": [
     {
       "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
-      "op": "greater",
+      "op": "gt",
       "value": 0,
       "scope": "protocol"
     }
@@ -508,7 +508,7 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
   "conditions": [
     {
       "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
-      "op": "greater",
+      "op": "gt",
       "value": 1000,
       "scope": "protocol",
       "appId": "aave-v3"
@@ -525,7 +525,7 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
   "conditions": [
     {
       "field": "tokens.0x0000000000000000000000000000000000000000.balance",
-      "op": "greater",
+      "op": "gt",
       "value": 1,
       "scope": "protocol",
       "appId": "lido"
@@ -554,7 +554,7 @@ Common label IDs:
 ```json
 {
   "conditions": [
-    { "field": "labels.coinbase.verified_account", "op": "equals", "value": "true" }
+    { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" }
   ],
   "logic": "and"
 }
@@ -565,7 +565,7 @@ Common label IDs:
 ```json
 {
   "conditions": [
-    { "field": "labels.coinbase.verified_country", "op": "equals", "value": "US" }
+    { "field": "labels.coinbase.verified_country", "op": "eq", "value": "US" }
   ],
   "logic": "and"
 }
@@ -576,7 +576,7 @@ Common label IDs:
 ```json
 {
   "conditions": [
-    { "field": "labels.passport.models_aggregate_score", "op": "greaterOrEqual", "value": "50" }
+    { "field": "labels.passport.models_aggregate_score", "op": "gte", "value": "50" }
   ],
   "logic": "and"
 }
@@ -596,9 +596,9 @@ curl -sS -X GET \
   -H "Content-Type: application/json" \
   -d '{
     "conditions": [
-      { "field": "users.net_worth_usd", "op": "greater", "value": 10000 },
+      { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
       { "field": "users.ens", "op": "notEmpty" },
-      { "field": "chains.1.balance", "op": "greater", "value": 0 }
+      { "field": "chains.1.balance", "op": "gt", "value": 0 }
     ],
     "logic": "and"
   }' \
@@ -615,8 +615,8 @@ curl -sS -X GET \
   -H "Content-Type: application/json" \
   -d '{
     "conditions": [
-      { "field": "apps.uniswap.balance", "op": "greater", "value": 0 },
-      { "field": "apps.aave.balance", "op": "greater", "value": 0 }
+      { "field": "apps.uniswap.balance", "op": "gt", "value": 0 },
+      { "field": "apps.aave.balance", "op": "gt", "value": 0 }
     ],
     "logic": "or"
   }' \
@@ -633,9 +633,9 @@ curl -sS -X GET \
   -H "Content-Type: application/json" \
   -d '{
     "conditions": [
-      { "field": "labels.coinbase.verified_account", "op": "equals", "value": "true" },
+      { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" },
       { "field": "labels.coinbase.verified_country", "op": "in", "value": ["US", "UK", "DE"] },
-      { "field": "users.lifecycle", "op": "equals", "value": "Power user" }
+      { "field": "users.lifecycle", "op": "eq", "value": "Power user" }
     ],
     "logic": "and"
   }' \
@@ -652,9 +652,9 @@ curl -sS -X GET \
   -H "Content-Type: application/json" \
   -d '{
     "conditions": [
-      { "field": "chains.1.balance", "op": "greater", "value": 10000 },
-      { "field": "chains.137.balance", "op": "greater", "value": 5000 },
-      { "field": "chains.42161.balance", "op": "greater", "value": 5000 }
+      { "field": "chains.1.balance", "op": "gt", "value": 10000 },
+      { "field": "chains.137.balance", "op": "gt", "value": 5000 },
+      { "field": "chains.42161.balance", "op": "gt", "value": 5000 }
     ],
     "logic": "and"
   }' \
