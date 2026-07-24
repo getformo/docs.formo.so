@@ -127,7 +127,7 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `notEmpty`, `isEmpty`
 
-The long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are deprecated aliases — still accepted by the API, but new usage should stick to the canonical operators above.
+The long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are retired — the API rejects them with a `400` naming the token. Use only the canonical operators above.
 
 ---
 

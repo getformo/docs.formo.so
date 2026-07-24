@@ -23,19 +23,20 @@ The `steps` query parameter is a JSON-encoded array of 2 to 10 step specs. Each 
 - **`name`** - a unique step id. Use `<event>::<index>` (e.g. `"connect::1"`) so the same event re-used at multiple steps can be told apart in the response.
 - **`filters`** - optional `[{operand, operator, value}]`.
   - **Operators:**
-    - `equals`
-    - `notEquals`
+    - `eq`
+    - `neq`
     - `in`
-    - `notIn`
+    - `nin`
     - `gt`
     - `lt`
     - `gte`
     - `lte`
     - `startsWith`
     - `endsWith`
-    - `includes`
+    - `contains`
     - `notEmpty` / `isEmpty` - value-less existence checks (the `value` is ignored; rejected on the numeric event columns `volume`/`revenue`/`points`)
-  - The numeric long forms `greater`, `greaterOrEqual`, `less`, `lessOrEqual` are accepted as equivalents of `gt` / `gte` / `lt` / `lte`.
+  - Canonical tokens only: the retired long-form spellings (`equals`, `notEquals`, `notIn`, `includes`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are rejected with a `400` naming the token.
+  - For `in` / `nin`, pass the values as a `|`-separated string in `value` (e.g. `"ethereum|polygon|base"`).
   - **`operand`** may target a standard event column or a JSON property on `properties`.
 
 ## Example
@@ -49,6 +50,6 @@ curl -G "https://api.formo.so/v0/funnel" \
   --data-urlencode 'steps=[
     {"type":"event","event":"page","name":"page::0","filters":[]},
     {"type":"track","event":"connect","name":"connect::1","filters":[]},
-    {"type":"track","event":"swap","name":"swap::2","filters":[{"operand":"chain","operator":"equals","value":"ethereum"}]}
+    {"type":"track","event":"swap","name":"swap::2","filters":[{"operand":"chain","operator":"eq","value":"ethereum"}]}
   ]'
 ```
