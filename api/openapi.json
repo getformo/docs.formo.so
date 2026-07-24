@@ -29,7 +29,7 @@
       "WorkspaceApiKey": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Workspace API key (e.g. `formo_xxx`). Create one in the Formo dashboard under Team Settings > API Keys."
+        "description": "Workspace API key (e.g. `formo_xxx`). Create one in the Formo dashboard under Team Settings > API."
       },
       "X402Payment": {
         "type": "apiKey",
@@ -2236,7 +2236,7 @@
     }
   },
   "x-api-scopes": {
-    "description": "API key scopes control access to endpoints. Create keys with the required scopes in Team Settings > API Keys.",
+    "description": "API key scopes control access to endpoints. Create keys with the required scopes in Team Settings > API.",
     "scopes": {
       "alerts:read": "List and get alerts",
       "alerts:write": "Create, update, delete alerts (requires alerts:read)",
