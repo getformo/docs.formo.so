@@ -91,18 +91,18 @@ formo profiles search --order-by net_worth_usd --order-dir desc --size 5
 
 # Search with a typed filter condition
 formo profiles search \
-  --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000}]' \
+  --conditions '[{"field":"users.net_worth_usd","op":"greater","value":10000}]' \
   --size 20
 
 # Search profiles matching either condition
 formo profiles search \
-  --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000},{"field":"users.volume","op":"gt","value":1000}]' \
+  --conditions '[{"field":"users.net_worth_usd","op":"greater","value":10000},{"field":"users.volume","op":"greater","value":1000}]' \
   --logic or \
   --size 20
 
 # Filter by onchain balance on Ethereum
 formo profiles search \
-  --conditions '[{"field":"chains.1.balance","op":"gt","value":1000}]' \
+  --conditions '[{"field":"chains.1.balance","op":"greater","value":1000}]' \
   --size 20
 ```
 
@@ -114,8 +114,8 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 ```json
 [
-  { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
-  { "field": "chains.1.balance", "op": "gte", "value": 1000 }
+  { "field": "users.net_worth_usd", "op": "greater", "value": 10000 },
+  { "field": "chains.1.balance", "op": "greaterOrEqual", "value": 1000 }
 ]
 ```
 

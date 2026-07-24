@@ -29,7 +29,7 @@
       "WorkspaceApiKey": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Workspace API key (e.g. `formo_xxx`). Create one in the Formo dashboard under Team Settings > API."
+        "description": "Workspace API key (e.g. `formo_xxx`). Create one in the Formo dashboard under Team Settings > API Keys."
       },
       "X402Payment": {
         "type": "apiKey",
@@ -168,7 +168,8 @@
                   "type": "string"
                 },
                 "operator": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Comparison operator for the trigger filter. Both the canonical filter operators (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `in`, `notIn`, `startsWith`, `endsWith`, `includes`, `notEmpty`, `isEmpty`) and their legacy aliases (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `nin`, `contains`) are accepted; the value is normalized to canonical form before the alert condition is evaluated."
                 },
                 "value": {
                   "type": "string"
@@ -275,11 +276,17 @@
               "gte",
               "lt",
               "lte",
+              "greater",
+              "greaterOrEqual",
+              "less",
+              "lessOrEqual",
               "startsWith",
               "endsWith",
-              "includes"
+              "includes",
+              "notEmpty",
+              "isEmpty"
             ],
-            "description": "Comparison operator. Use `in` / `notIn` for multi-value matching (pipe-delimited value string)."
+            "description": "Comparison operator. Both the abbreviated comparison aliases (`gt`, `gte`, `lt`, `lte`) and the canonical long forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are accepted and equivalent. Use `in` / `notIn` for multi-value matching (pipe-delimited value string). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on the property; the `value` is ignored. Existence checks are rejected on the numeric event columns `volume`/`revenue`/`points` — a number has no emptiness semantics."
           },
           "value": {
             "oneOf": [
@@ -370,9 +377,11 @@
               "notIn",
               "startsWith",
               "endsWith",
-              "includes"
+              "includes",
+              "notEmpty",
+              "isEmpty"
             ],
-            "description": "Comparison operator. `startsWith` / `endsWith` / `includes` are substring matches on text columns (e.g. `referrer`, `ref`, `utm_*`, `origin`, `builder_codes`)."
+            "description": "Comparison operator. `startsWith` / `endsWith` / `includes` are substring matches on text columns (e.g. `referrer`, `ref`, `utm_*`, `origin`, `builder_codes`). `notEmpty` matches rows where the column has any non-empty value, and `isEmpty` is its complement (the column is empty/unset); both ignore `value` (pass any placeholder). Existence checks are rejected on the numeric event columns `volume`/`revenue`/`points`."
           },
           "value": {
             "oneOf": [
@@ -414,11 +423,14 @@
               "gte",
               "lt",
               "lte",
-              "startsWith",
-              "endsWith",
-              "includes"
+              "greater",
+              "greaterOrEqual",
+              "less",
+              "lessOrEqual",
+              "notEmpty",
+              "isEmpty"
             ],
-            "description": "Comparison operator."
+            "description": "Comparison operator. Both the abbreviated numeric aliases (`gt`, `gte`, `lt`, `lte`) and the canonical long forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are accepted and equivalent. `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on a string user property; the `value` is ignored. Substring operators (`startsWith` / `endsWith` / `includes`) are not supported on retention user filters."
           },
           "value": {
             "oneOf": [
@@ -1631,8 +1643,7 @@
         "type": "object",
         "required": [
           "field",
-          "op",
-          "value"
+          "op"
         ],
         "properties": {
           "field": {
@@ -1642,18 +1653,22 @@
           "op": {
             "type": "string",
             "enum": [
-              "eq",
-              "neq",
-              "gt",
-              "gte",
-              "lt",
-              "lte",
+              "equals",
+              "notEquals",
+              "greater",
+              "greaterOrEqual",
+              "less",
+              "lessOrEqual",
               "in",
-              "nin"
-            ]
+              "notIn",
+              "includes",
+              "notEmpty",
+              "isEmpty"
+            ],
+            "description": "Comparison operator (canonical spellings only). The legacy abbreviated dialect (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `nin`, `contains`) is no longer accepted — sending one returns 400; use the canonical form (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`). `includes` (case-insensitive substring) is only supported on social fields (e.g. `users.twitter`, `users.email`). `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/…) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`."
           },
           "value": {
-            "description": "Filter value (string, number, boolean, or array)"
+            "description": "Filter value (string, number, boolean, or array). Required for every operator except the existence checks `notEmpty` and `isEmpty`, which ignore it."
           },
           "scope": {
             "type": "string",
@@ -2221,7 +2236,7 @@
     }
   },
   "x-api-scopes": {
-    "description": "API key scopes control access to endpoints. Create keys with the required scopes in Team Settings > API.",
+    "description": "API key scopes control access to endpoints. Create keys with the required scopes in Team Settings > API Keys.",
     "scopes": {
       "alerts:read": "List and get alerts",
       "alerts:write": "Create, update, delete alerts (requires alerts:read)",
@@ -2351,7 +2366,8 @@
                           "type": "string"
                         },
                         "operator": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Comparison operator for the trigger filter. Both the canonical filter operators (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `in`, `notIn`, `startsWith`, `endsWith`, `includes`, `notEmpty`, `isEmpty`) and their legacy aliases (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `nin`, `contains`) are accepted; the value is normalized to canonical form before the alert condition is evaluated."
                         },
                         "value": {
                           "type": "string"
@@ -4685,7 +4701,7 @@
                     "conditions": [
                       {
                         "field": "users.net_worth_usd",
-                        "op": "gt",
+                        "op": "greater",
                         "value": 10000
                       }
                     ],
@@ -4698,7 +4714,7 @@
                     "conditions": [
                       {
                         "field": "chains.1.balance",
-                        "op": "gt",
+                        "op": "greater",
                         "value": 1000
                       }
                     ],
@@ -4711,7 +4727,7 @@
                     "conditions": [
                       {
                         "field": "labels.coinbase.verified_account",
-                        "op": "eq",
+                        "op": "equals",
                         "value": "true"
                       }
                     ],
@@ -4724,7 +4740,7 @@
                     "conditions": [
                       {
                         "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
-                        "op": "gt",
+                        "op": "greater",
                         "value": 0,
                         "scope": "any"
                       }
@@ -7407,7 +7423,7 @@
       "get": {
         "operationId": "getAnalyticsFunnel",
         "summary": "Get multi-step conversion funnel",
-        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | startsWith | endsWith | includes`. `operand` may target a standard event column or a JSON property on `properties`.",
+        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `equals | notEquals | in | notIn | gt | lt | gte | lte | greater | greaterOrEqual | less | lessOrEqual | startsWith | endsWith | includes | notEmpty | isEmpty` (the short numeric aliases `gt`/`gte`/`lt`/`lte` and their canonical long forms are equivalent; `notEmpty`/`isEmpty` are value-less existence checks, rejected on the numeric event columns `volume`/`revenue`/`points`). `operand` may target a standard event column or a JSON property on `properties`.",
         "tags": [
           "Query"
         ],
@@ -7442,7 +7458,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `includes`. For `in`/`notIn`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `startsWith`, `endsWith`, `includes`, `notEmpty`, `isEmpty` (the short numeric aliases and their canonical long forms are equivalent; `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`notIn`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
                 "summary": "Simple 3-step funnel: page → connect → swap",
@@ -7678,7 +7694,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `includes`. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{operand, operator, value, values?}` (use `values` for `in`/`notIn`).\n\n**Filter operators:** `equals`, `notEquals`, `in`, `notIn`, `gt`, `lt`, `gte`, `lte`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `startsWith`, `endsWith`, `includes`, `notEmpty`, `isEmpty` (the short numeric aliases and their canonical long forms are equivalent; `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "anyPageView": {
                 "summary": "Match any page view as the start step",
