@@ -160,10 +160,10 @@ Each step in the `steps` array has the following shape:
 <Tip>
   For `in` and `nin`, join multiple values with a pipe `|`. Escape a literal
   pipe with `\|` and a literal backslash with `\\`. The legacy numeric long
-  forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are deprecated
-  aliases for `gt` / `gte` / `lt` / `lte` and remain accepted. `notEmpty` and
-  `isEmpty` are rejected on the numeric event columns `volume` / `revenue` /
-  `points`.
+  forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are retired and
+  rejected with a `400` naming the token — send `gt` / `gte` / `lt` / `lte`.
+  `notEmpty` and `isEmpty` are rejected on the numeric event columns `volume` /
+  `revenue` / `points`.
 </Tip>
 
 ### `settings` for Funnel Charts
@@ -573,10 +573,10 @@ Each step in the `steps` array has the following shape:
 <Tip>
   For `in` and `nin`, join multiple values with a pipe `|`. Escape a literal
   pipe with `\|` and a literal backslash with `\\`. The legacy numeric long
-  forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are deprecated
-  aliases for `gt` / `gte` / `lt` / `lte` and remain accepted. `notEmpty` and
-  `isEmpty` are rejected on the numeric event columns `volume` / `revenue` /
-  `points`.
+  forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are retired and
+  rejected with a `400` naming the token — send `gt` / `gte` / `lt` / `lte`.
+  `notEmpty` and `isEmpty` are rejected on the numeric event columns `volume` /
+  `revenue` / `points`.
 </Tip>
 
 ### `settings` for Funnel Charts

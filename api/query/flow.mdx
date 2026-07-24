@@ -15,7 +15,7 @@ Both `start_step` and `end_step` are JSON-encoded objects of shape `{type, event
 - **`type`** - event type (`event`, `track`, `transaction`, `signature`, `decoded_log`).
 - **`event`** - the event name.
 - **`resolved_event`** - the value matched against the events table. Use the sentinel `"__ALL_PAGE_VIEWS__"` to match any page view, or the page path / event name otherwise.
-- **`filters`** - optional `[{operand, operator, value, values?}]`. Use `values` for the `in` / `notIn` operators.
+- **`filters`** - optional `[{operand, operator, value, values?}]`. Use `values` for the `in` / `nin` operators. Operators use the canonical tokens only (`eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty`) — retired long-form spellings like `equals` / `notIn` / `includes` are rejected with a `400` naming the token.
 
 Pass `global_filters` as a JSON-encoded array to apply additional `{operand, operator, value, values?}` constraints to both the start-session scan and the relevant-events scan.
 
