@@ -26,6 +26,7 @@
                 "pages": [
                   "features/product-analytics/overview",
                   "features/product-analytics/key-metrics",
+                  "features/product-analytics/ads",
                   "features/product-analytics/activity",
                   "features/product-analytics/live-view",
                   "features/product-analytics/custom-events",

@@ -1,0 +1,42 @@
+---
+title: 'Ad Attribution'
+description: 'Measure which ad networks acquire your visitors, wallets, and conversions. Formo attributes traffic from Google, Meta, X, TikTok, LinkedIn, Reddit, and Microsoft ads automatically using click IDs, surfaced in the Ads tab and filters.'
+---
+
+Formo attributes traffic and users to the ad network that acquired them: no pixel, no postback setup. When someone clicks your ad, the platform appends a click ID to your landing page URL; the Formo SDK captures it automatically and every dashboard surface can then slice by ad network.
+
+## Supported ad platforms
+
+| Platform | Click ID parameter |
+| --- | --- |
+| Google Ads | `gclid`, `gad_source` |
+| Meta Ads | `fbclid` |
+| Microsoft Ads | `msclkid` |
+| TikTok Ads | `ttclid` |
+| X Ads | `twclid` |
+| LinkedIn Ads | `li_fat_id` |
+| Reddit Ads | `rdt_cid` |
+| Other Paid | any paid `utm_medium` (`cpc`, `cpm`, `ppc`, `paid*`, etc.) without a click ID |
+
+There is nothing to configure. Keep auto-tagging enabled on your ad platform (it is the default on all of them) and the click IDs arrive on your landing URLs. Adding UTM parameters as well gives you campaign-level detail on top of the network-level attribution; see the [UTM guide](https://formo.so/utm-generator).
+
+## How attribution works
+
+- **Sessions** attribute to the session's first paid touch. An organic landing followed by an ad click in the same session still counts for the ad network.
+- **Users** carry first-touch and last-touch ad attribution across their whole history, so you can analyze acquisition (first touch) or conversion influence (last touch).
+- Ads is one level more granular than [Channels](/data/attribution): the Paid Search and Paid Social channels group networks by ad format, while Ads shows the individual network.
+
+## Where Ads appears
+
+- **Overview → Acquisition card → Ads tab**: paid sessions and visitors by network. Click a row to jump to the Users page filtered to that network.
+- **Overview chart breakdown**: break Visitors, Sessions, Page views, Wallets, or Transactions down by Ads (Acquisition group in the breakdown picker).
+- **Users page**: filter by **Ads** (network) or **Ad Click ID** (raw token) in first-touch, last-touch, or any-touch mode. The users table has an **Ad** column, and each profile shows **Ad** and **Ad Click ID** rows with first and last touch.
+- **Activity page**: filter the event feed and chart by Ads or Ad Click ID.
+- **Funnels**: break conversion funnels down by Ads to compare conversion rates per network, or restrict a funnel to a saved segment with an Ads filter.
+- **Retention**: segment retention cohorts by Ads.
+- **API**: `/v0/top_sources?metric_column=paid_source` for the breakdown, and `/v0/profiles` returns and filters the user-level attribution columns. See the [API reference](/api).
+
+## Notes
+
+- Click IDs also feed [channel classification](/data/attribution): a click from a known ad platform classifies as Paid Search or Paid Social even when the referrer is missing (common with in-app browsers).
+- Ad click IDs are opaque tokens. Formo stores them for filtering and future conversion-export use cases; they are not shown as charts.
