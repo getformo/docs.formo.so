@@ -968,7 +968,7 @@ Here are the domains used by Formo to load the SDK and send data:
 Some ad blockers block specific scripts and API calls based on the domain name and URL. 
 To address this issue you can download and serve the Formo HTML Snippet from `cdn.formo.so` to your own domain e.g. `yourdomain.com/formo.js`.
 
-> If you use the Web SDK, you can skip this because they are not loaded from the CDN.
+> This only applies to the HTML snippet. If you installed `@formo/analytics` via NPM, the SDK is bundled with your app and is not loaded from the CDN, so you can skip this step.
 
 ### Next.js rewrites
 
@@ -981,7 +981,7 @@ module.exports = {
     return [
       {
         source: "/formo.js",
-        destination: "https://cdn.formo.so/analytics@latest", // Only if using HTML install script, skip if using the Web SDK
+        destination: "https://cdn.formo.so/analytics@latest", // Only for the HTML snippet, skip if you installed via NPM
       },
       {
         source: "/api/ingest",

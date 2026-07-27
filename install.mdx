@@ -798,6 +798,20 @@ Go to your browser's Network tab and look for successful 'raw_events' request in
 
 Events that are tracked correctly will show up in the [Activity page](/features/product-analytics/activity) of your Formo workspace.
 
+If the request never appears, an ad blocker or privacy browser is likely blocking it. Set up a [reverse proxy](#proxy) to route events through your own domain.
+
+## Proxy
+
+Ad blockers and privacy browsers block requests to known analytics domains, including `events.formo.so`. Before going to production, set up a reverse proxy so events are sent through your own domain, then pass that URL as `apiHost` in your SDK options.
+
+This applies to every installation method above. If you use the HTML snippet, also serve the script from your own domain instead of `cdn.formo.so`.
+
+<CardGroup>
+  <Card title="Set up a reverse proxy" icon="shield-halved" iconType="regular" href="/sdks/web#proxy">
+    Next.js rewrites, Next.js middleware, Cloudflare, CloudFront, and self-hosting the script
+  </Card>
+</CardGroup>
+
 ## SDK
 
 <CardGroup>
