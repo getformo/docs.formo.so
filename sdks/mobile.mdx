@@ -340,21 +340,6 @@ Requires `react-native-play-install-referrer` and a native rebuild — see [Inst
 Not supported. Apple does not expose an install-referrer API, so an install cannot be attributed to a referring website from within the SDK. This requires a third-party attribution service such as Branch or AppsFlyer. On iOS this capture is a no-op — deep link attribution still works normally.
 </Note>
 
-### Disabling
-
-Both attribution sources are on by default and can be turned off individually:
-
-```tsx
-options={{
-  attribution: {
-    deeplinks: true,        // capture UTM/ref from deep links
-    installReferrer: false, // skip the Play Install Referrer lookup
-  },
-}}
-```
-
-Passing `attribution: false` disables both.
-
 ## Configuration
 
 ### Provider props
@@ -363,12 +348,12 @@ Passing `attribution: false` disables both.
 |:-----|:-----|:---------|:------------|
 | `writeKey` | String | Yes | Your Formo project write key. |
 | `asyncStorage` | AsyncStorage | Yes | AsyncStorage instance for persistent storage. |
-| `options` | Object | No | Configuration options (see below). |
+| `options` | Object | No | Configuration options, including attribution (see below). |
 | `disabled` | Boolean | No | Disable the SDK entirely. |
 | `onReady` | Function | No | Callback when SDK is initialized. |
 | `onError` | Function | No | Callback when initialization fails. |
 
-### Options
+### Example
 
 ```tsx
 <FormoAnalyticsProvider
@@ -402,6 +387,12 @@ Passing `attribution: false` disables both.
 
     // Autocapture control
     autocapture: true,        // Enable/disable wallet autocapture
+
+    // Attribution control
+    attribution: {
+      deeplinks: true,        // capture UTM/ref from deep links
+      installReferrer: true,  // Play Install Referrer lookup (Android only)
+    },
 
     // Logging
     logger: {
@@ -481,6 +472,21 @@ options={{
   autocapture: false,
 }}
 ```
+
+### Attribution
+
+Control [web-to-mobile attribution](#web-to-mobile-attribution) capture. Both sources are on by default and can be turned off individually:
+
+```tsx
+options={{
+  attribution: {
+    deeplinks: true,        // capture UTM/ref from deep links
+    installReferrer: false, // skip the Play Install Referrer lookup
+  },
+}}
+```
+
+Passing `attribution: false` disables both.
 
 ### Logging
 
