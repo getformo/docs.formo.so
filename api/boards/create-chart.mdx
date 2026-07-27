@@ -338,9 +338,9 @@ Each `RetentionUserFilter`:
 
 | Field   | Type             | Description                                                              |
 | ------- | ---------------- | ------------------------------------------------------------------------ |
-| `field` | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
-| `op`    | string           | Comparison operator (same set as `StepFilterCondition.op`, minus the substring operators `startsWith` / `endsWith` / `contains`)               |
-| `value` | string \| number | Value to compare against                                                 |
+| `operand`  | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
+| `operator` | string           | Comparison operator (same set as `StepFilterCondition.op`, minus the substring operators `startsWith` / `endsWith` / `contains`)               |
+| `value`    | string \| number | Value to compare against                                                 |
 
 ```json
 {
@@ -351,8 +351,8 @@ Each `RetentionUserFilter`:
   "settings": {
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
-      { "field": "device", "op": "eq", "value": "desktop" },
-      { "field": "utm_source", "op": "neq", "value": "direct" }
+      { "operand": "device", "operator": "eq", "value": "desktop" },
+      { "operand": "utm_source", "operator": "neq", "value": "direct" }
     ]
   }
 }
@@ -751,9 +751,9 @@ Each `RetentionUserFilter`:
 
 | Field   | Type             | Description                                                              |
 | ------- | ---------------- | ------------------------------------------------------------------------ |
-| `field` | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
-| `op`    | string           | Comparison operator (same set as `StepFilterCondition.op`, minus the substring operators `startsWith` / `endsWith` / `contains`)               |
-| `value` | string \| number | Value to compare against                                                 |
+| `operand`  | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
+| `operator` | string           | Comparison operator (same set as `StepFilterCondition.op`, minus the substring operators `startsWith` / `endsWith` / `contains`)               |
+| `value`    | string \| number | Value to compare against                                                 |
 
 ```json
 {
@@ -764,8 +764,8 @@ Each `RetentionUserFilter`:
   "settings": {
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
-      { "field": "device", "op": "eq", "value": "desktop" },
-      { "field": "utm_source", "op": "neq", "value": "direct" }
+      { "operand": "device", "operator": "eq", "value": "desktop" },
+      { "operand": "utm_source", "operator": "neq", "value": "direct" }
     ]
   }
 }
