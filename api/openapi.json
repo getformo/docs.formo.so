@@ -231,7 +231,7 @@
       },
       "StepFilterCondition": {
         "type": "object",
-        "description": "A filter condition for an event property on a funnel step. The `op` field specifies the comparison operator and `value` is the value to compare against. For `in` and `nin` operators the value is a pipe-delimited string (e.g. `\"metamask|rainbow|coinbase\"`).",
+        "description": "A filter condition for an event property on a funnel step. Used as a value of `FunnelStep.additionalProperties`, so the filtered column is the PROPERTY KEY and this object carries only the comparison (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`). This is distinct from the `/v0/funnel` and `/v0/flow` `filters` arrays, whose entries name the column explicitly as `{operand, operator, value}`. For `in` and `nin` operators the value is a pipe-delimited string (e.g. `\"metamask|rainbow|coinbase\"`).",
         "properties": {
           "op": {
             "type": "string",
@@ -250,7 +250,7 @@
               "notEmpty",
               "isEmpty"
             ],
-            "description": "Comparison operator. Only the canonical terse tokens are accepted (the retired long forms `greater`/`greaterOrEqual`/`less`/`lessOrEqual` are rejected). Use `in` / `nin` for multi-value matching (pipe-delimited value string). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on the property; the `value` is ignored. Existence checks are rejected on the numeric event columns `volume`/`revenue`/`points` — a number has no emptiness semantics."
+            "description": "Comparison operator. Only the canonical terse tokens are accepted (the retired long forms `greater`/`greaterOrEqual`/`less`/`lessOrEqual` are rejected). Use `in` / `nin` for multi-value matching (pipe-delimited value string). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on the property; the `value` is ignored. Existence checks are rejected on the numeric event columns `volume`/`revenue`/`points`; a number has no emptiness semantics."
           },
           "value": {
             "oneOf": [
@@ -288,7 +288,7 @@
       },
       "ConversionWindow": {
         "type": "object",
-        "description": "Time window within which a user must complete all funnel steps (measured from Step 1). Defaults to 2 days if omitted.",
+        "description": "Time window within which a user must complete all funnel steps (measured from Step 1). Defaults to 2 hours if omitted.",
         "properties": {
           "value": {
             "type": "integer",
@@ -305,11 +305,11 @@
       },
       "AnalyticsFilterCondition": {
         "type": "object",
-        "description": "A single analytics filter condition. Use `in` / `nin` with a pipe-delimited string value (e.g. `\"a|b|c\"`) for multi-value matches.",
+        "description": "A single condition in an analytics `filters` query parameter. Multiple entries are combined with implicit AND. Use `in` / `nin` with a pipe-delimited string value (e.g. `\"a|b|c\"`) for multi-value matches.",
         "properties": {
           "field": {
             "type": "string",
-            "description": "Column to filter on. Standard session columns: `device`, `browser`, `os`, `location`, `referrer`, `ref`, `origin`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`. Track-event columns: `event`, `type`. Numeric event properties: `volume`, `revenue`, `points`."
+            "description": "Column to filter on. Page path: `page`. Standard session columns: `device`, `browser`, `os`, `location`, `referrer`, `ref`, `origin`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`. Track-event columns: `event`, `type`. Numeric event properties: `volume`, `revenue`, `points`."
           },
           "op": {
             "type": "string",
@@ -349,13 +349,13 @@
       },
       "RetentionUserFilter": {
         "type": "object",
-        "description": "A user-level segment filter applied to the retention chart cohort.",
+        "description": "A user-level segment filter applied to the retention chart cohort. Note that this object uses `operand`/`operator`, unlike the `field`/`op` spelling used by `FilterCondition`, `AnalyticsFilterCondition`, and `RetentionLabelSignal`.",
         "properties": {
-          "field": {
+          "operand": {
             "type": "string",
             "description": "The user property to filter on (e.g. `device`, `browser`, `os`, `location`, `utm_source`, `utm_medium`, `utm_campaign`)."
           },
-          "op": {
+          "operator": {
             "type": "string",
             "enum": [
               "eq",
@@ -383,7 +383,7 @@
             "description": "The value to compare against."
           }
         },
-        "required": ["field", "op", "value"]
+        "required": ["operand", "operator", "value"]
       },
       "RetentionLabelSignal": {
         "type": "object",
@@ -778,6 +778,7 @@
       },
       "Segment": {
         "type": "object",
+        "description": "A saved segment. `filterSet` is an array of `field::op::value` DSL strings, not an analytics `filters` array of objects.",
         "properties": {
           "id": {
             "type": "string"
@@ -790,6 +791,7 @@
           },
           "filterSet": {
             "type": "array",
+            "description": "Persisted filter expressions encoded as `field::op::value` strings (for example, `browser::in::Chrome|Safari`). Segment create requests call this array `filterSets`.",
             "items": {
               "type": "string"
             }
@@ -1027,6 +1029,26 @@
             "type": "string",
             "nullable": true,
             "description": "Last UTM term"
+          },
+          "first_paid_source": {
+            "type": "string",
+            "nullable": true,
+            "description": "First-touch acquiring ad network (google, meta, microsoft, tiktok, twitter, linkedin, reddit, or paid_utm for pricing-medium UTMs with no click ID)"
+          },
+          "last_paid_source": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last-touch acquiring ad network (same value set as first_paid_source)"
+          },
+          "first_click_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "First-touch raw ad-platform click ID (gclid, fbclid, msclkid, ttclid, twclid, li_fat_id, or rdt_cid)"
+          },
+          "last_click_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last-touch raw ad-platform click ID"
           },
           "last_type": {
             "type": "string",
@@ -1557,7 +1579,7 @@
       },
       "ProfileFilter": {
         "type": "object",
-        "description": "Filter conditions for profile search",
+        "description": "Filter conditions for profile search. `conditions` contains the same `{ field, op, value }` condition shape as analytics filters, but the wrapper carries explicit `logic` (`and` or `or`). This is intentionally distinct from the implicit-AND analytics `filters` query parameter and the string-encoded segment `filterSet`.",
         "properties": {
           "conditions": {
             "type": "array",
@@ -1592,10 +1614,12 @@
               "in",
               "nin",
               "contains",
+              "startsWith",
+              "endsWith",
               "notEmpty",
               "isEmpty"
             ],
-            "description": "Comparison operator. Only the canonical terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `notEmpty`, `isEmpty`) are accepted; the retired long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are rejected with a 400 naming the token. `contains` (case-insensitive substring) is only supported on social fields (e.g. `users.twitter`, `users.email`). `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/…) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
+            "description": "Comparison operator. Only the canonical terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `startsWith`, `endsWith`, `notEmpty`, `isEmpty`) are accepted; the retired long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are rejected with a 400 naming the token. **Substring operators:** `contains`, `startsWith` and `endsWith` are supported on routable string user attributes (`users.device`, `users.os`, `users.referrer`, `users.utm_*`, `users.click_id`, and the `first_*`/`last_*` attribution variants), where they match **case-sensitively**. Social fields (e.g. `users.twitter`, `users.email`) additionally support `contains`, which matches **case-insensitively** there; `startsWith`/`endsWith` are rejected on social fields. All three are rejected on numeric, chain/app/token/label and lifecycle fields. `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/…) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
           },
           "value": {
             "description": "Filter value (string, number, boolean, or array). Required for every operator except the existence checks `notEmpty` and `isEmpty`, which ignore it."
@@ -1708,29 +1732,31 @@
       "AnalyticsFilters": {
         "name": "filters",
         "in": "query",
-        "description": "Array of filter conditions, JSON-encoded in the query string. Each entry is `{ field, op, value }`. Use `in` / `nin` with a pipe-delimited `value` (e.g. `\"chrome|firefox\"`) for multi-value matching.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/AnalyticsFilterCondition"
-              }
-            },
-            "example": [
-              {
-                "field": "location",
-                "op": "eq",
-                "value": "US"
-              },
-              {
-                "field": "device",
-                "op": "in",
-                "value": "desktop|mobile"
-              }
-            ]
+        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. Use `in` / `nin` with a pipe-delimited `value` (e.g. `\"chrome|firefox\"`) for multi-value matching.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/AnalyticsFilterCondition"
           }
-        }
+        },
+        "example": [
+          {
+            "field": "referrer",
+            "op": "contains",
+            "value": "google"
+          }
+        ]
+      },
+      "AnalyticsPageScope": {
+        "name": "page_scope",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "enum": ["page", "session"],
+          "default": "page"
+        },
+        "description": "Controls how a `page` filter is interpreted. `page` (default) scopes metrics to activity on the filtered page. On `/v0/kpis`, `pageviews` counts only views of the filtered page, while `bounce_rate` and `avg_session_sec` are entry-page metrics for sessions that landed there. `session` preserves the legacy session scope: metrics include all relevant activity in any session that viewed the page. `sessions` and `visitors` are unchanged between scopes. This parameter only affects requests that include a `page` filter. It is distinct from `/v0/top_pages` `mode`, which selects the all, entry, or exit page-flow view.",
+        "example": "page"
       },
       "AnalyticsLimit": {
         "name": "limit",
@@ -1852,172 +1878,136 @@
         "name": "profile_filters",
         "in": "query",
         "description": "JSON array filtering by wallet profile attributes (e.g. net worth, total tx count). Each entry is `{ field, op, value }`.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/AnalyticsFilterCondition"
-              }
-            },
-            "example": [
-              {
-                "field": "net_worth_usd",
-                "op": "gt",
-                "value": "1000"
-              }
-            ]
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/AnalyticsFilterCondition"
           }
-        }
+        },
+        "example": [
+          {
+            "field": "net_worth_usd",
+            "op": "gt",
+            "value": "1000"
+          }
+        ]
       },
       "AnalyticsSocials": {
         "name": "socials",
         "in": "query",
         "description": "JSON array of social platforms to filter users by. Users must have at least one of the listed identities (e.g. `ens`, `farcaster`, `lens`, `twitter`).",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "example": ["ens", "farcaster"]
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
-        }
+        },
+        "example": ["ens", "farcaster"]
       },
       "AnalyticsAppFilters": {
         "name": "app_filters",
         "in": "query",
         "description": "JSON array of arrays describing DeFi app usage filters. Each entry is `[scope, chain_id, app_id, op, value]` where `scope` is `protocol` or `any`.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "array"
-              }
-            },
-            "example": [["protocol", 1, "uniswap-v3", "gt", "0"]]
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "array"
           }
-        }
+        },
+        "example": [["protocol", 1, "uniswap-v3", "gt", "0"]]
       },
       "AnalyticsTokenFilters": {
         "name": "token_filters",
         "in": "query",
         "description": "JSON array of arrays describing token-holding filters. Each entry is `[scope, chain_id, app_id, token_address, op, value]` where `scope` is `protocol` or `any`.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "array"
-              }
-            },
-            "example": [
-              [
-                "any",
-                1,
-                "",
-                "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-                "gt",
-                "100"
-              ]
-            ]
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "array"
           }
-        }
+        },
+        "example": [
+          [
+            "any",
+            1,
+            "",
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "gt",
+            "100"
+          ]
+        ]
       },
       "AnalyticsChainFilters": {
         "name": "chain_filters",
         "in": "query",
         "description": "JSON array of arrays describing chain-activity filters. Each entry is `[chain_id, op, value]`.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "array"
-              }
-            },
-            "example": [[1, "gt", "0"]]
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "array"
           }
-        }
+        },
+        "example": [[1, "gt", "0"]]
       },
       "AnalyticsBehaviorFilters": {
         "name": "behavior_filters",
         "in": "query",
         "description": "JSON array filtering users by event-based behavior with counts and either an absolute date range or a window relative to the user's first event. Each entry is `{ event, op, times, date_from?, date_to?, event_type?, relative_to?, window? }`. When `relative_to: \"first_seen\"` is set, the matching events must occur within `window.value` `window.unit` (`hour` | `day`) after the user's first event; `date_from`/`date_to` are ignored. `event_type` narrows matching to a specific event-type column (`page`, `connect`, `disconnect`, `chain`, `signature`, `transaction`, `track`, `decoded_log`, `detect`, `identify`); for `track` and `decoded_log` the `event` field is the named identifier; for other types only the `type` column is matched.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            },
-            "example": [
-              {
-                "event": "swap",
-                "event_type": "track",
-                "op": "gte",
-                "times": 1,
-                "relative_to": "first_seen",
-                "window": {
-                  "value": 24,
-                  "unit": "hour"
-                }
-              }
-            ]
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
           }
-        }
+        },
+        "example": [
+          {
+            "event": "swap",
+            "event_type": "track",
+            "op": "gte",
+            "times": 1,
+            "relative_to": "first_seen",
+            "window": {
+              "value": 24,
+              "unit": "hour"
+            }
+          }
+        ]
       },
       "AnalyticsSourceFilter": {
         "name": "source_filter",
         "in": "query",
         "description": "JSON object filtering users by raw event source; which SDK/integration the event was sent from (the raw `channel` column). Format: `{ op, value }` where `op` is one of `eq`, `neq`, `in`, `nin` and `value` is one of `web`, `api`, `import`, `mobile`, `server`, `onchain` (pipe-delimited for `in`/`nin`). Distinct from `channel_filter`, which matches the classified acquisition channel.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object"
-            },
-            "example": {
-              "op": "in",
-              "value": "web|mobile"
-            }
-          }
+        "schema": {
+          "type": "object"
+        },
+        "example": {
+          "op": "in",
+          "value": "web|mobile"
         }
       },
       "AnalyticsChannelFilter": {
         "name": "channel_filter",
         "in": "query",
         "description": "JSON object filtering users by classified acquisition channel; the precomputed `channel_type` column (GA4-style attribution). Format: `{ op, value }` where `op` is one of `eq`, `neq`, `in`, `nin` and `value` is one of `Direct`, `Organic Search`, `Organic Social`, `Organic Video`, `Paid Search`, `Paid Social`, `Paid Video`, `Email`, `Referrals`, `Display`, `AI`, `Referrers` (pipe-delimited for `in`/`nin`). Distinct from `source_filter`, which matches the raw SDK source.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object"
-            },
-            "example": {
-              "op": "in",
-              "value": "Organic Search|Paid Social"
-            }
-          }
+        "schema": {
+          "type": "object"
+        },
+        "example": {
+          "op": "in",
+          "value": "Organic Search|Paid Social"
         }
       },
       "AnalyticsLabelFilters": {
         "name": "label_filters",
         "in": "query",
         "description": "JSON array of arrays for filtering users by wallet labels. Each entry is `[tag_id, chain_id, op, value]`.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "array"
-              }
-            },
-            "example": [["whale", 1, "eq", "true"]]
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "array"
           }
-        }
+        },
+        "example": [["whale", 1, "eq", "true"]]
       },
       "AnalyticsExclude": {
         "name": "exclude",
@@ -3371,8 +3361,8 @@
                       },
                       "retentionUserFilters": [
                         {
-                          "field": "device",
-                          "op": "eq",
+                          "operand": "device",
+                          "operator": "eq",
                           "value": "desktop"
                         }
                       ]
@@ -3997,8 +3987,8 @@
                       "projectId": "proj_abc123",
                       "title": "High net worth desktop users",
                       "filterSet": [
-                        "{\"field\":\"device\",\"op\":\"eq\",\"value\":\"desktop\"}",
-                        "{\"field\":\"net_worth_usd\",\"op\":\"gte\",\"value\":100000}"
+                        "device::eq::desktop",
+                        "net_worth_usd::gte::100000"
                       ]
                     }
                   ],
@@ -4030,6 +4020,7 @@
                   },
                   "filterSets": {
                     "type": "array",
+                    "description": "Filter expressions encoded as `field::op::value` strings. Segment responses expose the persisted array as `filterSet`.",
                     "items": {
                       "type": "string"
                     },
@@ -5406,6 +5397,9 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
+          },
+          {
             "name": "group_by",
             "in": "query",
             "schema": {
@@ -5552,6 +5546,9 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
+          },
+          {
             "$ref": "#/components/parameters/AnalyticsLimit"
           },
           {
@@ -5675,6 +5672,9 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
+          },
+          {
             "name": "metric_column",
             "in": "query",
             "schema": {
@@ -5692,10 +5692,11 @@
                 "device",
                 "browser",
                 "os",
-                "channel"
+                "channel",
+                "paid_source"
               ]
             },
-            "description": "Column to break down sources by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md)."
+            "description": "Column to break down sources by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Use `paid_source` for the session-entry acquiring ad network (paid sessions only; see docs/ads.md)."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -5811,6 +5812,9 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
+          },
+          {
             "$ref": "#/components/parameters/AnalyticsLimit"
           },
           {
@@ -5924,6 +5928,9 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
+          },
+          {
             "$ref": "#/components/parameters/AnalyticsLimit"
           },
           {
@@ -6029,6 +6036,9 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
+          },
+          {
             "$ref": "#/components/parameters/AnalyticsLimit"
           },
           {
@@ -6132,6 +6142,9 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -6253,6 +6266,9 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
           },
           {
             "name": "metric_column",
@@ -6378,6 +6394,9 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
+          },
+          {
             "name": "metric_column",
             "in": "query",
             "required": true,
@@ -6499,6 +6518,9 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/AnalyticsPageScope"
           },
           {
             "name": "group_by",
@@ -7355,7 +7377,7 @@
       "get": {
         "operationId": "getAnalyticsFunnel",
         "summary": "Get multi-step conversion funnel",
-        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `eq | neq | in | nin | gt | lt | gte | lte | startsWith | endsWith | contains | notEmpty | isEmpty` (canonical tokens only — the retired long-form spellings are rejected; `notEmpty`/`isEmpty` are value-less existence checks, rejected on the numeric event columns `volume`/`revenue`/`points`). `operand` may target a standard event column or a JSON property on `properties`.",
+        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `eq | neq | in | nin | gt | lt | gte | lte | startsWith | endsWith | contains | notEmpty | isEmpty` (canonical tokens only; the retired long-form spellings are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on the numeric event columns `volume`/`revenue`/`points`). `operand` may target a standard event column or a JSON property on `properties`.",
         "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
@@ -7388,7 +7410,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only — the retired long-form spellings `equals`/`greater`/`includes`/… are rejected; `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
                 "summary": "Simple 3-step funnel: page → connect → swap",
@@ -7429,10 +7451,10 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "default": 1209600,
+              "default": 7200,
               "minimum": 1
             },
-            "description": "Conversion window length in seconds. Defaults to 1,209,600 (14 days). For closed funnels this is the in-order completion cap; for both variants the events scan is extended by this amount past `date_to`.",
+            "description": "Conversion window length in seconds. Defaults to 7,200 (2 hours). For closed funnels this is the in-order completion cap; for both variants the events scan is extended by this amount past `date_to`.",
             "example": 86400
           },
           {
@@ -7646,7 +7668,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{operand, operator, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only — the retired long-form spellings `equals`/`greater`/`includes`/… are rejected; `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{operand, operator, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "anyPageView": {
                 "summary": "Match any page view as the start step",
@@ -7716,6 +7738,10 @@
                 "summary": "Restrict to paid UTM cohorts using `in`",
                 "value": "[{\"operand\":\"utm_source\",\"operator\":\"in\",\"value\":\"google\",\"values\":[\"google\",\"twitter\",\"farcaster\"]}]"
               },
+              "referrer": {
+                "summary": "Restrict the flow to Google-referred sessions",
+                "value": "[{\"operand\":\"referrer\",\"operator\":\"contains\",\"value\":\"google\"}]"
+              },
               "jsonProperty": {
                 "summary": "Filter by a JSON property (MetaMask wallet only)",
                 "value": "[{\"operand\":\"provider_name\",\"operator\":\"eq\",\"value\":\"MetaMask\"}]"
@@ -7731,11 +7757,11 @@
             "in": "query",
             "schema": {
               "type": "integer",
-              "default": 1209600,
+              "default": 7200,
               "minimum": 1
             },
-            "description": "Conversion window length in seconds. Defaults to 1,209,600 (14 days).",
-            "example": 1209600
+            "description": "Conversion window length in seconds. Defaults to 7,200 (2 hours).",
+            "example": 7200
           },
           {
             "name": "max_steps",
