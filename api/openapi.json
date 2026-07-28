@@ -48,7 +48,12 @@
       "PaginatedListMeta": {
         "type": "object",
         "description": "Pagination cursor returned alongside `data` on every paginated list endpoint. Use these to walk pages: `has_more` is true while `page * size < total`. Combine with the matching `Page` and `Size` query parameters to request the next page.",
-        "required": ["page", "size", "total", "has_more"],
+        "required": [
+          "page",
+          "size",
+          "total",
+          "has_more"
+        ],
         "properties": {
           "page": {
             "type": "integer",
@@ -74,7 +79,11 @@
         "properties": {
           "error": {
             "type": "object",
-            "required": ["code", "message", "doc_url"],
+            "required": [
+              "code",
+              "message",
+              "doc_url"
+            ],
             "properties": {
               "code": {
                 "$ref": "#/components/schemas/ErrorCode"
@@ -100,7 +109,9 @@
             }
           }
         },
-        "required": ["error"]
+        "required": [
+          "error"
+        ]
       },
       "ErrorCode": {
         "type": "string",
@@ -141,32 +152,22 @@
           },
           "trigger_type": {
             "type": "string",
-            "enum": ["event", "user"]
+            "enum": [
+              "event",
+              "user"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["active", "inactive"]
+            "enum": [
+              "active",
+              "inactive"
+            ]
           },
           "trigger_filters": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "operator": {
-                  "type": "string",
-                  "description": "Comparison operator for the trigger filter. Only the canonical filter operators (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty`) are accepted; the retired legacy aliases (`equals`, `greater`, `like`, `=`, …) are rejected with a 400 naming the token."
-                },
-                "value": {
-                  "type": "string"
-                },
-                "numericThreshold": {
-                  "type": "string"
-                }
-              },
-              "required": ["name", "value"]
+              "$ref": "#/components/schemas/AlertFilter"
             }
           },
           "recipient": {
@@ -176,7 +177,11 @@
               "properties": {
                 "type": {
                   "type": "string",
-                  "enum": ["email", "slack", "webhook"]
+                  "enum": [
+                    "email",
+                    "slack",
+                    "webhook"
+                  ]
                 },
                 "value": {
                   "type": "array",
@@ -185,7 +190,10 @@
                   }
                 }
               },
-              "required": ["type", "value"]
+              "required": [
+                "type",
+                "value"
+              ]
             }
           },
           "project_id": {
@@ -195,7 +203,13 @@
             "type": "boolean"
           }
         },
-        "required": ["id", "name", "trigger_type", "status", "project_id"]
+        "required": [
+          "id",
+          "name",
+          "trigger_type",
+          "status",
+          "project_id"
+        ]
       },
       "Board": {
         "type": "object",
@@ -227,30 +241,38 @@
             "nullable": true
           }
         },
-        "required": ["id", "project_id", "enabled"]
+        "required": [
+          "id",
+          "project_id",
+          "enabled"
+        ]
       },
       "StepFilterCondition": {
         "type": "object",
-        "description": "A filter condition for an event property on a funnel step. Used as a value of `FunnelStep.additionalProperties`, so the filtered column is the PROPERTY KEY and this object carries only the comparison (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`). This is distinct from the `/v0/funnel` and `/v0/flow` `filters` arrays, whose entries name the column explicitly as `{operand, operator, value}`. For `in` and `nin` operators the value is a pipe-delimited string (e.g. `\"metamask|rainbow|coinbase\"`).",
+        "description": "A canonical filter on a funnel, flow, retention, or user-path step.",
         "properties": {
+          "field": {
+            "type": "string",
+            "description": "Column or property targeted by this filter."
+          },
           "op": {
             "type": "string",
             "enum": [
               "eq",
               "neq",
+              "gt",
+              "lt",
+              "gte",
+              "lte",
               "in",
               "nin",
-              "gt",
-              "gte",
-              "lt",
-              "lte",
               "startsWith",
               "endsWith",
               "contains",
               "notEmpty",
               "isEmpty"
             ],
-            "description": "Comparison operator. Only the canonical terse tokens are accepted (the retired long forms `greater`/`greaterOrEqual`/`less`/`lessOrEqual` are rejected). Use `in` / `nin` for multi-value matching (pipe-delimited value string). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on the property; the `value` is ignored. Existence checks are rejected on the numeric event columns `volume`/`revenue`/`points`; a number has no emptiness semantics."
+            "description": "Canonical comparison operator token."
           },
           "value": {
             "oneOf": [
@@ -259,32 +281,65 @@
               },
               {
                 "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "null"
               }
             ],
-            "description": "The comparison value. For `in` / `nin`, use a pipe-delimited string: `\"metamask|rainbow|coinbase\"`."
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string."
           }
         },
-        "required": ["op", "value"]
+        "required": [
+          "field",
+          "op"
+        ]
       },
       "FunnelStep": {
         "type": "object",
-        "description": "A single step in a funnel or user-path flow.\n\n`type` and `event` are required. Any additional property key becomes a filter condition using the `StepFilterCondition` schema (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`).\n\nStandard filterable columns: `origin`, `device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`. Any other key is treated as a JSON event property and extracted via `JSONExtractString(properties, '<key>')`.",
+        "description": "A single funnel or user-path step. Event-property predicates are stored in `filters`, using the same canonical `{field, op, value}` envelope as every other filter surface.",
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["event", "track", "decoded_log"],
+            "enum": [
+              "event",
+              "track",
+              "decoded_log"
+            ],
             "description": "`event`: built-in page/connect/transaction events; `track`: custom tracked events; `decoded_log`: decoded smart-contract events."
           },
           "event": {
             "type": "string",
             "minLength": 1,
             "description": "Event name (e.g. `page`, `connect`, `transaction`, or a custom track event name)."
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StepFilterCondition"
+            }
           }
         },
-        "required": ["type", "event"],
-        "additionalProperties": {
-          "$ref": "#/components/schemas/StepFilterCondition"
-        }
+        "required": [
+          "type",
+          "event"
+        ],
+        "additionalProperties": true
       },
       "ConversionWindow": {
         "type": "object",
@@ -297,11 +352,18 @@
           },
           "unit": {
             "type": "string",
-            "enum": ["hour", "day", "week"],
+            "enum": [
+              "hour",
+              "day",
+              "week"
+            ],
             "description": "Time unit. `week` = 7 days."
           }
         },
-        "required": ["value", "unit"]
+        "required": [
+          "value",
+          "unit"
+        ]
       },
       "AnalyticsFilterCondition": {
         "type": "object",
@@ -340,22 +402,59 @@
               },
               {
                 "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "null"
               }
             ],
-            "description": "Value to compare against. For `in` / `nin`, pass a pipe-delimited string (e.g. `\"chrome|firefox\"`)."
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string."
+          },
+          "filters": {
+            "type": "array",
+            "description": "Optional predicates on properties of the selected event. Nested entries use the same canonical envelope.",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsFilterCondition"
+            }
           }
         },
-        "required": ["field", "op", "value"]
+        "required": [
+          "field",
+          "op"
+        ]
       },
       "RetentionUserFilter": {
         "type": "object",
-        "description": "A user-level segment filter applied to the retention chart cohort. Note that this object uses `operand`/`operator`, unlike the `field`/`op` spelling used by `FilterCondition`, `AnalyticsFilterCondition`, and `RetentionLabelSignal`.",
+        "description": "A user-level retention cohort filter using the canonical `{field, op, value}` envelope.",
         "properties": {
-          "operand": {
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "description": "The value to compare against. Omit for `notEmpty` and `isEmpty`."
+          },
+          "field": {
             "type": "string",
             "description": "The user property to filter on (e.g. `device`, `browser`, `os`, `location`, `utm_source`, `utm_medium`, `utm_campaign`)."
           },
-          "operator": {
+          "op": {
             "type": "string",
             "enum": [
               "eq",
@@ -370,32 +469,30 @@
               "isEmpty"
             ],
             "description": "Comparison operator. Only the canonical terse tokens are accepted (the retired long forms `greater`/`greaterOrEqual`/`less`/`lessOrEqual` are rejected). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on a string user property; the `value` is ignored. Substring operators (`startsWith` / `endsWith` / `contains`) are not supported on retention user filters."
-          },
-          "value": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ],
-            "description": "The value to compare against."
           }
         },
-        "required": ["operand", "operator", "value"]
+        "required": [
+          "field",
+          "op"
+        ]
       },
       "RetentionLabelSignal": {
         "type": "object",
         "description": "The label predicate for label-based retention. The cohort is wallets grouped by the week they FIRST crossed this predicate on their label value; a wallet is retained in a later week if its latest value as of that week's end still satisfies it (as-of / carry-forward, evaluated against label history).",
         "properties": {
-          "tag_id": {
+          "field": {
             "type": "string",
-            "description": "The label tag to evaluate (matches the `tag_id` set via `POST /v0/profiles/:address/labels`)."
+            "description": "The label tag to evaluate (the value of `tag_id` set via `POST /v0/profiles/:address/labels`)."
           },
           "op": {
             "type": "string",
-            "enum": ["gt", "gte", "lt", "lte", "eq"],
+            "enum": [
+              "gt",
+              "gte",
+              "lt",
+              "lte",
+              "eq"
+            ],
             "default": "gt",
             "description": "Comparison operator. Numeric operators coerce both sides via toFloat64OrZero, so a numeric op on a non-numeric value yields no match (not an error)."
           },
@@ -409,7 +506,47 @@
             "description": "Optional chain scope. Empty string matches across all chains."
           }
         },
-        "required": ["tag_id", "op", "value"]
+        "required": [
+          "field",
+          "op",
+          "value"
+        ]
+      },
+      "RetentionCohortLabelFilter": {
+        "type": "object",
+        "description": "A label predicate that restricts an event-based retention cohort. Uses the canonical filter envelope.",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "The label tag to evaluate."
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "neq",
+              "contains",
+              "gt",
+              "gte",
+              "lt",
+              "lte"
+            ],
+            "default": "eq"
+          },
+          "value": {
+            "type": "string"
+          },
+          "chain_id": {
+            "type": "string",
+            "default": "",
+            "description": "Optional chain scope. Empty string matches across all chains."
+          }
+        },
+        "required": [
+          "field",
+          "op",
+          "value"
+        ]
       },
       "ChartSettings": {
         "type": "object",
@@ -417,7 +554,10 @@
         "properties": {
           "funnelType": {
             "type": "string",
-            "enum": ["closed", "open"],
+            "enum": [
+              "closed",
+              "open"
+            ],
             "default": "closed",
             "description": "**Funnel only.** `closed`: users must complete steps in strict order with no intervening events. `open`: users may complete steps in order but other events may occur between steps."
           },
@@ -496,13 +636,23 @@
           },
           "retentionSignalType": {
             "type": "string",
-            "enum": ["event", "label"],
+            "enum": [
+              "event",
+              "label"
+            ],
             "default": "event",
             "description": "**retention.** `event` (default): cohort and retention are driven by events. `label`: driven by a label value over time (see `retentionLabelSignal`); when `label`, the event fields are ignored."
           },
           "retentionLabelSignal": {
             "$ref": "#/components/schemas/RetentionLabelSignal",
             "description": "**retention.** The label predicate when `retentionSignalType` is `label`."
+          },
+          "retentionCohortLabelFilters": {
+            "type": "array",
+            "description": "**retention.** Label predicates that restrict an event-based cohort.",
+            "items": {
+              "$ref": "#/components/schemas/RetentionCohortLabelFilter"
+            }
           }
         }
       },
@@ -571,7 +721,11 @@
             "$ref": "#/components/schemas/ChartSettings"
           }
         },
-        "required": ["projectId", "chart_type", "title"]
+        "required": [
+          "projectId",
+          "chart_type",
+          "title"
+        ]
       },
       "UpdateChartRequest": {
         "type": "object",
@@ -642,7 +796,12 @@
             "$ref": "#/components/schemas/ChartSettings"
           }
         },
-        "required": ["chartId", "projectId", "chart_type", "title"]
+        "required": [
+          "chartId",
+          "projectId",
+          "chart_type",
+          "title"
+        ]
       },
       "Chart": {
         "type": "object",
@@ -770,15 +929,26 @@
                   "type": "string"
                 }
               },
-              "required": ["anonymous", "inputs", "name", "type"]
+              "required": [
+                "anonymous",
+                "inputs",
+                "name",
+                "type"
+              ]
             }
           }
         },
-        "required": ["name", "chain", "address", "abi", "events"]
+        "required": [
+          "name",
+          "chain",
+          "address",
+          "abi",
+          "events"
+        ]
       },
       "Segment": {
         "type": "object",
-        "description": "A saved segment. `filterSet` is an array of `field::op::value` DSL strings, not an analytics `filters` array of objects.",
+        "description": "A saved segment. `filters` is an array of canonical filter objects combined with implicit AND.",
         "properties": {
           "id": {
             "type": "string"
@@ -789,15 +959,18 @@
           "projectId": {
             "type": "string"
           },
-          "filterSet": {
+          "filters": {
             "type": "array",
-            "description": "Persisted filter expressions encoded as `field::op::value` strings (for example, `browser::in::Chrome|Safari`). Segment create requests call this array `filterSets`.",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/AnalyticsFilterCondition"
             }
           }
         },
-        "required": ["id", "title"]
+        "required": [
+          "id",
+          "title",
+          "filters"
+        ]
       },
       "Profile": {
         "type": "object",
@@ -1163,7 +1336,11 @@
           },
           "device": {
             "type": "string",
-            "enum": ["desktop", "mobile", "tablet"]
+            "enum": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
           },
           "os": {
             "type": "string"
@@ -1206,7 +1383,12 @@
       "Event": {
         "type": "object",
         "description": "A single analytics event",
-        "required": ["type", "anonymous_id", "version", "channel"],
+        "required": [
+          "type",
+          "anonymous_id",
+          "version",
+          "channel"
+        ],
         "properties": {
           "type": {
             "type": "string",
@@ -1225,7 +1407,13 @@
           },
           "channel": {
             "type": "string",
-            "enum": ["web", "mobile", "server", "api", "import"],
+            "enum": [
+              "web",
+              "mobile",
+              "server",
+              "api",
+              "import"
+            ],
             "description": "Source of the event. The Formo Web SDK uses `web`; mobile SDK uses `mobile`; server SDK uses `server`. Use `api` for direct HTTP submissions and `import` for backfills."
           },
           "version": {
@@ -1373,7 +1561,9 @@
       },
       "UserLabelInput": {
         "type": "object",
-        "required": ["tag_id"],
+        "required": [
+          "tag_id"
+        ],
         "properties": {
           "tag_id": {
             "type": "string",
@@ -1394,7 +1584,10 @@
           },
           "_is_deleted": {
             "type": "integer",
-            "enum": [0, 1],
+            "enum": [
+              0,
+              1
+            ],
             "description": "Optional tombstone flag for backfilled removals. `1` records the row as a soft-delete (label removed) instead of a live value; pair it with a past `timestamp` to express \"label removed at past time T\" so point-in-time retention drops the wallet from that week. The future-timestamp guard still applies. Defaults to `0` (a live label) when omitted."
           }
         }
@@ -1441,7 +1634,10 @@
       "UpdateUserPropertiesResponse": {
         "type": "object",
         "description": "Echo of the wallet identity after the merge-update applied. Synthesised from the request payload; analytics ingestion is eventually consistent, so the response reflects the applied write rather than a follow-up read.",
-        "required": ["address", "updated_at"],
+        "required": [
+          "address",
+          "updated_at"
+        ],
         "properties": {
           "address": {
             "type": "string"
@@ -1543,7 +1739,10 @@
       "BatchWriteResponse": {
         "type": "object",
         "description": "Acknowledgement for a batch write. `successful_rows` counts rows accepted and forwarded to ingest after a 2xx (ingestion is async/eventually-consistent; there is no follow-up read). `quarantined_rows` counts rows skipped for an invalid address or no valid keys; `errors` (omitted when nothing was quarantined) maps each skipped row back to its request index.",
-        "required": ["successful_rows", "quarantined_rows"],
+        "required": [
+          "successful_rows",
+          "quarantined_rows"
+        ],
         "properties": {
           "successful_rows": {
             "type": "integer",
@@ -1558,7 +1757,10 @@
             "description": "One entry per quarantined row. Omitted when quarantined_rows is 0.",
             "items": {
               "type": "object",
-              "required": ["index", "reason"],
+              "required": [
+                "index",
+                "reason"
+              ],
               "properties": {
                 "index": {
                   "type": "integer",
@@ -1579,24 +1781,33 @@
       },
       "ProfileFilter": {
         "type": "object",
-        "description": "Filter conditions for profile search. `conditions` contains the same `{ field, op, value }` condition shape as analytics filters, but the wrapper carries explicit `logic` (`and` or `or`). This is intentionally distinct from the implicit-AND analytics `filters` query parameter and the string-encoded segment `filterSet`.",
+        "description": "A profile-search filter group. `filters` contains canonical `{field, op, value}` leaves and `logic` combines them at this level.",
         "properties": {
-          "conditions": {
+          "logic": {
+            "type": "string",
+            "enum": [
+              "and",
+              "or"
+            ],
+            "default": "and"
+          },
+          "filters": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FilterCondition"
             }
-          },
-          "logic": {
-            "type": "string",
-            "enum": ["and", "or"],
-            "default": "and"
           }
-        }
+        },
+        "required": [
+          "filters"
+        ]
       },
       "FilterCondition": {
         "type": "object",
-        "required": ["field", "op"],
+        "required": [
+          "field",
+          "op"
+        ],
         "properties": {
           "field": {
             "type": "string",
@@ -1626,7 +1837,10 @@
           },
           "scope": {
             "type": "string",
-            "enum": ["any", "protocol"],
+            "enum": [
+              "any",
+              "protocol"
+            ],
             "description": "For token filters: any=wallet+protocol, protocol=specific app"
           },
           "appId": {
@@ -1675,6 +1889,159 @@
             "additionalProperties": true
           }
         }
+      },
+      "AlertFilter": {
+        "type": "object",
+        "description": "A project-alert trigger filter using the canonical envelope.",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Column or property targeted by this filter."
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "neq",
+              "gt",
+              "lt",
+              "gte",
+              "lte",
+              "in",
+              "nin",
+              "startsWith",
+              "endsWith",
+              "contains",
+              "notEmpty",
+              "isEmpty"
+            ],
+            "description": "Canonical comparison operator token."
+          },
+          "value": {
+            "type": "string"
+          },
+          "numericThreshold": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "value"
+        ]
+      },
+      "SourceFilterCondition": {
+        "type": "object",
+        "description": "Filters the raw event source. `field` must be `source`.",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Column or property targeted by this filter.",
+            "enum": [
+              "source"
+            ]
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "neq",
+              "in",
+              "nin"
+            ],
+            "description": "Canonical comparison operator token."
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string."
+          }
+        },
+        "required": [
+          "field",
+          "op"
+        ]
+      },
+      "ChannelFilterCondition": {
+        "type": "object",
+        "description": "Filters the classified acquisition channel. `field` must be `channel_type`.",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Column or property targeted by this filter.",
+            "enum": [
+              "channel_type"
+            ]
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "neq",
+              "in",
+              "nin"
+            ],
+            "description": "Canonical comparison operator token."
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string."
+          }
+        },
+        "required": [
+          "field",
+          "op"
+        ]
       }
     },
     "parameters": {
@@ -1752,7 +2119,10 @@
         "in": "query",
         "schema": {
           "type": "string",
-          "enum": ["page", "session"],
+          "enum": [
+            "page",
+            "session"
+          ],
           "default": "page"
         },
         "description": "Controls how a `page` filter is interpreted. `page` (default) scopes metrics to activity on the filtered page. On `/v0/kpis`, `pageviews` counts only views of the filtered page, while `bounce_rate` and `avg_session_sec` are entry-page metrics for sessions that landed there. `session` preserves the legacy session scope: metrics include all relevant activity in any session that viewed the page. `sessions` and `visitors` are unchanged between scopes. This parameter only affects requests that include a `page` filter. It is distinct from `/v0/top_pages` `mode`, which selects the all, entry, or exit page-flow view.",
@@ -1902,7 +2272,10 @@
             "type": "string"
           }
         },
-        "example": ["ens", "farcaster"]
+        "example": [
+          "ens",
+          "farcaster"
+        ]
       },
       "AnalyticsAppFilters": {
         "name": "app_filters",
@@ -1914,7 +2287,15 @@
             "type": "array"
           }
         },
-        "example": [["protocol", 1, "uniswap-v3", "gt", "0"]]
+        "example": [
+          [
+            "protocol",
+            1,
+            "uniswap-v3",
+            "gt",
+            "0"
+          ]
+        ]
       },
       "AnalyticsTokenFilters": {
         "name": "token_filters",
@@ -1947,7 +2328,13 @@
             "type": "array"
           }
         },
-        "example": [[1, "gt", "0"]]
+        "example": [
+          [
+            1,
+            "gt",
+            "0"
+          ]
+        ]
       },
       "AnalyticsBehaviorFilters": {
         "name": "behavior_filters",
@@ -1976,11 +2363,12 @@
       "AnalyticsSourceFilter": {
         "name": "source_filter",
         "in": "query",
-        "description": "JSON object filtering users by raw event source; which SDK/integration the event was sent from (the raw `channel` column). Format: `{ op, value }` where `op` is one of `eq`, `neq`, `in`, `nin` and `value` is one of `web`, `api`, `import`, `mobile`, `server`, `onchain` (pipe-delimited for `in`/`nin`). Distinct from `channel_filter`, which matches the classified acquisition channel.",
+        "description": "JSON object filtering users by raw event source. Uses the canonical envelope; `field` must be `source`. Distinct from `channel_filter`, which matches the classified acquisition channel.",
         "schema": {
-          "type": "object"
+          "$ref": "#/components/schemas/SourceFilterCondition"
         },
         "example": {
+          "field": "source",
           "op": "in",
           "value": "web|mobile"
         }
@@ -1988,11 +2376,12 @@
       "AnalyticsChannelFilter": {
         "name": "channel_filter",
         "in": "query",
-        "description": "JSON object filtering users by classified acquisition channel; the precomputed `channel_type` column (GA4-style attribution). Format: `{ op, value }` where `op` is one of `eq`, `neq`, `in`, `nin` and `value` is one of `Direct`, `Organic Search`, `Organic Social`, `Organic Video`, `Paid Search`, `Paid Social`, `Paid Video`, `Email`, `Referrals`, `Display`, `AI`, `Referrers` (pipe-delimited for `in`/`nin`). Distinct from `source_filter`, which matches the raw SDK source.",
+        "description": "JSON object filtering users by classified acquisition channel. Uses the canonical envelope; `field` must be `channel_type`. Distinct from `source_filter`, which matches the raw SDK source.",
         "schema": {
-          "type": "object"
+          "$ref": "#/components/schemas/ChannelFilterCondition"
         },
         "example": {
+          "field": "channel_type",
           "op": "in",
           "value": "Organic Search|Paid Social"
         }
@@ -2007,7 +2396,14 @@
             "type": "array"
           }
         },
-        "example": [["whale", 1, "eq", "true"]]
+        "example": [
+          [
+            "whale",
+            1,
+            "eq",
+            "true"
+          ]
+        ]
       },
       "AnalyticsExclude": {
         "name": "exclude",
@@ -2181,7 +2577,9 @@
         "operationId": "listAlerts",
         "summary": "List alerts",
         "description": "List alerts for the project scoped to the API key. Paginated: see `page` and `size` query params; the response carries `total` and `has_more` so callers can walk pages.",
-        "tags": ["Alerts"],
+        "tags": [
+          "Alerts"
+        ],
         "x-required-scope": "alerts:read",
         "parameters": [
           {
@@ -2203,7 +2601,9 @@
                     },
                     {
                       "type": "object",
-                      "required": ["data"],
+                      "required": [
+                        "data"
+                      ],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -2225,25 +2625,29 @@
                       "status": "active",
                       "trigger_filters": [
                         {
-                          "name": "event",
-                          "operator": "eq",
-                          "value": "transaction"
+                          "value": "transaction",
+                          "field": "event",
+                          "op": "eq"
                         },
                         {
-                          "name": "revenue",
-                          "operator": "less_than",
                           "value": "1000",
-                          "numericThreshold": "sum"
+                          "numericThreshold": "sum",
+                          "field": "revenue",
+                          "op": "lt"
                         }
                       ],
                       "recipient": [
                         {
                           "type": "email",
-                          "value": ["alerts@myapp.com"]
+                          "value": [
+                            "alerts@myapp.com"
+                          ]
                         },
                         {
                           "type": "slack",
-                          "value": ["C0123456789"]
+                          "value": [
+                            "C0123456789"
+                          ]
                         }
                       ],
                       "has_secret": false,
@@ -2265,7 +2669,9 @@
         "operationId": "createAlert",
         "summary": "Create alert",
         "description": "Create a new alert for the project.",
-        "tags": ["Alerts"],
+        "tags": [
+          "Alerts"
+        ],
         "x-required-scope": "alerts:write",
         "requestBody": {
           "required": true,
@@ -2280,28 +2686,15 @@
                   },
                   "trigger_type": {
                     "type": "string",
-                    "enum": ["event", "user"]
+                    "enum": [
+                      "event",
+                      "user"
+                    ]
                   },
                   "trigger_filters": {
                     "type": "array",
                     "items": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        },
-                        "operator": {
-                          "type": "string",
-                          "description": "Comparison operator for the trigger filter. Only the canonical filter operators (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty`) are accepted; the retired legacy aliases (`equals`, `greater`, `like`, `=`, …) are rejected with a 400 naming the token."
-                        },
-                        "value": {
-                          "type": "string"
-                        },
-                        "numericThreshold": {
-                          "type": "string"
-                        }
-                      },
-                      "required": ["name", "value"]
+                      "$ref": "#/components/schemas/AlertFilter"
                     }
                   },
                   "recipient": {
@@ -2311,7 +2704,11 @@
                       "properties": {
                         "type": {
                           "type": "string",
-                          "enum": ["email", "slack", "webhook"]
+                          "enum": [
+                            "email",
+                            "slack",
+                            "webhook"
+                          ]
                         },
                         "value": {
                           "type": "array",
@@ -2327,7 +2724,11 @@
                     "description": "Webhook signing secret"
                   }
                 },
-                "required": ["name", "trigger_type", "trigger_filters"]
+                "required": [
+                  "name",
+                  "trigger_type",
+                  "trigger_filters"
+                ]
               },
               "examples": {
                 "eventAlertWithWebhook": {
@@ -2337,30 +2738,34 @@
                     "trigger_type": "event",
                     "trigger_filters": [
                       {
-                        "name": "type",
                         "value": "swap",
-                        "operator": "eq"
+                        "field": "type",
+                        "op": "eq"
                       },
                       {
-                        "name": "device",
                         "value": "mobile",
-                        "operator": "eq"
+                        "field": "device",
+                        "op": "eq"
                       },
                       {
-                        "name": "volume",
                         "value": "1000",
-                        "operator": "gt",
-                        "numericThreshold": "1000"
+                        "numericThreshold": "1000",
+                        "field": "volume",
+                        "op": "gt"
                       }
                     ],
                     "recipient": [
                       {
                         "type": "webhook",
-                        "value": ["https://hooks.myapp.com/formo-alerts"]
+                        "value": [
+                          "https://hooks.myapp.com/formo-alerts"
+                        ]
                       },
                       {
                         "type": "email",
-                        "value": ["alerts@myapp.com"]
+                        "value": [
+                          "alerts@myapp.com"
+                        ]
                       }
                     ],
                     "secret": "whsec_mysigningsecret123"
@@ -2373,18 +2778,18 @@
                     "trigger_type": "event",
                     "trigger_filters": [
                       {
-                        "name": "type",
-                        "value": "purchase"
+                        "value": "purchase",
+                        "field": "type"
                       },
                       {
-                        "name": "utm_source",
                         "value": "google",
-                        "operator": "eq"
+                        "field": "utm_source",
+                        "op": "eq"
                       },
                       {
-                        "name": "utm_medium",
                         "value": "cpc",
-                        "operator": "eq"
+                        "field": "utm_medium",
+                        "op": "eq"
                       }
                     ],
                     "recipient": [
@@ -2404,21 +2809,23 @@
                     "trigger_type": "user",
                     "trigger_filters": [
                       {
-                        "name": "location",
                         "value": "US",
-                        "operator": "eq"
+                        "field": "location",
+                        "op": "eq"
                       },
                       {
-                        "name": "net_worth_usd",
                         "value": "10000",
-                        "operator": "gte",
-                        "numericThreshold": "10000"
+                        "numericThreshold": "10000",
+                        "field": "net_worth_usd",
+                        "op": "gte"
                       }
                     ],
                     "recipient": [
                       {
                         "type": "email",
-                        "value": ["team@myapp.com"]
+                        "value": [
+                          "team@myapp.com"
+                        ]
                       }
                     ]
                   }
@@ -2430,22 +2837,24 @@
                     "trigger_type": "event",
                     "trigger_filters": [
                       {
-                        "name": "apps",
                         "value": "uniswap",
-                        "operator": "gt",
-                        "numericThreshold": "5"
+                        "numericThreshold": "5",
+                        "field": "apps",
+                        "op": "gt"
                       },
                       {
-                        "name": "chains",
                         "value": "1",
-                        "operator": "gte",
-                        "numericThreshold": "3"
+                        "numericThreshold": "3",
+                        "field": "chains",
+                        "op": "gte"
                       }
                     ],
                     "recipient": [
                       {
                         "type": "webhook",
-                        "value": ["https://hooks.myapp.com/token-alerts"]
+                        "value": [
+                          "https://hooks.myapp.com/token-alerts"
+                        ]
                       }
                     ]
                   }
@@ -2472,7 +2881,9 @@
       "get": {
         "operationId": "getAlert",
         "summary": "Get alert",
-        "tags": ["Alerts"],
+        "tags": [
+          "Alerts"
+        ],
         "parameters": [
           {
             "name": "alertId",
@@ -2499,25 +2910,29 @@
                   "status": "active",
                   "trigger_filters": [
                     {
-                      "name": "event",
-                      "operator": "eq",
-                      "value": "transaction"
+                      "value": "transaction",
+                      "field": "event",
+                      "op": "eq"
                     },
                     {
-                      "name": "revenue",
-                      "operator": "less_than",
                       "value": "1000",
-                      "numericThreshold": "sum"
+                      "numericThreshold": "sum",
+                      "field": "revenue",
+                      "op": "lt"
                     }
                   ],
                   "recipient": [
                     {
                       "type": "email",
-                      "value": ["alerts@myapp.com"]
+                      "value": [
+                        "alerts@myapp.com"
+                      ]
                     },
                     {
                       "type": "slack",
-                      "value": ["C0123456789"]
+                      "value": [
+                        "C0123456789"
+                      ]
                     }
                   ],
                   "has_secret": false,
@@ -2533,7 +2948,9 @@
       "put": {
         "operationId": "updateAlert",
         "summary": "Update alert",
-        "tags": ["Alerts"],
+        "tags": [
+          "Alerts"
+        ],
         "parameters": [
           {
             "name": "alertId",
@@ -2557,12 +2974,15 @@
                   },
                   "trigger_type": {
                     "type": "string",
-                    "enum": ["event", "user"]
+                    "enum": [
+                      "event",
+                      "user"
+                    ]
                   },
                   "trigger_filters": {
                     "type": "array",
                     "items": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/AlertFilter"
                     }
                   },
                   "recipient": {
@@ -2575,7 +2995,11 @@
                     "type": "string"
                   }
                 },
-                "required": ["name", "trigger_type", "trigger_filters"]
+                "required": [
+                  "name",
+                  "trigger_type",
+                  "trigger_filters"
+                ]
               },
               "examples": {
                 "updateRecipients": {
@@ -2585,18 +3009,20 @@
                     "trigger_type": "event",
                     "trigger_filters": [
                       {
-                        "name": "type",
-                        "value": "swap"
+                        "value": "swap",
+                        "field": "type"
                       },
                       {
-                        "name": "device",
-                        "value": "mobile"
+                        "value": "mobile",
+                        "field": "device"
                       }
                     ],
                     "recipient": [
                       {
                         "type": "webhook",
-                        "value": ["https://hooks.myapp.com/v2/alerts"]
+                        "value": [
+                          "https://hooks.myapp.com/v2/alerts"
+                        ]
                       },
                       {
                         "type": "slack",
@@ -2628,7 +3054,9 @@
       "delete": {
         "operationId": "deleteAlert",
         "summary": "Delete alert",
-        "tags": ["Alerts"],
+        "tags": [
+          "Alerts"
+        ],
         "parameters": [
           {
             "name": "alertId",
@@ -2656,7 +3084,9 @@
       "patch": {
         "operationId": "toggleAlertStatus",
         "summary": "Toggle alert status",
-        "tags": ["Alerts"],
+        "tags": [
+          "Alerts"
+        ],
         "parameters": [
           {
             "name": "alertId",
@@ -2676,10 +3106,15 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": ["active", "inactive"]
+                    "enum": [
+                      "active",
+                      "inactive"
+                    ]
                   }
                 },
-                "required": ["status"]
+                "required": [
+                  "status"
+                ]
               },
               "examples": {
                 "activate": {
@@ -2718,7 +3153,9 @@
         "operationId": "listBoards",
         "summary": "List boards",
         "description": "List boards for the project scoped to the API key. Paginated.",
-        "tags": ["Boards"],
+        "tags": [
+          "Boards"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/Page"
@@ -2739,7 +3176,9 @@
                     },
                     {
                       "type": "object",
-                      "required": ["data"],
+                      "required": [
+                        "data"
+                      ],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -2787,14 +3226,18 @@
         "operationId": "createBoard",
         "summary": "Create board",
         "description": "Create a new board with the given title.",
-        "tags": ["Boards"],
+        "tags": [
+          "Boards"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["title"],
+                "required": [
+                  "title"
+                ],
                 "properties": {
                   "title": {
                     "type": "string",
@@ -2839,7 +3282,9 @@
       "get": {
         "operationId": "getBoard",
         "summary": "Get board",
-        "tags": ["Boards"],
+        "tags": [
+          "Boards"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -2876,7 +3321,9 @@
       "patch": {
         "operationId": "updateBoard",
         "summary": "Update board",
-        "tags": ["Boards"],
+        "tags": [
+          "Boards"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -2950,7 +3397,9 @@
         "operationId": "deleteBoard",
         "summary": "Delete board",
         "description": "Delete a board and all its charts.",
-        "tags": ["Boards"],
+        "tags": [
+          "Boards"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -2981,7 +3430,9 @@
         "operationId": "listCharts",
         "summary": "List charts for a board",
         "description": "List charts in a board with their executed query results. Paginated. Includes the parent `board` for caller convenience and an optional `warnings` sidecar carrying per-chart query failures (the failing charts are excluded from `data` so the page renders cleanly).",
-        "tags": ["Charts"],
+        "tags": [
+          "Charts"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -3010,7 +3461,10 @@
                     },
                     {
                       "type": "object",
-                      "required": ["data", "board"],
+                      "required": [
+                        "data",
+                        "board"
+                      ],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -3059,7 +3513,9 @@
                       "description": null,
                       "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
                       "x_axis": "day",
-                      "y_axis": ["revenue"],
+                      "y_axis": [
+                        "revenue"
+                      ],
                       "group_by": null,
                       "steps": null,
                       "settings": null
@@ -3086,7 +3542,9 @@
       "post": {
         "operationId": "createChart",
         "summary": "Create chart",
-        "tags": ["Charts"],
+        "tags": [
+          "Charts"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -3251,7 +3709,9 @@
                     "chart_type": "bar",
                     "title": "Daily Active Users",
                     "x_axis": "date",
-                    "y_axis": ["users"]
+                    "y_axis": [
+                      "users"
+                    ]
                   }
                 },
                 "lineChart": {
@@ -3262,7 +3722,9 @@
                     "chart_type": "line",
                     "title": "Daily Active Users",
                     "x_axis": "date",
-                    "y_axis": ["daily_active_users"]
+                    "y_axis": [
+                      "daily_active_users"
+                    ]
                   }
                 },
                 "pieChart": {
@@ -3273,7 +3735,9 @@
                     "chart_type": "pie",
                     "title": "Sessions by Device",
                     "x_axis": "device",
-                    "y_axis": ["session_count"]
+                    "y_axis": [
+                      "session_count"
+                    ]
                   }
                 },
                 "stackedChart": {
@@ -3284,7 +3748,9 @@
                     "chart_type": "stacked",
                     "title": "Sessions by Device and Browser",
                     "x_axis": "device",
-                    "y_axis": ["session_count"],
+                    "y_axis": [
+                      "session_count"
+                    ],
                     "group_by": "browser"
                   }
                 },
@@ -3361,9 +3827,9 @@
                       },
                       "retentionUserFilters": [
                         {
-                          "operand": "device",
-                          "operator": "eq",
-                          "value": "desktop"
+                          "value": "desktop",
+                          "field": "device",
+                          "op": "eq"
                         }
                       ]
                     }
@@ -3401,7 +3867,9 @@
       "get": {
         "operationId": "getChart",
         "summary": "Get chart",
-        "tags": ["Charts"],
+        "tags": [
+          "Charts"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -3437,7 +3905,9 @@
                   "description": null,
                   "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
                   "x_axis": "day",
-                  "y_axis": ["revenue"],
+                  "y_axis": [
+                    "revenue"
+                  ],
                   "group_by": null,
                   "steps": null,
                   "settings": null
@@ -3451,7 +3921,9 @@
       "put": {
         "operationId": "editChart",
         "summary": "Edit chart",
-        "tags": ["Charts"],
+        "tags": [
+          "Charts"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -3498,7 +3970,9 @@
       "delete": {
         "operationId": "deleteChart",
         "summary": "Delete chart",
-        "tags": ["Charts"],
+        "tags": [
+          "Charts"
+        ],
         "parameters": [
           {
             "name": "boardId",
@@ -3530,7 +4004,9 @@
         "operationId": "listContracts",
         "summary": "List contracts",
         "description": "List monitored contracts. Paginated; the canonical `data` array carries the contracts for the current page. The `deploy` sidecar reports the project-wide deploy state (always reflects ALL contracts, not just this page) so callers can render \"X contracts pending deploy\" without a second request.",
-        "tags": ["Contracts"],
+        "tags": [
+          "Contracts"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/Page"
@@ -3551,7 +4027,10 @@
                     },
                     {
                       "type": "object",
-                      "required": ["data", "deploy"],
+                      "required": [
+                        "data",
+                        "deploy"
+                      ],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -3561,7 +4040,10 @@
                         },
                         "deploy": {
                           "type": "object",
-                          "required": ["last_deployed_at", "diff"],
+                          "required": [
+                            "last_deployed_at",
+                            "diff"
+                          ],
                           "properties": {
                             "last_deployed_at": {
                               "type": "string",
@@ -3666,7 +4148,9 @@
         "operationId": "createContract",
         "summary": "Create contract",
         "description": "Add a blockchain contract to monitor.",
-        "tags": ["Contracts"],
+        "tags": [
+          "Contracts"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3711,14 +4195,25 @@
                           "type": "string"
                         }
                       },
-                      "required": ["anonymous", "inputs", "name", "type"]
+                      "required": [
+                        "anonymous",
+                        "inputs",
+                        "name",
+                        "type"
+                      ]
                     }
                   },
                   "start_block": {
                     "type": "integer"
                   }
                 },
-                "required": ["address", "chain", "name", "abi", "events"]
+                "required": [
+                  "address",
+                  "chain",
+                  "name",
+                  "abi",
+                  "events"
+                ]
               },
               "examples": {
                 "erc20Token": {
@@ -3782,7 +4277,9 @@
         "operationId": "getContract",
         "summary": "Get contract",
         "description": "Fetch a single monitored contract by chain ID and address. Returns the bare `Contract` resource (no envelope).",
-        "tags": ["Contracts"],
+        "tags": [
+          "Contracts"
+        ],
         "parameters": [
           {
             "name": "chain",
@@ -3837,7 +4334,9 @@
       "put": {
         "operationId": "updateContract",
         "summary": "Update contract",
-        "tags": ["Contracts"],
+        "tags": [
+          "Contracts"
+        ],
         "parameters": [
           {
             "name": "chain",
@@ -3886,7 +4385,13 @@
                     "type": "integer"
                   }
                 },
-                "required": ["address", "chain", "name", "abi", "events"]
+                "required": [
+                  "address",
+                  "chain",
+                  "name",
+                  "abi",
+                  "events"
+                ]
               }
             }
           }
@@ -3908,7 +4413,9 @@
       "delete": {
         "operationId": "deleteContract",
         "summary": "Delete contract",
-        "tags": ["Contracts"],
+        "tags": [
+          "Contracts"
+        ],
         "parameters": [
           {
             "name": "chain",
@@ -3947,7 +4454,9 @@
         "operationId": "listSegments",
         "summary": "List segments",
         "description": "List user segments for the project scoped to the API key. Paginated.",
-        "tags": ["Segments"],
+        "tags": [
+          "Segments"
+        ],
         "parameters": [
           {
             "$ref": "#/components/parameters/Page"
@@ -3968,7 +4477,9 @@
                     },
                     {
                       "type": "object",
-                      "required": ["data"],
+                      "required": [
+                        "data"
+                      ],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -3986,9 +4497,17 @@
                       "id": "seg_e3f4g5h6i7j8",
                       "projectId": "proj_abc123",
                       "title": "High net worth desktop users",
-                      "filterSet": [
-                        "device::eq::desktop",
-                        "net_worth_usd::gte::100000"
+                      "filters": [
+                        {
+                          "field": "device",
+                          "op": "eq",
+                          "value": "desktop"
+                        },
+                        {
+                          "field": "net_worth_usd",
+                          "op": "gte",
+                          "value": "100000"
+                        }
                       ]
                     }
                   ],
@@ -4006,7 +4525,9 @@
       "post": {
         "operationId": "createSegment",
         "summary": "Create segment",
-        "tags": ["Segments"],
+        "tags": [
+          "Segments"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4018,26 +4539,41 @@
                     "type": "string",
                     "minLength": 1
                   },
-                  "filterSets": {
+                  "filters": {
                     "type": "array",
-                    "description": "Filter expressions encoded as `field::op::value` strings. Segment responses expose the persisted array as `filterSet`.",
+                    "minItems": 1,
                     "items": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/AnalyticsFilterCondition"
                     },
-                    "minItems": 1
+                    "description": "Canonical filter objects combined with implicit AND."
                   }
                 },
-                "required": ["title", "filterSets"]
+                "required": [
+                  "title",
+                  "filters"
+                ]
               },
               "examples": {
                 "highValueMobileUsers": {
                   "summary": "High-value mobile users from paid campaigns",
                   "value": {
                     "title": "High-value mobile users",
-                    "filterSets": [
-                      "device::eq::mobile",
-                      "net_worth_usd::gte::10000",
-                      "utm_source::eq::paid_ads"
+                    "filters": [
+                      {
+                        "field": "device",
+                        "op": "eq",
+                        "value": "mobile"
+                      },
+                      {
+                        "field": "net_worth_usd",
+                        "op": "gte",
+                        "value": "10000"
+                      },
+                      {
+                        "field": "utm_source",
+                        "op": "eq",
+                        "value": "paid_ads"
+                      }
                     ]
                   }
                 },
@@ -4045,24 +4581,48 @@
                   "summary": "Chrome or Safari users (multi-value filter)",
                   "value": {
                     "title": "Chrome/Safari users",
-                    "filterSets": ["browser::in::Chrome|Safari"]
+                    "filters": [
+                      {
+                        "field": "browser",
+                        "op": "in",
+                        "value": "Chrome|Safari"
+                      }
+                    ]
                   }
                 },
                 "excludeUSUsers": {
                   "summary": "All users except from the US",
                   "value": {
                     "title": "Non-US users",
-                    "filterSets": ["location::neq::US"]
+                    "filters": [
+                      {
+                        "field": "location",
+                        "op": "neq",
+                        "value": "US"
+                      }
+                    ]
                   }
                 },
                 "powerUsers": {
                   "summary": "Power users with high net worth from organic traffic",
                   "value": {
                     "title": "Organic power users",
-                    "filterSets": [
-                      "net_worth_usd::gt::1000",
-                      "utm_source::nin::google_ads|facebook_ads",
-                      "lifecycle::eq::power"
+                    "filters": [
+                      {
+                        "field": "net_worth_usd",
+                        "op": "gt",
+                        "value": "1000"
+                      },
+                      {
+                        "field": "utm_source",
+                        "op": "nin",
+                        "value": "google_ads|facebook_ads"
+                      },
+                      {
+                        "field": "lifecycle",
+                        "op": "eq",
+                        "value": "power"
+                      }
                     ]
                   }
                 },
@@ -4070,42 +4630,74 @@
                   "summary": "Users active on 3+ chains with high net worth",
                   "value": {
                     "title": "Multi-chain whales",
-                    "filterSets": [
-                      "chains::gte::3",
-                      "net_worth_usd::gt::100000",
-                      "apps::gt::5"
+                    "filters": [
+                      {
+                        "field": "chains",
+                        "op": "gte",
+                        "value": "3"
+                      },
+                      {
+                        "field": "net_worth_usd",
+                        "op": "gt",
+                        "value": "100000"
+                      },
+                      {
+                        "field": "apps",
+                        "op": "gt",
+                        "value": "5"
+                      }
                     ]
                   }
                 },
                 "behavioralFilterSimple": {
                   "summary": "Users who performed 'signature' event at least once in last 30 days",
-                  "description": "Behavioural filters use the 'events' filter key with a base64-encoded JSON array as the value. The JSON contains event name, frequency operator (gt/gte/eq/lte/lt), times count, and date range.",
+                  "description": "Behavior filters use the `events` field. Its value is a base64-encoded JSON array of event-count predicates; property predicates inside each event use canonical `filters` leaves.",
                   "value": {
                     "title": "Recent signers",
-                    "filterSets": [
-                      "events::eq::W3siZXZlbnQiOiAic2lnbmF0dXJlIiwgIm9wZXJhdG9yIjogImdyZWF0ZXJPckVxdWFsIiwgInRpbWVzIjogMSwgInByZXNldCI6ICJsYXN0XzMwZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0wOS0xOSIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifV0="
+                    "filters": [
+                      {
+                        "field": "events",
+                        "op": "eq",
+                        "value": "W3siZXZlbnQiOiJzaWduYXR1cmUiLCJvcGVyYXRvciI6Imd0ZSIsInRpbWVzIjoxLCJwcmVzZXQiOiJsYXN0XzMwZCJ9XQ=="
+                      }
                     ]
                   }
                 },
                 "behavioralFilterWithProperties": {
                   "summary": "Users who connected via MetaMask on Ethereum mainnet + from India",
-                  "description": "Combines a behavioural filter (type=connect event with property filters) and a demographic filter (location). The 'event' field uses the event type key (e.g. 'connect', 'signature', 'transaction', 'page'), not the display label. Event property filters use {op, value} objects as additional keys.",
+                  "description": "Combines an event-count filter and a demographic filter. Event property filters use canonical `{field, op, value}` leaves in the behavior step `filters` array.",
                   "value": {
                     "title": "Indian MetaMask users",
-                    "filterSets": [
-                      "events::eq::W3siZXZlbnQiOiAiY29ubmVjdCIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5IiwgInJkbnMiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICJpby5tZXRhbWFzayJ9LCAiY2hhaW5faWQiOiB7Im9wIjogImVxdWFscyIsICJ2YWx1ZSI6ICIxIn19XQ==",
-                      "location::eq::IN"
+                    "filters": [
+                      {
+                        "field": "events",
+                        "op": "eq",
+                        "value": "W3siZXZlbnQiOiJjb25uZWN0Iiwib3BlcmF0b3IiOiJndGUiLCJ0aW1lcyI6MSwicHJlc2V0IjoibGFzdF8zMGQiLCJmaWx0ZXJzIjpbeyJmaWVsZCI6InJkbnMiLCJvcCI6ImVxIiwidmFsdWUiOiJpby5tZXRhbWFzayJ9LHsiZmllbGQiOiJjaGFpbl9pZCIsIm9wIjoiZXEiLCJ2YWx1ZSI6IjEifV19XQ=="
+                      },
+                      {
+                        "field": "location",
+                        "op": "eq",
+                        "value": "IN"
+                      }
                     ]
                   }
                 },
                 "behavioralFilterMultipleEvents": {
                   "summary": "Users with 5+ page views last week AND at least 1 transaction last month",
-                  "description": "Multiple behavioural events in a single filter. All conditions in the array must be met (AND logic). Valid event types: page, connect, disconnect, chain, signature, transaction, track, decoded_log, detect, identify.",
+                  "description": "Multiple behavior steps in one base64-encoded `events` filter value. All steps in the array must match.",
                   "value": {
                     "title": "Active transactors",
-                    "filterSets": [
-                      "events::eq::W3siZXZlbnQiOiAicGFnZSIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDUsICJwcmVzZXQiOiAibGFzdF83ZCIsICJkYXRlX2Zyb20iOiAiMjAyNS0xMC0xMiIsICJkYXRlX3RvIjogIjIwMjUtMTAtMTkifSwgeyJldmVudCI6ICJ0cmFuc2FjdGlvbiIsICJvcGVyYXRvciI6ICJncmVhdGVyT3JFcXVhbCIsICJ0aW1lcyI6IDEsICJwcmVzZXQiOiAibGFzdF8zMGQiLCAiZGF0ZV9mcm9tIjogIjIwMjUtMDktMTkiLCAiZGF0ZV90byI6ICIyMDI1LTEwLTE5In1d",
-                      "device::eq::desktop"
+                    "filters": [
+                      {
+                        "field": "events",
+                        "op": "eq",
+                        "value": "W3siZXZlbnQiOiJwYWdlIiwib3BlcmF0b3IiOiJndGUiLCJ0aW1lcyI6NSwicHJlc2V0IjoibGFzdF83ZCJ9LHsiZXZlbnQiOiJ0cmFuc2FjdGlvbiIsIm9wZXJhdG9yIjoiZ3RlIiwidGltZXMiOjEsInByZXNldCI6Imxhc3RfMzBkIn1d"
+                      },
+                      {
+                        "field": "device",
+                        "op": "eq",
+                        "value": "desktop"
+                      }
                     ]
                   }
                 }
@@ -4132,7 +4724,9 @@
       "delete": {
         "operationId": "deleteSegment",
         "summary": "Delete segment",
-        "tags": ["Segments"],
+        "tags": [
+          "Segments"
+        ],
         "parameters": [
           {
             "name": "segmentId",
@@ -4163,7 +4757,9 @@
         "operationId": "getProfile",
         "summary": "Get wallet profile",
         "description": "Get a single wallet profile. Agents can call the same path through the paid x402 or MPP gateway hosts without a caller-supplied Formo API key; Paysponge uses Formo's workspace API key behind the scenes. Paid gateway callers only provide the protocol payment header returned by the gateway challenge.",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -4394,7 +4990,9 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["processing"]
+                      "enum": [
+                        "processing"
+                      ]
                     },
                     "address": {
                       "type": "string"
@@ -4435,7 +5033,9 @@
       "get": {
         "operationId": "searchProfiles",
         "summary": "Search wallet profiles",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "responses": {
           "200": {
             "description": "Paginated wallet profile search results.",
@@ -4448,7 +5048,9 @@
                     },
                     {
                       "type": "object",
-                      "required": ["data"],
+                      "required": [
+                        "data"
+                      ],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -4535,7 +5137,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"]
+              "enum": [
+                "asc",
+                "desc"
+              ]
             },
             "description": "Sort direction"
           },
@@ -4573,54 +5178,54 @@
                 "highNetWorth": {
                   "summary": "Users with >$10k net worth",
                   "value": {
-                    "conditions": [
+                    "logic": "and",
+                    "filters": [
                       {
                         "field": "users.net_worth_usd",
                         "op": "gt",
                         "value": 10000
                       }
-                    ],
-                    "logic": "and"
+                    ]
                   }
                 },
                 "chainFilter": {
                   "summary": "Users active on Ethereum with >$1k balance",
                   "value": {
-                    "conditions": [
+                    "logic": "and",
+                    "filters": [
                       {
                         "field": "chains.1.balance",
                         "op": "gt",
                         "value": 1000
                       }
-                    ],
-                    "logic": "and"
+                    ]
                   }
                 },
                 "labelFilter": {
                   "summary": "Coinbase verified users",
                   "value": {
-                    "conditions": [
+                    "logic": "and",
+                    "filters": [
                       {
                         "field": "labels.coinbase.verified_account",
                         "op": "eq",
                         "value": "true"
                       }
-                    ],
-                    "logic": "and"
+                    ]
                   }
                 },
                 "tokenFilter": {
                   "summary": "Users holding USDC in any protocol",
                   "value": {
-                    "conditions": [
+                    "logic": "and",
+                    "filters": [
                       {
                         "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
                         "op": "gt",
                         "value": 0,
                         "scope": "any"
                       }
-                    ],
-                    "logic": "and"
+                    ]
                   }
                 }
               }
@@ -4634,7 +5239,9 @@
         "operationId": "updateUserProperties",
         "summary": "Update user properties",
         "description": "Set first-party properties for a wallet profile. Override display name, email, socials, avatar, location, and other identity fields.",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "parameters": [
           {
             "name": "address",
@@ -4775,7 +5382,9 @@
         "operationId": "batchUpdateUserProperties",
         "summary": "Batch update user properties",
         "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4787,7 +5396,9 @@
                 "items": {
                   "type": "object",
                   "description": "Flat { address, ...keys } object. `address` is required; only the listed profile keys are persisted (all string-valued). Unknown keys are accepted but ignored.",
-                  "required": ["address"],
+                  "required": [
+                    "address"
+                  ],
                   "additionalProperties": true,
                   "properties": {
                     "address": {
@@ -4920,7 +5531,9 @@
         "operationId": "upsertUserLabel",
         "summary": "Add or update user labels",
         "description": "Upsert one or more labels for a wallet. Accepts either a single label object or an array of labels. Labels with the same tag_id (and chain_id, if provided) are overwritten. Requires profiles:write scope.",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "parameters": [
           {
             "name": "address",
@@ -5040,7 +5653,9 @@
         "operationId": "deleteUserLabel",
         "summary": "Delete a user label",
         "description": "Delete a label from a wallet. Pass chain_id to scope the deletion to a specific chain; omit it to match labels without a chain scope. Requires profiles:write scope.",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "parameters": [
           {
             "name": "address",
@@ -5058,7 +5673,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["tag_id"],
+                "required": [
+                  "tag_id"
+                ],
                 "properties": {
                   "tag_id": {
                     "type": "string",
@@ -5112,7 +5729,9 @@
         "operationId": "batchUpsertUserLabels",
         "summary": "Batch add or update user labels",
         "description": "Upsert up to 100 labels across many wallets in one request; each item carries its own `address`. Modelled on the events ingest API: rows with an invalid address (ENS names are NOT resolved here; pass a literal EVM `0x...` or Solana address) are quarantined (skipped and reported in the response) rather than failing the whole batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5128,7 +5747,9 @@
                     },
                     {
                       "type": "object",
-                      "required": ["address"],
+                      "required": [
+                        "address"
+                      ],
                       "properties": {
                         "address": {
                           "type": "string",
@@ -5221,7 +5842,9 @@
         "operationId": "importWallets",
         "summary": "Import wallet addresses",
         "description": "Import wallet addresses into the project. Requires profiles:write scope and Scale/Enterprise plan.",
-        "tags": ["Profiles"],
+        "tags": [
+          "Profiles"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5241,7 +5864,10 @@
                     "description": "SDK write key"
                   }
                 },
-                "required": ["addresses", "writeKey"]
+                "required": [
+                  "addresses",
+                  "writeKey"
+                ]
               },
               "examples": {
                 "importWallets": {
@@ -5271,7 +5897,9 @@
         "operationId": "executeQuery",
         "summary": "Execute SQL query",
         "description": "Execute a SQL query against the project's analytics data. Only SELECT and WITH statements are allowed. LIMIT is capped at 1,000,000. Forbidden keywords: INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, etc.",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -5284,7 +5912,9 @@
                     "description": "SQL query to execute"
                   }
                 },
-                "required": ["query"]
+                "required": [
+                  "query"
+                ]
               },
               "examples": {
                 "dailyActiveUsers": {
@@ -5310,7 +5940,13 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["data", "total", "limit", "offset", "has_more"],
+                  "required": [
+                    "data",
+                    "total",
+                    "limit",
+                    "offset",
+                    "has_more"
+                  ],
                   "properties": {
                     "data": {
                       "type": "array",
@@ -5384,7 +6020,9 @@
         "operationId": "getAnalyticsKpis",
         "summary": "Get KPIs (sessions, pageviews, bounce rate, session duration)",
         "description": "Time-series traffic KPIs with optional dimension breakdown. Returns `sessions` (session count), pageviews, bounce rate and average session length. When `include_previous_period=true` without `group_by`, the response also includes `visitors` (unique visitors), `visitors_current` and `visitors_previous`.",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -5533,7 +6171,9 @@
         "operationId": "getAnalyticsTopPages",
         "summary": "Get top pages by sessions or visitors, optionally restricted to entry or exit pages",
         "description": "Returns the most visited pages with traffic metrics. Pass `mode=entry` to restrict to the first page of each session (with `bounce_rate`) or `mode=exit` for the last page (with `exit_rate`). Default `mode=all` returns project-wide page metrics with anon-per-session visitor counts.",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -5559,7 +6199,11 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["all", "entry", "exit"],
+              "enum": [
+                "all",
+                "entry",
+                "exit"
+              ],
               "default": "all"
             },
             "description": "Page-flow mode. `all` (default) returns project-wide page metrics with anon-per-session visitor counts (`sessions`, `visitors`, `hits`). `entry` returns landing pages with `bounce_rate`. `exit` returns exit pages with `exit_rate`. The visitor count is omitted in `entry`/`exit` modes since those metrics are session-scoped."
@@ -5659,7 +6303,9 @@
       "get": {
         "operationId": "getAnalyticsTopSources",
         "summary": "Get top traffic sources (referrers / utm)",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -5799,7 +6445,9 @@
       "get": {
         "operationId": "getAnalyticsTopLocations",
         "summary": "Get top countries",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -5915,7 +6563,9 @@
       "get": {
         "operationId": "getAnalyticsTopWallets",
         "summary": "Get top wallet types",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6023,7 +6673,9 @@
       "get": {
         "operationId": "getAnalyticsTopChains",
         "summary": "Get top blockchain chains",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6131,7 +6783,9 @@
       "get": {
         "operationId": "getAnalyticsTopEvents",
         "summary": "Get top events by frequency",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6157,7 +6811,9 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["custom"]
+              "enum": [
+                "custom"
+              ]
             },
             "description": "Pass 'custom' to filter to custom track events only (events with type='track' and a non-empty event name). Omit for all events."
           }
@@ -6255,7 +6911,9 @@
       "get": {
         "operationId": "getAnalyticsRevenueByMetric",
         "summary": "Get revenue grouped by a chosen column",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6381,7 +7039,9 @@
       "get": {
         "operationId": "getAnalyticsVolumeByMetric",
         "summary": "Get transaction volume grouped by a chosen column",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6507,7 +7167,9 @@
       "get": {
         "operationId": "getAnalyticsRevenueOverview",
         "summary": "Get revenue and transaction volume time-series",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6633,7 +7295,9 @@
         "operationId": "getAnalyticsRevenueTimeseries",
         "summary": "Get per-event revenue and volume trend for a single wallet",
         "description": "Returns daily per-event revenue and volume rows for the given wallet `address`. Scoped per wallet; there is no project-wide aggregate mode on this endpoint.",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6757,7 +7421,9 @@
       "get": {
         "operationId": "getAnalyticsEventTimeseries",
         "summary": "Get event count time-series",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6875,7 +7541,9 @@
         "operationId": "getAnalyticsLifecycle",
         "summary": "Get user lifecycle stages (New / Returning / Power user / Resurrected / At Risk / Churned)",
         "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7030,7 +7698,9 @@
       "get": {
         "operationId": "getAnalyticsFrequency",
         "summary": "Get visit-frequency distribution",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7168,7 +7838,9 @@
       "get": {
         "operationId": "getAnalyticsRetention",
         "summary": "Get user retention cohorts",
-        "tags": ["Query"],
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7185,7 +7857,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["address", "anonymous_id"],
+              "enum": [
+                "address",
+                "anonymous_id"
+              ],
               "default": "address"
             },
             "description": "User identifier to cohort by. `address` (default) groups by wallet; `anonymous_id` groups by anonymous session ID."
@@ -7377,8 +8052,10 @@
       "get": {
         "operationId": "getAnalyticsFunnel",
         "summary": "Get multi-step conversion funnel",
-        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{operand, operator, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `operator` accepts `eq | neq | in | nin | gt | lt | gte | lte | startsWith | endsWith | contains | notEmpty | isEmpty` (canonical tokens only; the retired long-form spellings are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on the numeric event columns `volume`/`revenue`/`points`). `operand` may target a standard event column or a JSON property on `properties`.",
-        "tags": ["Query"],
+        "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{field, op, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `op` accepts `eq | neq | in | nin | gt | lt | gte | lte | startsWith | endsWith | contains | notEmpty | isEmpty` (canonical tokens only; the retired long-form spellings are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on the numeric event columns `volume`/`revenue`/`points`). `field` may target a standard event column or a JSON property on `properties`.",
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7410,7 +8087,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{operand, operator, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{field, op, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
                 "summary": "Simple 3-step funnel: page → connect → swap",
@@ -7418,31 +8095,31 @@
               },
               "standardColumnFilter": {
                 "summary": "Step filter on a standard column (mobile-only first step)",
-                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"operand\":\"device\",\"operator\":\"eq\",\"value\":\"mobile\"}]},{\"type\":\"track\",\"event\":\"signup\",\"name\":\"signup::1\",\"filters\":[]}]"
+                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"value\":\"mobile\",\"field\":\"device\",\"op\":\"eq\"}]},{\"type\":\"track\",\"event\":\"signup\",\"name\":\"signup::1\",\"filters\":[]}]"
               },
               "utmSourceIn": {
                 "summary": "Step filter using `in` on a standard column (UTM-attributed sessions)",
-                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"operand\":\"utm_source\",\"operator\":\"in\",\"value\":\"twitter|farcaster|telegram\"}]},{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::1\",\"filters\":[]}]"
+                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"value\":\"twitter|farcaster|telegram\",\"field\":\"utm_source\",\"op\":\"in\"}]},{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::1\",\"filters\":[]}]"
               },
               "pagePathStartsWith": {
                 "summary": "Step filter using `startsWith` on `page_path`",
-                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"operand\":\"page_path\",\"operator\":\"startsWith\",\"value\":\"/swap\"}]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[]}]"
+                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"value\":\"/swap\",\"field\":\"page_path\",\"op\":\"startsWith\"}]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[]}]"
               },
               "jsonPropertyFilter": {
                 "summary": "Step property filter (JSON property `provider_name=MetaMask`)",
-                "value": "[{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::0\",\"filters\":[{\"operand\":\"provider_name\",\"operator\":\"eq\",\"value\":\"MetaMask\"}]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[]}]"
+                "value": "[{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::0\",\"filters\":[{\"value\":\"MetaMask\",\"field\":\"provider_name\",\"op\":\"eq\"}]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[]}]"
               },
               "jsonNumericFilter": {
                 "summary": "Step property filter using a numeric comparator (price > 100 → JSONExtractFloat)",
-                "value": "[{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::0\",\"filters\":[{\"operand\":\"price\",\"operator\":\"gt\",\"value\":\"100\"}]},{\"type\":\"track\",\"event\":\"refund\",\"name\":\"refund::1\",\"filters\":[]}]"
+                "value": "[{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::0\",\"filters\":[{\"value\":\"100\",\"field\":\"price\",\"op\":\"gt\"}]},{\"type\":\"track\",\"event\":\"refund\",\"name\":\"refund::1\",\"filters\":[]}]"
               },
               "combinedFilters": {
                 "summary": "Step with multiple filters (standard column + JSON property)",
-                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"operand\":\"device\",\"operator\":\"eq\",\"value\":\"desktop\"},{\"operand\":\"page_path\",\"operator\":\"startsWith\",\"value\":\"/earn\"}]},{\"type\":\"track\",\"event\":\"deposit\",\"name\":\"deposit::1\",\"filters\":[{\"operand\":\"chain_id\",\"operator\":\"eq\",\"value\":\"1\"},{\"operand\":\"asset\",\"operator\":\"in\",\"value\":\"USDC|USDT|DAI\"}]}]"
+                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[{\"value\":\"desktop\",\"field\":\"device\",\"op\":\"eq\"},{\"value\":\"/earn\",\"field\":\"page_path\",\"op\":\"startsWith\"}]},{\"type\":\"track\",\"event\":\"deposit\",\"name\":\"deposit::1\",\"filters\":[{\"value\":\"1\",\"field\":\"chain_id\",\"op\":\"eq\"},{\"value\":\"USDC|USDT|DAI\",\"field\":\"asset\",\"op\":\"in\"}]}]"
               },
               "transactionStatus": {
                 "summary": "Onchain step (`transaction` type, success-only via JSON property)",
-                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[]},{\"type\":\"transaction\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[{\"operand\":\"status\",\"operator\":\"eq\",\"value\":\"success\"}]}]"
+                "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[]},{\"type\":\"transaction\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[{\"value\":\"success\",\"field\":\"status\",\"op\":\"eq\"}]}]"
               }
             }
           },
@@ -7462,7 +8139,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["closed", "open"],
+              "enum": [
+                "closed",
+                "open"
+              ],
               "default": "closed"
             },
             "description": "`closed` (default): ordered, in-window. `open`: unordered per-step; emits an extra `dropped_off_users` column."
@@ -7504,7 +8184,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["first_touch", "last_touch"],
+              "enum": [
+                "first_touch",
+                "last_touch"
+              ],
               "default": "first_touch"
             },
             "description": "Per-user attribution for the `group_by` dimension. `first_touch` (default) buckets each user by their earliest value; `last_touch` by their latest. Ignored unless `group_by` is set."
@@ -7563,7 +8246,7 @@
                       "event": "page::0",
                       "users": 1240,
                       "total": 1240,
-                      "conversion_from_start": 1.0,
+                      "conversion_from_start": 1,
                       "conversion_from_previous": null,
                       "dropoff_from_previous": null,
                       "median_seconds_from_previous": null,
@@ -7577,8 +8260,8 @@
                       "conversion_from_start": 0.3887,
                       "conversion_from_previous": 0.3887,
                       "dropoff_from_previous": 0.6113,
-                      "median_seconds_from_previous": 38.0,
-                      "median_seconds_from_start": 38.0
+                      "median_seconds_from_previous": 38,
+                      "median_seconds_from_start": 38
                     },
                     {
                       "step": 3,
@@ -7588,8 +8271,8 @@
                       "conversion_from_start": 0.1508,
                       "conversion_from_previous": 0.388,
                       "dropoff_from_previous": 0.612,
-                      "median_seconds_from_previous": 124.0,
-                      "median_seconds_from_start": 162.0
+                      "median_seconds_from_previous": 124,
+                      "median_seconds_from_start": 162
                     }
                   ],
                   "rows": 3,
@@ -7635,8 +8318,10 @@
       "get": {
         "operationId": "getAnalyticsFlow",
         "summary": "Get session-scoped user-flow transitions (Sankey)",
-        "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the endpoint rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour; every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{operand, operator, value, values?}` (use `values` for `in`/`nin`).",
-        "tags": ["Query"],
+        "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the endpoint rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour; every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{field, op, value, values?}` (use `values` for `in`/`nin`).",
+        "tags": [
+          "Query"
+        ],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7668,7 +8353,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{operand, operator, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{field, op, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "anyPageView": {
                 "summary": "Match any page view as the start step",
@@ -7684,15 +8369,15 @@
               },
               "withStandardFilter": {
                 "summary": "Step filter on a standard column (mobile sessions only)",
-                "value": "{\"type\":\"event\",\"event\":\"page\",\"resolved_event\":\"__ALL_PAGE_VIEWS__\",\"filters\":[{\"operand\":\"device\",\"operator\":\"eq\",\"value\":\"mobile\"}]}"
+                "value": "{\"type\":\"event\",\"event\":\"page\",\"resolved_event\":\"__ALL_PAGE_VIEWS__\",\"filters\":[{\"value\":\"mobile\",\"field\":\"device\",\"op\":\"eq\"}]}"
               },
               "withInValuesFilter": {
                 "summary": "Step filter using `in` with the `values` array",
-                "value": "{\"type\":\"event\",\"event\":\"page\",\"resolved_event\":\"__ALL_PAGE_VIEWS__\",\"filters\":[{\"operand\":\"utm_source\",\"operator\":\"in\",\"value\":\"twitter\",\"values\":[\"twitter\",\"farcaster\",\"telegram\"]}]}"
+                "value": "{\"type\":\"event\",\"event\":\"page\",\"resolved_event\":\"__ALL_PAGE_VIEWS__\",\"filters\":[{\"value\":\"twitter\",\"values\":[\"twitter\",\"farcaster\",\"telegram\"],\"field\":\"utm_source\",\"op\":\"in\"}]}"
               },
               "withJsonPropertyFilter": {
                 "summary": "Step property filter (JSON property `provider_name=MetaMask`)",
-                "value": "{\"type\":\"track\",\"event\":\"connect\",\"resolved_event\":\"connect\",\"filters\":[{\"operand\":\"provider_name\",\"operator\":\"eq\",\"value\":\"MetaMask\"}]}"
+                "value": "{\"type\":\"track\",\"event\":\"connect\",\"resolved_event\":\"connect\",\"filters\":[{\"value\":\"MetaMask\",\"field\":\"provider_name\",\"op\":\"eq\"}]}"
               },
               "transactionWithStatus": {
                 "summary": "Onchain transaction matched via `status_type` + `status_value`",
@@ -7714,7 +8399,7 @@
               },
               "endWithFilter": {
                 "summary": "Conversion goal with a JSON property filter (premium plan only)",
-                "value": "{\"type\":\"track\",\"event\":\"upgrade\",\"resolved_event\":\"upgrade\",\"filters\":[{\"operand\":\"plan\",\"operator\":\"eq\",\"value\":\"premium\"}]}"
+                "value": "{\"type\":\"track\",\"event\":\"upgrade\",\"resolved_event\":\"upgrade\",\"filters\":[{\"value\":\"premium\",\"field\":\"plan\",\"op\":\"eq\"}]}"
               },
               "transactionEnd": {
                 "summary": "Successful onchain transaction as the end step",
@@ -7728,27 +8413,27 @@
             "schema": {
               "type": "string"
             },
-            "description": "Optional JSON-encoded array of `{operand, operator, value, values?}` filters applied to both the start-session scan and the relevant-events scan. Useful for restricting the entire flow to a specific cohort (e.g. desktop visitors, a UTM source, a wallet provider).",
+            "description": "Optional JSON-encoded array of `{field, op, value, values?}` filters applied to both the start-session scan and the relevant-events scan. Useful for restricting the entire flow to a specific cohort (e.g. desktop visitors, a UTM source, a wallet provider).",
             "examples": {
               "deviceFilter": {
                 "summary": "Restrict to desktop sessions",
-                "value": "[{\"operand\":\"device\",\"operator\":\"eq\",\"value\":\"desktop\"}]"
+                "value": "[{\"value\":\"desktop\",\"field\":\"device\",\"op\":\"eq\"}]"
               },
               "utmCohort": {
                 "summary": "Restrict to paid UTM cohorts using `in`",
-                "value": "[{\"operand\":\"utm_source\",\"operator\":\"in\",\"value\":\"google\",\"values\":[\"google\",\"twitter\",\"farcaster\"]}]"
+                "value": "[{\"value\":\"google\",\"values\":[\"google\",\"twitter\",\"farcaster\"],\"field\":\"utm_source\",\"op\":\"in\"}]"
               },
               "referrer": {
                 "summary": "Restrict the flow to Google-referred sessions",
-                "value": "[{\"operand\":\"referrer\",\"operator\":\"contains\",\"value\":\"google\"}]"
+                "value": "[{\"value\":\"google\",\"field\":\"referrer\",\"op\":\"contains\"}]"
               },
               "jsonProperty": {
                 "summary": "Filter by a JSON property (MetaMask wallet only)",
-                "value": "[{\"operand\":\"provider_name\",\"operator\":\"eq\",\"value\":\"MetaMask\"}]"
+                "value": "[{\"value\":\"MetaMask\",\"field\":\"provider_name\",\"op\":\"eq\"}]"
               },
               "combined": {
                 "summary": "Combine standard column + JSON property filters",
-                "value": "[{\"operand\":\"device\",\"operator\":\"eq\",\"value\":\"desktop\"},{\"operand\":\"chain_id\",\"operator\":\"eq\",\"value\":\"1\"}]"
+                "value": "[{\"value\":\"desktop\",\"field\":\"device\",\"op\":\"eq\"},{\"value\":\"1\",\"field\":\"chain_id\",\"op\":\"eq\"}]"
               }
             }
           },
@@ -7881,7 +8566,9 @@
         "operationId": "ingestEvents",
         "summary": "Ingest events",
         "description": "Send analytics events to Formo. This endpoint runs on events.formo.so (not api.formo.so). Authenticate with your project's SDK write key.",
-        "tags": ["Events"],
+        "tags": [
+          "Events"
+        ],
         "servers": [
           {
             "url": "https://events.formo.so"

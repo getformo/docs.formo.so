@@ -36,10 +36,8 @@ curl -G "https://api.formo.so/v0/kpis" \
 `page_scope=page` is the default. It counts `pageviews` only on the filtered page and calculates `bounce_rate` and `avg_session_sec` for sessions that landed there. Use `page_scope=session` for the legacy behavior, which includes all activity in any session that viewed the page. The scope only changes requests that include a `page` filter.
 
 <Note>
-  The three public filter container names describe different wire structures and
-  are not interchangeable. Query endpoints use `filters`, an implicit-AND array
-  of objects. Profile search uses `{"conditions": [...], "logic": "and" |
-  "or"}` so callers can choose a combinator. Segment records use `filterSet`,
-  an array of persisted `field::op::value` strings; segment create requests
-  call that input array `filterSets`.
+  Every public filter leaf uses `{"field", "op", "value"}`, and every
+  collection is named `filters`. Query endpoints and saved segments combine
+  their arrays with implicit AND. Profile search adds a sibling `logic` field,
+  so its body is `{"filters": [...], "logic": "and" | "or"}`.
 </Note>

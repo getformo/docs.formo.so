@@ -15,9 +15,9 @@ Both `start_step` and `end_step` are JSON-encoded objects of shape `{type, event
 - **`type`** - event type (`event`, `track`, `transaction`, `signature`, `decoded_log`).
 - **`event`** - the event name.
 - **`resolved_event`** - the value matched against the events table. Use the sentinel `"__ALL_PAGE_VIEWS__"` to match any page view, or the page path / event name otherwise.
-- **`filters`** - optional `[{operand, operator, value, values?}]`. Use `values` for the `in` / `nin` operators. Operators use the canonical tokens only (`eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty`). Retired long-form spellings like `equals` / `notIn` / `includes` are rejected with a `400` naming the token.
+- **`filters`** - optional `[{field, op, value, values?}]`. Use `values` for the `in` / `nin` operators. Operators use the canonical tokens only (`eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty`). Retired long-form spellings like `equals` / `notIn` / `includes` are rejected with a `400` naming the token.
 
-Pass `global_filters` as a JSON-encoded array to apply additional `{operand, operator, value, values?}` constraints to both the start-session scan and the relevant-events scan.
+Pass `global_filters` as a JSON-encoded array to apply additional `{field, op, value, values?}` constraints to both the start-session scan and the relevant-events scan.
 
 ## Conversion window and depth
 
@@ -34,5 +34,5 @@ curl -G "https://api.formo.so/v0/flow" \
   --data-urlencode "max_steps=4" \
   --data-urlencode 'start_step={"type":"event","event":"page","resolved_event":"__ALL_PAGE_VIEWS__","filters":[]}' \
   --data-urlencode 'end_step={"type":"track","event":"swap","resolved_event":"swap","filters":[]}' \
-  --data-urlencode 'global_filters=[{"operand":"referrer","operator":"contains","value":"google"}]'
+  --data-urlencode 'global_filters=[{"field":"referrer","op":"contains","value":"google"}]'
 ```
