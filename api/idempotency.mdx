@@ -72,7 +72,7 @@ curl -X POST https://api.formo.so/v0/alerts \
     "name": "Daily revenue drop",
     "trigger_type": "event",
     "trigger_filters": [
-      { "name": "event", "operator": "eq", "value": "transaction" }
+      { "field": "event", "op": "eq", "value": "transaction" }
     ],
     "recipient": [{ "type": "webhook", "value": ["https://myapp.com/formo-webhook"] }]
   }'

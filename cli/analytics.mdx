@@ -52,7 +52,7 @@ Requires `query:read` scope on your API key.
 
 ### `--filters`
 
-A JSON array of `{ field, op, value }` conditions, e.g. `[{"field":"location","op":"eq","value":"US"}]`. For multi-value matching, use `in` / `nin` with a pipe-delimited `value` (e.g. `"chrome|firefox"`).
+A JSON array of `{ field, op, value }` filters, e.g. `[{"field":"location","op":"eq","value":"US"}]`. For multi-value matching, use `in` / `nin` with an array value (e.g. `["chrome","firefox"]`); pipe-delimited strings remain supported by the analytics query boundary.
 
 ### `--params` (pipe-specific)
 

@@ -68,8 +68,8 @@ Requires `profiles:read` scope on your API key.
 | `--order-by` | `enum` | ❌ | Field to sort by |
 | `--order-dir` | `enum` | ❌ | Sort direction: `asc` or `desc` |
 | `--expand` | `string` | ❌ | Comma-separated fields to expand |
-| `--conditions` | `string` | ❌ | JSON array of `FilterCondition` objects |
-| `--logic` | `enum` | ❌ | Combine conditions with `and` or `or` |
+| `--filters` | `string` | ❌ | JSON array of canonical `{field, op, value}` filter objects |
+| `--logic` | `enum` | ❌ | Combine filters with `and` or `or` |
 
 The lifecycle threshold options listed above are also supported.
 
@@ -91,18 +91,18 @@ formo profiles search --order-by net_worth_usd --order-dir desc --size 5
 
 # Search with a typed filter condition
 formo profiles search \
-  --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000}]' \
+  --filters '[{"field":"users.net_worth_usd","op":"gt","value":10000}]' \
   --size 20
 
 # Search profiles matching either condition
 formo profiles search \
-  --conditions '[{"field":"users.net_worth_usd","op":"gt","value":10000},{"field":"users.volume","op":"gt","value":1000}]' \
+  --filters '[{"field":"users.net_worth_usd","op":"gt","value":10000},{"field":"users.volume","op":"gt","value":1000}]' \
   --logic or \
   --size 20
 
 # Filter by onchain balance on Ethereum
 formo profiles search \
-  --conditions '[{"field":"chains.1.balance","op":"gt","value":1000}]' \
+  --filters '[{"field":"chains.1.balance","op":"gt","value":1000}]' \
   --size 20
 ```
 
@@ -110,7 +110,7 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 ### Filter Conditions
 
-`--conditions` accepts a JSON array of filter condition objects:
+`--filters` accepts a JSON array of canonical filter objects:
 
 ```json
 [
