@@ -3756,18 +3756,28 @@
                       {
                         "type": "event",
                         "event": "page",
-                        "device": {
-                          "op": "eq",
-                          "value": "mobile"
-                        }
+                        "filters": [
+                          {
+                            "field": "device",
+                            "op": "eq",
+                            "value": "mobile"
+                          }
+                        ]
                       },
                       {
                         "type": "event",
                         "event": "connect",
-                        "provider_name": {
-                          "op": "in",
-                          "value": "metamask|rainbow|coinbase"
-                        }
+                        "filters": [
+                          {
+                            "field": "provider_name",
+                            "op": "in",
+                            "value": [
+                              "metamask",
+                              "rainbow",
+                              "coinbase"
+                            ]
+                          }
+                        ]
                       },
                       {
                         "type": "event",
@@ -3859,7 +3869,6 @@
                   "summary": "User flow from connect (max 5 steps)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
                     "chart_type": "user_paths",
                     "title": "Post-Connect User Flow",
                     "settings": {
@@ -3885,7 +3894,6 @@
                   "summary": "Open-ended user flow from page view",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 14 DAY ORDER BY anonymous_id, timestamp",
                     "chart_type": "user_paths",
                     "title": "User Discovery Paths",
                     "settings": {
