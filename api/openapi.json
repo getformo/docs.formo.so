@@ -684,7 +684,7 @@
       },
       "ChartSettings": {
         "type": "object",
-        "description": "Chart-type-specific configuration. The fields that apply depend on `chart_type`:\n\n- **funnel**: `funnelType`, `conversionWindow`, `breakdown`\n- **user_paths**: `startStep`, `endStep`, `maxSteps`, `nodesPerStep`, `conversionWindow`, `filters`\n- **retention**: `retentionFilter`, `retentionUserFilters`, `retentionSignalType`, `retentionLabelSignal`\n\nAll fields are optional at the schema level; see per-type validation rules for which are functionally required.",
+        "description": "Chart-type-specific configuration. The fields that apply depend on `chart_type`:\n\n- **funnel**: `funnelType`, `conversionWindow`, `breakdown`\n- **user_paths**: `anchors`, `maxSteps`, `nodesPerStep`, `conversionWindow`, `filters`\n- **retention**: `entryFilter`, `retentionFilter`, `retentionUserFilters`, `retentionSignalType`, `retentionLabelSignal`\n\nFields are optional at the schema level except where the selected chart type requires them. User Paths require at least one `anchors` entry. Retention requests must explicitly include `entryFilter`; use `null` for any event.",
         "properties": {
           "funnelType": {
             "type": "string",
@@ -717,20 +717,13 @@
             ],
             "description": "**Funnel only.** Split each funnel bar by this dimension. The top categories are shown individually; the rest are collapsed into 'Others'."
           },
-          "startStep": {
-            "$ref": "#/components/schemas/FunnelStep",
-            "description": "**user_paths (required).** The event where the user flow begins."
-          },
-          "endStep": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/FunnelStep"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "**user_paths (optional).** The event where the user flow ends. If `null` the flow is open-ended."
+          "anchors": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/FunnelStep"
+            },
+            "description": "**user_paths (required).** Ordered path anchors. The first entry starts the flow; the last entry ends it. A single entry creates an open-ended flow."
           },
           "maxSteps": {
             "type": "integer",
@@ -760,6 +753,17 @@
               }
             ],
             "description": "**retention.** Event that qualifies a returning visit as 'retained'. If `null`, any event counts as a return."
+          },
+          "entryFilter": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FunnelStep"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "**retention (required).** Event that places a user into the cohort. If `null`, any event counts as cohort entry. The key must be present even when its value is `null`."
           },
           "retentionUserFilters": {
             "type": "array",
@@ -817,7 +821,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.anchors` (≥ 1) |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -849,7 +853,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property predicates in its canonical `filters` array (e.g. `\"filters\": [{ \"field\": \"rdns\", \"op\": \"eq\", \"value\": \"io.metamask\" }]`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -892,7 +896,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.startStep` |\n| `retention` | none (`query` ignored) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.anchors` (≥ 1) |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -924,7 +928,7 @@
               "$ref": "#/components/schemas/FunnelStep"
             },
             "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property filters as extra keys on the step object (e.g. `\"rdns\": { \"op\": \"eq\", \"value\": \"io.metamask\" }`)."
+            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property predicates in its canonical `filters` array (e.g. `\"filters\": [{ \"field\": \"rdns\", \"op\": \"eq\", \"value\": \"io.metamask\" }]`)."
           },
           "settings": {
             "$ref": "#/components/schemas/ChartSettings"
@@ -3855,14 +3859,16 @@
                     "chart_type": "user_paths",
                     "title": "Post-Connect User Flow",
                     "settings": {
-                      "startStep": {
-                        "type": "event",
-                        "event": "connect"
-                      },
-                      "endStep": {
-                        "type": "event",
-                        "event": "transaction"
-                      },
+                      "anchors": [
+                        {
+                          "type": "event",
+                          "event": "connect"
+                        },
+                        {
+                          "type": "event",
+                          "event": "transaction"
+                        }
+                      ],
                       "maxSteps": 5,
                       "conversionWindow": {
                         "value": 2,
@@ -3879,10 +3885,12 @@
                     "chart_type": "user_paths",
                     "title": "User Discovery Paths",
                     "settings": {
-                      "startStep": {
-                        "type": "event",
-                        "event": "page"
-                      },
+                      "anchors": [
+                        {
+                          "type": "event",
+                          "event": "page"
+                        }
+                      ],
                       "maxSteps": 5,
                       "nodesPerStep": 8
                     }
@@ -3897,6 +3905,10 @@
                     "title": "Weekly Retention: Desktop",
                     "settings": {
                       "retentionFilter": {
+                        "type": "event",
+                        "event": "transaction"
+                      },
+                      "entryFilter": {
                         "type": "event",
                         "event": "transaction"
                       },
@@ -3916,7 +3928,11 @@
                     "projectId": "proj_abc",
                     "query": "",
                     "chart_type": "retention",
-                    "title": "Overall Retention"
+                    "title": "Overall Retention",
+                    "settings": {
+                      "retentionFilter": null,
+                      "entryFilter": null
+                    }
                   }
                 }
               }
