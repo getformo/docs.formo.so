@@ -14,8 +14,6 @@ Install the SDK and its required peer dependency:
 npm install @formo/analytics-react-native @react-native-async-storage/async-storage
 ```
 
-### Optional dependencies
-
 For automatic device info detection (version, build number, device model), install one of:
 
 ```bash
@@ -50,8 +48,6 @@ Expo projects handle native linking automatically - no `pod install` needed.
 
 ## Quick Start
 
-### Basic Setup
-
 Wrap your app with the `FormoAnalyticsProvider`:
 
 ```tsx
@@ -69,8 +65,6 @@ function App() {
   );
 }
 ```
-
-### With Wagmi
 
 For apps using [Wagmi](https://wagmi.sh), enable native integration for automatic wallet event tracking:
 
@@ -113,6 +107,18 @@ function App() {
 }
 ```
 
+## Code examples
+
+<CardGroup>
+  <Card
+    title="React Native"
+    icon="file-code"
+    href="https://github.com/getformo/examples/tree/main/with-react-native"
+  >
+    examples/react-native
+  </Card>
+</CardGroup>
+
 ## Track screen views
 
 Use the [`screen()`](/data/events/page) method to track screen views - the mobile equivalent of page views:
@@ -146,7 +152,7 @@ Screen views are sent as `page` events so they flow through the same analytics a
 
 Formo derives the rest for you: your app becomes the equivalent of a web origin (from the app name or bundle ID in the event context), and the screen name becomes the page path — so screens appear alongside web pages in reports like Top Pages.
 
-### With React Navigation
+### React Navigation
 
 Automatically track all screen transitions:
 
@@ -257,18 +263,6 @@ formo.track('Swap Executed', {
   volume: 1.5,      // Reserved: volume tracking
 });
 ```
-
-## Code examples
-
-<CardGroup>
-  <Card
-    title="React Native"
-    icon="file-code"
-    href="https://github.com/getformo/examples/tree/main/with-react-native"
-  >
-    examples/react-native
-  </Card>
-</CardGroup>
 
 ## Deep link attribution
 
