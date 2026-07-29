@@ -146,11 +146,11 @@ Each filter in the `filters` array has:
 | `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
 | `nin` | Not in array | `{"field": "users.location", "op": "nin", "value": ["US", "UK"]}` |
 | `contains` | Case-insensitive substring match for social fields only | `{"field": "users.twitter", "op": "contains", "value": "vitalik"}` |
-| `notEmpty` | Field is set (non-empty). String fields only — value is ignored | `{"field": "users.email", "op": "notEmpty"}` |
-| `isEmpty` | Field is not set (empty). String user attributes only — value is ignored | `{"field": "users.utm_source", "op": "isEmpty"}` |
+| `notEmpty` | Field is set (non-empty). String fields only; value is ignored | `{"field": "users.email", "op": "notEmpty"}` |
+| `isEmpty` | Field is not set (empty). String user attributes only; value is ignored | `{"field": "users.utm_source", "op": "isEmpty"}` |
 
 <Note>
-**Legacy spellings are retired.** The long-form spellings `equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, and `includes` (and symbol forms like `=` / `!=` / `like`) are no longer accepted on this endpoint — a request carrying one is rejected with a `400` whose message names the offending token. Send only the canonical operators above. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only — not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
+**Legacy spellings are retired.** The long-form spellings `equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, and `includes` (and symbol forms like `=` / `!=` / `like`) are no longer accepted on this endpoint. A request carrying one is rejected with a `400` whose message names the offending token. Send only the canonical operators above. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only, not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
 </Note>
 
 ---

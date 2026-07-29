@@ -85,7 +85,7 @@ formo alerts create \
 formo alerts create \
   --name "Slack revenue alert" \
   --trigger-type user \
-  --trigger-filters '[{"field":"revenue","op":"gt","value":"1000"}]' \
+  --trigger-filters '[{"field":"revenue","op":"gt","value":"","numericThreshold":"1000"}]' \
   --recipient '[{"type":"webhook","value":["https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"]}]' \
   --slack-property-keys '["event","revenue","address"]'
 ```

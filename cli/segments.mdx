@@ -49,12 +49,12 @@ Requires `segments:write` scope on your API key.
 # Create a high-value segment
 formo segments create \
   --title "Whales" \
-  --filters '[{"field":"net_worth_usd","op":"gt","value":"100000"}]'
+  --filters '[{"field":"net_worth_usd","op":"gt","value":100000}]'
 
 # Create a power-user segment
 formo segments create \
   --title "Power Users" \
-  --filters '[{"field":"net_worth_usd","op":"gt","value":"1000"},{"field":"lifecycle","op":"eq","value":"power"}]'
+  --filters '[{"field":"tx_count","op":"gt","value":100},{"field":"num_sessions","op":"gt","value":10}]'
 ```
 
 ---

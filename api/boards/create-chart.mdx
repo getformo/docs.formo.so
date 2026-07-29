@@ -125,7 +125,7 @@ Each step in the `steps` array has the following shape:
 {
   "type": "event | track | decoded_log",
   "event": "<event name>",
-  "<propertyKey>": { "op": "<operator>", "value": "<value>" }
+  "filters": [{ "field": "<property>", "op": "<op>", "value": "<value>" }]
 }
 ```
 
@@ -133,12 +133,12 @@ Each step in the `steps` array has the following shape:
 | --------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `type`          | string                | Yes      | `event` - built-in events (page, connect, transaction); `track` - custom tracked events; `decoded_log` - decoded smart-contract events                                                                                                                                    |
 | `event`         | string                | Yes      | Event name (e.g. `page`, `connect`, `transaction`)                                                                                                                                                                                                                        |
-| `<propertyKey>` | `StepFilterCondition` | No       | One or more property filters. Any extra key on the step object is treated as a filter. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_*`) are filtered directly; all other keys are extracted from `properties` via `JSONExtractString` |
+| `filters`       | `StepFilterCondition[]` | No       | Canonical `{field, op, value}` property filters. Standard columns are filtered directly; other fields are extracted from event `properties`. |
 
 ### Filter Operators (`StepFilterCondition`)
 
 ```json
-{ "op": "<operator>", "value": "<value>" }
+{ "field": "<property>", "op": "<op>", "value": "<value>" }
 ```
 
 | `op`         | SQL equivalent         | Notes                                                 |
@@ -161,7 +161,7 @@ Each step in the `steps` array has the following shape:
   For `in` and `nin`, join multiple values with a pipe `|`. Escape a literal
   pipe with `\|` and a literal backslash with `\\`. The legacy numeric long
   forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are retired and
-  rejected with a `400` naming the token — send `gt` / `gte` / `lt` / `lte`.
+  rejected with a `400` naming the token. Send `gt` / `gte` / `lt` / `lte`.
   `notEmpty` and `isEmpty` are rejected on the numeric event columns `volume` /
   `revenue` / `points`.
 </Tip>
@@ -538,7 +538,7 @@ Each step in the `steps` array has the following shape:
 {
   "type": "event | track | decoded_log",
   "event": "<event name>",
-  "<propertyKey>": { "op": "<operator>", "value": "<value>" }
+  "filters": [{ "field": "<property>", "op": "<op>", "value": "<value>" }]
 }
 ```
 
@@ -546,12 +546,12 @@ Each step in the `steps` array has the following shape:
 | --------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `type`          | string                | Yes      | `event` - built-in events (page, connect, transaction); `track` - custom tracked events; `decoded_log` - decoded smart-contract events                                                                                                                                    |
 | `event`         | string                | Yes      | Event name (e.g. `page`, `connect`, `transaction`)                                                                                                                                                                                                                        |
-| `<propertyKey>` | `StepFilterCondition` | No       | One or more property filters. Any extra key on the step object is treated as a filter. Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_*`) are filtered directly; all other keys are extracted from `properties` via `JSONExtractString` |
+| `filters`       | `StepFilterCondition[]` | No       | Canonical `{field, op, value}` property filters. Standard columns are filtered directly; other fields are extracted from event `properties`. |
 
 ### Filter Operators (`StepFilterCondition`)
 
 ```json
-{ "op": "<operator>", "value": "<value>" }
+{ "field": "<property>", "op": "<op>", "value": "<value>" }
 ```
 
 | `op`         | SQL equivalent         | Notes                                                 |
@@ -574,7 +574,7 @@ Each step in the `steps` array has the following shape:
   For `in` and `nin`, join multiple values with a pipe `|`. Escape a literal
   pipe with `\|` and a literal backslash with `\\`. The legacy numeric long
   forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are retired and
-  rejected with a `400` naming the token — send `gt` / `gte` / `lt` / `lte`.
+  rejected with a `400` naming the token. Send `gt` / `gte` / `lt` / `lte`.
   `notEmpty` and `isEmpty` are rejected on the numeric event columns `volume` /
   `revenue` / `points`.
 </Tip>
