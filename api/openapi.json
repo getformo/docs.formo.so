@@ -805,7 +805,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: omit it; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -880,7 +880,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: omit it; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -3912,7 +3912,6 @@
                   "summary": "Weekly retention: desktop users, transaction event",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "",
                     "chart_type": "retention",
                     "title": "Weekly Retention: Desktop",
                     "settings": {
@@ -3938,7 +3937,6 @@
                   "summary": "Overall retention (no filters)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "",
                     "chart_type": "retention",
                     "title": "Overall Retention",
                     "settings": {

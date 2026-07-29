@@ -333,7 +333,7 @@ Visualize how users navigate your app through an ordered list of path anchors. `
 
 ## Retention Charts
 
-Measures how often users return over time. The `query` field is not used - pass `""` or omit it.
+Measures how often users return over time. Omit the `query` field; retention data is fetched automatically.
 
 ### `settings` for Retention Charts
 
@@ -354,7 +354,6 @@ Each `RetentionUserFilter`:
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
   "title": "Weekly Retention - Desktop Users",
   "settings": {
@@ -373,7 +372,6 @@ For all-user retention with no event filters, explicitly set both event filters 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
   "title": "Overall Retention",
   "settings": {
@@ -397,7 +395,7 @@ For all-user retention with no event filters, explicitly set both event filters 
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required              |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL |
 | `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors |
-| `retention`  | `settings.entryFilter` key is required; `query` is ignored                                  |
+| `retention`  | `settings.entryFilter` key is required; omit `query`                                       |
 
 ---
 
@@ -760,7 +758,7 @@ Visualize how users navigate your app through an ordered list of path anchors. `
 
 ## Retention Charts
 
-Measures how often users return over time. The `query` field is not used - pass `""` or omit it.
+Measures how often users return over time. Omit the `query` field; retention data is fetched automatically.
 
 ### `settings` for Retention Charts
 
@@ -781,7 +779,6 @@ Each `RetentionUserFilter`:
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
   "title": "Weekly Retention - Desktop Users",
   "settings": {
@@ -800,7 +797,6 @@ For all-user retention with no event filters, explicitly set both event filters 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
   "title": "Overall Retention",
   "settings": {
@@ -824,7 +820,7 @@ For all-user retention with no event filters, explicitly set both event filters 
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required                                                                            |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL                                                               |
 | `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors                                                   |
-| `retention`  | `settings.entryFilter` key is required; `query` is ignored                                                                                                                  |
+| `retention`  | `settings.entryFilter` key is required; omit `query`                                                                                                                       |
 
 ---
 
