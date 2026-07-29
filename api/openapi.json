@@ -805,7 +805,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -821,7 +821,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.anchors` (≥ 1) |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -880,7 +880,7 @@
           "query": {
             "type": "string",
             "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
+            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: can be omitted or pass `\"\"`; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
           },
           "chart_type": {
             "type": "string",
@@ -896,7 +896,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `query`, `settings.anchors` (≥ 1) |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -3687,14 +3687,18 @@
                       {
                         "type": "event",
                         "event": "connect",
-                        "rdns": {
-                          "op": "eq",
-                          "value": "io.metamask"
-                        },
-                        "chain_id": {
-                          "op": "eq",
-                          "value": "1"
-                        }
+                        "filters": [
+                          {
+                            "field": "rdns",
+                            "op": "eq",
+                            "value": "io.metamask"
+                          },
+                          {
+                            "field": "chain_id",
+                            "op": "eq",
+                            "value": "1"
+                          }
+                        ]
                       },
                       {
                         "type": "event",

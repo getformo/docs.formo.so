@@ -8,7 +8,7 @@ openapi: "POST /v0/boards/{boardId}/charts"
 
 Creates a new chart and attaches it to a board. Returns the full chart object on success.
 
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
+The `chart_type` field controls which other request body fields are required or validated. Funnel charts derive SQL from `steps` and accept `"SELECT 1"` as the placeholder. User Paths charts derive SQL from `settings.anchors`, so omit `query`.
 
 ---
 
@@ -17,7 +17,7 @@ The `chart_type` field controls which other request body fields are required or 
 | Field         | Type          | Required    | Description                                                                                     |
 | ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
 | `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
-| `query`       | string        | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"`           |
+| `query`       | string        | Conditional | SQL query. Omit for `user_paths` and `retention`. For `funnel`, pass `"SELECT 1"`               |
 | `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
 | `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
 | `description` | string        | No          | Optional description                                                                            |
@@ -397,7 +397,7 @@ For all-user retention with no event filters, explicitly set both event filters 
 | `pie`        | `y_axis` requires exactly 1 element                                                      |
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required              |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL |
-| `user_paths` | `settings.anchors` requires at least one entry; `query` must execute and return valid path data |
+| `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors |
 | `retention`  | `settings.entryFilter` key is required; `query` is ignored                                  |
 
 ---
@@ -436,7 +436,7 @@ Use the returned `id` with the [Get Chart](/api/boards/get-chart), [Update Chart
 
 Creates a new chart and attaches it to a board. Returns the full chart object on success.
 
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
+The `chart_type` field controls which other request body fields are required or validated. Funnel charts derive SQL from `steps` and accept `"SELECT 1"` as the placeholder. User Paths charts derive SQL from `settings.anchors`, so omit `query`.
 
 ---
 
@@ -445,7 +445,7 @@ The `chart_type` field controls which other request body fields are required or 
 | Field         | Type          | Required    | Description                                                                                     |
 | ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
 | `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
-| `query`       | string        | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"`           |
+| `query`       | string        | Conditional | SQL query. Omit for `user_paths` and `retention`. For `funnel`, pass `"SELECT 1"`               |
 | `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
 | `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
 | `description` | string        | No          | Optional description                                                                            |
@@ -825,7 +825,7 @@ For all-user retention with no event filters, explicitly set both event filters 
 | `pie`        | `y_axis` requires exactly 1 element                                                                                                                    |
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required                                                                            |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL                                                               |
-| `user_paths` | `settings.anchors` requires at least one entry; `query` must execute and return data in the expected user-path format (columns: user identifier, event name, timestamp) |
+| `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors                                                   |
 | `retention`  | `settings.entryFilter` key is required; `query` is ignored                                                                                                                  |
 
 ---
