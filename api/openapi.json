@@ -435,6 +435,68 @@
           "op"
         ]
       },
+      "SegmentFilterCondition": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "A condition in a saved segment. Segment entries use the canonical `{field, op, value}` envelope and are combined with implicit AND. Nested event-property predicates are not supported by saved segments.",
+        "properties": {
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "neq",
+              "gt",
+              "lt",
+              "gte",
+              "lte",
+              "in",
+              "nin",
+              "startsWith",
+              "endsWith",
+              "contains",
+              "notEmpty",
+              "isEmpty"
+            ]
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "field",
+          "op"
+        ]
+      },
       "RetentionUserFilter": {
         "type": "object",
         "description": "A user-level retention cohort filter using the canonical `{field, op, value}` envelope.",
@@ -962,7 +1024,7 @@
           "filters": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/AnalyticsFilterCondition"
+              "$ref": "#/components/schemas/SegmentFilterCondition"
             }
           }
         },
@@ -2101,18 +2163,9 @@
         "in": "query",
         "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. Use `in` / `nin` with a pipe-delimited `value` (e.g. `\"chrome|firefox\"`) for multi-value matching.",
         "schema": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/AnalyticsFilterCondition"
-          }
+          "type": "string"
         },
-        "example": [
-          {
-            "field": "referrer",
-            "op": "contains",
-            "value": "google"
-          }
-        ]
+        "example": "[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]"
       },
       "AnalyticsPageScope": {
         "name": "page_scope",
@@ -2249,161 +2302,81 @@
         "in": "query",
         "description": "JSON array filtering by wallet profile attributes (e.g. net worth, total tx count). Each entry is `{ field, op, value }`.",
         "schema": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/AnalyticsFilterCondition"
-          }
+          "type": "string"
         },
-        "example": [
-          {
-            "field": "net_worth_usd",
-            "op": "gt",
-            "value": "1000"
-          }
-        ]
+        "example": "[{\"field\":\"net_worth_usd\",\"op\":\"gt\",\"value\":\"1000\"}]"
       },
       "AnalyticsSocials": {
         "name": "socials",
         "in": "query",
         "description": "JSON array of social platforms to filter users by. Users must have at least one of the listed identities (e.g. `ens`, `farcaster`, `lens`, `twitter`).",
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "type": "string"
         },
-        "example": [
-          "ens",
-          "farcaster"
-        ]
+        "example": "[\"ens\",\"farcaster\"]"
       },
       "AnalyticsAppFilters": {
         "name": "app_filters",
         "in": "query",
         "description": "JSON array of arrays describing DeFi app usage filters. Each entry is `[scope, chain_id, app_id, op, value]` where `scope` is `protocol` or `any`.",
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "array"
-          }
+          "type": "string"
         },
-        "example": [
-          [
-            "protocol",
-            1,
-            "uniswap-v3",
-            "gt",
-            "0"
-          ]
-        ]
+        "example": "[[\"protocol\",1,\"uniswap-v3\",\"gt\",\"0\"]]"
       },
       "AnalyticsTokenFilters": {
         "name": "token_filters",
         "in": "query",
         "description": "JSON array of arrays describing token-holding filters. Each entry is `[scope, chain_id, app_id, token_address, op, value]` where `scope` is `protocol` or `any`.",
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "array"
-          }
+          "type": "string"
         },
-        "example": [
-          [
-            "any",
-            1,
-            "",
-            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "gt",
-            "100"
-          ]
-        ]
+        "example": "[[\"any\",1,\"\",\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\",\"gt\",\"100\"]]"
       },
       "AnalyticsChainFilters": {
         "name": "chain_filters",
         "in": "query",
         "description": "JSON array of arrays describing chain-activity filters. Each entry is `[chain_id, op, value]`.",
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "array"
-          }
+          "type": "string"
         },
-        "example": [
-          [
-            1,
-            "gt",
-            "0"
-          ]
-        ]
+        "example": "[[1,\"gt\",\"0\"]]"
       },
       "AnalyticsBehaviorFilters": {
         "name": "behavior_filters",
         "in": "query",
         "description": "JSON array filtering users by event-based behavior with counts and either an absolute date range or a window relative to the user's first event. Each entry is `{ event, op, times, date_from?, date_to?, event_type?, relative_to?, window? }`. When `relative_to: \"first_seen\"` is set, the matching events must occur within `window.value` `window.unit` (`hour` | `day`) after the user's first event; `date_from`/`date_to` are ignored. `event_type` narrows matching to a specific event-type column (`page`, `connect`, `disconnect`, `chain`, `signature`, `transaction`, `track`, `decoded_log`, `detect`, `identify`); for `track` and `decoded_log` the `event` field is the named identifier; for other types only the `type` column is matched.",
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "object"
-          }
+          "type": "string"
         },
-        "example": [
-          {
-            "event": "swap",
-            "event_type": "track",
-            "op": "gte",
-            "times": 1,
-            "relative_to": "first_seen",
-            "window": {
-              "value": 24,
-              "unit": "hour"
-            }
-          }
-        ]
+        "example": "[{\"event\":\"swap\",\"event_type\":\"track\",\"op\":\"gte\",\"times\":1,\"relative_to\":\"first_seen\",\"window\":{\"value\":24,\"unit\":\"hour\"}}]"
       },
       "AnalyticsSourceFilter": {
         "name": "source_filter",
         "in": "query",
-        "description": "JSON object filtering users by raw event source. Uses the canonical envelope; `field` must be `source`. Distinct from `channel_filter`, which matches the classified acquisition channel.",
+        "description": "JSON array filtering users by raw event source. Entries use the canonical envelope and `field` must be `source`. Distinct from `channel_filter`, which matches the classified acquisition channel.",
         "schema": {
-          "$ref": "#/components/schemas/SourceFilterCondition"
+          "type": "string"
         },
-        "example": {
-          "field": "source",
-          "op": "in",
-          "value": "web|mobile"
-        }
+        "example": "[{\"field\":\"source\",\"op\":\"in\",\"value\":\"web|mobile\"}]"
       },
       "AnalyticsChannelFilter": {
         "name": "channel_filter",
         "in": "query",
-        "description": "JSON object filtering users by classified acquisition channel. Uses the canonical envelope; `field` must be `channel_type`. Distinct from `source_filter`, which matches the raw SDK source.",
+        "description": "JSON array filtering users by classified acquisition channel. Entries use the canonical envelope and `field` must be `channel_type`. Distinct from `source_filter`, which matches the raw SDK source.",
         "schema": {
-          "$ref": "#/components/schemas/ChannelFilterCondition"
+          "type": "string"
         },
-        "example": {
-          "field": "channel_type",
-          "op": "in",
-          "value": "Organic Search|Paid Social"
-        }
+        "example": "[{\"field\":\"channel_type\",\"op\":\"in\",\"value\":\"Organic Search|Paid Social\"}]"
       },
       "AnalyticsLabelFilters": {
         "name": "label_filters",
         "in": "query",
         "description": "JSON array of arrays for filtering users by wallet labels. Each entry is `[tag_id, chain_id, op, value]`.",
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "array"
-          }
+          "type": "string"
         },
-        "example": [
-          [
-            "whale",
-            1,
-            "eq",
-            "true"
-          ]
-        ]
+        "example": "[[\"whale\",1,\"eq\",\"true\"]]"
       },
       "AnalyticsExclude": {
         "name": "exclude",
@@ -4543,7 +4516,7 @@
                     "type": "array",
                     "minItems": 1,
                     "items": {
-                      "$ref": "#/components/schemas/AnalyticsFilterCondition"
+                      "$ref": "#/components/schemas/SegmentFilterCondition"
                     },
                     "description": "Canonical filter objects combined with implicit AND."
                   }
@@ -7908,23 +7881,10 @@
             "name": "user_filters",
             "in": "query",
             "description": "JSON array filtering users by profile attributes (`device`, `browser`, `os`, `location`, `volume`, `revenue`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`). When set, all weekly cohorts are returned regardless of `min_users`.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AnalyticsFilterCondition"
-                  }
-                },
-                "example": [
-                  {
-                    "field": "device",
-                    "op": "eq",
-                    "value": "desktop"
-                  }
-                ]
-              }
-            }
+            "schema": {
+              "type": "string"
+            },
+            "example": "[{\"field\":\"device\",\"op\":\"eq\",\"value\":\"desktop\"}]"
           }
         ],
         "responses": {
