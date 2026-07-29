@@ -2229,7 +2229,7 @@
       "AnalyticsFilters": {
         "name": "filters",
         "in": "query",
-        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. Use `in` / `nin` with a pipe-delimited `value` (e.g. `\"chrome|firefox\"`) for multi-value matching.",
+        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. For `in` / `nin`, pass an array value such as `[\"chrome\",\"firefox\"]` or a pipe-delimited string such as `\"chrome|firefox\"`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator. Optional one-level nested `filters` use the same canonical envelope and membership rule.",
         "schema": {
           "type": "string"
         },
