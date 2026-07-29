@@ -424,10 +424,73 @@
           },
           "filters": {
             "type": "array",
-            "description": "Optional predicates on properties of the selected event. Nested entries use the same canonical envelope.",
+            "description": "Optional predicates on properties of the selected event. Nested entries use the same canonical envelope and are leaves; deeper nesting is not supported.",
             "items": {
-              "$ref": "#/components/schemas/AnalyticsFilterCondition"
+              "$ref": "#/components/schemas/AnalyticsNestedFilterCondition"
             }
+          }
+        },
+        "required": [
+          "field",
+          "op"
+        ]
+      },
+      "AnalyticsNestedFilterCondition": {
+        "type": "object",
+        "description": "A leaf predicate on a property of the event selected by an analytics filter. This canonical envelope cannot contain further nested filters.",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Event property targeted by this filter."
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "neq",
+              "gt",
+              "lt",
+              "gte",
+              "lte",
+              "in",
+              "nin",
+              "startsWith",
+              "endsWith",
+              "contains",
+              "notEmpty",
+              "isEmpty"
+            ],
+            "description": "Canonical comparison operator token."
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string."
           }
         },
         "required": [

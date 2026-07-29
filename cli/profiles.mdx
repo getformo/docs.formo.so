@@ -68,7 +68,7 @@ Requires `profiles:read` scope on your API key.
 | `--order-by` | `enum` | ❌ | Field to sort by |
 | `--order-dir` | `enum` | ❌ | Sort direction: `asc` or `desc` |
 | `--expand` | `string` | ❌ | Comma-separated fields to expand |
-| `--filters` | `string` | ❌ | JSON array of `FilterCondition` objects |
+| `--filters` | `string` | ❌ | JSON array of canonical `{field, op, value}` filter objects |
 | `--logic` | `enum` | ❌ | Combine filters with `and` or `or` |
 
 The lifecycle threshold options listed above are also supported.
@@ -110,7 +110,7 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 ### Filters
 
-`--filters` accepts a JSON array of filter condition objects:
+`--filters` accepts a JSON array of canonical filter objects:
 
 ```json
 [
@@ -127,7 +127,7 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `notEmpty`, `isEmpty`
 
-The long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are retired — the API rejects them with a `400` naming the token. Use only the canonical operators above.
+The long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are retired. The API rejects them with a `400` naming the token. Use only the canonical operators above.
 
 ---
 

@@ -79,7 +79,7 @@ formo alerts create --name "High value tx" --trigger-type event
 formo alerts create \
   --name "Whale activity" \
   --trigger-type user \
-  --trigger-filters '[{"field":"net_worth_usd","op":"gt","value":100000}]' \
+  --trigger-filters '[{"field":"net_worth_usd","op":"gt","value":"100000"}]' \
   --recipient '[{"type":"webhook","value":["https://example.com/formo-webhook"]}]'
 
 formo alerts create \
