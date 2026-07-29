@@ -8,7 +8,7 @@ openapi: "POST /v0/boards/{boardId}/charts"
 
 Creates a new chart and attaches it to a board. Returns the full chart object on success.
 
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
+The `chart_type` field controls which other request body fields are required or validated. Funnel charts derive SQL from `steps` and accept `"SELECT 1"` as the placeholder. User Paths charts derive SQL from `settings.anchors`, so omit `query`.
 
 ---
 
@@ -17,7 +17,7 @@ The `chart_type` field controls which other request body fields are required or 
 | Field         | Type          | Required    | Description                                                                                     |
 | ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
 | `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
-| `query`       | string        | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"`           |
+| `query`       | string        | Conditional | SQL query. Omit for `user_paths` and `retention`. For `funnel`, pass `"SELECT 1"`               |
 | `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
 | `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
 | `description` | string        | No          | Optional description                                                                            |
@@ -227,8 +227,10 @@ Filter step 2 to MetaMask wallets on Ethereum mainnet:
     {
       "type": "event",
       "event": "connect",
-      "rdns": { "op": "eq", "value": "io.metamask" },
-      "chain_id": { "op": "eq", "value": "1" }
+      "filters": [
+        { "field": "rdns", "op": "eq", "value": "io.metamask" },
+        { "field": "chain_id", "op": "eq", "value": "1" }
+      ]
     },
     { "type": "event", "event": "transaction" }
   ],
@@ -272,12 +274,18 @@ Filter step 2 to MetaMask wallets on Ethereum mainnet:
     {
       "type": "event",
       "event": "page",
-      "device": { "op": "eq", "value": "mobile" }
+      "filters": [{ "field": "device", "op": "eq", "value": "mobile" }]
     },
     {
       "type": "event",
       "event": "connect",
-      "provider_name": { "op": "in", "value": "metamask|rainbow|coinbase" }
+      "filters": [
+        {
+          "field": "provider_name",
+          "op": "in",
+          "value": ["metamask", "rainbow", "coinbase"]
+        }
+      ]
     },
     { "type": "event", "event": "transaction" }
   ],
@@ -293,28 +301,28 @@ Filter step 2 to MetaMask wallets on Ethereum mainnet:
 
 ## User Paths Charts
 
-Visualize how users navigate your app after a starting event. `settings.startStep` is required.
+Visualize how users navigate your app through an ordered list of path anchors. `settings.anchors` requires at least one entry. One anchor produces an open-ended exploration; two or more constrain the path in order.
 
 ### `settings` for User Paths Charts
 
-| Field              | Type                   | Default | Description                                                        |
-| ------------------ | ---------------------- | ------- | ------------------------------------------------------------------ |
-| `startStep`        | `FunnelStep`           | -       | **Required.** Event where the flow begins                          |
-| `endStep`          | `FunnelStep` \| `null` | `null`  | Optional ending event. `null` = open-ended                         |
-| `maxSteps`         | integer (2 to 5)       | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5     |
-| `nodesPerStep`     | integer (2 to 8)       | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8   |
-| `conversionWindow` | `ConversionWindow`     | -       | Time window to group the flow                                      |
-| `filters`          | string                 | -       | JSON-encoded string of additional path filters                     |
+| Field              | Type               | Default | Description                                                      |
+| ------------------ | ------------------ | ------- | ---------------------------------------------------------------- |
+| `anchors`          | `FunnelStep[]`     | -       | **Required.** Ordered path anchors; one entry is open-ended       |
+| `maxSteps`         | integer (2 to 5)   | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5   |
+| `nodesPerStep`     | integer (2 to 8)   | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8 |
+| `conversionWindow` | `ConversionWindow` | -       | Time window to group the flow                                    |
+| `filters`          | string             | -       | JSON-encoded string of additional path filters                   |
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
   "chart_type": "user_paths",
   "title": "Post-Connect User Flow",
   "settings": {
-    "startStep": { "type": "event", "event": "connect" },
-    "endStep": { "type": "event", "event": "transaction" },
+    "anchors": [
+      { "type": "event", "event": "connect" },
+      { "type": "event", "event": "transaction" }
+    ],
     "maxSteps": 5,
     "conversionWindow": { "value": 2, "unit": "week" }
   }
@@ -325,14 +333,15 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 
 ## Retention Charts
 
-Measures how often users return over time. The `query` field is not used - pass `""` or omit it.
+Measures how often users return over time. Omit the `query` field; retention data is fetched automatically.
 
 ### `settings` for Retention Charts
 
-| Field                  | Type                    | Description                                                                     |
-| ---------------------- | ----------------------- | ------------------------------------------------------------------------------- |
-| `retentionFilter`      | `FunnelStep` \| `null`  | Event that qualifies a returning visit as "retained". `null` = any event counts |
-| `retentionUserFilters` | `RetentionUserFilter[]` | User-segment filters that narrow the retention cohort                           |
+| Field                  | Type                    | Description                                                                       |
+| ---------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| `entryFilter`          | `FunnelStep` \| `null`  | **Required key.** Event that enters the cohort; `null` means any event             |
+| `retentionFilter`      | `FunnelStep` \| `null`  | Event that qualifies a return as "retained"; `null` means any event                |
+| `retentionUserFilters` | `RetentionUserFilter[]` | User-segment filters that narrow the retention cohort                             |
 
 Each `RetentionUserFilter`:
 
@@ -345,10 +354,10 @@ Each `RetentionUserFilter`:
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
   "title": "Weekly Retention - Desktop Users",
   "settings": {
+    "entryFilter": { "type": "event", "event": "transaction" },
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
       { "field": "device", "op": "eq", "value": "desktop" },
@@ -358,14 +367,17 @@ Each `RetentionUserFilter`:
 }
 ```
 
-For all-user retention with no filters, omit `settings`:
+For all-user retention with no event filters, explicitly set both event filters to `null`:
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
-  "title": "Overall Retention"
+  "title": "Overall Retention",
+  "settings": {
+    "entryFilter": null,
+    "retentionFilter": null
+  }
 }
 ```
 
@@ -382,8 +394,8 @@ For all-user retention with no filters, omit `settings`:
 | `pie`        | `y_axis` requires exactly 1 element                                                      |
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required              |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL |
-| `user_paths` | `settings.startStep` required; `query` must execute and return valid path data           |
-| `retention`  | No query validation - `query` is ignored                                                 |
+| `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors |
+| `retention`  | `settings.entryFilter` key is required; omit `query`                                       |
 
 ---
 
@@ -421,7 +433,7 @@ Use the returned `id` with the [Get Chart](/api/boards/get-chart), [Update Chart
 
 Creates a new chart and attaches it to a board. Returns the full chart object on success.
 
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts are special - their SQL is **auto-generated** from the `steps` array, so pass `"SELECT 1"` as the `query` placeholder.
+The `chart_type` field controls which other request body fields are required or validated. Funnel charts derive SQL from `steps` and accept `"SELECT 1"` as the placeholder. User Paths charts derive SQL from `settings.anchors`, so omit `query`.
 
 ---
 
@@ -430,7 +442,7 @@ The `chart_type` field controls which other request body fields are required or 
 | Field         | Type          | Required    | Description                                                                                     |
 | ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
 | `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
-| `query`       | string        | Conditional | SQL query. Required for all types except `retention`. For `funnel`, pass `"SELECT 1"`           |
+| `query`       | string        | Conditional | SQL query. Omit for `user_paths` and `retention`. For `funnel`, pass `"SELECT 1"`               |
 | `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
 | `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
 | `description` | string        | No          | Optional description                                                                            |
@@ -640,8 +652,10 @@ Filter step 2 to MetaMask wallet connections on Ethereum mainnet:
     {
       "type": "event",
       "event": "connect",
-      "rdns": { "op": "eq", "value": "io.metamask" },
-      "chain_id": { "op": "eq", "value": "1" }
+      "filters": [
+        { "field": "rdns", "op": "eq", "value": "io.metamask" },
+        { "field": "chain_id", "op": "eq", "value": "1" }
+      ]
     },
     { "type": "event", "event": "transaction" }
   ],
@@ -685,12 +699,18 @@ Filter step 2 to MetaMask wallet connections on Ethereum mainnet:
     {
       "type": "event",
       "event": "page",
-      "device": { "op": "eq", "value": "mobile" }
+      "filters": [{ "field": "device", "op": "eq", "value": "mobile" }]
     },
     {
       "type": "event",
       "event": "connect",
-      "provider_name": { "op": "in", "value": "metamask|rainbow|coinbase" }
+      "filters": [
+        {
+          "field": "provider_name",
+          "op": "in",
+          "value": ["metamask", "rainbow", "coinbase"]
+        }
+      ]
     },
     { "type": "event", "event": "transaction" }
   ],
@@ -706,28 +726,28 @@ Filter step 2 to MetaMask wallet connections on Ethereum mainnet:
 
 ## User Paths Charts
 
-Visualize how users navigate your app after a starting event. `settings.startStep` is required.
+Visualize how users navigate your app through an ordered list of path anchors. `settings.anchors` requires at least one entry. One anchor produces an open-ended exploration; two or more constrain the path in order.
 
 ### `settings` for User Paths Charts
 
-| Field              | Type                   | Default | Description                                                        |
-| ------------------ | ---------------------- | ------- | ------------------------------------------------------------------ |
-| `startStep`        | `FunnelStep`           | -       | **Required.** Event where the flow begins                          |
-| `endStep`          | `FunnelStep` \| `null` | `null`  | Optional ending event. `null` = open-ended                         |
-| `maxSteps`         | integer (2 to 5)       | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5     |
-| `nodesPerStep`     | integer (2 to 8)       | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8   |
-| `conversionWindow` | `ConversionWindow`     | 2 weeks | Time window to group the flow                                      |
-| `filters`          | string                 | -       | JSON-encoded string of additional path filters                     |
+| Field              | Type               | Default | Description                                                      |
+| ------------------ | ------------------ | ------- | ---------------------------------------------------------------- |
+| `anchors`          | `FunnelStep[]`     | -       | **Required.** Ordered path anchors; one entry is open-ended       |
+| `maxSteps`         | integer (2 to 5)   | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5   |
+| `nodesPerStep`     | integer (2 to 8)   | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8 |
+| `conversionWindow` | `ConversionWindow` | 2 weeks | Time window to group the flow                                    |
+| `filters`          | string             | -       | JSON-encoded string of additional path filters                   |
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT anonymous_id, type AS event, timestamp FROM events WHERE timestamp >= today() - INTERVAL 30 DAY ORDER BY anonymous_id, timestamp",
   "chart_type": "user_paths",
   "title": "Post-Connect User Flow",
   "settings": {
-    "startStep": { "type": "event", "event": "connect" },
-    "endStep": { "type": "event", "event": "transaction" },
+    "anchors": [
+      { "type": "event", "event": "connect" },
+      { "type": "event", "event": "transaction" }
+    ],
     "maxSteps": 5,
     "conversionWindow": { "value": 2, "unit": "week" }
   }
@@ -738,14 +758,15 @@ Visualize how users navigate your app after a starting event. `settings.startSte
 
 ## Retention Charts
 
-Measures how often users return over time. The `query` field is not used - pass `""` or omit it.
+Measures how often users return over time. Omit the `query` field; retention data is fetched automatically.
 
 ### `settings` for Retention Charts
 
-| Field                  | Type                    | Description                                                                     |
-| ---------------------- | ----------------------- | ------------------------------------------------------------------------------- |
-| `retentionFilter`      | `FunnelStep` \| `null`  | Event that qualifies a returning visit as "retained". `null` = any event counts |
-| `retentionUserFilters` | `RetentionUserFilter[]` | User-segment filters that narrow the retention cohort                           |
+| Field                  | Type                    | Description                                                                       |
+| ---------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| `entryFilter`          | `FunnelStep` \| `null`  | **Required key.** Event that enters the cohort; `null` means any event             |
+| `retentionFilter`      | `FunnelStep` \| `null`  | Event that qualifies a return as "retained"; `null` means any event                |
+| `retentionUserFilters` | `RetentionUserFilter[]` | User-segment filters that narrow the retention cohort                             |
 
 Each `RetentionUserFilter`:
 
@@ -758,10 +779,10 @@ Each `RetentionUserFilter`:
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
   "title": "Weekly Retention - Desktop Users",
   "settings": {
+    "entryFilter": { "type": "event", "event": "transaction" },
     "retentionFilter": { "type": "event", "event": "transaction" },
     "retentionUserFilters": [
       { "field": "device", "op": "eq", "value": "desktop" },
@@ -771,14 +792,17 @@ Each `RetentionUserFilter`:
 }
 ```
 
-For all-user retention with no filters, omit `settings`:
+For all-user retention with no event filters, explicitly set both event filters to `null`:
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "",
   "chart_type": "retention",
-  "title": "Overall Retention"
+  "title": "Overall Retention",
+  "settings": {
+    "entryFilter": null,
+    "retentionFilter": null
+  }
 }
 ```
 
@@ -795,8 +819,8 @@ For all-user retention with no filters, omit `settings`:
 | `pie`        | `y_axis` requires exactly 1 element                                                                                                                    |
 | `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required                                                                            |
 | `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL                                                               |
-| `user_paths` | `settings.startStep` required; `query` must execute and return data in the expected user-path format (columns: user identifier, event name, timestamp) |
-| `retention`  | No query validation - `query` is ignored                                                                                                               |
+| `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors                                                   |
+| `retention`  | `settings.entryFilter` key is required; omit `query`                                                                                                                       |
 
 ---
 
