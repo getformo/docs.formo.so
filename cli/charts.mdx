@@ -96,8 +96,8 @@ Requires `boards:write` scope on your API key.
 | `--x-axis` | `string` | ❌ | Column used as the x-axis |
 | `--y-axis` | `string` | ❌ | Comma-separated or JSON array of y-axis columns |
 | `--group-by` | `string` | ❌ | Column used to group or stack series |
-| `--steps` | `string` | ❌ | JSON array of funnel/user-path step objects |
-| `--settings` | `string` | ❌ | JSON object of chart settings |
+| `--steps` | `string` | ❌ | JSON array of funnel step objects |
+| `--settings` | `string` | ❌ | JSON chart settings. User Paths require `anchors`; retention requires an `entryFilter` key. |
 
 Provide either `--body` or typed chart fields such as `--title`, `--chart-type`, and `--query`.
 
@@ -117,6 +117,13 @@ formo charts create \
 formo charts create \
   --board-id board_abc123 \
   --body '{"title":"Recent events","chart_type":"table","query":"SELECT * FROM events LIMIT 10"}'
+
+# Create an open-ended User Paths chart; omit --query
+formo charts create \
+  --board-id board_abc123 \
+  --title "Post-connect paths" \
+  --chart-type user_paths \
+  --settings '{"anchors":[{"type":"event","event":"connect"}],"maxSteps":5,"nodesPerStep":3}'
 ```
 
 ---
