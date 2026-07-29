@@ -287,6 +287,7 @@
               },
               {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "oneOf": [
                     {
@@ -303,7 +304,7 @@
                 "type": "null"
               }
             ],
-            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass a non-empty array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
           }
         },
         "required": [
@@ -406,6 +407,7 @@
               },
               {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "oneOf": [
                     {
@@ -422,7 +424,7 @@
                 "type": "null"
               }
             ],
-            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass a non-empty array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
           },
           "filters": {
             "type": "array",
@@ -477,6 +479,7 @@
               },
               {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "oneOf": [
                     {
@@ -493,7 +496,7 @@
                 "type": "null"
               }
             ],
-            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass a non-empty array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
           }
         },
         "required": [
@@ -541,6 +544,7 @@
               },
               {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "oneOf": [
                     {
@@ -557,7 +561,7 @@
                 "type": "null"
               }
             ],
-            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
+            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. Membership arrays must be non-empty. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
           }
         },
         "required": [
@@ -1963,7 +1967,33 @@
             "description": "Comparison operator. Only the canonical terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `startsWith`, `endsWith`, `notEmpty`, `isEmpty`) are accepted; the retired long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are rejected with a 400 naming the token. **Substring operators:** `contains`, `startsWith` and `endsWith` are supported on routable string user attributes (`users.device`, `users.os`, `users.referrer`, `users.utm_*`, `users.click_id`, and the `first_*`/`last_*` attribution variants), where they match **case-sensitively**. Social fields (e.g. `users.twitter`, `users.email`) additionally support `contains`, which matches **case-insensitively** there; `startsWith`/`endsWith` are rejected on social fields. All three are rejected on numeric, chain/app/token/label and lifecycle fields. `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/…) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
           },
           "value": {
-            "description": "Filter value (string, number, boolean, or array). Required for every operator except the existence checks `notEmpty` and `isEmpty`, which ignore it."
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[^|]*$"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              }
+            ],
+            "description": "Filter value (string, number, boolean, or non-empty array). Required for every operator except the existence checks `notEmpty` and `isEmpty`, which ignore it."
           },
           "scope": {
             "type": "string",
@@ -2093,10 +2123,12 @@
               },
               {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "oneOf": [
                     {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^[^|]*$"
                     },
                     {
                       "type": "number"
@@ -2108,7 +2140,7 @@
                 "type": "null"
               }
             ],
-            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string."
+            "description": "Value to compare against. For `in` / `nin`, pass a non-empty array or a pipe-delimited string."
           }
         },
         "required": [
@@ -2150,10 +2182,12 @@
               },
               {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "oneOf": [
                     {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^[^|]*$"
                     },
                     {
                       "type": "number"
@@ -2165,7 +2199,7 @@
                 "type": "null"
               }
             ],
-            "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass an array or a pipe-delimited string."
+            "description": "Value to compare against. For `in` / `nin`, pass a non-empty array or a pipe-delimited string."
           }
         },
         "required": [
@@ -2229,7 +2263,7 @@
       "AnalyticsFilters": {
         "name": "filters",
         "in": "query",
-        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. For `in` / `nin`, pass an array value such as `[\"chrome\",\"firefox\"]` or a pipe-delimited string such as `\"chrome|firefox\"`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator. Optional one-level nested `filters` use the same canonical envelope and membership rule.",
+        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. For `in` / `nin`, pass a non-empty array value such as `[\"chrome\",\"firefox\"]` or a pipe-delimited string such as `\"chrome|firefox\"`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator. Optional one-level nested `filters` use the same canonical envelope and membership rule.",
         "schema": {
           "type": "string"
         },
