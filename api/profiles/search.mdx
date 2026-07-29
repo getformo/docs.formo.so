@@ -99,13 +99,13 @@ Page size - number of profiles per page.
 
 ## Request Body (Filters)
 
-The search endpoint supports rich filtering capabilities through a JSON request body. The body contains a filter object with `conditions` and `logic`.
+The search endpoint supports rich filtering capabilities through a JSON request body. The body contains a filter object with `filters` and `logic`.
 
 ### Filter Schema
 
 ```json
 {
-  "conditions": [
+  "filters": [
     {
       "field": "users.net_worth_usd",
       "op": "gt",
@@ -118,12 +118,12 @@ The search endpoint supports rich filtering capabilities through a JSON request 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `conditions` | array | Array of filter conditions |
-| `logic` | string | How to combine conditions: `and` (all must match) or `or` (any must match). Default: `and` |
+| `filters` | array | Array of canonical filter objects |
+| `logic` | string | How to combine filters: `and` (all must match) or `or` (any must match). Default: `and` |
 
 ### Filter Condition
 
-Each condition in the `conditions` array has:
+Each filter in the `filters` array has:
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -146,11 +146,11 @@ Each condition in the `conditions` array has:
 | `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
 | `nin` | Not in array | `{"field": "users.location", "op": "nin", "value": ["US", "UK"]}` |
 | `contains` | Case-insensitive substring match for social fields only | `{"field": "users.twitter", "op": "contains", "value": "vitalik"}` |
-| `notEmpty` | Field is set (non-empty). String fields only — value is ignored | `{"field": "users.email", "op": "notEmpty"}` |
-| `isEmpty` | Field is not set (empty). String user attributes only — value is ignored | `{"field": "users.utm_source", "op": "isEmpty"}` |
+| `notEmpty` | Field is set (non-empty). String fields only : value is ignored | `{"field": "users.email", "op": "notEmpty"}` |
+| `isEmpty` | Field is not set (empty). String user attributes only : value is ignored | `{"field": "users.utm_source", "op": "isEmpty"}` |
 
 <Note>
-**Legacy spellings are retired.** The long-form spellings `equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, and `includes` (and symbol forms like `=` / `!=` / `like`) are no longer accepted on this endpoint — a request carrying one is rejected with a `400` whose message names the offending token. Send only the canonical operators above. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only — not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
+**Legacy spellings are retired.** The long-form spellings `equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, and `includes` (and symbol forms like `=` / `!=` / `like`) are no longer accepted on this endpoint : a request carrying one is rejected with a `400` whose message names the offending token. Send only the canonical operators above. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only : not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
 </Note>
 
 ---
@@ -174,7 +174,7 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.net_worth_usd", "op": "gt", "value": 10000 }
   ],
   "logic": "and"
@@ -185,7 +185,7 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.volume", "op": "gt", "value": 5000 }
   ],
   "logic": "and"
@@ -205,7 +205,7 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.device", "op": "eq", "value": "Mobile" },
     { "field": "users.location", "op": "eq", "value": "US" }
   ],
@@ -238,7 +238,7 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.first_utm_source", "op": "eq", "value": "google" },
     { "field": "users.first_utm_medium", "op": "eq", "value": "cpc" }
   ],
@@ -258,7 +258,7 @@ Filter by user lifecycle stage. Valid values: `At Risk`, `Churned`, `New`, `Powe
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.lifecycle", "op": "in", "value": ["New", "Power user"] }
   ],
   "logic": "and"
@@ -296,7 +296,7 @@ Social fields support two modes:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.email", "op": "notEmpty" }
   ],
   "logic": "and"
@@ -307,7 +307,7 @@ Social fields support two modes:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.ens", "op": "notEmpty" },
     { "field": "users.farcaster", "op": "notEmpty" }
   ],
@@ -319,7 +319,7 @@ Social fields support two modes:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.twitter", "op": "contains", "value": "bob" }
   ],
   "logic": "and"
@@ -330,7 +330,7 @@ Social fields support two modes:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "users.email", "op": "eq", "value": "alice@formo.so" }
   ],
   "logic": "and"
@@ -351,7 +351,7 @@ Use `chains.balance` to filter across all chains (returns profiles where **any**
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "chains.balance", "op": "gt", "value": 1000 }
   ],
   "logic": "and"
@@ -375,7 +375,7 @@ Common chain IDs:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "chains.1.balance", "op": "gt", "value": 5000 }
   ],
   "logic": "and"
@@ -386,7 +386,7 @@ Common chain IDs:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "chains.1.balance", "op": "gt", "value": 1000 },
     { "field": "chains.137.balance", "op": "gt", "value": 1000 }
   ],
@@ -408,7 +408,7 @@ Use `apps.{app_id}.balance` to filter by app balance across all chains.
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "apps.uniswap.balance", "op": "gt", "value": 1000 }
   ],
   "logic": "and"
@@ -423,7 +423,7 @@ Use `apps.{chain_id}.{app_id}.balance` to filter by app balance on a specific ch
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "apps.1.aave.balance", "op": "gt", "value": 500 }
   ],
   "logic": "and"
@@ -451,7 +451,7 @@ Use `tokens.{token_address}.balance` to filter by token balance across all chain
 
 ```json
 {
-  "conditions": [
+  "filters": [
     {
       "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
       "op": "gt",
@@ -470,7 +470,7 @@ Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a 
 
 ```json
 {
-  "conditions": [
+  "filters": [
     {
       "field": "tokens.1.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
       "op": "gt",
@@ -489,7 +489,7 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
 
 ```json
 {
-  "conditions": [
+  "filters": [
     {
       "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
       "op": "gt",
@@ -505,7 +505,7 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
 
 ```json
 {
-  "conditions": [
+  "filters": [
     {
       "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
       "op": "gt",
@@ -522,7 +522,7 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
 
 ```json
 {
-  "conditions": [
+  "filters": [
     {
       "field": "tokens.0x0000000000000000000000000000000000000000.balance",
       "op": "gt",
@@ -553,7 +553,7 @@ Common label IDs:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" }
   ],
   "logic": "and"
@@ -564,7 +564,7 @@ Common label IDs:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "labels.coinbase.verified_country", "op": "eq", "value": "US" }
   ],
   "logic": "and"
@@ -575,7 +575,7 @@ Common label IDs:
 
 ```json
 {
-  "conditions": [
+  "filters": [
     { "field": "labels.passport.models_aggregate_score", "op": "gte", "value": "50" }
   ],
   "logic": "and"
@@ -595,7 +595,7 @@ curl -sS -X GET \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
-    "conditions": [
+    "filters": [
       { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
       { "field": "users.ens", "op": "notEmpty" },
       { "field": "chains.1.balance", "op": "gt", "value": 0 }
@@ -614,7 +614,7 @@ curl -sS -X GET \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
-    "conditions": [
+    "filters": [
       { "field": "apps.uniswap.balance", "op": "gt", "value": 0 },
       { "field": "apps.aave.balance", "op": "gt", "value": 0 }
     ],
@@ -632,7 +632,7 @@ curl -sS -X GET \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
-    "conditions": [
+    "filters": [
       { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" },
       { "field": "labels.coinbase.verified_country", "op": "in", "value": ["US", "UK", "DE"] },
       { "field": "users.lifecycle", "op": "eq", "value": "Power user" }
@@ -651,7 +651,7 @@ curl -sS -X GET \
   -H "Authorization: Bearer <your_workspace_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
-    "conditions": [
+    "filters": [
       { "field": "chains.1.balance", "op": "gt", "value": 10000 },
       { "field": "chains.137.balance", "op": "gt", "value": 5000 },
       { "field": "chains.42161.balance", "op": "gt", "value": 5000 }

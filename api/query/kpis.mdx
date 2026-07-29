@@ -7,3 +7,37 @@ openapi: "GET /v0/kpis"
 Returns the same KPI series that powers the Formo dashboard's overview chart. Here `sessions` is the per-day session count (the overview's **Sessions** card), while `visitors` (and `visitors_current` / `visitors_previous`) are unique anonymous visitors (the overview's **Visitors** card), returned only when `include_previous_period=true` and no `group_by` is set.
 
 Use `group_by` to break results down by `referrer`, `location`, `device`, `browser`, `os`, or any UTM dimension. Set `include_previous_period=true` to also receive the equivalent prior window for week-over-week comparisons.
+
+## Filtering
+
+Pass `filters` as a JSON-encoded array of `{ field, op, value }` objects. Multiple filters are combined with implicit AND.
+
+For example, return KPIs only for traffic whose referrer contains `google`:
+
+```bash
+curl -G "https://api.formo.so/v0/kpis" \
+  -H "Authorization: Bearer $FORMO_API_KEY" \
+  --data-urlencode "date_from=2026-07-01" \
+  --data-urlencode "date_to=2026-07-28" \
+  --data-urlencode 'filters=[{"field":"referrer","op":"contains","value":"google"}]'
+```
+
+To filter by page path, use the `page` field:
+
+```bash
+curl -G "https://api.formo.so/v0/kpis" \
+  -H "Authorization: Bearer $FORMO_API_KEY" \
+  --data-urlencode "date_from=2026-07-01" \
+  --data-urlencode "date_to=2026-07-28" \
+  --data-urlencode 'filters=[{"field":"page","op":"eq","value":"/pricing"}]' \
+  --data-urlencode "page_scope=page"
+```
+
+`page_scope=page` is the default. It counts `pageviews` only on the filtered page and calculates `bounce_rate` and `avg_session_sec` for sessions that landed there. Use `page_scope=session` for the legacy behavior, which includes all activity in any session that viewed the page. The scope only changes requests that include a `page` filter.
+
+<Note>
+  Every public filter leaf uses `{"field", "op", "value"}`, and every
+  collection is named `filters`. Query endpoints and saved segments combine
+  their arrays with implicit AND. Profile search adds a sibling `logic` field,
+  so its body is `{"filters": [...], "logic": "and" | "or"}`.
+</Note>
