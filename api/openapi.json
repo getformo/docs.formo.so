@@ -48,12 +48,7 @@
       "PaginatedListMeta": {
         "type": "object",
         "description": "Pagination cursor returned alongside `data` on every paginated list endpoint. Use these to walk pages: `has_more` is true while `page * size < total`. Combine with the matching `Page` and `Size` query parameters to request the next page.",
-        "required": [
-          "page",
-          "size",
-          "total",
-          "has_more"
-        ],
+        "required": ["page", "size", "total", "has_more"],
         "properties": {
           "page": {
             "type": "integer",
@@ -79,11 +74,7 @@
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "message",
-              "doc_url"
-            ],
+            "required": ["code", "message", "doc_url"],
             "properties": {
               "code": {
                 "$ref": "#/components/schemas/ErrorCode"
@@ -109,9 +100,7 @@
             }
           }
         },
-        "required": [
-          "error"
-        ]
+        "required": ["error"]
       },
       "ErrorCode": {
         "type": "string",
@@ -152,17 +141,11 @@
           },
           "trigger_type": {
             "type": "string",
-            "enum": [
-              "event",
-              "user"
-            ]
+            "enum": ["event", "user"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "inactive"
-            ]
+            "enum": ["active", "inactive"]
           },
           "trigger_filters": {
             "type": "array",
@@ -177,11 +160,7 @@
               "properties": {
                 "type": {
                   "type": "string",
-                  "enum": [
-                    "email",
-                    "slack",
-                    "webhook"
-                  ]
+                  "enum": ["email", "slack", "webhook"]
                 },
                 "value": {
                   "type": "array",
@@ -190,10 +169,7 @@
                   }
                 }
               },
-              "required": [
-                "type",
-                "value"
-              ]
+              "required": ["type", "value"]
             }
           },
           "project_id": {
@@ -203,13 +179,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "id",
-          "name",
-          "trigger_type",
-          "status",
-          "project_id"
-        ]
+        "required": ["id", "name", "trigger_type", "status", "project_id"]
       },
       "Board": {
         "type": "object",
@@ -241,11 +211,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "id",
-          "project_id",
-          "enabled"
-        ]
+        "required": ["id", "project_id", "enabled"]
       },
       "StepFilterCondition": {
         "type": "object",
@@ -307,10 +273,7 @@
             "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass a non-empty array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
           }
         },
-        "required": [
-          "field",
-          "op"
-        ]
+        "required": ["field", "op"]
       },
       "FunnelStep": {
         "type": "object",
@@ -318,11 +281,7 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": [
-              "event",
-              "track",
-              "decoded_log"
-            ],
+            "enum": ["event", "track", "decoded_log"],
             "description": "`event`: built-in page/connect/transaction events; `track`: custom tracked events; `decoded_log`: decoded smart-contract events."
           },
           "event": {
@@ -337,10 +296,7 @@
             }
           }
         },
-        "required": [
-          "type",
-          "event"
-        ],
+        "required": ["type", "event"],
         "additionalProperties": true
       },
       "ConversionWindow": {
@@ -354,18 +310,11 @@
           },
           "unit": {
             "type": "string",
-            "enum": [
-              "hour",
-              "day",
-              "week"
-            ],
+            "enum": ["hour", "day", "week"],
             "description": "Time unit. `week` = 7 days."
           }
         },
-        "required": [
-          "value",
-          "unit"
-        ]
+        "required": ["value", "unit"]
       },
       "AnalyticsFilterCondition": {
         "type": "object",
@@ -434,10 +383,7 @@
             }
           }
         },
-        "required": [
-          "field",
-          "op"
-        ]
+        "required": ["field", "op"]
       },
       "AnalyticsNestedFilterCondition": {
         "type": "object",
@@ -499,10 +445,7 @@
             "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. For `in` / `nin`, pass a non-empty array or a pipe-delimited string. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
           }
         },
-        "required": [
-          "field",
-          "op"
-        ]
+        "required": ["field", "op"]
       },
       "SegmentFilterCondition": {
         "type": "object",
@@ -564,10 +507,7 @@
             "description": "Value to compare against. Omit for `notEmpty` and `isEmpty`. Membership arrays must be non-empty. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator."
           }
         },
-        "required": [
-          "field",
-          "op"
-        ]
+        "required": ["field", "op"]
       },
       "RetentionUserFilter": {
         "type": "object",
@@ -605,10 +545,7 @@
             "description": "Comparison operator. Only the canonical terse tokens are accepted (the retired long forms `greater`/`greaterOrEqual`/`less`/`lessOrEqual` are rejected). `notEmpty` (\"is not empty\") and `isEmpty` (\"is empty\") are value-less existence checks on a string user property; the `value` is ignored. Substring operators (`startsWith` / `endsWith` / `contains`) are not supported on retention user filters."
           }
         },
-        "required": [
-          "field",
-          "op"
-        ]
+        "required": ["field", "op"]
       },
       "RetentionLabelSignal": {
         "type": "object",
@@ -620,13 +557,7 @@
           },
           "op": {
             "type": "string",
-            "enum": [
-              "gt",
-              "gte",
-              "lt",
-              "lte",
-              "eq"
-            ],
+            "enum": ["gt", "gte", "lt", "lte", "eq"],
             "default": "gt",
             "description": "Comparison operator. Numeric operators coerce both sides via toFloat64OrZero, so a numeric op on a non-numeric value yields no match (not an error)."
           },
@@ -640,11 +571,7 @@
             "description": "Optional chain scope. Empty string matches across all chains."
           }
         },
-        "required": [
-          "field",
-          "op",
-          "value"
-        ]
+        "required": ["field", "op", "value"]
       },
       "RetentionCohortLabelFilter": {
         "type": "object",
@@ -656,15 +583,7 @@
           },
           "op": {
             "type": "string",
-            "enum": [
-              "eq",
-              "neq",
-              "contains",
-              "gt",
-              "gte",
-              "lt",
-              "lte"
-            ],
+            "enum": ["eq", "neq", "contains", "gt", "gte", "lt", "lte"],
             "default": "eq"
           },
           "value": {
@@ -676,11 +595,7 @@
             "description": "Optional chain scope. Empty string matches across all chains."
           }
         },
-        "required": [
-          "field",
-          "op",
-          "value"
-        ]
+        "required": ["field", "op", "value"]
       },
       "ChartSettings": {
         "type": "object",
@@ -688,10 +603,7 @@
         "properties": {
           "funnelType": {
             "type": "string",
-            "enum": [
-              "closed",
-              "open"
-            ],
+            "enum": ["closed", "open"],
             "default": "closed",
             "description": "**Funnel only.** `closed`: users must complete steps in strict order with no intervening events. `open`: users may complete steps in order but other events may occur between steps."
           },
@@ -774,10 +686,7 @@
           },
           "retentionSignalType": {
             "type": "string",
-            "enum": [
-              "event",
-              "label"
-            ],
+            "enum": ["event", "label"],
             "default": "event",
             "description": "**retention.** `event` (default): cohort and retention are driven by events. `label`: driven by a label value over time (see `retentionLabelSignal`); when `label`, the event fields are ignored."
           },
@@ -821,7 +730,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `area` | `query`, `x_axis`, `y_axis` (\u2265 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (\u2265 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -859,11 +768,7 @@
             "$ref": "#/components/schemas/ChartSettings"
           }
         },
-        "required": [
-          "projectId",
-          "chart_type",
-          "title"
-        ]
+        "required": ["projectId", "chart_type", "title"]
       },
       "UpdateChartRequest": {
         "type": "object",
@@ -896,7 +801,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `area` | `query`, `x_axis`, `y_axis` (\u2265 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (\u2265 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -934,12 +839,7 @@
             "$ref": "#/components/schemas/ChartSettings"
           }
         },
-        "required": [
-          "chartId",
-          "projectId",
-          "chart_type",
-          "title"
-        ]
+        "required": ["chartId", "projectId", "chart_type", "title"]
       },
       "Chart": {
         "type": "object",
@@ -1067,22 +967,11 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "anonymous",
-                "inputs",
-                "name",
-                "type"
-              ]
+              "required": ["anonymous", "inputs", "name", "type"]
             }
           }
         },
-        "required": [
-          "name",
-          "chain",
-          "address",
-          "abi",
-          "events"
-        ]
+        "required": ["name", "chain", "address", "abi", "events"]
       },
       "Segment": {
         "type": "object",
@@ -1104,11 +993,7 @@
             }
           }
         },
-        "required": [
-          "id",
-          "title",
-          "filters"
-        ]
+        "required": ["id", "title", "filters"]
       },
       "Profile": {
         "type": "object",
@@ -1474,11 +1359,7 @@
           },
           "device": {
             "type": "string",
-            "enum": [
-              "desktop",
-              "mobile",
-              "tablet"
-            ]
+            "enum": ["desktop", "mobile", "tablet"]
           },
           "os": {
             "type": "string"
@@ -1521,12 +1402,7 @@
       "Event": {
         "type": "object",
         "description": "A single analytics event",
-        "required": [
-          "type",
-          "anonymous_id",
-          "version",
-          "channel"
-        ],
+        "required": ["type", "anonymous_id", "version", "channel"],
         "properties": {
           "type": {
             "type": "string",
@@ -1545,13 +1421,7 @@
           },
           "channel": {
             "type": "string",
-            "enum": [
-              "web",
-              "mobile",
-              "server",
-              "api",
-              "import"
-            ],
+            "enum": ["web", "mobile", "server", "api", "import"],
             "description": "Source of the event. The Formo Web SDK uses `web`; mobile SDK uses `mobile`; server SDK uses `server`. Use `api` for direct HTTP submissions and `import` for backfills."
           },
           "version": {
@@ -1699,9 +1569,7 @@
       },
       "UserLabelInput": {
         "type": "object",
-        "required": [
-          "tag_id"
-        ],
+        "required": ["tag_id"],
         "properties": {
           "tag_id": {
             "type": "string",
@@ -1722,10 +1590,7 @@
           },
           "_is_deleted": {
             "type": "integer",
-            "enum": [
-              0,
-              1
-            ],
+            "enum": [0, 1],
             "description": "Optional tombstone flag for backfilled removals. `1` records the row as a soft-delete (label removed) instead of a live value; pair it with a past `timestamp` to express \"label removed at past time T\" so point-in-time retention drops the wallet from that week. The future-timestamp guard still applies. Defaults to `0` (a live label) when omitted."
           }
         }
@@ -1772,10 +1637,7 @@
       "UpdateUserPropertiesResponse": {
         "type": "object",
         "description": "Echo of the wallet identity after the merge-update applied. Synthesised from the request payload; analytics ingestion is eventually consistent, so the response reflects the applied write rather than a follow-up read.",
-        "required": [
-          "address",
-          "updated_at"
-        ],
+        "required": ["address", "updated_at"],
         "properties": {
           "address": {
             "type": "string"
@@ -1877,10 +1739,7 @@
       "BatchWriteResponse": {
         "type": "object",
         "description": "Acknowledgement for a batch write. `successful_rows` counts rows accepted and forwarded to ingest after a 2xx (ingestion is async/eventually-consistent; there is no follow-up read). `quarantined_rows` counts rows skipped for an invalid address or no valid keys; `errors` (omitted when nothing was quarantined) maps each skipped row back to its request index.",
-        "required": [
-          "successful_rows",
-          "quarantined_rows"
-        ],
+        "required": ["successful_rows", "quarantined_rows"],
         "properties": {
           "successful_rows": {
             "type": "integer",
@@ -1895,10 +1754,7 @@
             "description": "One entry per quarantined row. Omitted when quarantined_rows is 0.",
             "items": {
               "type": "object",
-              "required": [
-                "index",
-                "reason"
-              ],
+              "required": ["index", "reason"],
               "properties": {
                 "index": {
                   "type": "integer",
@@ -1923,10 +1779,7 @@
         "properties": {
           "logic": {
             "type": "string",
-            "enum": [
-              "and",
-              "or"
-            ],
+            "enum": ["and", "or"],
             "default": "and"
           },
           "filters": {
@@ -1936,16 +1789,11 @@
             }
           }
         },
-        "required": [
-          "filters"
-        ]
+        "required": ["filters"]
       },
       "FilterCondition": {
         "type": "object",
-        "required": [
-          "field",
-          "op"
-        ],
+        "required": ["field", "op"],
         "properties": {
           "field": {
             "type": "string",
@@ -1968,7 +1816,7 @@
               "notEmpty",
               "isEmpty"
             ],
-            "description": "Comparison operator. Only the canonical terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `startsWith`, `endsWith`, `notEmpty`, `isEmpty`) are accepted; the retired long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are rejected with a 400 naming the token. **Substring operators:** `contains`, `startsWith` and `endsWith` are supported on routable string user attributes (`users.device`, `users.os`, `users.referrer`, `users.utm_*`, `users.click_id`, and the `first_*`/`last_*` attribution variants), where they match **case-sensitively**. Social fields (e.g. `users.twitter`, `users.email`) additionally support `contains`, which matches **case-insensitively** there; `startsWith`/`endsWith` are rejected on social fields. `contains` is also supported on `labels.value` and matches case-insensitively; `startsWith` and `endsWith` remain unsupported on labels. All three substring operators are rejected on numeric, chain/app/token, and lifecycle fields. `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/\u2026) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
+            "description": "Comparison operator. Only the canonical terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `startsWith`, `endsWith`, `notEmpty`, `isEmpty`) are accepted; the retired long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are rejected with a 400 naming the token. **Substring operators:** `contains`, `startsWith` and `endsWith` are supported on routable string user attributes (`users.device`, `users.os`, `users.referrer`, `users.utm_*`, `users.click_id`, and the `first_*`/`last_*` attribution variants), where they match **case-sensitively**. Social fields (e.g. `users.twitter`, `users.email`) additionally support `contains`, which matches **case-insensitively** there; `startsWith`/`endsWith` are rejected on social fields. `contains` is also supported on `labels.value` and matches case-insensitively; `startsWith` and `endsWith` remain unsupported on labels. All three substring operators are rejected on numeric, chain/app/token, and lifecycle fields. `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/…) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
           },
           "value": {
             "oneOf": [
@@ -2001,10 +1849,7 @@
           },
           "scope": {
             "type": "string",
-            "enum": [
-              "any",
-              "protocol"
-            ],
+            "enum": ["any", "protocol"],
             "description": "Required for tokens.balance: any includes wallet and protocol balances; protocol requires app_id."
           },
           "chain_id": {
@@ -2104,10 +1949,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "field",
-          "value"
-        ]
+        "required": ["field", "value"]
       },
       "SourceFilterCondition": {
         "type": "object",
@@ -2116,18 +1958,11 @@
           "field": {
             "type": "string",
             "description": "Column or property targeted by this filter.",
-            "enum": [
-              "source"
-            ]
+            "enum": ["source"]
           },
           "op": {
             "type": "string",
-            "enum": [
-              "eq",
-              "neq",
-              "in",
-              "nin"
-            ],
+            "enum": ["eq", "neq", "in", "nin"],
             "description": "Canonical comparison operator token."
           },
           "value": {
@@ -2163,10 +1998,7 @@
             "description": "Value to compare against. For `in` / `nin`, pass a non-empty array or a pipe-delimited string."
           }
         },
-        "required": [
-          "field",
-          "op"
-        ]
+        "required": ["field", "op"]
       },
       "ChannelFilterCondition": {
         "type": "object",
@@ -2175,18 +2007,11 @@
           "field": {
             "type": "string",
             "description": "Column or property targeted by this filter.",
-            "enum": [
-              "channel_type"
-            ]
+            "enum": ["channel_type"]
           },
           "op": {
             "type": "string",
-            "enum": [
-              "eq",
-              "neq",
-              "in",
-              "nin"
-            ],
+            "enum": ["eq", "neq", "in", "nin"],
             "description": "Canonical comparison operator token."
           },
           "value": {
@@ -2222,10 +2047,7 @@
             "description": "Value to compare against. For `in` / `nin`, pass a non-empty array or a pipe-delimited string."
           }
         },
-        "required": [
-          "field",
-          "op"
-        ]
+        "required": ["field", "op"]
       }
     },
     "parameters": {
@@ -2283,7 +2105,7 @@
       "AnalyticsFilters": {
         "name": "filters",
         "in": "query",
-        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. For `in` / `nin`, pass a non-empty array value such as `[\"chrome\",\"firefox\"]` or a pipe-delimited string such as `\"chrome|firefox\"`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator. Optional one-level nested `filters` use the same canonical envelope and membership rule.",
+        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. For `in` / `nin`, pass a non-empty array value such as `[\"chrome\",\"firefox\"]` or a pipe-delimited string such as `\"chrome|firefox\"`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator. Optional one-level nested `filters` use the same canonical envelope and membership rule. On the user-aggregate endpoints (lifecycle, frequency) the same array also carries profile-family entries: profile metrics (net_worth_usd, volume, revenue, points), social identity fields, a lifecycle entry ({\"field\":\"lifecycle\",\"op\":\"in\",\"value\":\"New|Power user\"}), and resource entries using the stable fields chains.balance, apps.balance, tokens.balance, and labels.value with named qualifier properties (chain_id, app_id, token_address, scope, tag_id). The retired per-family parameters (socials, chain_filters, app_filters, token_filters, label_filters, profile_filters, lifecycle_filter) are rejected.",
         "schema": {
           "type": "string"
         },
@@ -2294,10 +2116,7 @@
         "in": "query",
         "schema": {
           "type": "string",
-          "enum": [
-            "page",
-            "session"
-          ],
+          "enum": ["page", "session"],
           "default": "page"
         },
         "description": "Controls how a `page` filter is interpreted. `page` (default) scopes metrics to activity on the filtered page. On `/v0/kpis`, `pageviews` counts only views of the filtered page, while `bounce_rate` and `avg_session_sec` are entry-page metrics for sessions that landed there. `session` preserves the legacy session scope: metrics include all relevant activity in any session that viewed the page. `sessions` and `visitors` are unchanged between scopes. This parameter only affects requests that include a `page` filter. It is distinct from `/v0/top_pages` `mode`, which selects the all, entry, or exit page-flow view.",
@@ -2332,22 +2151,6 @@
           "type": "boolean"
         },
         "description": "When `true`, returns both current and previous period metrics for week-over-week comparison. The previous period is non-overlapping and equal in length to the current range."
-      },
-      "AnalyticsLifecycleFilter": {
-        "name": "lifecycle_filter",
-        "in": "query",
-        "schema": {
-          "type": "string",
-          "enum": [
-            "New",
-            "Returning",
-            "Power user",
-            "Resurrected",
-            "At Risk",
-            "Churned"
-          ]
-        },
-        "description": "Restrict results to a single lifecycle stage."
       },
       "LifecycleNewWindowDays": {
         "name": "new_window_days",
@@ -2419,51 +2222,6 @@
         },
         "description": "Override: minimum active days a wallet had in the window before the recent quiet stretch to qualify as At Risk (default 1)."
       },
-      "AnalyticsProfileFilters": {
-        "name": "profile_filters",
-        "in": "query",
-        "description": "JSON array filtering by wallet profile attributes (e.g. net worth, total tx count). Each entry is `{ field, op, value }`.",
-        "schema": {
-          "type": "string"
-        },
-        "example": "[{\"field\":\"net_worth_usd\",\"op\":\"gt\",\"value\":\"1000\"}]"
-      },
-      "AnalyticsSocials": {
-        "name": "socials",
-        "in": "query",
-        "description": "JSON array of social platforms to filter users by. Users must have at least one of the listed identities (e.g. `ens`, `farcaster`, `lens`, `twitter`).",
-        "schema": {
-          "type": "string"
-        },
-        "example": "[\"ens\",\"farcaster\"]"
-      },
-      "AnalyticsAppFilters": {
-        "name": "app_filters",
-        "in": "query",
-        "description": "JSON array of arrays describing DeFi app usage filters. Each entry is `[scope, chain_id, app_id, op, value]` where `scope` is `protocol` or `any`.",
-        "schema": {
-          "type": "string"
-        },
-        "example": "[[\"protocol\",1,\"uniswap-v3\",\"gt\",\"0\"]]"
-      },
-      "AnalyticsTokenFilters": {
-        "name": "token_filters",
-        "in": "query",
-        "description": "JSON array of arrays describing token-holding filters. Each entry is `[scope, chain_id, app_id, token_address, op, value]` where `scope` is `protocol` or `any`.",
-        "schema": {
-          "type": "string"
-        },
-        "example": "[[\"any\",1,\"\",\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\",\"gt\",\"100\"]]"
-      },
-      "AnalyticsChainFilters": {
-        "name": "chain_filters",
-        "in": "query",
-        "description": "JSON array of arrays describing chain-activity filters. Each entry is `[chain_id, op, value]`.",
-        "schema": {
-          "type": "string"
-        },
-        "example": "[[1,\"gt\",\"0\"]]"
-      },
       "AnalyticsBehaviorFilters": {
         "name": "behavior_filters",
         "in": "query",
@@ -2490,15 +2248,6 @@
           "type": "string"
         },
         "example": "[{\"field\":\"channel_type\",\"op\":\"in\",\"value\":\"Organic Search|Paid Social\"}]"
-      },
-      "AnalyticsLabelFilters": {
-        "name": "label_filters",
-        "in": "query",
-        "description": "JSON array of arrays for filtering users by wallet labels. Each entry is `[tag_id, chain_id, op, value]`.",
-        "schema": {
-          "type": "string"
-        },
-        "example": "[[\"whale\",1,\"eq\",\"true\"]]"
       },
       "AnalyticsExclude": {
         "name": "exclude",
@@ -2672,9 +2421,7 @@
         "operationId": "listAlerts",
         "summary": "List alerts",
         "description": "List alerts for the project scoped to the API key. Paginated: see `page` and `size` query params; the response carries `total` and `has_more` so callers can walk pages.",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "x-required-scope": "alerts:read",
         "parameters": [
           {
@@ -2696,9 +2443,7 @@
                     },
                     {
                       "type": "object",
-                      "required": [
-                        "data"
-                      ],
+                      "required": ["data"],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -2734,15 +2479,11 @@
                       "recipient": [
                         {
                           "type": "email",
-                          "value": [
-                            "alerts@myapp.com"
-                          ]
+                          "value": ["alerts@myapp.com"]
                         },
                         {
                           "type": "slack",
-                          "value": [
-                            "C0123456789"
-                          ]
+                          "value": ["C0123456789"]
                         }
                       ],
                       "has_secret": false,
@@ -2764,9 +2505,7 @@
         "operationId": "createAlert",
         "summary": "Create alert",
         "description": "Create a new alert for the project.",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "x-required-scope": "alerts:write",
         "requestBody": {
           "required": true,
@@ -2781,10 +2520,7 @@
                   },
                   "trigger_type": {
                     "type": "string",
-                    "enum": [
-                      "event",
-                      "user"
-                    ]
+                    "enum": ["event", "user"]
                   },
                   "trigger_filters": {
                     "type": "array",
@@ -2799,11 +2535,7 @@
                       "properties": {
                         "type": {
                           "type": "string",
-                          "enum": [
-                            "email",
-                            "slack",
-                            "webhook"
-                          ]
+                          "enum": ["email", "slack", "webhook"]
                         },
                         "value": {
                           "type": "array",
@@ -2819,11 +2551,7 @@
                     "description": "Webhook signing secret"
                   }
                 },
-                "required": [
-                  "name",
-                  "trigger_type",
-                  "trigger_filters"
-                ]
+                "required": ["name", "trigger_type", "trigger_filters"]
               },
               "examples": {
                 "eventAlertWithWebhook": {
@@ -2852,15 +2580,11 @@
                     "recipient": [
                       {
                         "type": "webhook",
-                        "value": [
-                          "https://hooks.myapp.com/formo-alerts"
-                        ]
+                        "value": ["https://hooks.myapp.com/formo-alerts"]
                       },
                       {
                         "type": "email",
-                        "value": [
-                          "alerts@myapp.com"
-                        ]
+                        "value": ["alerts@myapp.com"]
                       }
                     ],
                     "secret": "whsec_mysigningsecret123"
@@ -2918,9 +2642,7 @@
                     "recipient": [
                       {
                         "type": "email",
-                        "value": [
-                          "team@myapp.com"
-                        ]
+                        "value": ["team@myapp.com"]
                       }
                     ]
                   }
@@ -2947,9 +2669,7 @@
                     "recipient": [
                       {
                         "type": "webhook",
-                        "value": [
-                          "https://hooks.myapp.com/token-alerts"
-                        ]
+                        "value": ["https://hooks.myapp.com/token-alerts"]
                       }
                     ]
                   }
@@ -2976,9 +2696,7 @@
       "get": {
         "operationId": "getAlert",
         "summary": "Get alert",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "alertId",
@@ -3019,15 +2737,11 @@
                   "recipient": [
                     {
                       "type": "email",
-                      "value": [
-                        "alerts@myapp.com"
-                      ]
+                      "value": ["alerts@myapp.com"]
                     },
                     {
                       "type": "slack",
-                      "value": [
-                        "C0123456789"
-                      ]
+                      "value": ["C0123456789"]
                     }
                   ],
                   "has_secret": false,
@@ -3043,9 +2757,7 @@
       "put": {
         "operationId": "updateAlert",
         "summary": "Update alert",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "alertId",
@@ -3069,10 +2781,7 @@
                   },
                   "trigger_type": {
                     "type": "string",
-                    "enum": [
-                      "event",
-                      "user"
-                    ]
+                    "enum": ["event", "user"]
                   },
                   "trigger_filters": {
                     "type": "array",
@@ -3090,11 +2799,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "trigger_type",
-                  "trigger_filters"
-                ]
+                "required": ["name", "trigger_type", "trigger_filters"]
               },
               "examples": {
                 "updateRecipients": {
@@ -3115,9 +2820,7 @@
                     "recipient": [
                       {
                         "type": "webhook",
-                        "value": [
-                          "https://hooks.myapp.com/v2/alerts"
-                        ]
+                        "value": ["https://hooks.myapp.com/v2/alerts"]
                       },
                       {
                         "type": "slack",
@@ -3149,9 +2852,7 @@
       "delete": {
         "operationId": "deleteAlert",
         "summary": "Delete alert",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "alertId",
@@ -3179,9 +2880,7 @@
       "patch": {
         "operationId": "toggleAlertStatus",
         "summary": "Toggle alert status",
-        "tags": [
-          "Alerts"
-        ],
+        "tags": ["Alerts"],
         "parameters": [
           {
             "name": "alertId",
@@ -3201,15 +2900,10 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": [
-                      "active",
-                      "inactive"
-                    ]
+                    "enum": ["active", "inactive"]
                   }
                 },
-                "required": [
-                  "status"
-                ]
+                "required": ["status"]
               },
               "examples": {
                 "activate": {
@@ -3248,9 +2942,7 @@
         "operationId": "listBoards",
         "summary": "List boards",
         "description": "List boards for the project scoped to the API key. Paginated.",
-        "tags": [
-          "Boards"
-        ],
+        "tags": ["Boards"],
         "parameters": [
           {
             "$ref": "#/components/parameters/Page"
@@ -3271,9 +2963,7 @@
                     },
                     {
                       "type": "object",
-                      "required": [
-                        "data"
-                      ],
+                      "required": ["data"],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -3321,18 +3011,14 @@
         "operationId": "createBoard",
         "summary": "Create board",
         "description": "Create a new board with the given title.",
-        "tags": [
-          "Boards"
-        ],
+        "tags": ["Boards"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "title"
-                ],
+                "required": ["title"],
                 "properties": {
                   "title": {
                     "type": "string",
@@ -3377,9 +3063,7 @@
       "get": {
         "operationId": "getBoard",
         "summary": "Get board",
-        "tags": [
-          "Boards"
-        ],
+        "tags": ["Boards"],
         "parameters": [
           {
             "name": "boardId",
@@ -3416,9 +3100,7 @@
       "patch": {
         "operationId": "updateBoard",
         "summary": "Update board",
-        "tags": [
-          "Boards"
-        ],
+        "tags": ["Boards"],
         "parameters": [
           {
             "name": "boardId",
@@ -3492,9 +3174,7 @@
         "operationId": "deleteBoard",
         "summary": "Delete board",
         "description": "Delete a board and all its charts.",
-        "tags": [
-          "Boards"
-        ],
+        "tags": ["Boards"],
         "parameters": [
           {
             "name": "boardId",
@@ -3525,9 +3205,7 @@
         "operationId": "listCharts",
         "summary": "List charts for a board",
         "description": "List charts in a board with their executed query results. Paginated. Includes the parent `board` for caller convenience and an optional `warnings` sidecar carrying per-chart query failures (the failing charts are excluded from `data` so the page renders cleanly).",
-        "tags": [
-          "Charts"
-        ],
+        "tags": ["Charts"],
         "parameters": [
           {
             "name": "boardId",
@@ -3556,10 +3234,7 @@
                     },
                     {
                       "type": "object",
-                      "required": [
-                        "data",
-                        "board"
-                      ],
+                      "required": ["data", "board"],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -3608,9 +3283,7 @@
                       "description": null,
                       "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
                       "x_axis": "day",
-                      "y_axis": [
-                        "revenue"
-                      ],
+                      "y_axis": ["revenue"],
                       "group_by": null,
                       "steps": null,
                       "settings": null
@@ -3637,9 +3310,7 @@
       "post": {
         "operationId": "createChart",
         "summary": "Create chart",
-        "tags": [
-          "Charts"
-        ],
+        "tags": ["Charts"],
         "parameters": [
           {
             "name": "boardId",
@@ -3787,11 +3458,7 @@
                           {
                             "field": "provider_name",
                             "op": "in",
-                            "value": [
-                              "metamask",
-                              "rainbow",
-                              "coinbase"
-                            ]
+                            "value": ["metamask", "rainbow", "coinbase"]
                           }
                         ]
                       },
@@ -3818,9 +3485,7 @@
                     "chart_type": "bar",
                     "title": "Daily Active Users",
                     "x_axis": "date",
-                    "y_axis": [
-                      "users"
-                    ]
+                    "y_axis": ["users"]
                   }
                 },
                 "lineChart": {
@@ -3831,9 +3496,7 @@
                     "chart_type": "line",
                     "title": "Daily Active Users",
                     "x_axis": "date",
-                    "y_axis": [
-                      "daily_active_users"
-                    ]
+                    "y_axis": ["daily_active_users"]
                   }
                 },
                 "pieChart": {
@@ -3844,9 +3507,7 @@
                     "chart_type": "pie",
                     "title": "Sessions by Device",
                     "x_axis": "device",
-                    "y_axis": [
-                      "session_count"
-                    ]
+                    "y_axis": ["session_count"]
                   }
                 },
                 "stackedChart": {
@@ -3857,9 +3518,7 @@
                     "chart_type": "stacked",
                     "title": "Sessions by Device and Browser",
                     "x_axis": "device",
-                    "y_axis": [
-                      "session_count"
-                    ],
+                    "y_axis": ["session_count"],
                     "group_by": "browser"
                   }
                 },
@@ -3984,9 +3643,7 @@
       "get": {
         "operationId": "getChart",
         "summary": "Get chart",
-        "tags": [
-          "Charts"
-        ],
+        "tags": ["Charts"],
         "parameters": [
           {
             "name": "boardId",
@@ -4022,9 +3679,7 @@
                   "description": null,
                   "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
                   "x_axis": "day",
-                  "y_axis": [
-                    "revenue"
-                  ],
+                  "y_axis": ["revenue"],
                   "group_by": null,
                   "steps": null,
                   "settings": null
@@ -4038,9 +3693,7 @@
       "put": {
         "operationId": "editChart",
         "summary": "Edit chart",
-        "tags": [
-          "Charts"
-        ],
+        "tags": ["Charts"],
         "parameters": [
           {
             "name": "boardId",
@@ -4087,9 +3740,7 @@
       "delete": {
         "operationId": "deleteChart",
         "summary": "Delete chart",
-        "tags": [
-          "Charts"
-        ],
+        "tags": ["Charts"],
         "parameters": [
           {
             "name": "boardId",
@@ -4121,9 +3772,7 @@
         "operationId": "listContracts",
         "summary": "List contracts",
         "description": "List monitored contracts. Paginated; the canonical `data` array carries the contracts for the current page. The `deploy` sidecar reports the project-wide deploy state (always reflects ALL contracts, not just this page) so callers can render \"X contracts pending deploy\" without a second request.",
-        "tags": [
-          "Contracts"
-        ],
+        "tags": ["Contracts"],
         "parameters": [
           {
             "$ref": "#/components/parameters/Page"
@@ -4144,10 +3793,7 @@
                     },
                     {
                       "type": "object",
-                      "required": [
-                        "data",
-                        "deploy"
-                      ],
+                      "required": ["data", "deploy"],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -4157,10 +3803,7 @@
                         },
                         "deploy": {
                           "type": "object",
-                          "required": [
-                            "last_deployed_at",
-                            "diff"
-                          ],
+                          "required": ["last_deployed_at", "diff"],
                           "properties": {
                             "last_deployed_at": {
                               "type": "string",
@@ -4265,9 +3908,7 @@
         "operationId": "createContract",
         "summary": "Create contract",
         "description": "Add a blockchain contract to monitor.",
-        "tags": [
-          "Contracts"
-        ],
+        "tags": ["Contracts"],
         "requestBody": {
           "required": true,
           "content": {
@@ -4312,25 +3953,14 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "anonymous",
-                        "inputs",
-                        "name",
-                        "type"
-                      ]
+                      "required": ["anonymous", "inputs", "name", "type"]
                     }
                   },
                   "start_block": {
                     "type": "integer"
                   }
                 },
-                "required": [
-                  "address",
-                  "chain",
-                  "name",
-                  "abi",
-                  "events"
-                ]
+                "required": ["address", "chain", "name", "abi", "events"]
               },
               "examples": {
                 "erc20Token": {
@@ -4394,9 +4024,7 @@
         "operationId": "getContract",
         "summary": "Get contract",
         "description": "Fetch a single monitored contract by chain ID and address. Returns the bare `Contract` resource (no envelope).",
-        "tags": [
-          "Contracts"
-        ],
+        "tags": ["Contracts"],
         "parameters": [
           {
             "name": "chain",
@@ -4451,9 +4079,7 @@
       "put": {
         "operationId": "updateContract",
         "summary": "Update contract",
-        "tags": [
-          "Contracts"
-        ],
+        "tags": ["Contracts"],
         "parameters": [
           {
             "name": "chain",
@@ -4502,13 +4128,7 @@
                     "type": "integer"
                   }
                 },
-                "required": [
-                  "address",
-                  "chain",
-                  "name",
-                  "abi",
-                  "events"
-                ]
+                "required": ["address", "chain", "name", "abi", "events"]
               }
             }
           }
@@ -4530,9 +4150,7 @@
       "delete": {
         "operationId": "deleteContract",
         "summary": "Delete contract",
-        "tags": [
-          "Contracts"
-        ],
+        "tags": ["Contracts"],
         "parameters": [
           {
             "name": "chain",
@@ -4571,9 +4189,7 @@
         "operationId": "listSegments",
         "summary": "List segments",
         "description": "List user segments for the project scoped to the API key. Paginated.",
-        "tags": [
-          "Segments"
-        ],
+        "tags": ["Segments"],
         "parameters": [
           {
             "$ref": "#/components/parameters/Page"
@@ -4594,9 +4210,7 @@
                     },
                     {
                       "type": "object",
-                      "required": [
-                        "data"
-                      ],
+                      "required": ["data"],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -4642,9 +4256,7 @@
       "post": {
         "operationId": "createSegment",
         "summary": "Create segment",
-        "tags": [
-          "Segments"
-        ],
+        "tags": ["Segments"],
         "requestBody": {
           "required": true,
           "content": {
@@ -4665,10 +4277,7 @@
                     "description": "Canonical filter objects combined with implicit AND."
                   }
                 },
-                "required": [
-                  "title",
-                  "filters"
-                ]
+                "required": ["title", "filters"]
               },
               "examples": {
                 "highValueMobileUsers": {
@@ -4841,9 +4450,7 @@
       "delete": {
         "operationId": "deleteSegment",
         "summary": "Delete segment",
-        "tags": [
-          "Segments"
-        ],
+        "tags": ["Segments"],
         "parameters": [
           {
             "name": "segmentId",
@@ -4874,9 +4481,7 @@
         "operationId": "getProfile",
         "summary": "Get wallet profile",
         "description": "Get a single wallet profile. Agents can call the same path through the paid x402 or MPP gateway hosts without a caller-supplied Formo API key; Paysponge uses Formo's workspace API key behind the scenes. Paid gateway callers only provide the protocol payment header returned by the gateway challenge.",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "servers": [
           {
             "url": "https://api.formo.so",
@@ -5107,9 +4712,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "processing"
-                      ]
+                      "enum": ["processing"]
                     },
                     "address": {
                       "type": "string"
@@ -5150,9 +4753,7 @@
       "get": {
         "operationId": "searchProfiles",
         "summary": "Search wallet profiles",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "responses": {
           "200": {
             "description": "Paginated wallet profile search results.",
@@ -5165,9 +4766,7 @@
                     },
                     {
                       "type": "object",
-                      "required": [
-                        "data"
-                      ],
+                      "required": ["data"],
                       "properties": {
                         "data": {
                           "type": "array",
@@ -5254,10 +4853,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ]
+              "enum": ["asc", "desc"]
             },
             "description": "Sort direction"
           },
@@ -5359,9 +4955,7 @@
         "operationId": "updateUserProperties",
         "summary": "Update user properties",
         "description": "Set first-party properties for a wallet profile. Override display name, email, socials, avatar, location, and other identity fields.",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "parameters": [
           {
             "name": "address",
@@ -5502,9 +5096,7 @@
         "operationId": "batchUpdateUserProperties",
         "summary": "Batch update user properties",
         "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "requestBody": {
           "required": true,
           "content": {
@@ -5516,9 +5108,7 @@
                 "items": {
                   "type": "object",
                   "description": "Flat { address, ...keys } object. `address` is required; only the listed profile keys are persisted (all string-valued). Unknown keys are accepted but ignored.",
-                  "required": [
-                    "address"
-                  ],
+                  "required": ["address"],
                   "additionalProperties": true,
                   "properties": {
                     "address": {
@@ -5651,9 +5241,7 @@
         "operationId": "upsertUserLabel",
         "summary": "Add or update user labels",
         "description": "Upsert one or more labels for a wallet. Accepts either a single label object or an array of labels. Labels with the same tag_id (and chain_id, if provided) are overwritten. Requires profiles:write scope.",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "parameters": [
           {
             "name": "address",
@@ -5729,7 +5317,7 @@
         },
         "responses": {
           "200": {
-            "description": "Labels upserted. Single label in \u2192 bare `UserLabel`; array in \u2192 array of `UserLabel`. Echoes the normalised entries (lowercased tag_id; the caller-supplied `timestamp` when present, otherwise the server write time).",
+            "description": "Labels upserted. Single label in → bare `UserLabel`; array in → array of `UserLabel`. Echoes the normalised entries (lowercased tag_id; the caller-supplied `timestamp` when present, otherwise the server write time).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5773,9 +5361,7 @@
         "operationId": "deleteUserLabel",
         "summary": "Delete a user label",
         "description": "Delete a label from a wallet. Pass chain_id to scope the deletion to a specific chain; omit it to match labels without a chain scope. Requires profiles:write scope.",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "parameters": [
           {
             "name": "address",
@@ -5793,9 +5379,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "tag_id"
-                ],
+                "required": ["tag_id"],
                 "properties": {
                   "tag_id": {
                     "type": "string",
@@ -5849,9 +5433,7 @@
         "operationId": "batchUpsertUserLabels",
         "summary": "Batch add or update user labels",
         "description": "Upsert up to 100 labels across many wallets in one request; each item carries its own `address`. Modelled on the events ingest API: rows with an invalid address (ENS names are NOT resolved here; pass a literal EVM `0x...` or Solana address) are quarantined (skipped and reported in the response) rather than failing the whole batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "requestBody": {
           "required": true,
           "content": {
@@ -5867,9 +5449,7 @@
                     },
                     {
                       "type": "object",
-                      "required": [
-                        "address"
-                      ],
+                      "required": ["address"],
                       "properties": {
                         "address": {
                           "type": "string",
@@ -5962,9 +5542,7 @@
         "operationId": "importWallets",
         "summary": "Import wallet addresses",
         "description": "Import wallet addresses into the project. Requires profiles:write scope and Scale/Enterprise plan.",
-        "tags": [
-          "Profiles"
-        ],
+        "tags": ["Profiles"],
         "requestBody": {
           "required": true,
           "content": {
@@ -5984,10 +5562,7 @@
                     "description": "SDK write key"
                   }
                 },
-                "required": [
-                  "addresses",
-                  "writeKey"
-                ]
+                "required": ["addresses", "writeKey"]
               },
               "examples": {
                 "importWallets": {
@@ -6017,9 +5592,7 @@
         "operationId": "executeQuery",
         "summary": "Execute SQL query",
         "description": "Execute a SQL query against the project's analytics data. Only SELECT and WITH statements are allowed. LIMIT is capped at 1,000,000. Forbidden keywords: INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, etc.",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "requestBody": {
           "required": true,
           "content": {
@@ -6032,9 +5605,7 @@
                     "description": "SQL query to execute"
                   }
                 },
-                "required": [
-                  "query"
-                ]
+                "required": ["query"]
               },
               "examples": {
                 "dailyActiveUsers": {
@@ -6060,13 +5631,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "data",
-                    "total",
-                    "limit",
-                    "offset",
-                    "has_more"
-                  ],
+                  "required": ["data", "total", "limit", "offset", "has_more"],
                   "properties": {
                     "data": {
                       "type": "array",
@@ -6140,9 +5705,7 @@
         "operationId": "getAnalyticsKpis",
         "summary": "Get KPIs (sessions, pageviews, bounce rate, session duration)",
         "description": "Time-series traffic KPIs with optional dimension breakdown. Returns `sessions` (session count), pageviews, bounce rate and average session length. When `include_previous_period=true` without `group_by`, the response also includes `visitors` (unique visitors), `visitors_current` and `visitors_previous`.",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6291,9 +5854,7 @@
         "operationId": "getAnalyticsTopPages",
         "summary": "Get top pages by sessions or visitors, optionally restricted to entry or exit pages",
         "description": "Returns the most visited pages with traffic metrics. Pass `mode=entry` to restrict to the first page of each session (with `bounce_rate`) or `mode=exit` for the last page (with `exit_rate`). Default `mode=all` returns project-wide page metrics with anon-per-session visitor counts.",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6319,11 +5880,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "all",
-                "entry",
-                "exit"
-              ],
+              "enum": ["all", "entry", "exit"],
               "default": "all"
             },
             "description": "Page-flow mode. `all` (default) returns project-wide page metrics with anon-per-session visitor counts (`sessions`, `visitors`, `hits`). `entry` returns landing pages with `bounce_rate`. `exit` returns exit pages with `exit_rate`. The visitor count is omitted in `entry`/`exit` modes since those metrics are session-scoped."
@@ -6423,9 +5980,7 @@
       "get": {
         "operationId": "getAnalyticsTopSources",
         "summary": "Get top traffic sources (referrers / utm)",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6565,9 +6120,7 @@
       "get": {
         "operationId": "getAnalyticsTopLocations",
         "summary": "Get top countries",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6683,9 +6236,7 @@
       "get": {
         "operationId": "getAnalyticsTopWallets",
         "summary": "Get top wallet types",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6793,9 +6344,7 @@
       "get": {
         "operationId": "getAnalyticsTopChains",
         "summary": "Get top blockchain chains",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6903,9 +6452,7 @@
       "get": {
         "operationId": "getAnalyticsTopEvents",
         "summary": "Get top events by frequency",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -6931,9 +6478,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "custom"
-              ]
+              "enum": ["custom"]
             },
             "description": "Pass 'custom' to filter to custom track events only (events with type='track' and a non-empty event name). Omit for all events."
           }
@@ -7031,9 +6576,7 @@
       "get": {
         "operationId": "getAnalyticsRevenueByMetric",
         "summary": "Get revenue grouped by a chosen column",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7159,9 +6702,7 @@
       "get": {
         "operationId": "getAnalyticsVolumeByMetric",
         "summary": "Get transaction volume grouped by a chosen column",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7287,9 +6828,7 @@
       "get": {
         "operationId": "getAnalyticsRevenueOverview",
         "summary": "Get revenue and transaction volume time-series",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7415,9 +6954,7 @@
         "operationId": "getAnalyticsRevenueTimeseries",
         "summary": "Get per-event revenue and volume trend for a single wallet",
         "description": "Returns daily per-event revenue and volume rows for the given wallet `address`. Scoped per wallet; there is no project-wide aggregate mode on this endpoint.",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7541,9 +7078,7 @@
       "get": {
         "operationId": "getAnalyticsEventTimeseries",
         "summary": "Get event count time-series",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7579,7 +7114,7 @@
                 "builder_codes"
               ]
             },
-            "description": "Optional breakdown dimension. When set, `event_key` carries the dimension's value (empty \u2192 `Direct`) instead of the event type/name, so the series splits by that dimension. Top 100 values + `Others`."
+            "description": "Optional breakdown dimension. When set, `event_key` carries the dimension's value (empty → `Direct`) instead of the event type/name, so the series splits by that dimension. Top 100 values + `Others`."
           }
         ],
         "responses": {
@@ -7660,10 +7195,8 @@
       "get": {
         "operationId": "getAnalyticsLifecycle",
         "summary": "Get user lifecycle stages (New / Returning / Power user / Resurrected / At Risk / Churned)",
-        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings \u2192 Lifecycle values apply, then the platform defaults.",
-        "tags": [
-          "Query"
-        ],
+        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7676,25 +7209,7 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
-            "$ref": "#/components/parameters/AnalyticsLifecycleFilter"
-          },
-          {
             "$ref": "#/components/parameters/AnalyticsIncludePreviousPeriod"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsProfileFilters"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsSocials"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsAppFilters"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsTokenFilters"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsChainFilters"
           },
           {
             "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
@@ -7704,9 +7219,6 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsChannelFilter"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsLabelFilters"
           },
           {
             "$ref": "#/components/parameters/LifecycleNewWindowDays"
@@ -7818,9 +7330,7 @@
       "get": {
         "operationId": "getAnalyticsFrequency",
         "summary": "Get visit-frequency distribution",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7833,25 +7343,7 @@
             "$ref": "#/components/parameters/AnalyticsFilters"
           },
           {
-            "$ref": "#/components/parameters/AnalyticsLifecycleFilter"
-          },
-          {
             "$ref": "#/components/parameters/AnalyticsIncludePreviousPeriod"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsProfileFilters"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsSocials"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsAppFilters"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsTokenFilters"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsChainFilters"
           },
           {
             "$ref": "#/components/parameters/AnalyticsBehaviorFilters"
@@ -7861,9 +7353,6 @@
           },
           {
             "$ref": "#/components/parameters/AnalyticsChannelFilter"
-          },
-          {
-            "$ref": "#/components/parameters/AnalyticsLabelFilters"
           }
         ],
         "responses": {
@@ -7958,9 +7447,7 @@
       "get": {
         "operationId": "getAnalyticsRetention",
         "summary": "Get user retention cohorts",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -7977,10 +7464,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "address",
-                "anonymous_id"
-              ],
+              "enum": ["address", "anonymous_id"],
               "default": "address"
             },
             "description": "User identifier to cohort by. `address` (default) groups by wallet; `anonymous_id` groups by anonymous session ID."
@@ -8160,9 +7644,7 @@
         "operationId": "getAnalyticsFunnel",
         "summary": "Get multi-step conversion funnel",
         "description": "Multi-step conversion funnel. For an ordered list of step specs, returns one row per step with the unique-user count, conversion ratios against step 1 and the previous step, drop-off ratio, and median time-to-convert (from-previous and from-start, in seconds).\n\n**Closed vs open:** `funnel_type=closed` (default) requires the user to fire the steps in order within `window_seconds`. `funnel_type=open` counts whoever fired step k regardless of order, and adds a `dropped_off_users` column for each step.\n\n**Breakdown:** when `group_by` is set to a column from the breakdown allowlist (`device`, `browser`, `os`, `location`, `referrer`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`), the response gains a `breakdown` column and is grouped per (step, top-N category + 'Others', up to `limit` which defaults to 5). First-touch attribution is used by default; pass `attribution=last_touch` to bucket by each user's latest value.\n\n**Steps:** the `steps` query param is a JSON-encoded array of 2 to 10 step specs of shape `{type, event, name, filters?: [{field, op, value}]}`. Use `name` (e.g. `\"page::0\"`) as a unique step id so the same event re-used at different steps can be disambiguated in the response. `op` accepts `eq | neq | in | nin | gt | lt | gte | lte | startsWith | endsWith | contains | notEmpty | isEmpty` (canonical tokens only; the retired long-form spellings are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on the numeric event columns `volume`/`revenue`/`points`). `field` may target a standard event column or a JSON property on `properties`.",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -8194,10 +7676,10 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{field, op, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/\u2026 are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{field, op, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
-                "summary": "Simple 3-step funnel: page \u2192 connect \u2192 swap",
+                "summary": "Simple 3-step funnel: page → connect → swap",
                 "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[]},{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::1\",\"filters\":[]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::2\",\"filters\":[]}]"
               },
               "standardColumnFilter": {
@@ -8217,7 +7699,7 @@
                 "value": "[{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::0\",\"filters\":[{\"value\":\"MetaMask\",\"field\":\"provider_name\",\"op\":\"eq\"}]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[]}]"
               },
               "jsonNumericFilter": {
-                "summary": "Step property filter using a numeric comparator (price > 100 \u2192 JSONExtractFloat)",
+                "summary": "Step property filter using a numeric comparator (price > 100 → JSONExtractFloat)",
                 "value": "[{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::0\",\"filters\":[{\"value\":\"100\",\"field\":\"price\",\"op\":\"gt\"}]},{\"type\":\"track\",\"event\":\"refund\",\"name\":\"refund::1\",\"filters\":[]}]"
               },
               "combinedFilters": {
@@ -8246,10 +7728,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "closed",
-                "open"
-              ],
+              "enum": ["closed", "open"],
               "default": "closed"
             },
             "description": "`closed` (default): ordered, in-window. `open`: unordered per-step; emits an extra `dropped_off_users` column."
@@ -8291,10 +7770,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "first_touch",
-                "last_touch"
-              ],
+              "enum": ["first_touch", "last_touch"],
               "default": "first_touch"
             },
             "description": "Per-user attribution for the `group_by` dimension. `first_touch` (default) buckets each user by their earliest value; `last_touch` by their latest. Ignored unless `group_by` is set."
@@ -8426,9 +7902,7 @@
         "operationId": "getAnalyticsFlow",
         "summary": "Get session-scoped user-flow transitions (Sankey)",
         "description": "Session-scoped user-flow transitions for Sankey-style charts. Given a required `start_step`, optional `end_step`, date window, conversion window, and max-step cap, returns one row per `(step, source, target)` transition with counts and per-step percentages.\n\n**How it works:** for each session that fires the start step inside `[date_from, date_to]`, the endpoint rebuilds the ordered sequence of subsequent events within the conversion window (`window_seconds`), normalises each event into a flow-node label (page path for `page`, event name for `track`/`decoded_log`, prefixed for `signature`/`transaction`), truncates at the first end-step match (when `end_step` is set), and slices to `max_steps + 1` nodes. Adjacent nodes are then exploded into `(step, source, target)` edges with counts and percentages.\n\n**Converter-only mode:** when `end_step` is set, only sessions that actually reached the end event within the window are kept, and the matched event is suffixed with `__END_MATCH__`. This mirrors PostHog's `pathsFilter.endPoint` behaviour; every visible link is part of a converting path.\n\n**Step shape:** `start_step` and `end_step` are JSON objects of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. `resolved_event` is the value used to match against the events table (event name, page path, or the sentinel `__ALL_PAGE_VIEWS__` for any page view). `filters` and `global_filters` accept `{field, op, value, values?}` (use `values` for `in`/`nin`).",
-        "tags": [
-          "Query"
-        ],
+        "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
           {
@@ -8460,7 +7934,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{field, op, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/\u2026 are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{field, op, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "anyPageView": {
                 "summary": "Match any page view as the start step",
@@ -8673,9 +8147,7 @@
         "operationId": "ingestEvents",
         "summary": "Ingest events",
         "description": "Send analytics events to Formo. This endpoint runs on events.formo.so (not api.formo.so). Authenticate with your project's SDK write key.",
-        "tags": [
-          "Events"
-        ],
+        "tags": ["Events"],
         "servers": [
           {
             "url": "https://events.formo.so"
