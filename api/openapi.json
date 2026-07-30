@@ -821,7 +821,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `area` | `query`, `x_axis`, `y_axis` (\u2265 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (\u2265 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -896,7 +896,7 @@
               "user_paths",
               "retention"
             ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
+            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row \u00d7 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `line` | `query`, `x_axis`, `y_axis` (\u2265 1) |\n| `area` | `query`, `x_axis`, `y_axis` (\u2265 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (\u2265 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (\u2265 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -1949,7 +1949,7 @@
         "properties": {
           "field": {
             "type": "string",
-            "description": "Field path. Profile: users.net_worth_usd, users.volume, users.revenue, users.points. Engagement: users.device, users.browser, users.os, users.location. Lifecycle: users.lifecycle. Socials: users.ens, users.farcaster, etc. Chains: chains.balance, chains.{chain_id}.balance. Apps: apps.{app_id}.balance. Tokens: tokens.{address}.balance. Labels: labels.{tag_id}"
+            "description": "Stable profile filter field. User/profile/social fields use user.* or users.*. Resource metrics use chains.balance, apps.balance, tokens.balance, or labels.value; resource identifiers belong in named qualifier properties and must not be embedded in the field path."
           },
           "op": {
             "type": "string",
@@ -1968,7 +1968,7 @@
               "notEmpty",
               "isEmpty"
             ],
-            "description": "Comparison operator. Only the canonical terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `startsWith`, `endsWith`, `notEmpty`, `isEmpty`) are accepted; the retired long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are rejected with a 400 naming the token. **Substring operators:** `contains`, `startsWith` and `endsWith` are supported on routable string user attributes (`users.device`, `users.os`, `users.referrer`, `users.utm_*`, `users.click_id`, and the `first_*`/`last_*` attribution variants), where they match **case-sensitively**. Social fields (e.g. `users.twitter`, `users.email`) additionally support `contains`, which matches **case-insensitively** there; `startsWith`/`endsWith` are rejected on social fields. All three are rejected on numeric, chain/app/token/label and lifecycle fields. `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/…) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
+            "description": "Comparison operator. Only the canonical terse tokens (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `startsWith`, `endsWith`, `notEmpty`, `isEmpty`) are accepted; the retired long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are rejected with a 400 naming the token. **Substring operators:** `contains`, `startsWith` and `endsWith` are supported on routable string user attributes (`users.device`, `users.os`, `users.referrer`, `users.utm_*`, `users.click_id`, and the `first_*`/`last_*` attribution variants), where they match **case-sensitively**. Social fields (e.g. `users.twitter`, `users.email`) additionally support `contains`, which matches **case-insensitively** there; `startsWith`/`endsWith` are rejected on social fields. `contains` is also supported on `labels.value` and matches case-insensitively; `startsWith` and `endsWith` remain unsupported on labels. All three substring operators are rejected on numeric, chain/app/token, and lifecycle fields. `notEmpty` (\"is not empty\" / \"is set\") is a string existence check for user string attributes (device/os/utm_*/referrer/\u2026) and social fields; `isEmpty` (\"is empty\" / \"is not set\") is its complement, supported for user string attributes only (not social fields). Both ignore `value`. `users.lifecycle` supports only `eq` (a single stage) and `in` (a list of stages)."
           },
           "value": {
             "oneOf": [
@@ -1997,7 +1997,7 @@
                 }
               }
             ],
-            "description": "Filter value (string, number, boolean, or non-empty array). Required for every operator except the existence checks `notEmpty` and `isEmpty`, which ignore it."
+            "description": "Filter value (string, number, boolean, or non-empty array). Required for every operator except the existence checks `notEmpty` and `isEmpty`, which ignore it. Resource balance fields (`chains.balance`, `apps.balance`, and `tokens.balance`) require a JSON number; empty strings and numeric strings are rejected. `labels.value` also rejects an empty string operand."
           },
           "scope": {
             "type": "string",
@@ -2005,11 +2005,27 @@
               "any",
               "protocol"
             ],
-            "description": "For token filters: any=wallet+protocol, protocol=specific app"
+            "description": "Required for tokens.balance: any includes wallet and protocol balances; protocol requires app_id."
           },
-          "appId": {
+          "chain_id": {
             "type": "string",
-            "description": "For token scope=protocol (e.g. aave-v3)"
+            "minLength": 1,
+            "description": "Optional chain qualifier. Omit to compare across all chains."
+          },
+          "app_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Required for apps.balance and for tokens.balance with scope=protocol."
+          },
+          "token_address": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Required token address for tokens.balance."
+          },
+          "tag_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Required label tag for labels.value."
           }
         }
       },
@@ -5295,9 +5311,10 @@
                     "logic": "and",
                     "filters": [
                       {
-                        "field": "chains.1.balance",
+                        "field": "chains.balance",
                         "op": "gt",
-                        "value": 1000
+                        "value": 1000,
+                        "chain_id": "1"
                       }
                     ]
                   }
@@ -5308,9 +5325,10 @@
                     "logic": "and",
                     "filters": [
                       {
-                        "field": "labels.coinbase.verified_account",
+                        "field": "labels.value",
                         "op": "eq",
-                        "value": "true"
+                        "value": "true",
+                        "tag_id": "coinbase.verified_account"
                       }
                     ]
                   }
@@ -5321,10 +5339,11 @@
                     "logic": "and",
                     "filters": [
                       {
-                        "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+                        "field": "tokens.balance",
                         "op": "gt",
                         "value": 0,
-                        "scope": "any"
+                        "scope": "any",
+                        "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
                       }
                     ]
                   }
@@ -5710,7 +5729,7 @@
         },
         "responses": {
           "200": {
-            "description": "Labels upserted. Single label in → bare `UserLabel`; array in → array of `UserLabel`. Echoes the normalised entries (lowercased tag_id; the caller-supplied `timestamp` when present, otherwise the server write time).",
+            "description": "Labels upserted. Single label in \u2192 bare `UserLabel`; array in \u2192 array of `UserLabel`. Echoes the normalised entries (lowercased tag_id; the caller-supplied `timestamp` when present, otherwise the server write time).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7560,7 +7579,7 @@
                 "builder_codes"
               ]
             },
-            "description": "Optional breakdown dimension. When set, `event_key` carries the dimension's value (empty → `Direct`) instead of the event type/name, so the series splits by that dimension. Top 100 values + `Others`."
+            "description": "Optional breakdown dimension. When set, `event_key` carries the dimension's value (empty \u2192 `Direct`) instead of the event type/name, so the series splits by that dimension. Top 100 values + `Others`."
           }
         ],
         "responses": {
@@ -7641,7 +7660,7 @@
       "get": {
         "operationId": "getAnalyticsLifecycle",
         "summary": "Get user lifecycle stages (New / Returning / Power user / Resurrected / At Risk / Churned)",
-        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
+        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings \u2192 Lifecycle values apply, then the platform defaults.",
         "tags": [
           "Query"
         ],
@@ -8175,10 +8194,10 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{field, op, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded array of 2 to 10 step specs. Each step is `{type, event, name, filters?: [{field, op, value}]}`. `type` is the event type (e.g. `event` for page views, `track` for custom events, `transaction`, `signature`, `decoded_log`). `event` is the event name. `name` is the unique step id (use `\"<event>::<index>\"` to disambiguate repeated events).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/\u2026 are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). For `in`/`nin`, pass the values as a `|`-separated string in `value` (e.g. `\"ethereum|polygon|base\"`).\n\n**Standard columns** (rendered via direct column access): `origin`, `device`, `browser`, `os`, `location`, `referrer`, `direct`, `ref`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `builder_codes`, `version`, `locale`, `timezone`, `page_path`. Anything else is treated as a JSON property and read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "simple": {
-                "summary": "Simple 3-step funnel: page → connect → swap",
+                "summary": "Simple 3-step funnel: page \u2192 connect \u2192 swap",
                 "value": "[{\"type\":\"event\",\"event\":\"page\",\"name\":\"page::0\",\"filters\":[]},{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::1\",\"filters\":[]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::2\",\"filters\":[]}]"
               },
               "standardColumnFilter": {
@@ -8198,7 +8217,7 @@
                 "value": "[{\"type\":\"track\",\"event\":\"connect\",\"name\":\"connect::0\",\"filters\":[{\"value\":\"MetaMask\",\"field\":\"provider_name\",\"op\":\"eq\"}]},{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::1\",\"filters\":[]}]"
               },
               "jsonNumericFilter": {
-                "summary": "Step property filter using a numeric comparator (price > 100 → JSONExtractFloat)",
+                "summary": "Step property filter using a numeric comparator (price > 100 \u2192 JSONExtractFloat)",
                 "value": "[{\"type\":\"track\",\"event\":\"swap\",\"name\":\"swap::0\",\"filters\":[{\"value\":\"100\",\"field\":\"price\",\"op\":\"gt\"}]},{\"type\":\"track\",\"event\":\"refund\",\"name\":\"refund::1\",\"filters\":[]}]"
               },
               "combinedFilters": {
@@ -8441,7 +8460,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{field, op, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/… are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
+            "description": "JSON-encoded start-step spec of shape `{type, event, resolved_event, filters?: [...], status_type?, status_value?}`. Use `\"resolved_event\":\"__ALL_PAGE_VIEWS__\"` to match any page view; pass a page path for a specific landing page; or pass an event name for `track`/`decoded_log` start events. `filters` use `{field, op, value, values?}` (use `values` for `in`/`nin`).\n\n**Filter operators:** `eq`, `neq`, `in`, `nin`, `gt`, `lt`, `gte`, `lte`, `startsWith`, `endsWith`, `contains`, `notEmpty`, `isEmpty` (canonical tokens only; the retired long-form spellings `equals`/`greater`/`includes`/\u2026 are rejected, `notEmpty`/`isEmpty` are value-less existence checks, rejected on numeric event columns `volume`/`revenue`/`points`). Standard columns (`device`, `browser`, `os`, `location`, `referrer`, `utm_*`, `page_path`, etc.) are read directly; everything else is read from `properties` via `JSONExtractString` (or `JSONExtractFloat` for numeric comparators).",
             "examples": {
               "anyPageView": {
                 "summary": "Match any page view as the start step",
