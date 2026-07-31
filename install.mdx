@@ -426,20 +426,25 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
         ```tsx
           import { createClient, autoDiscover } from '@solana/client';
+          import { SolanaProvider } from '@solana/react-hooks';
           import { FormoAnalyticsProvider } from '@formo/analytics';
 
           const client = createClient({
-            cluster: 'mainnet-beta',
+            cluster: 'mainnet',
             walletConnectors: autoDiscover(),
           });
 
-          <FormoAnalyticsProvider
-            writeKey="<YOUR_WRITE_KEY>"
-            options={{ evm: false, solana: { store: client.store } }}
-          >
-            <YourApp />
-          </FormoAnalyticsProvider>
+          <SolanaProvider client={client}>
+            <FormoAnalyticsProvider
+              writeKey="<YOUR_WRITE_KEY>"
+              options={{ evm: false, solana: { store: client.store } }}
+            >
+              <YourApp />
+            </FormoAnalyticsProvider>
+          </SolanaProvider>
         ```
+
+        Note the two spellings of mainnet: `@solana/client` takes `cluster: 'mainnet'`, while Formo's `SOLANA_CHAIN_IDS` is keyed on `'mainnet-beta'`.
       </Accordion>
       <Accordion title="wallet-adapter, Privy, Dynamic, Reown, or custom">
         There is no store to observe, so **nothing is autocaptured**. Emit wallet events yourself with [`connect`](/data/events/connect) and [`disconnect`](/data/events/disconnect).

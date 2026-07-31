@@ -993,6 +993,8 @@ Solana has no numeric chain ID, so Formo maps each cluster to a reserved ID abov
 | `devnet` | `900003` |
 | `localnet` | `900004` |
 
+Mainnet has two spellings: `@solana/client` takes `cluster: 'mainnet'`, while `SOLANA_CHAIN_IDS` is keyed on `'mainnet-beta'`. Map between them when you derive one from the other.
+
 `connect()` validates the address against the chain ID, so a base58 Solana address paired with an EVM chain ID is rejected. Rejected calls log a warning and emit nothing. Enable logging while integrating so you see them:
 
 ```tsx
