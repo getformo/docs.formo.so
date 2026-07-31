@@ -825,19 +825,6 @@ There are two ways to integrate Solana, depending on which wallet library your a
 - **[framework-kit](#solana-with-framework-kit)** (`@solana/client` + `@solana/react-hooks`): the SDK subscribes to framework-kit's zustand store and captures wallet events automatically.
 - **[Any other wallet library](#solana-without-framework-kit)** (`@solana/wallet-adapter`, Privy, Dynamic, Reown, or a custom connector): call `formo.connect()` and `formo.disconnect()` yourself.
 
-Both paths produce the same `connect` and `disconnect` event types, so the dashboard treats them identically.
-
-<Warning>
-Do not report wallet connections with `formo.track()`. A custom event such as `formo.track('Connect', { address })` is stored as a track event, not as the built-in `connect` type, so it will not reach anything that reads wallet connections:
-
-- the **Connect wallet** step in [funnels](/guides/funnels) and [flows](/guides/flows) returns zero
-- first-time and daily wallet connection charts stay empty
-- breakdowns by wallet provider are unavailable
-- sessions are not attributed to the wallet
-
-Use `formo.connect()` for wallet connections and reserve `formo.track()` for product events such as swaps, deposits, and mints.
-</Warning>
-
 #### Solana with framework-kit
 
 The SDK subscribes to framework-kit's zustand store as a read-only observer. It never wraps or intercepts wallet methods.
@@ -930,6 +917,17 @@ The following Solana wallet events are autocaptured via zustand store subscripti
 #### Solana without framework-kit
 
 If your app uses `@solana/wallet-adapter`, Privy, Dynamic, Reown, or a custom connector, there is no store for the SDK to observe, so nothing is autocaptured. Call `formo.connect()` and `formo.disconnect()` at the points where your wallet state changes.
+
+<Warning>
+Do not report wallet connections with `formo.track()`. A custom event such as `formo.track('Connect', { address })` is stored as a track event, not as the built-in `connect` type, so it will not reach anything that reads wallet connections:
+
+- the **Connect wallet** step in [funnels](/guides/funnels) and [flows](/guides/flows) returns zero
+- first-time and daily wallet connection charts stay empty
+- breakdowns by wallet provider are unavailable
+- sessions are not attributed to the wallet
+
+Use `formo.connect()` for wallet connections and reserve `formo.track()` for product events such as swaps, deposits, and mints.
+</Warning>
 
 Initialize the SDK without the `solana.store` option:
 
