@@ -10,7 +10,7 @@ The `connect` event is emitted whenever the user connects a wallet.
 | Property | Type | Description |
 |:---------|:-----|:------------|
 | `chain_id` | Number | Chain ID of the network the wallet connected to. |
-| `provider_name` | String | Wallet connector/provider name (auto-captured through the wagmi and framework-kit integrations, or passed explicitly to `formo.connect()`). |
+| `provider_name` | String | Wallet connector/provider name (present when auto-captured through the wagmi integration). |
 
 ## Sample Payload
 
@@ -25,20 +25,3 @@ Here’s the payload of a typical call with most common fields removed:
     }
 }
 ```
-
-Solana connections use the same event type. Clusters map to reserved chain IDs above 900000 (`900001` is `mainnet-beta`); see [Solana integration](/sdks/web#solana-without-framework-kit).
-
-```json
-{
-    "type": "connect",
-    "address": "A5FLDA1NLmEfifFSB7xEKPc26dSbK5HTTsDhRTWqpDaJ",
-    "properties": {
-        "chain_id": 900001,
-        "provider_name": "Phantom"
-    }
-}
-```
-
-<Warning>
-Emit wallet connections with `formo.connect()`, not `formo.track()`. A custom track event named "Connect" is stored as a track event rather than the `connect` type, so the **Connect wallet** funnel step, first-time wallet connection charts, and wallet provider breakdowns will all be empty. See [Solana integration](/sdks/web#solana-integration) for how to emit it without an autocapture integration.
-</Warning>
