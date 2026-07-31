@@ -18,7 +18,7 @@ Use this pre-built prompt to get started faster: [Install Formo with AI](/instal
 
 There are several ways to install the Formo SDK:
 - [Wagmi](#wagmi) is recommended for EVM apps with wallet connection
-- [Solana](#solana-integration) for Solana apps using framework-kit
+- [Solana](#solana-integration) for Solana apps, with or without framework-kit
 - [HTML Snippet](#html-snippet) is recommended for static websites
 - [React & Next.js (without Wagmi)](#react--nextjs-without-wagmi)
 - [Angular](#angular) for Angular apps using the bare EIP-1193 provider
@@ -1025,23 +1025,6 @@ formo.signature({ status: SignatureStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['
 For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-1193 / EIP-6963). This prevents unnecessary tracking of injected EVM wallets.
 </Note>
 
-## FAQ
-
-<AccordionGroup>
-  <Accordion title="What is the difference between the Wagmi integration and the standard React integration?">
-    The [Wagmi integration](#wagmi) automatically tracks wallet connects, disconnects, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs-without-wagmi) tracks wallet events by wrapping the EIP-1193 wallet provider to track signatures and transactions. Use the Wagmi integration if your app uses Wagmi and its hooks.
-  </Accordion>
-  <Accordion title="How do I track custom events like swaps, deposits, or mints?">
-    Use [formo.track()](/data/events/track) to send custom events with any properties you need. For example: `formo.track('Swap Completed', { pair: 'ETH/USDC', token_in: 'ETH', token_out: 'USDC', amount_in: 1.5 })`. Custom events appear in the [Activity](/features/product-analytics/activity) feed and can be queried in the [Explorer](/features/product-analytics/explore).
-  </Accordion>
-  <Accordion title="Does the Formo SDK support consent management for GDPR?">
-    Yes. The SDK provides built-in [consent management](#consent-management) with `optOutTracking()` and `optInTracking()` methods. Call `optOutTracking()` to stop all tracking for a user, and `optInTracking()` to re-enable it. Formo does not use third-party cookies, IP addresses, or device fingerprinting, so most jurisdictions do not require a cookie consent banner.
-  </Accordion>
-  <Accordion title="Can I use Formo with Privy or other embedded wallet providers?">
-    Yes. The SDK includes a dedicated [Privy integration](#identify-users) with `parsePrivyProperties()` to extract profile properties and linked wallet addresses. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
-  </Accordion>
-</AccordionGroup>
-
 ## Proxy
 
 To handle ad-blockers and privacy browsers, we recommend setting up a reverse proxy.
@@ -1179,3 +1162,28 @@ To verify the proxy is working:
 - Open the network tab in your browser's developer tools
 - Check that analytics requests are going through your domain instead of `events.formo.so`
 - Check that events show up in the Activity page on the Formo dashboard
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the difference between the Wagmi integration and the standard React integration?">
+    The [Wagmi integration](#wagmi) automatically tracks wallet connects, disconnects, chain switches, transactions, and signatures by hooking into Wagmi's wallet adapter. The standard [React integration](#react--nextjs-without-wagmi) tracks wallet events by wrapping the EIP-1193 wallet provider to track signatures and transactions. Use the Wagmi integration if your app uses Wagmi and its hooks.
+  </Accordion>
+  <Accordion title="How do I track custom events like swaps, deposits, or mints?">
+    Use [formo.track()](/data/events/track) to send custom events with any properties you need. For example: `formo.track('Swap Completed', { pair: 'ETH/USDC', token_in: 'ETH', token_out: 'USDC', amount_in: 1.5 })`. Custom events appear in the [Activity](/features/product-analytics/activity) feed and can be queried in the [Explorer](/features/product-analytics/explore).
+  </Accordion>
+  <Accordion title="Does the Formo SDK support consent management for GDPR?">
+    Yes. The SDK provides built-in [consent management](#consent-management) with `optOutTracking()` and `optInTracking()` methods. Call `optOutTracking()` to stop all tracking for a user, and `optInTracking()` to re-enable it. Formo does not use third-party cookies, IP addresses, or device fingerprinting, so most jurisdictions do not require a cookie consent banner.
+  </Accordion>
+  <Accordion title="Can I use Formo with Privy or other embedded wallet providers?">
+    Yes. The SDK includes a dedicated [Privy integration](#identify-users) with `parsePrivyProperties()` to extract profile properties and linked wallet addresses. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
+  </Accordion>
+  <Accordion title="Why are my Solana wallet connections not showing up?">
+    Wallet events are autocaptured on Solana only when your app passes a [framework-kit](#solana-with-framework-kit) store to `options.solana.store`. With `@solana/wallet-adapter`, Privy, Dynamic, Reown, or a custom connector there is no wallet state for the SDK to observe, so nothing is captured until you emit it yourself. See [Solana without framework-kit](#solana-without-framework-kit).
+
+    Sending connections as a custom `track()` event instead will not work: they are stored as track events rather than the built-in `connect` type, so the **Connect wallet** funnel step and every wallet connection chart stay empty.
+  </Accordion>
+  <Accordion title="Do I need framework-kit to use Formo on Solana?">
+    No. framework-kit gives you autocapture for connects, disconnects and cluster switches, but any Solana app can integrate by calling [`formo.connect()`](/data/events/connect) and `formo.disconnect()` directly. Both paths produce the same `connect` and `disconnect` event types, so the dashboard treats them identically. Transactions and signatures need explicit `formo.transaction()` and `formo.signature()` calls on either path.
+  </Accordion>
+</AccordionGroup>
