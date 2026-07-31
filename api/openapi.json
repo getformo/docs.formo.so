@@ -1793,6 +1793,7 @@
       },
       "FilterCondition": {
         "type": "object",
+        "additionalProperties": false,
         "required": ["field", "op"],
         "properties": {
           "field": {
