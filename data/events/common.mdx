@@ -16,7 +16,7 @@ This guide covers the common and contextual fields in detail.
 | `channel` | String | ✓ | Identifies the source of the event. The Formo SDKs emit `web`, `mobile`, or `server`. Other values such as `onchain`, `import`, and `api` are reserved for platform and import-pipeline ingestion, not SDK-emitted events. |
 | `version` | String | ✓ | Version of the event spec. |
 | `project_id` | String | ✓ | Unique identification for the project in the database. |
-| `session_id` | String | ✓ | Session identifier. On **web** this is a privacy-friendly, daily-changing value derived server-side at ingestion, so no cookie is required. The **mobile** SDK supplies its own instead, which rotates after 30 minutes of inactivity — see [Session management](/sdks/mobile#session-management). |
+| `session_id` | String | ✓ | Session identifier. On **web** this is a privacy-friendly, daily-changing value derived server-side at ingestion, so no cookie is required. The **mobile** SDK supplies its own instead, which rotates after 30 minutes of inactivity; see [Session management](/sdks/mobile#session-management). |
 | `anonymous_id` | String | ✓ | Pseudo-identifier for the user in cases where userId is absent. Equivalent to a device ID. |
 | `user_id` | String |  | Unique identification for the user in the database. |
 | `address` | String |  | Unique wallet address of the user. |

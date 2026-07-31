@@ -4,6 +4,8 @@ description: "Step-by-step guide to installing the Formo SDK."
 icon: rocket-launch
 ---
 
+Developers integrate Formo using SDKs, APIs, SQL access, webhooks, and data exports.
+
 ## Install with AI
 
 <Tip>
@@ -788,13 +790,13 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
 ## Autocapture
 
-The Formo SDK automatically captures key events (page views, sessions) and wallet events (connect, disconnect, signature, transaction) with full attribution data (channel, campaign, referrer, UTM, referrals.)
+The Formo SDK automatically captures key events (page views, sessions) and wallet events (connect, disconnect, signature, transaction) with full attribution data (channel, campaign, referrer, UTM, referrals).
 
 ## Verification
 
 To verify that the SDK is installed correctly, navigate to your site and open the network tab of the developer tools in your browser.
 
-Go to your browser's Network tab and look for successful 'raw_events' request in the network console. Check that the request returns a 202 response status. (Note that it may take up to a minute due to the flush interval.)
+Go to your browser's Network tab and look for a successful 'raw_events' request in the network console. Check that the request returns a 202 response status. (Note that it may take up to a minute due to the flush interval.)
 
 Events that are tracked correctly will show up in the [Activity page](/features/product-analytics/activity) of your Formo workspace.
 
@@ -822,7 +824,7 @@ This applies to every installation method above. If you use the HTML snippet, al
     React Native
   </Card>
   <Card title="Server-side SDK" icon="server" iconType="regular" href="/sdks/server">
-    Typescript
+    TypeScript
   </Card>
 </CardGroup>
 
@@ -839,7 +841,7 @@ This applies to every installation method above. If you use the HTML snippet, al
     After installing the SDK, Formo automatically tracks [pageviews](/data/events/page), sessions, [wallet connects](/data/events/connect), [disconnects](/data/events/disconnect), [chain switches](/data/events/chain), [transactions](/data/events/transaction), and [signatures](/data/events/signature). You can also define [custom events](/features/product-analytics/custom-events) and [contract events](/features/product-analytics/contract-events).
   </Accordion>
   <Accordion title="Does the Formo SDK work on localhost during development?">
-    The SDK skips tracking in localhost by default. For testing purposes, you can enable [local testing](/sdks/web#local-testing) and [logging](/sdks/web#logging) in the SDK configuration.
+    The SDK skips tracking on localhost by default. For testing purposes, you can enable [local testing](/sdks/web#local-testing) and [logging](/sdks/web#logging) in the SDK configuration.
   </Accordion>
   <Accordion title="How do I stop ad blockers or privacy browsers from blocking analytics?">
     Set up a [reverse proxy](/sdks/web#proxy) to route analytics data through your own domain. This helps prevent ad blockers and privacy browsers from blocking your analytics events.

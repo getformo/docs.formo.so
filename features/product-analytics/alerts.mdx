@@ -56,12 +56,12 @@ Formo supports two trigger types: **Event alerts**, which fire on individual mat
     | **page** | User visits a specific page |
     | **custom** | Your custom tracked events |
 
-    You can add conditions to filter on the event's top-level fields: `type`, `event`, `address`, `user_id`, `anonymous_id`, `location`, `device`, `browser`, `os`, and `referrer`. Conditions support exact match, contains, starts with, ends with, and not-equals (e.g., `browser = Chrome`, `referrer contains twitter`). They can't filter on values nested in `properties` (like `chain_id` or a transaction's `status`) or use numeric comparisons (`>`, `<`) - use a User alert if you need to filter on a number.
+    You can add conditions to filter on the event's top-level fields: `type`, `event`, `address`, `user_id`, `anonymous_id`, `location`, `device`, `browser`, `os`, and `referrer`. Conditions support exact match, contains, starts with, ends with, and not-equals (e.g., `browser = Chrome`, `referrer contains twitter`). They can't filter on values nested in `properties` (like `chain_id` or a transaction's `status`) or use numeric comparisons (`>`, `<`); use a User alert if you need to filter on a number.
   </Tab>
   <Tab title="Users">
     Triggers when a user profile matches your filters. Formo checks for matching users every 5 minutes and sends a notification for each new user that meets your filters.
 
-    Each matching user is **notified once per 24 hours** - if the same user remains active and continues to match, they won't be re-sent until the dedup window expires.
+    Each matching user is **notified once per 24 hours**: if the same user remains active and continues to match, they won't be re-sent until the dedup window expires.
 
     Available user filters:
 
@@ -315,7 +315,7 @@ The webhook payload uses the `alert.user.triggered` event type:
 | `created` | number | Unix timestamp (seconds) when the webhook was created |
 | `data` | array | Array of user profiles that matched your filters |
 
-**Each user in `data`** contains the full wallet profile. All fields from the profile are included - key properties:
+**Each user in `data`** contains the full wallet profile. All fields from the profile are included; key properties:
 
 **Wallet identity:**
 

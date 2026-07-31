@@ -31,7 +31,7 @@ Step B must happen after Step A, but any number of events can happen between A a
 This is the default and most common mode. Users must progress through your defined steps in order, but they can perform other actions in between. For example, in a funnel of **Page View → Wallet Connect → Swap**, a user who visits the page, browses other pages, connects their wallet, checks token prices, and then swaps would still count as converted.
 
 <Note>
-**Seeing less than expected counts in the sequential funnel?** Users likely:
+**Seeing lower counts than expected in the sequential funnel?** Users likely:
 - Skipped steps in your defined funnel
 - Completed steps in a different order
 - Had multiple wallets/sessions where they completed different parts of the funnel
@@ -53,7 +53,7 @@ In this mode, users must complete all defined steps, but the order does not matt
 | **Any order** | Feature adoption or non-linear flows | Deposit, Borrow, and Swap in any sequence |
 
 <Tip>
-Start with **Sequential** (the default). Switch to **Any order** only if your funnel represents actions that genuinely happen in variable order - such as multi-step DeFi flows where users may borrow before swapping, or complete approvals in any sequence.
+Start with **Sequential** (the default). Switch to **Any order** only if your funnel represents actions that genuinely happen in variable order: for example, multi-step DeFi flows where users may borrow before swapping, or complete approvals in any sequence.
 </Tip>
 
 ## Funnel Breakdowns
@@ -105,7 +105,7 @@ All insights are derived from a standard binary exposure vs. conversion table:
 To prevent false positives, we automatically filter out events with:
 
 - Low volume (fewer than 10 users).
-- Negligible impact (less than 0.2% - 1.5% absolute difference depending on baseline conversion).
+- Negligible impact (less than 0.2% to 1.5% absolute difference depending on baseline conversion).
 
 </Accordion>
 

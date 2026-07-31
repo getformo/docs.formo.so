@@ -37,7 +37,7 @@ When `wagmi` options are provided, the SDK hooks directly into Wagmi's state man
 - Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
 - Full tracking of signatures and transactions via TanStack Query's mutation cache
 
-Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration)
+Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration).
 </Note>
 
 Install the Web SDK via NPM.
@@ -324,7 +324,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
 ## Track events
 
-> The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc) with full attribution (referrer, UTM, referrals.) You do not need to manually track them.
+> The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc.) with full attribution (referrer, UTM, referrals). You do not need to manually track them.
 
 To track custom events (in-app user actions, key conversions) use the [`track`](/data/events/track) function with details of what happened:
 
@@ -458,7 +458,7 @@ You can [track volume, revenue, and points](/data/events/track#tracking-volume-r
 
 ### Local testing
 
-The SDK skips tracking in localhost by default. 
+The SDK skips tracking on localhost by default. 
 To enable tracking locally during development, set `tracking` to `true`:
 
 ```tsx
@@ -966,7 +966,7 @@ Here are the domains used by Formo to load the SDK and send data:
 ### CDN
 
 Some ad blockers block specific scripts and API calls based on the domain name and URL. 
-To address this issue you can download and serve the Formo HTML Snippet from `cdn.formo.so` to your own domain e.g. `yourdomain.com/formo.js`.
+To address this issue you can download and serve the Formo HTML Snippet from `cdn.formo.so` to your own domain, e.g. `yourdomain.com/formo.js`.
 
 > This only applies to the HTML snippet. If you installed `@formo/analytics` via NPM, the SDK is bundled with your app and is not loaded from the CDN, so you can skip this step.
 
@@ -1005,7 +1005,7 @@ Then, configure the Formo SDK to send requests via your rewrite. Update the `api
 
 > See an [example Next.js app](https://github.com/getformo/examples/tree/main/with-next-app-router) here.
 
-If you are using the HTML / website snippet, replace the install script to:
+If you are using the HTML / website snippet, replace the install script with:
 
 ```javascript
 <script
@@ -1060,7 +1060,7 @@ Once done, configure the Formo SDK to send requests via your rewrite:
 
 ### Others
 
-Alternatively, you can set up your own proxy (with Cloudfront, Cloudflare, etc) and pass the URL as the SDK `apiHost`:
+Alternatively, you can set up your own proxy (with CloudFront, Cloudflare, etc.) and pass the URL as the SDK `apiHost`:
 
 ```javascript
 <script
