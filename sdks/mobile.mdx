@@ -32,7 +32,7 @@ For **Android install attribution** (knowing which site or campaign a user came 
 npm install react-native-play-install-referrer
 ```
 
-This one requires a native rebuild of your Android app. Without it the SDK still works — install attribution is simply skipped, and a warning is logged on startup. See [Web-to-mobile attribution](#web-to-mobile-attribution).
+This one requires a native rebuild of your Android app. Without it the SDK still works; install attribution is simply skipped, and a warning is logged on startup. See [Web-to-mobile attribution](#web-to-mobile-attribution).
 
 ### iOS Setup (bare React Native only)
 
@@ -43,7 +43,7 @@ cd ios && pod install
 ```
 
 <Note>
-Expo projects handle native linking automatically - no `pod install` needed.
+Expo projects handle native linking automatically, so no `pod install` is needed.
 </Note>
 
 ## Quick Start
@@ -121,7 +121,7 @@ function App() {
 
 ## Track screen views
 
-Use the [`screen()`](/data/events/page) method to track screen views - the mobile equivalent of page views:
+Use the [`screen()`](/data/events/page) method to track screen views, the mobile equivalent of page views:
 
 ```tsx
 import { useFormo } from '@formo/analytics-react-native';
@@ -148,9 +148,9 @@ formo.screen(name: string, category?: string, properties?: object)
 Include `formo` in the dependency array. The SDK initializes asynchronously, so including it ensures the screen event fires once initialization completes.
 </Note>
 
-Screen views are sent as `page` events so they flow through the same analytics as web page views. The screen name is recorded in the `app://` scheme — `formo.screen('Wallet')` is sent with a `page_url` of `app://Wallet`, and a router-style name like `formo.screen('/tabs/leaderboard')` is sent as `app:///tabs/leaderboard`.
+Screen views are sent as `page` events so they flow through the same analytics as web page views. The screen name is recorded in the `app://` scheme: `formo.screen('Wallet')` is sent with a `page_url` of `app://Wallet`, and a router-style name like `formo.screen('/tabs/leaderboard')` is sent as `app:///tabs/leaderboard`.
 
-Formo derives the rest for you: your app becomes the equivalent of a web origin (from the app name or bundle ID in the event context), and the screen name becomes the page path — so screens appear alongside web pages in reports like Top Pages.
+Formo derives the rest for you: your app becomes the equivalent of a web origin (from the app name or bundle ID in the event context), and the screen name becomes the page path, so screens appear alongside web pages in reports like Top Pages.
 
 ### React Navigation
 
@@ -326,12 +326,12 @@ On first launch the SDK reads that value and attaches it to the [`Application In
 }
 ```
 
-Requires `react-native-play-install-referrer` and a native rebuild — see [Installation](#optional-dependencies). The lookup runs once, on the first launch after install.
+Requires `react-native-play-install-referrer` and a native rebuild; see [Installation](#optional-dependencies). The lookup runs once, on the first launch after install.
 
 ### iOS
 
 <Note>
-Not supported. Apple does not expose an install-referrer API, so an install cannot be attributed to a referring website from within the SDK. This requires a third-party attribution service such as Branch or AppsFlyer. On iOS this capture is a no-op — deep link attribution still works normally.
+Not supported. Apple does not expose an install-referrer API, so an install cannot be attributed to a referring website from within the SDK. This requires a third-party attribution service such as Branch or AppsFlyer. On iOS this capture is a no-op; deep link attribution still works normally.
 </Note>
 
 ## Configuration
@@ -592,11 +592,11 @@ The SDK assigns a `session_id` to every event. A session groups one user's burst
 |:---------|:------------|
 | Session start | The first event after install, or the first event after a session expires. |
 | Session timeout | 30 minutes of inactivity. The next event after that starts a new session. |
-| Persistence | A session survives app restarts — it expires on inactivity, not on close. |
+| Persistence | A session survives app restarts; it expires on inactivity, not on close. |
 | Reset | `reset()` ends the current session and starts a new one. |
 
 <Note>
-This differs from the web SDK, where `session_id` is derived server-side as a daily-changing value. That derivation relies on the request's origin, IP and browser user agent — signals a native app does not provide meaningfully — so the mobile SDK supplies its own session instead.
+This differs from the web SDK, where `session_id` is derived server-side as a daily-changing value. That derivation relies on the request's origin, IP and browser user agent (signals a native app does not provide meaningfully), so the mobile SDK supplies its own session instead.
 </Note>
 
 Reset the current user session:

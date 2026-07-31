@@ -127,9 +127,9 @@ Each filter in the `filters` array carries the canonical `{field, op, value}` co
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `field` | string | The stable field path to filter on (see Field Reference below). User/profile/social fields use `users.{attribute}`. Resource metrics use the fixed paths `chains.balance`, `apps.balance`, `tokens.balance`, or `labels.value` — identifiers belong in the qualifier properties below and must **not** be embedded in the field path. |
+| `field` | string | The stable field path to filter on (see Field Reference below). User/profile/social fields use `users.{attribute}`. Resource metrics use the fixed paths `chains.balance`, `apps.balance`, `tokens.balance`, or `labels.value`. Identifiers belong in the qualifier properties below and must **not** be embedded in the field path. |
 | `op` | string | The comparison operator |
-| `value` | string \| number \| boolean \| array | The value to compare against. Balance fields (`chains.balance`, `apps.balance`, `tokens.balance`) require a JSON number — numeric strings and empty strings are rejected. `labels.value` rejects an empty string. |
+| `value` | string \| number \| boolean \| array | The value to compare against. Balance fields (`chains.balance`, `apps.balance`, `tokens.balance`) require a JSON number; numeric strings and empty strings are rejected. `labels.value` rejects an empty string. |
 | `chain_id` | string | (Optional) Chain qualifier for `chains.balance`, `apps.balance`, `tokens.balance`, and `labels.value`. Omit to compare across all chains. |
 | `app_id` | string | Required for `apps.balance`, and for `tokens.balance` with `scope: "protocol"` (e.g., `aave-v3`, `compound-v3`). |
 | `token_address` | string | Required token address for `tokens.balance`. |
@@ -443,7 +443,7 @@ Set the `chain_id` qualifier to filter by app balance on a specific chain.
 
 ### Token Filters (`tokens.balance`)
 
-Filter by token holdings using the stable field `tokens.balance` with required `token_address` and `scope` qualifiers, plus an optional `chain_id` and — for protocol scope — a required `app_id`.
+Filter by token holdings using the stable field `tokens.balance` with required `token_address` and `scope` qualifiers, plus an optional `chain_id` and, for protocol scope, a required `app_id`.
 
 #### Token Filter Qualifiers
 

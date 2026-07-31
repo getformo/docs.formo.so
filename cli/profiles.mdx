@@ -123,7 +123,7 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 ```
 
 <Warning>
-`field` must be a stable typed path: `users.{attribute}` for user/profile/social fields, or one of `chains.balance`, `apps.balance`, `tokens.balance`, `labels.value` for resource filters. Bare names like `net_worth_usd` are rejected because the API ignores them, and the retired identifier-in-path spellings (`chains.1.balance`, `apps.uniswap-v3.balance`, `tokens.0x….balance`, `labels.vip`) are rejected with a `400` — put identifiers in the qualifier properties instead.
+`field` must be a stable typed path: `users.{attribute}` for user/profile/social fields, or one of `chains.balance`, `apps.balance`, `tokens.balance`, `labels.value` for resource filters. Bare names like `net_worth_usd` are rejected because the API ignores them, and the retired identifier-in-path spellings (`chains.1.balance`, `apps.uniswap-v3.balance`, `tokens.0x….balance`, `labels.vip`) are rejected with a `400`; put identifiers in the qualifier properties instead.
 </Warning>
 
 ### Filter Operators
