@@ -123,15 +123,20 @@ The search endpoint supports rich filtering capabilities through a JSON request 
 
 ### Filter Condition
 
-Each filter in the `filters` array has:
+Each filter in the `filters` array carries the canonical `{field, op, value}` core, plus named **qualifier** properties for resource filters:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `field` | string | The field path to filter on (see Field Reference below) |
+| `field` | string | The stable field path to filter on (see Field Reference below). User/profile/social fields use `users.{attribute}`. Resource metrics use the fixed paths `chains.balance`, `apps.balance`, `tokens.balance`, or `labels.value` — identifiers belong in the qualifier properties below and must **not** be embedded in the field path. |
 | `op` | string | The comparison operator |
-| `value` | string \| number \| boolean \| array | The value to compare against |
-| `scope` | string | (Optional) Only for token filters: `any` (wallet + protocols) or `protocol` (specific protocol only) |
-| `appId` | string | (Optional) Only for token filters with `scope: "protocol"`. The DeFi protocol ID (e.g., `aave-v3`, `compound-v3`) |
+| `value` | string \| number \| boolean \| array | The value to compare against. Balance fields (`chains.balance`, `apps.balance`, `tokens.balance`) require a JSON number — numeric strings and empty strings are rejected. `labels.value` rejects an empty string. |
+| `chain_id` | string | (Optional) Chain qualifier for `chains.balance`, `apps.balance`, `tokens.balance`, and `labels.value`. Omit to compare across all chains. |
+| `app_id` | string | Required for `apps.balance`, and for `tokens.balance` with `scope: "protocol"` (e.g., `aave-v3`, `compound-v3`). |
+| `token_address` | string | Required token address for `tokens.balance`. |
+| `scope` | string | Required for `tokens.balance`: `any` (wallet + all protocols) or `protocol` (a specific protocol; requires `app_id`). |
+| `tag_id` | string | Required label tag for `labels.value` (e.g., `coinbase.verified_account`). |
+
+Unknown properties and qualifiers that don't apply to the targeted `field` are rejected with a `400`.
 
 ### Operators
 
@@ -142,15 +147,19 @@ Each filter in the `filters` array has:
 | `gt` | Greater than | `{"field": "users.net_worth_usd", "op": "gt", "value": 1000}` |
 | `gte` | Greater than or equal | `{"field": "users.volume", "op": "gte", "value": 100}` |
 | `lt` | Less than | `{"field": "users.net_worth_usd", "op": "lt", "value": 50000}` |
-| `lte` | Less than or equal | `{"field": "chains.1.balance", "op": "lte", "value": 10000}` |
+| `lte` | Less than or equal | `{"field": "chains.balance", "op": "lte", "value": 10000, "chain_id": "1"}` |
 | `in` | In array | `{"field": "users.lifecycle", "op": "in", "value": ["New", "Power user"]}` |
 | `nin` | Not in array | `{"field": "users.location", "op": "nin", "value": ["US", "UK"]}` |
-| `contains` | Case-insensitive substring match for social fields only | `{"field": "users.twitter", "op": "contains", "value": "vitalik"}` |
+| `contains` | Case-insensitive substring match for social fields and `labels.value` | `{"field": "users.twitter", "op": "contains", "value": "vitalik"}` |
 | `notEmpty` | Field is set (non-empty). String fields only; value is ignored | `{"field": "users.email", "op": "notEmpty"}` |
 | `isEmpty` | Field is not set (empty). String user attributes only; value is ignored | `{"field": "users.utm_source", "op": "isEmpty"}` |
 
 <Note>
 **Legacy spellings are retired.** The long-form spellings `equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, and `includes` (and symbol forms like `=` / `!=` / `like`) are no longer accepted on this endpoint. A request carrying one is rejected with a `400` whose message names the offending token. Send only the canonical operators above. `notEmpty` / `isEmpty` are value-less existence checks (any `value` is ignored) and are supported on string user/profile attributes only, not on numeric metrics (`net_worth_usd`, `volume`, `revenue`, `points`), the `lifecycle` enum, or chain/app/token/label fields.
+</Note>
+
+<Note>
+**Dynamic field paths are retired.** Identifier-in-path spellings such as `chains.1.balance`, `apps.aave-v3.balance`, `tokens.0x….balance`, and `labels.coinbase.verified_account` are no longer accepted and return a `400`. Use the stable field (`chains.balance`, `apps.balance`, `tokens.balance`, `labels.value`) with the matching qualifier property (`chain_id`, `app_id`, `token_address`, `tag_id`) instead. Balance fields support only the comparison operators (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`); `labels.value` supports comparisons plus case-insensitive `contains`.
 </Note>
 
 ---
@@ -339,13 +348,13 @@ Social fields support two modes:
 
 ---
 
-### Chain Filters (`chains.*`)
+### Chain Filters (`chains.balance`)
 
-Filter by per-chain net worth. Supports filtering across all chains or specific chains.
+Filter by per-chain net worth using the stable field `chains.balance` and an optional `chain_id` qualifier. This is distinct from `users.net_worth_usd`, which compares the profile's **total** net worth.
 
 #### All Chains
 
-Use `chains.balance` to filter across all chains (returns profiles where **any** chain matches).
+Omit `chain_id` to filter across all chains (returns profiles where **any** chain matches).
 
 **Example - Find users with >$1,000 on any chain:**
 
@@ -360,7 +369,7 @@ Use `chains.balance` to filter across all chains (returns profiles where **any**
 
 #### Specific Chain
 
-Use `chains.{chain_id}.balance` to filter on a specific chain.
+Set the `chain_id` qualifier to filter on a specific chain.
 
 Common chain IDs:
 - `1` - Ethereum Mainnet
@@ -376,7 +385,7 @@ Common chain IDs:
 ```json
 {
   "filters": [
-    { "field": "chains.1.balance", "op": "gt", "value": 5000 }
+    { "field": "chains.balance", "op": "gt", "value": 5000, "chain_id": "1" }
   ],
   "logic": "and"
 }
@@ -387,8 +396,8 @@ Common chain IDs:
 ```json
 {
   "filters": [
-    { "field": "chains.1.balance", "op": "gt", "value": 1000 },
-    { "field": "chains.137.balance", "op": "gt", "value": 1000 }
+    { "field": "chains.balance", "op": "gt", "value": 1000, "chain_id": "1" },
+    { "field": "chains.balance", "op": "gt", "value": 1000, "chain_id": "137" }
   ],
   "logic": "and"
 }
@@ -396,20 +405,20 @@ Common chain IDs:
 
 ---
 
-### App Filters (`apps.*`)
+### App Filters (`apps.balance`)
 
-Filter by DeFi app interactions and balances.
+Filter by DeFi app balances using the stable field `apps.balance` with a required `app_id` qualifier and an optional `chain_id` qualifier.
 
 #### All Chains
 
-Use `apps.{app_id}.balance` to filter by app balance across all chains.
+Omit `chain_id` to filter by app balance across all chains.
 
 **Example - Find users with >$1,000 in Uniswap:**
 
 ```json
 {
   "filters": [
-    { "field": "apps.uniswap.balance", "op": "gt", "value": 1000 }
+    { "field": "apps.balance", "op": "gt", "value": 1000, "app_id": "uniswap" }
   ],
   "logic": "and"
 }
@@ -417,14 +426,14 @@ Use `apps.{app_id}.balance` to filter by app balance across all chains.
 
 #### Specific Chain
 
-Use `apps.{chain_id}.{app_id}.balance` to filter by app balance on a specific chain.
+Set the `chain_id` qualifier to filter by app balance on a specific chain.
 
 **Example - Find users with >$500 in Aave on Ethereum:**
 
 ```json
 {
   "filters": [
-    { "field": "apps.1.aave.balance", "op": "gt", "value": 500 }
+    { "field": "apps.balance", "op": "gt", "value": 500, "app_id": "aave", "chain_id": "1" }
   ],
   "logic": "and"
 }
@@ -432,20 +441,22 @@ Use `apps.{chain_id}.{app_id}.balance` to filter by app balance on a specific ch
 
 ---
 
-### Token Filters (`tokens.*`)
+### Token Filters (`tokens.balance`)
 
-Filter by token holdings. Supports optional `scope` and `appId` parameters.
+Filter by token holdings using the stable field `tokens.balance` with required `token_address` and `scope` qualifiers, plus an optional `chain_id` and — for protocol scope — a required `app_id`.
 
-#### Token Filter Parameters
+#### Token Filter Qualifiers
 
-| Parameter | Type | Description |
+| Qualifier | Type | Description |
 |-----------|------|-------------|
-| `scope` | string | `any` (default) = wallet + all protocols, `protocol` = specific protocol only |
-| `appId` | string | Only for `scope: "protocol"`. Specifies the DeFi protocol ID (e.g., `aave-v3`, `compound-v3`, `uniswap-v3`) |
+| `token_address` | string | Required. The token's contract address. |
+| `scope` | string | Required. `any` = wallet + all protocols, `protocol` = a specific protocol only (requires `app_id`) |
+| `app_id` | string | Required for `scope: "protocol"`. The DeFi protocol ID (e.g., `aave-v3`, `compound-v3`, `uniswap-v3`) |
+| `chain_id` | string | Optional. Omit to compare across all chains. |
 
 #### All Chains
 
-Use `tokens.{token_address}.balance` to filter by token balance across all chains.
+Omit `chain_id` to filter by token balance across all chains.
 
 **Example - Find users holding >1000 USDC (any chain):**
 
@@ -453,9 +464,11 @@ Use `tokens.{token_address}.balance` to filter by token balance across all chain
 {
   "filters": [
     {
-      "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "field": "tokens.balance",
       "op": "gt",
-      "value": 1000
+      "value": 1000,
+      "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "scope": "any"
     }
   ],
   "logic": "and"
@@ -464,7 +477,7 @@ Use `tokens.{token_address}.balance` to filter by token balance across all chain
 
 #### Specific Chain
 
-Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a specific chain.
+Set the `chain_id` qualifier to filter by token balance on a specific chain.
 
 **Example - Find users with >500 USDC on Ethereum:**
 
@@ -472,9 +485,12 @@ Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a 
 {
   "filters": [
     {
-      "field": "tokens.1.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "field": "tokens.balance",
       "op": "gt",
-      "value": 500
+      "value": 500,
+      "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "scope": "any",
+      "chain_id": "1"
     }
   ],
   "logic": "and"
@@ -483,23 +499,7 @@ Use `tokens.{chain_id}.{token_address}.balance` to filter by token balance on a 
 
 #### Protocol-Specific Token Filters
 
-Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specific DeFi protocol.
-
-**Example - Find users with USDC deposited in any protocol:**
-
-```json
-{
-  "filters": [
-    {
-      "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
-      "op": "gt",
-      "value": 0,
-      "scope": "protocol"
-    }
-  ],
-  "logic": "and"
-}
-```
+Use `scope: "protocol"` with `app_id` to filter for tokens deposited in a specific DeFi protocol.
 
 **Example - Find users with USDC deposited in Aave V3:**
 
@@ -507,11 +507,12 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
 {
   "filters": [
     {
-      "field": "tokens.0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.balance",
+      "field": "tokens.balance",
       "op": "gt",
       "value": 1000,
+      "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "scope": "protocol",
-      "appId": "aave-v3"
+      "app_id": "aave-v3"
     }
   ],
   "logic": "and"
@@ -524,11 +525,12 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
 {
   "filters": [
     {
-      "field": "tokens.0x0000000000000000000000000000000000000000.balance",
+      "field": "tokens.balance",
       "op": "gt",
       "value": 1,
+      "token_address": "0x0000000000000000000000000000000000000000",
       "scope": "protocol",
-      "appId": "lido"
+      "app_id": "lido"
     }
   ],
   "logic": "and"
@@ -537,11 +539,11 @@ Use `scope: "protocol"` with `appId` to filter for tokens deposited in a specifi
 
 ---
 
-### Label Filters (`labels.*`)
+### Label Filters (`labels.value`)
 
-Filter by wallet labels. Use the format `labels.{tag_id}`.
+Filter by wallet labels using the stable field `labels.value` with a required `tag_id` qualifier (and an optional `chain_id`). Supported operators are the comparisons (`eq`, `neq`, `gt`, `gte`, `lt`, `lte`) and case-insensitive `contains`; the `value` must be non-empty.
 
-Common label IDs:
+Common label tags:
 - `coinbase.verified_account` - Coinbase verified account (boolean)
 - `coinbase.verified_country` - Coinbase verified country code
 - `coinbase.verified_coinbase_one` - Coinbase One membership (boolean)
@@ -554,7 +556,7 @@ Common label IDs:
 ```json
 {
   "filters": [
-    { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" }
+    { "field": "labels.value", "op": "eq", "value": "true", "tag_id": "coinbase.verified_account" }
   ],
   "logic": "and"
 }
@@ -565,7 +567,7 @@ Common label IDs:
 ```json
 {
   "filters": [
-    { "field": "labels.coinbase.verified_country", "op": "eq", "value": "US" }
+    { "field": "labels.value", "op": "eq", "value": "US", "tag_id": "coinbase.verified_country" }
   ],
   "logic": "and"
 }
@@ -576,7 +578,7 @@ Common label IDs:
 ```json
 {
   "filters": [
-    { "field": "labels.passport.models_aggregate_score", "op": "gte", "value": "50" }
+    { "field": "labels.value", "op": "gte", "value": 50, "tag_id": "passport.models_aggregate_score" }
   ],
   "logic": "and"
 }
@@ -598,7 +600,7 @@ curl -sS -X GET \
     "filters": [
       { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
       { "field": "users.ens", "op": "notEmpty" },
-      { "field": "chains.1.balance", "op": "gt", "value": 0 }
+      { "field": "chains.balance", "op": "gt", "value": 0, "chain_id": "1" }
     ],
     "logic": "and"
   }' \
@@ -615,8 +617,8 @@ curl -sS -X GET \
   -H "Content-Type: application/json" \
   -d '{
     "filters": [
-      { "field": "apps.uniswap.balance", "op": "gt", "value": 0 },
-      { "field": "apps.aave.balance", "op": "gt", "value": 0 }
+      { "field": "apps.balance", "op": "gt", "value": 0, "app_id": "uniswap" },
+      { "field": "apps.balance", "op": "gt", "value": 0, "app_id": "aave" }
     ],
     "logic": "or"
   }' \
@@ -633,8 +635,8 @@ curl -sS -X GET \
   -H "Content-Type: application/json" \
   -d '{
     "filters": [
-      { "field": "labels.coinbase.verified_account", "op": "eq", "value": "true" },
-      { "field": "labels.coinbase.verified_country", "op": "in", "value": ["US", "UK", "DE"] },
+      { "field": "labels.value", "op": "eq", "value": "true", "tag_id": "coinbase.verified_account" },
+      { "field": "labels.value", "op": "eq", "value": "US", "tag_id": "coinbase.verified_country" },
       { "field": "users.lifecycle", "op": "eq", "value": "Power user" }
     ],
     "logic": "and"
@@ -652,9 +654,9 @@ curl -sS -X GET \
   -H "Content-Type: application/json" \
   -d '{
     "filters": [
-      { "field": "chains.1.balance", "op": "gt", "value": 10000 },
-      { "field": "chains.137.balance", "op": "gt", "value": 5000 },
-      { "field": "chains.42161.balance", "op": "gt", "value": 5000 }
+      { "field": "chains.balance", "op": "gt", "value": 10000, "chain_id": "1" },
+      { "field": "chains.balance", "op": "gt", "value": 5000, "chain_id": "137" },
+      { "field": "chains.balance", "op": "gt", "value": 5000, "chain_id": "42161" }
     ],
     "logic": "and"
   }' \

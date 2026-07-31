@@ -102,7 +102,7 @@ formo profiles search \
 
 # Filter by onchain balance on Ethereum
 formo profiles search \
-  --filters '[{"field":"chains.1.balance","op":"gt","value":1000}]' \
+  --filters '[{"field":"chains.balance","op":"gt","value":1000,"chain_id":"1"}]' \
   --size 20
 ```
 
@@ -110,17 +110,20 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 ### Filters
 
-`--filters` accepts a JSON array of canonical filter objects:
+`--filters` accepts a JSON array of canonical filter objects. Resource filters use a stable `field` plus named qualifier properties (`chain_id`, `app_id`, `token_address`, `scope`, `tag_id`):
 
 ```json
 [
   { "field": "users.net_worth_usd", "op": "gt", "value": 10000 },
-  { "field": "chains.1.balance", "op": "gte", "value": 1000 }
+  { "field": "chains.balance", "op": "gte", "value": 1000, "chain_id": "1" },
+  { "field": "apps.balance", "op": "gt", "value": 500, "app_id": "uniswap-v3" },
+  { "field": "tokens.balance", "op": "gt", "value": 0, "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "scope": "any" },
+  { "field": "labels.value", "op": "eq", "value": "tier-1", "tag_id": "vip" }
 ]
 ```
 
 <Warning>
-`field` must be a typed path such as `users.net_worth_usd`, `chains.1.balance`, `apps.uniswap-v3.balance`, `tokens.0xA0b8...48.balance`, or `labels.vip`. Bare names like `net_worth_usd` are rejected by the CLI because the API ignores them.
+`field` must be a stable typed path: `users.{attribute}` for user/profile/social fields, or one of `chains.balance`, `apps.balance`, `tokens.balance`, `labels.value` for resource filters. Bare names like `net_worth_usd` are rejected because the API ignores them, and the retired identifier-in-path spellings (`chains.1.balance`, `apps.uniswap-v3.balance`, `tokens.0x….balance`, `labels.vip`) are rejected with a `400` — put identifiers in the qualifier properties instead.
 </Warning>
 
 ### Filter Operators
