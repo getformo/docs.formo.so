@@ -54,6 +54,12 @@ Requires `query:read` scope on your API key.
 
 A JSON array of `{ field, op, value }` filters, e.g. `[{"field":"location","op":"eq","value":"US"}]`. For multi-value matching, use `in` / `nin` with an array value (e.g. `["chrome","firefox"]`); pipe-delimited strings remain supported by the analytics query boundary.
 
+This one array carries every predicate. On the user-aggregate pipes (`lifecycle`, `frequency`) it also takes profile metrics, social identity fields, a lifecycle entry (`{"field":"lifecycle","op":"in","value":["New","Power user"]}`), and resource entries using the stable fields `chains.balance`, `apps.balance`, `tokens.balance` and `labels.value` with named qualifiers (`chain_id`, `app_id`, `token_address`, `scope`, `tag_id`).
+
+<Warning>
+The retired per-family params — `socials`, `chain_filters`, `app_filters`, `token_filters`, `label_filters`, `profile_filters`, `lifecycle_filter` — are rejected with a `400` if passed through `--params`. Forwarding them would silently drop the predicate and broaden the result set, so the API fails loud instead. Send a canonical entry in `--filters`.
+</Warning>
+
 ### `--params` (pipe-specific)
 
 Some pipes take additional, pipe-specific parameters. Pass them as a JSON object via `--params`:
@@ -68,6 +74,9 @@ Some pipes take additional, pipe-specific parameters. Pass them as a JSON object
 | `revenue_timeseries` | `address` (required) |
 | `revenue_by_metric`, `volume_by_metric`, `top_sources` | `metric_column`, `limit`, `offset` |
 | `top_chains`, `top_events`, `top_locations`, `top_pages`, `top_wallets` | `limit`, `offset` |
+| `kpis`, `top_*`, `revenue_*`, `volume_by_metric` | `page_scope` — `page` (default) or `session` |
+
+`page_scope` only affects requests that carry a `page` filter. The default scopes metrics to activity on that page; `session` restores the legacy behaviour where metrics include all activity in any session that viewed the page.
 
 ### Examples
 
