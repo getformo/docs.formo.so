@@ -128,9 +128,23 @@ The response is a paginated envelope: `{ data, total, page, size, has_more }`.
 
 ### Filter Operators
 
-`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `notEmpty`, `isEmpty`
+`eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `nin`, `contains`, `startsWith`, `endsWith`, `notEmpty`, `isEmpty`
 
 The long-form spellings (`equals`, `notEquals`, `greater`, `greaterOrEqual`, `less`, `lessOrEqual`, `notIn`, `includes`) are retired. The API rejects them with a `400` naming the token. Use only the canonical operators above.
+
+The vocabulary is shared, but each field implements a subset — an unsupported pairing is a `400`:
+
+| Field class | Supported operators |
+|-------------|---------------------|
+| `chains.balance`, `apps.balance`, `tokens.balance` | `eq`, `neq`, `gt`, `gte`, `lt`, `lte` — the value must be a JSON number, not a numeric string |
+| `labels.value` | comparison operators plus `contains` (case-insensitive) |
+| Numeric profile metrics (`users.net_worth_usd`, `users.volume`, `users.revenue`, `users.points`) | comparison operators |
+| Routable string attributes (`users.device`, `users.os`, `users.referrer`, `users.utm_*`, `users.click_id`, and the `first_*`/`last_*` attribution variants) | the full vocabulary; `contains`, `startsWith` and `endsWith` match case-sensitively |
+| Social fields (`users.twitter`, `users.email`, `users.farcaster`, …) | `contains` (case-insensitive) and `notEmpty`; `startsWith`, `endsWith` and `isEmpty` are rejected |
+| `users.paid_source` (and its `first_`/`last_` variants) | `eq`, `neq`, `in`, `nin`, `notEmpty`, `isEmpty` — it is a fixed ad-network enum |
+| `users.lifecycle` | `eq` (one stage) and `in` (a list of stages) |
+
+`notEmpty` and `isEmpty` are value-less existence checks; the `value` is ignored.
 
 ---
 
