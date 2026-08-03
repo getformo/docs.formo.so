@@ -148,9 +148,24 @@ formo.screen(name: string, category?: string, properties?: object)
 Include `formo` in the dependency array. The SDK initializes asynchronously, so including it ensures the screen event fires once initialization completes.
 </Note>
 
-Screen views are sent as `page` events so they flow through the same analytics as web page views. The screen name is recorded in the `app://` scheme: `formo.screen('Wallet')` is sent with a `page_url` of `app://Wallet`, and a router-style name like `formo.screen('/tabs/leaderboard')` is sent as `app:///tabs/leaderboard`.
+Screen views are sent as `page` events so they flow through the same analytics as web page views. The screen name is recorded in a `page_url` that mirrors a web URL:
 
-Formo derives the rest for you: your app becomes the equivalent of a web origin (from the app name or bundle ID in the event context), and the screen name becomes the page path, so screens appear alongside web pages in reports like Top Pages.
+```
+formo.screen('Wallet')              →  app://com.acme.wallet/Wallet
+formo.screen('/tabs/leaderboard')   →  app://com.acme.wallet/tabs/leaderboard
+```
+
+Your **bundle ID** takes the place of the hostname and the **screen name** takes the place of the path — structurally the same as `https://app.example.com/wallet`. Formo therefore reads them with the same URL parsing it uses for web: the bundle ID becomes the `origin` and the screen becomes the `page_path`, so screens appear alongside web pages in reports like Top Pages.
+
+<Note>
+Requires SDK **1.0.1 or later**. Earlier versions sent `app://Wallet`, where the screen name occupies the hostname slot and there is no path at all — URL parsers return an empty path for that shape, so those screen views do not appear in Top Pages. Upgrading is the fix.
+</Note>
+
+A few consequences worth knowing:
+
+- **Screen names containing `?` or `#` are percent-encoded**, so a name like `Checkout?coupon=X` cannot truncate the path. `/` is left alone, since router-style names are meant to be path segments.
+- **The bundle ID is the grouping key**, not your app's display name. Renaming your app therefore does not split its history.
+- Set `app.bundleId` explicitly (see [App metadata](#app-metadata)) if you run in **Expo Go** or on **React Native Web**. In Expo Go the native modules report Expo Go's own bundle ID, and on the web nothing resolves one at all.
 
 ### React Navigation
 
@@ -194,10 +209,11 @@ The SDK automatically tracks application lifecycle events following the Segment/
 
 | Event | When | Properties |
 |:------|:-----|:-----------|
-| `Application Installed` | First app launch (no stored version) | `version`, `build` |
+| `Application Installed` | First app launch (no stored version) | `version`, `build`, plus any captured attribution |
 | `Application Updated` | App version or build changed since last launch | `version`, `build`, `previous_version`, `previous_build` |
 | `Application Opened` | Every cold start and return from background | `version`, `build`, `from_background`, `url` (if deep linked) |
 | `Application Backgrounded` | App transitions to background | `version`, `build` |
+| `Deep Link Opened` | App launched or resumed via a deep or universal link | `url` |
 
 Lifecycle events are enabled by default and require `asyncStorage` to be provided for accurate install/update detection. To disable:
 
@@ -208,6 +224,38 @@ options={{
   },
 }}
 ```
+
+### Opt-in lifecycle events
+
+Two more are available but **off by default**, because enabling either changes how your app behaves:
+
+| Event | When | Enable with |
+|:------|:-----|:------------|
+| `Application Foregrounded` | Background → active | `autocapture: { foregrounded: true }` |
+| `Application Crashed` | Unhandled JavaScript error | `autocapture: { crashes: true }` |
+
+`Application Foregrounded` marks the same transition as `Application Opened` with `from_background: true`, so enabling it doubles your foreground event volume without adding information. It exists for consumers that key on the Segment spec name directly — for example dashboards being migrated from Segment or RudderStack.
+
+`Application Crashed` installs a global JavaScript error handler. Your previous handler always runs afterwards, so React Native's redbox and any crash reporter you already use keep working. It reports `message`, `name`, `stack` and `fatal`.
+
+<Note>
+`autocapture: true` does **not** enable these two — they must be named individually. Crash tracking is **native only**: on React Native Web an uncaught error goes to `window.onerror` and never reaches the handler the SDK installs.
+</Note>
+
+### Push notification events
+
+Push delivery is invisible to JavaScript without a native module, so these are not autocaptured. Call them from your own push handler:
+
+```tsx
+const formo = useFormo();
+
+// e.g. inside @react-native-firebase/messaging or expo-notifications callbacks
+await formo.pushNotificationReceived({ campaign_id: 'spring', message_id: id });
+await formo.pushNotificationTapped({ campaign_id: 'spring', message_id: id });
+await formo.pushNotificationBounced({ campaign_id: 'spring', message_id: id });
+```
+
+They emit `Push Notification Received`, `Push Notification Tapped` and `Push Notification Bounced` respectively. Any properties are accepted; the Segment spec suggests `campaign_id`, `campaign_name`, `message_id`, `action`, `title` and `body`.
 
 <Note>
 The SDK detects app version and build from `expo-application`, `react-native-device-info`, or the `app` option (in that order). If none are available, version and build will be empty strings.
@@ -458,6 +506,7 @@ options={{
     transaction: false,  // Disable transaction tracking
     chain: true,
     lifecycle: true,     // Application lifecycle events
+    deepLinks: true,     // Deep Link Opened
   },
 }}
 
@@ -466,6 +515,29 @@ options={{
   autocapture: false,
 }}
 ```
+
+Two options are **off** unless named explicitly, because enabling either changes how the app behaves. `autocapture: true` does not turn them on:
+
+```tsx
+options={{
+  autocapture: {
+    foregrounded: true,  // Application Foregrounded (doubles foreground volume)
+    crashes: true,       // Application Crashed (installs a global error handler)
+  },
+}}
+```
+
+| Option | Default | Controls |
+|:-------|:--------|:---------|
+| `connect`, `disconnect`, `signature`, `transaction`, `chain` | `true` | Wallet events |
+| `lifecycle` | `true` | `Application Installed` / `Updated` / `Opened` / `Backgrounded` |
+| `deepLinks` | `true` | `Deep Link Opened` |
+| `foregrounded` | **`false`** | `Application Foregrounded` |
+| `crashes` | **`false`** | `Application Crashed` |
+
+<Note>
+`autocapture.deepLinks` controls only the **event**. Parsing a deep link's UTM parameters into event context is separate, under [`attribution.deeplinks`](#attribution). Turning either off leaves the other working.
+</Note>
 
 ### Attribution
 
@@ -571,9 +643,9 @@ The SDK automatically enriches every event with mobile-specific context:
 | `device_model` | Device model (iPhone 14 Pro, Pixel 8). |
 | `device_manufacturer` | Device manufacturer (Apple, Google, Samsung). |
 | `device_type` | Device type (mobile, tablet). |
-| `user_agent` | Device user agent. Taken from the platform when available, otherwise derived from the device and OS above. Used to resolve device and OS in analytics. |
-| `screen_width` | Screen width in pixels. |
-| `screen_height` | Screen height in pixels. |
+| `user_agent` | Device user agent. Taken from the platform when available, otherwise synthesized from the device and OS above. Formo resolves `device` and `os` from it — and reports `browser` as `unknown`, since the synthesized string deliberately carries no browser token. |
+| `screen_width` | Screen width in logical points (not raw pixels — see `screen_density`). |
+| `screen_height` | Screen height in logical points. |
 | `screen_density` | Pixel density (devicePixelRatio). |
 | `locale` | Device language setting. |
 | `timezone` | Device timezone. |
