@@ -6602,6 +6602,7 @@
                 "pathname",
                 "origin",
                 "channel",
+                "paid_source",
                 "referrer",
                 "referrer_url",
                 "ref",
@@ -6621,7 +6622,7 @@
                 "event"
               ]
             },
-            "description": "Column to group revenue by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Unknown values return zero rows."
+            "description": "Column to group revenue by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only — see docs/ads.md). Unknown values return zero rows."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -6728,6 +6729,7 @@
                 "pathname",
                 "origin",
                 "channel",
+                "paid_source",
                 "referrer",
                 "referrer_url",
                 "ref",
@@ -6747,7 +6749,7 @@
                 "event"
               ]
             },
-            "description": "Column to group volume by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Unknown values return zero rows."
+            "description": "Column to group volume by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only — see docs/ads.md). Unknown values return zero rows."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -6849,7 +6851,8 @@
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Breakdown dimension. Valid options: referrer, location, device, browser, os, utm_source, utm_medium, utm_campaign, utm_content, utm_term, ref, builder_codes, channel_type, paid_source. Unknown values are ignored (ungrouped totals). `paid_source` is the acquiring ad network (per-event sticky attribution; empty bucket is 'None' — see docs/ads.md)."
           },
           {
             "name": "limit",
