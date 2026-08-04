@@ -4525,6 +4525,15 @@
               "type": "string"
             },
             "description": "Comma-separated: apps, chains, tokens, labels"
+          },
+          {
+            "name": "timestamp",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Optional point in time for wallet-enrichment data. Returns the stored base snapshot closest to this instant instead of the latest snapshot; an exact-distance tie chooses the later snapshot. Expanded chains, apps, and tokens come from the profiling batch associated with that selected snapshot. Project engagement fields, project-defined identity overrides, and labels remain current. Must be ISO-8601 with a timezone."
           }
         ],
         "responses": {
@@ -4827,6 +4836,15 @@
               "type": "string"
             },
             "description": "Comma-separated: apps, chains, tokens, labels"
+          },
+          {
+            "name": "timestamp",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Optional point in time for wallet-enrichment data. Requires the address query parameter; unbounded historical collection scans are rejected. Returns the wallet's stored base snapshot closest to this instant instead of its latest snapshot; an exact-distance tie chooses the later snapshot. Expanded chains, apps, and tokens come from the selected snapshot's profiling batch. Project engagement fields, project-defined identity overrides, and labels remain current. Must be ISO-8601 with a timezone."
           },
           {
             "name": "order_by",
