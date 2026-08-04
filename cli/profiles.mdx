@@ -36,6 +36,7 @@ Requires `profiles:read` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--expand` | `string` | ❌ | Comma-separated fields to expand: `apps`, `chains`, `tokens`, `labels` |
+| `--timestamp` | `string` | ❌ | ISO-8601 timestamp; return the closest stored wallet-enrichment snapshot |
 
 The lifecycle threshold options listed above are also supported.
 
@@ -45,6 +46,7 @@ The lifecycle threshold options listed above are also supported.
 formo profiles get 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
 formo profiles get vitalik.eth --expand labels,chains
 formo profiles get vitalik.eth --expand apps,chains,tokens,labels --churn-window-days 30
+formo profiles get vitalik.eth --timestamp 2025-06-21T10:03:00Z
 ```
 
 ---
@@ -63,6 +65,7 @@ Requires `profiles:read` scope on your API key.
 |--------|------|----------|-------------|
 | `--address` | `string` | ❌ | Filter by wallet address |
 | `--search` | `string` | ❌ | Free-text search across address and identity fields |
+| `--timestamp` | `string` | ❌ | ISO-8601 timestamp; requires `--address` and returns the closest stored wallet-enrichment snapshot |
 | `--page` | `number` | ❌ | Page number, 1-indexed |
 | `--size` | `number` | ❌ | Page size |
 | `--order-by` | `enum` | ❌ | Field to sort by |
@@ -86,6 +89,11 @@ formo profiles search --size 10
 # Search text fields
 formo profiles search --search vitalik --size 5
 
+# Return the closest stored snapshot for one wallet
+formo profiles search \
+  --address 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --timestamp 2025-06-21T10:03:00Z
+
 # Top 5 profiles by net worth
 formo profiles search --order-by net_worth_usd --order-dir desc --size 5
 
@@ -107,6 +115,8 @@ formo profiles search \
 ```
 
 The response is a paginated envelope: `{ data, total, page, size, has_more }`.
+
+When `--timestamp` is present, wallet-enrichment fields come from the stored base snapshot closest to that instant. If two snapshots are equally close, the later snapshot is returned. Expanded chains, apps, and tokens come from the selected profiling batch. Project engagement fields, project-defined identity overrides, and labels remain current. Omitting `--timestamp` returns the latest profile.
 
 ### Filters
 
