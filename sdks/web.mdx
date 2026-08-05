@@ -257,34 +257,26 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
     ```tsx
     import { useFormo } from '@formo/analytics';
-    import { usePrivy, useWallets } from '@privy-io/react-auth';
+    import { usePrivy } from '@privy-io/react-auth';
+    import { useAccount } from 'wagmi';
     import { useEffect } from 'react';
 
     function App() {
-      const { user } = usePrivy();
-      const { wallets, ready: walletsReady } = useWallets();
+      const { user } = usePrivy();       // null when the session isn't a Privy one
       const { address } = useAccount();  // plain wallet sessions
       const formo = useFormo();
 
-      // Depend on the address string, not the `wallets` array - useWallets()
-      // returns a new reference on many renders.
-      const activeAddress = address ?? wallets[0]?.address;
-
       useEffect(() => {
         if (!formo) return;
-        // Wait for Privy to finish discovering wallets: `user` can be ready
-        // first, and identifying in that window resolves no active address, so
-        // attribution falls back to user.wallet (usually the embedded wallet).
-        if (!walletsReady) return;
 
         // Check `user` first: a Privy session usually also has a wagmi
         // address, so testing the address first would lose the clustering.
         if (user) {
-          formo.identify(user, { activeAddress });
+          formo.identify(user);
         } else if (address) {
           formo.identify({ address });
         }
-      }, [user, address, formo, activeAddress, walletsReady]);
+      }, [user, address, formo]);
     }
     ```
 
@@ -1048,7 +1040,7 @@ A Privy user is **one account (a DID) with many linked wallets** - an embedded w
 `identify(user)` resolves this in a single call: it expands `user.linkedAccounts` and emits one identify per linked wallet, each tagged with the same Privy DID, so they cluster into one user.
 
 ```tsx
-formo.identify(user, { activeAddress });
+formo.identify(user);
 ```
 
 **What each wallet sends.** The shared profile parsed from `user.linkedAccounts` - `privyDid`, `privyCreatedAt`, `email`, `phone`, and socials (X, Discord, GitHub, Farcaster, Google, …) - plus that wallet's own `wallet_client`, `chain_type`, and `is_embedded`.
