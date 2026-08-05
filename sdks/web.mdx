@@ -253,34 +253,36 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
     ```
   </Tab>
   <Tab title="Privy">
-    The SDK includes `parsePrivyProperties()` which extracts profile properties (email, social accounts) and all linked wallet addresses from the Privy user object.
-
-    Call `identify()` in a `useEffect` that triggers when the Privy user becomes available:
+    A Privy user is one account (a DID) with many linked wallets. Pass the `usePrivy()` user straight to `identify()` and the SDK identifies **every** linked wallet under that user's DID, so they cluster into a single user instead of one per address:
 
     ```tsx
-    import { useFormo, parsePrivyProperties } from '@formo/analytics';
+    import { useFormo } from '@formo/analytics';
     import { usePrivy } from '@privy-io/react-auth';
+    import { useAccount } from 'wagmi';
     import { useEffect } from 'react';
 
     function App() {
-      const { user } = usePrivy();
+      const { user } = usePrivy();       // null when the session isn't a Privy one
+      const { address } = useAccount();  // plain wallet sessions
       const formo = useFormo();
 
       useEffect(() => {
-        if (!user || !formo) return;
+        if (!formo) return;
 
-        const { properties, wallets } = parsePrivyProperties(user);
-
-        for (const wallet of wallets) {
-          formo.identify({ address: wallet.address, userId: user.id }, properties);
+        // Check `user` first: a Privy session usually also has a wagmi
+        // address, so testing the address first would lose the clustering.
+        if (user) {
+          formo.identify(user);
+        } else if (address) {
+          formo.identify({ address });
         }
-      }, [user, formo]);
+      }, [user, address, formo]);
     }
     ```
 
-    `parsePrivyProperties()` returns:
-    - `properties` - a flat object with `email`, `discord`, `twitter`, `farcaster`, `github`, `telegram`, `google`, `apple`, and other social identifiers from the Privy user's linked accounts
-    - `wallets` - all wallets linked to the Privy user, so each wallet is identified with the same profile properties
+    `user` is reactive, so this re-runs on login and on every link/unlink.
+
+    See [Privy integration](#privy-integration) below for what each wallet sends and how mixed Privy/non-Privy apps identify.
   </Tab>
   <Tab title="HTML Snippet">
     ```html
@@ -1027,6 +1029,36 @@ formo.signature({ status: SignatureStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['
 For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-1193 / EIP-6963). This prevents unnecessary tracking of injected EVM wallets.
 </Note>
 
+### Privy integration
+
+A Privy user is **one account (a DID) with many linked wallets** - an embedded wallet plus any external wallets they connect over time. Because Formo is address-keyed, one person with 8 wallets would otherwise appear as 8 users.
+
+`identify(user)` resolves this in a single call: it expands `user.linkedAccounts` and emits one identify per linked wallet, each tagged with the same Privy DID, so they cluster into one user.
+
+```tsx
+formo.identify(user);
+```
+
+**What each wallet sends.** The shared profile parsed from `user.linkedAccounts` - `privyDid`, `privyCreatedAt`, `email`, `phone`, and socials (X, Discord, GitHub, Farcaster, Google, …) - plus that wallet's own `wallet_client`, `chain_type`, and `is_embedded`.
+
+Linked wallets include `wallet` and `smart_wallet` accounts, plus a `cross_app` account's embedded and smart wallets (e.g. Abstract Global Wallet). Addresses are deduplicated.
+
+**Apps with both Privy and non-Privy users.** Branch on which identity you have, checking `user` first - a Privy session usually also has a wagmi `address`, so testing the address first would send that user down the plain path and lose the clustering:
+
+```tsx
+useEffect(() => {
+  if (!formo) return;
+
+  if (user) {
+    formo.identify(user);            // every linked wallet, under the DID
+  } else if (address) {
+    formo.identify({ address });     // plain wallet connect
+  }
+}, [user, address, formo]);
+```
+
+`parsePrivyProperties(user)` returns the same parsed profile and wallet list without emitting, if you want to inspect or display what would be sent.
+
 ## Proxy
 
 To handle ad-blockers and privacy browsers, we recommend setting up a reverse proxy.
@@ -1178,7 +1210,7 @@ To verify the proxy is working:
     Yes. The SDK provides built-in [consent management](#consent-management) with `optOutTracking()` and `optInTracking()` methods. Call `optOutTracking()` to stop all tracking for a user, and `optInTracking()` to re-enable it. Formo does not use third-party cookies, IP addresses, or device fingerprinting, so most jurisdictions do not require a cookie consent banner.
   </Accordion>
   <Accordion title="Can I use Formo with Privy or other embedded wallet providers?">
-    Yes. The SDK includes a dedicated [Privy integration](#identify-users) with `parsePrivyProperties()` to extract profile properties and linked wallet addresses. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
+    Yes. The SDK includes a dedicated [Privy integration](#privy-integration): pass the `usePrivy()` user to `identify(user)` and every wallet linked to that Privy account is identified under the user's DID, so a multi-wallet user clusters into one Formo user. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
   <Accordion title="Why are my Solana wallet connections not showing up?">
     Wallet events are autocaptured on Solana only when your app passes a [framework-kit](#solana-with-framework-kit) store to `options.solana.store`. With `@solana/wallet-adapter`, Privy, Dynamic, Reown, or a custom connector there is no wallet state for the SDK to observe, so nothing is captured until you emit it yourself. See [Solana without framework-kit](#solana-without-framework-kit).
