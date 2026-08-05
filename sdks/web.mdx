@@ -263,23 +263,30 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
     function App() {
       const { user } = usePrivy();
       const { wallets } = useWallets();
+      const { address } = useAccount();  // plain wallet sessions
       const formo = useFormo();
 
-      // Depend on the address string, not the `wallets` array — useWallets()
+      // Depend on the address string, not the `wallets` array - useWallets()
       // returns a new reference on many renders.
       const activeAddress = wallets[0]?.address;
 
       useEffect(() => {
-        if (!user || !formo) return;
+        if (!formo) return;
 
-        formo.identify(user, { activeAddress });
-      }, [user, formo, activeAddress]);
+        // Check `user` first: a Privy session usually also has a wagmi
+        // address, so testing the address first would lose the clustering.
+        if (user) {
+          formo.identify(user, { activeAddress });
+        } else if (address) {
+          formo.identify({ address });
+        }
+      }, [user, address, formo, activeAddress]);
     }
     ```
 
     `user` is reactive, so this re-runs on login and on every link/unlink, keeping the identity graph current.
 
-    Only the active wallet takes over event attribution — `activeAddress` if you pass it, else the wallet Formo already tracks, else Privy's `user.wallet`. Every other linked wallet is recorded purely for clustering and never repoints attribution.
+    Only the active wallet takes over event attribution - `activeAddress` if you pass it, else the wallet Formo already tracks, else Privy's `user.wallet`. Every other linked wallet is recorded purely for clustering and never repoints attribution.
 
     See the [Privy integration guide](https://github.com/getformo/sdk/blob/main/docs/PRIVY_INTEGRATION.md) for attribution rules, what each wallet sends, and when identity re-emits.
   </Tab>
@@ -1030,7 +1037,7 @@ For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-11
 
 ### Privy integration
 
-A Privy user is **one account (a DID) with many linked wallets** — an embedded wallet plus any external wallets they connect over time. Because Formo is address-keyed, one person with 8 wallets would otherwise appear as 8 users.
+A Privy user is **one account (a DID) with many linked wallets** - an embedded wallet plus any external wallets they connect over time. Because Formo is address-keyed, one person with 8 wallets would otherwise appear as 8 users.
 
 `identify(user)` resolves this in a single call: it expands `user.linkedAccounts` and emits one identify per linked wallet, each tagged with the same Privy DID, so they cluster into one user.
 
@@ -1038,15 +1045,15 @@ A Privy user is **one account (a DID) with many linked wallets** — an embedded
 formo.identify(user, { activeAddress });
 ```
 
-**What each wallet sends.** The shared profile parsed from `user.linkedAccounts` — `privyDid`, `privyCreatedAt`, `email`, `phone`, and socials (X, Discord, GitHub, Farcaster, Google, …) — plus that wallet's own `wallet_client`, `chain_type`, and `is_embedded`.
+**What each wallet sends.** The shared profile parsed from `user.linkedAccounts` - `privyDid`, `privyCreatedAt`, `email`, `phone`, and socials (X, Discord, GitHub, Farcaster, Google, …) - plus that wallet's own `wallet_client`, `chain_type`, and `is_embedded`.
 
 Linked wallets include `wallet` and `smart_wallet` accounts, plus a `cross_app` account's embedded and smart wallets (e.g. Abstract Global Wallet). Addresses are deduplicated.
 
-**Attribution.** Only one wallet owns the current address that later `track()` and `page()` events are attributed to. It's chosen in order: `activeAddress` if you pass it, else the wallet Formo already tracks from a prior connect, else Privy's `user.wallet`. The first two are matched strictly — a connected wallet that isn't linked in Privy is left alone rather than overwritten.
+**Attribution.** Only one wallet owns the current address that later `track()` and `page()` events are attributed to. It's chosen in order: `activeAddress` if you pass it, else the wallet Formo already tracks from a prior connect, else Privy's `user.wallet`. The first two are matched strictly - a connected wallet that isn't linked in Privy is left alone rather than overwritten.
 
 **When identity re-emits.** Identify events are deduplicated per session on the wallet, the user id, and the profile, so:
 
-- re-running with the same user and profile is deduplicated — no spam on re-render;
+- re-running with the same user and profile is deduplicated - no spam on re-render;
 - a wallet identified anonymously re-emits once the Privy DID is attached at login;
 - **linking or unlinking a profile account re-emits every linked wallet** with the updated profile, since those properties are shared across the cluster.
 
@@ -1054,7 +1061,7 @@ Linked wallets include `wallet` and `smart_wallet` accounts, plus a `cross_app` 
 Pass stable identity metadata in `properties`. A value that changes on every call (a timestamp, a random id) makes every identify a new event.
 </Note>
 
-**Apps with both Privy and non-Privy users.** Branch on which identity you have, checking `user` first — a Privy session usually also has a wagmi `address`, so testing the address first would send that user down the plain path and lose the clustering:
+**Apps with both Privy and non-Privy users.** Branch on which identity you have, checking `user` first - a Privy session usually also has a wagmi `address`, so testing the address first would send that user down the plain path and lose the clustering:
 
 ```tsx
 useEffect(() => {
@@ -1068,7 +1075,7 @@ useEffect(() => {
 }, [user, address, formo]);
 ```
 
-For the framework-agnostic form, use `identifyPrivyUser(formo, user, options)` — the same behavior without the flag, available from the React-free `./core` entry.
+For the framework-agnostic form, use `identifyPrivyUser(formo, user, options)` - the same behavior without the flag, available from the React-free `./core` entry.
 
 ## Proxy
 

@@ -36,7 +36,7 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
 
   If the project is a Solana app, **always** use Option E. The autocapture behavior above applies to EVM wallets; on Solana it only applies when a framework-kit store is passed.
 
-  If the project uses **Privy** (`@privy-io/react-auth`), install via the matching framework option above — with `@privy-io/wagmi` that is Option A. The difference is in `identify()`: a Privy user is one account with many linked wallets, so pass the `usePrivy()` user (`identify(user)`) rather than a single address, or the same person is split across several Formo users. See step 3.
+  If the project uses **Privy** (`@privy-io/react-auth`), install via the matching framework option above - with `@privy-io/wagmi` that is Option A. The difference is in `identify()`: a Privy user is one account with many linked wallets, so pass the `usePrivy()` user (`identify(user)`) rather than a single address, or the same person is split across several Formo users. See step 3.
 
   If you're able to use a web tool to access a URL, visit https://docs.formo.so/install to get the latest, up-to-date instructions.
 
@@ -207,13 +207,16 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
 
   **Using Privy?** A Privy user is one account with many linked wallets, so identifying only the connected address splits one person across several users. Pass the `usePrivy()` user instead and every linked wallet is identified under that user's DID, clustering them into one:
 
-  // React / Next.js — Privy
-  const { user } = usePrivy();
+  // React / Next.js, Privy
+  const { user } = usePrivy();       // null when the session isn't a Privy one
+  const { address } = useAccount();  // plain wallet connect
   useEffect(() => {
-    if (user && analytics) { analytics.identify(user); }
-  }, [user, analytics]);
+    if (!analytics) return;
+    if (user) { analytics.identify(user); }
+    else if (address) { analytics.identify({ address }); }
+  }, [user, address, analytics]);
 
-  Key the effect on `user` so it re-runs on login and on every account link/unlink. See [Privy integration](/sdks/web#privy-integration).
+  Key the effect on `user` so it re-runs on login and on every account link/unlink. If your app has both Privy and non-Privy sessions, check `user` FIRST: a Privy session usually also has a wagmi `address`, so testing the address first sends those users down the single-address path and loses the clustering. See [Privy integration](/sdks/web#privy-integration).
 
   ### Track Custom Events
 
