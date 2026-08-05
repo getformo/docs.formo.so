@@ -253,7 +253,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
     ```
   </Tab>
   <Tab title="Privy">
-    A Privy user is one account (a DID) with many linked wallets. Pass the `usePrivy()` user with `{ privy: true }` and the SDK identifies **every** linked wallet under that user's DID, so they cluster into a single user instead of one per address:
+    A Privy user is one account (a DID) with many linked wallets. Pass the `usePrivy()` user straight to `identify()` and the SDK identifies **every** linked wallet under that user's DID, so they cluster into a single user instead of one per address:
 
     ```tsx
     import { useFormo } from '@formo/analytics';
@@ -272,7 +272,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
       useEffect(() => {
         if (!user || !formo) return;
 
-        formo.identify(user, { privy: true, activeAddress });
+        formo.identify(user, { activeAddress });
       }, [user, formo, activeAddress]);
     }
     ```
@@ -1032,10 +1032,10 @@ For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-11
 
 A Privy user is **one account (a DID) with many linked wallets** — an embedded wallet plus any external wallets they connect over time. Because Formo is address-keyed, one person with 8 wallets would otherwise appear as 8 users.
 
-`identify(user, { privy: true })` resolves this in a single call: it expands `user.linkedAccounts` and emits one identify per linked wallet, each tagged with the same Privy DID, so they cluster into one user.
+`identify(user)` resolves this in a single call: it expands `user.linkedAccounts` and emits one identify per linked wallet, each tagged with the same Privy DID, so they cluster into one user.
 
 ```tsx
-formo.identify(user, { privy: true, activeAddress });
+formo.identify(user, { activeAddress });
 ```
 
 **What each wallet sends.** The shared profile parsed from `user.linkedAccounts` — `privyDid`, `privyCreatedAt`, `email`, `phone`, and socials (X, Discord, GitHub, Farcaster, Google, …) — plus that wallet's own `wallet_client`, `chain_type`, and `is_embedded`.

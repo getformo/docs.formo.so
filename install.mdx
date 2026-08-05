@@ -9,7 +9,7 @@ Developers integrate Formo using SDKs, APIs, SQL access, webhooks, and data expo
 ## Install with AI
 
 <Tip>
-Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com/link/prompt?text=Install%20Formo%20Analytics%20using%20the%20instructions%20at%20https%3A%2F%2Fdocs.formo.so%2Finstall%20and%20https%3A%2F%2Fdocs.formo.so%2Fsdks%2Fweb.%20Detect%20the%20framework%20%28Wagmi%2C%20React%2C%20Next.js%2C%20Solana%29%20and%20follow%20the%20matching%20setup.%20Use%20%40formo%2Fanalytics%20as%20the%20only%20package.%20Wrap%20the%20app%20with%20FormoAnalyticsProvider.%20For%20Wagmi%2C%20place%20it%20inside%20WagmiProvider%20and%20QueryClientProvider%20and%20pass%20both%20config%20and%20queryClient%20via%20options.wagmi.%20For%20Next.js%20App%20Router%2C%20create%20a%20%27use%20client%27%20wrapper%20component.%20For%20Solana%2C%20wallet%20events%20are%20only%20autocaptured%20when%20a%20framework-kit%20store%20is%20passed%20via%20options.solana.store%3B%20with%20%40solana%2Fwallet-adapter%2C%20Privy%2C%20Dynamic%2C%20or%20Reown%20nothing%20is%20autocaptured%2C%20so%20call%20formo.connect%28%29%20and%20formo.disconnect%28%29%20from%20an%20effect%20on%20wallet%20state%2C%20and%20never%20report%20wallet%20connections%20with%20track%28%29.%20After%20setup%2C%20add%20identify%28%29%20after%20wallet%20connection%20and%20track%28%29%20for%20custom%20events.%20Analyze%20the%20codebase%20to%20suggest%20relevant%20custom%20events%20to%20track.)
+Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com/link/prompt?text=Install%20Formo%20Analytics%20using%20the%20instructions%20at%20https%3A%2F%2Fdocs.formo.so%2Finstall%20and%20https%3A%2F%2Fdocs.formo.so%2Fsdks%2Fweb.%20Detect%20the%20framework%20%28Wagmi%2C%20React%2C%20Next.js%2C%20Solana%29%20and%20follow%20the%20matching%20setup.%20Use%20%40formo%2Fanalytics%20as%20the%20only%20package.%20Wrap%20the%20app%20with%20FormoAnalyticsProvider.%20For%20Wagmi%2C%20place%20it%20inside%20WagmiProvider%20and%20QueryClientProvider%20and%20pass%20both%20config%20and%20queryClient%20via%20options.wagmi.%20For%20Next.js%20App%20Router%2C%20create%20a%20%27use%20client%27%20wrapper%20component.%20For%20Solana%2C%20wallet%20events%20are%20only%20autocaptured%20when%20a%20framework-kit%20store%20is%20passed%20via%20options.solana.store%3B%20with%20%40solana%2Fwallet-adapter%2C%20Privy%2C%20Dynamic%2C%20or%20Reown%20nothing%20is%20autocaptured%2C%20so%20call%20formo.connect%28%29%20and%20formo.disconnect%28%29%20from%20an%20effect%20on%20wallet%20state%2C%20and%20never%20report%20wallet%20connections%20with%20track%28%29.%20After%20setup%2C%20add%20identify%28%29%20after%20wallet%20connection%20and%20track%28%29%20for%20custom%20events.%20For%20Privy%2C%20pass%20the%20usePrivy%28%29%20user%20to%20identify%28user%29%20instead%20of%20an%20address%20so%20all%20of%20the%20user%27s%20linked%20wallets%20cluster%20under%20one%20DID.%20Analyze%20the%20codebase%20to%20suggest%20relevant%20custom%20events%20to%20track.)
 </Tip>
 
 <Accordion title="Copy prompt">
@@ -202,6 +202,16 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
       if (address && analytics) { analytics.identify({ address }); }
     }, [address, analytics]);
   };
+
+  **Using Privy?** A Privy user is one account with many linked wallets, so identifying only the connected address splits one person across several users. Pass the `usePrivy()` user instead and every linked wallet is identified under that user's DID, clustering them into one:
+
+  // React / Next.js — Privy
+  const { user } = usePrivy();
+  useEffect(() => {
+    if (user && analytics) { analytics.identify(user); }
+  }, [user, analytics]);
+
+  Key the effect on `user` so it re-runs on login and on every account link/unlink. See [Privy integration](/sdks/web#privy-integration).
 
   ### Track Custom Events
 
