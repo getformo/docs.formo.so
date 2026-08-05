@@ -1055,6 +1055,8 @@ formo.identify(user, { activeAddress });
 
 Linked wallets include `wallet` and `smart_wallet` accounts, plus a `cross_app` account's embedded and smart wallets (e.g. Abstract Global Wallet). Addresses are deduplicated.
 
+**Pinning the active wallet is optional.** `identify(user)` alone is enough for most apps: identify runs before the wagmi connect event on first load, so the active wallet may resolve to Privy's primary for a moment, but the effect re-runs once wallets load and attribution corrects itself. Pass `activeAddress` (and gate on `useWallets().ready`) only if you need attribution exact from the very first event, and note that gating means no identify at all until Privy reports ready.
+
 **Attribution.** Only one wallet owns the current address that later `track()` and `page()` events are attributed to. It's chosen in order: `activeAddress` if you pass it, else the wallet Formo already tracks from a prior connect, else Privy's `user.wallet`. The first two are matched strictly - a connected wallet that isn't linked in Privy is left alone rather than overwritten.
 
 **When identity re-emits.** Identify events are deduplicated per session on the wallet, the user id, and the profile, so:
