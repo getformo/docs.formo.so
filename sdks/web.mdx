@@ -1054,6 +1054,20 @@ Linked wallets include `wallet` and `smart_wallet` accounts, plus a `cross_app` 
 Pass stable identity metadata in `properties`. A value that changes on every call (a timestamp, a random id) makes every identify a new event.
 </Note>
 
+**Apps with both Privy and non-Privy users.** Branch on which identity you have, checking `user` first — a Privy session usually also has a wagmi `address`, so testing the address first would send that user down the plain path and lose the clustering:
+
+```tsx
+useEffect(() => {
+  if (!formo) return;
+
+  if (user) {
+    formo.identify(user);            // every linked wallet, under the DID
+  } else if (address) {
+    formo.identify({ address });     // plain wallet connect
+  }
+}, [user, address, formo]);
+```
+
 For the framework-agnostic form, use `identifyPrivyUser(formo, user, options)` — the same behavior without the flag, available from the React-free `./core` entry.
 
 ## Proxy

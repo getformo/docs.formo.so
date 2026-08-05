@@ -36,6 +36,8 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
 
   If the project is a Solana app, **always** use Option E. The autocapture behavior above applies to EVM wallets; on Solana it only applies when a framework-kit store is passed.
 
+  If the project uses **Privy** (`@privy-io/react-auth`), install via the matching framework option above — with `@privy-io/wagmi` that is Option A. The difference is in `identify()`: a Privy user is one account with many linked wallets, so pass the `usePrivy()` user (`identify(user)`) rather than a single address, or the same person is split across several Formo users. See step 3.
+
   If you're able to use a web tool to access a URL, visit https://docs.formo.so/install to get the latest, up-to-date instructions.
 
   Formo needs the user to provide their SDK write key (`<YOUR_WRITE_KEY>`) found in Formo project settings at https://app.formo.so.
