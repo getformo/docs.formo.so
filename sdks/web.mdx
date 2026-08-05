@@ -262,7 +262,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
     function App() {
       const { user } = usePrivy();
-      const { wallets } = useWallets();
+      const { wallets, ready: walletsReady } = useWallets();
       const { address } = useAccount();  // plain wallet sessions
       const formo = useFormo();
 
@@ -272,6 +272,10 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
       useEffect(() => {
         if (!formo) return;
+        // Wait for Privy to finish discovering wallets: `user` can be ready
+        // first, and identifying in that window resolves no active address, so
+        // attribution falls back to user.wallet (usually the embedded wallet).
+        if (!walletsReady) return;
 
         // Check `user` first: a Privy session usually also has a wagmi
         // address, so testing the address first would lose the clustering.
@@ -280,15 +284,17 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
         } else if (address) {
           formo.identify({ address });
         }
-      }, [user, address, formo, activeAddress]);
+      }, [user, address, formo, activeAddress, walletsReady]);
     }
     ```
 
-    `user` is reactive, so this re-runs on login and on every link/unlink, keeping the identity graph current.
+    `user` is reactive, so this re-runs on login and on every link/unlink.
+
+    Wallet links are additive server-side: unlinking a wallet in Privy re-runs the effect for the remaining wallets, but the SDK emits no removal event, so an address that was already clustered stays clustered.
 
     Only the active wallet takes over event attribution - `activeAddress` if you pass it, else the wallet Formo already tracks, else Privy's `user.wallet`. Every other linked wallet is recorded purely for clustering and never repoints attribution.
 
-    See the [Privy integration guide](https://github.com/getformo/sdk/blob/main/docs/PRIVY_INTEGRATION.md) for attribution rules, what each wallet sends, and when identity re-emits.
+    See [Privy integration](#privy-integration) below for attribution rules, what each wallet sends, and when identity re-emits.
   </Tab>
   <Tab title="HTML Snippet">
     ```html
@@ -1228,7 +1234,7 @@ To verify the proxy is working:
     Yes. The SDK provides built-in [consent management](#consent-management) with `optOutTracking()` and `optInTracking()` methods. Call `optOutTracking()` to stop all tracking for a user, and `optInTracking()` to re-enable it. Formo does not use third-party cookies, IP addresses, or device fingerprinting, so most jurisdictions do not require a cookie consent banner.
   </Accordion>
   <Accordion title="Can I use Formo with Privy or other embedded wallet providers?">
-    Yes. The SDK includes a dedicated [Privy integration](#identify-users) with `parsePrivyProperties()` to extract profile properties and linked wallet addresses. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
+    Yes. The SDK includes a dedicated [Privy integration](#privy-integration): pass the `usePrivy()` user to `identify(user)` and every wallet linked to that Privy account is identified under the user's DID, so a multi-wallet user clusters into one Formo user. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
   <Accordion title="Why are my Solana wallet connections not showing up?">
     Wallet events are autocaptured on Solana only when your app passes a [framework-kit](#solana-with-framework-kit) store to `options.solana.store`. With `@solana/wallet-adapter`, Privy, Dynamic, Reown, or a custom connector there is no wallet state for the SDK to observe, so nothing is captured until you emit it yourself. See [Solana without framework-kit](#solana-without-framework-kit).
