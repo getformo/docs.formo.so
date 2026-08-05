@@ -282,10 +282,6 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
     `user` is reactive, so this re-runs on login and on every link/unlink.
 
-    Wallet links are additive server-side: unlinking a wallet in Privy re-runs the effect for the remaining wallets, but the SDK emits no removal event, so an address that was already clustered stays clustered.
-
-    Only the active wallet takes over event attribution - `activeAddress` if you pass it, else the wallet Formo already tracks, else Privy's `user.wallet`. Every other linked wallet is recorded purely for clustering and never repoints attribution.
-
     See [Privy integration](#privy-integration) below for attribution rules, what each wallet sends, and when identity re-emits.
   </Tab>
   <Tab title="HTML Snippet">
@@ -1056,6 +1052,8 @@ Linked wallets include `wallet` and `smart_wallet` accounts, plus a `cross_app` 
 - re-running with the same user and profile is deduplicated - no spam on re-render;
 - a wallet identified anonymously re-emits once the Privy DID is attached at login;
 - **linking or unlinking a profile account re-emits every linked wallet** with the updated profile, since those properties are shared across the cluster.
+
+Unlinking is not retracted server-side. The effect re-runs for the remaining wallets, but no removal event is emitted, so an address that was already clustered stays clustered.
 
 <Note>
 Pass stable identity metadata in `properties`. A value that changes on every call (a timestamp, a random id) makes every identify a new event.
