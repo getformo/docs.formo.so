@@ -208,13 +208,21 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
   **Using Privy?** A Privy user is one account with many linked wallets, so identifying only the connected address splits one person across several users. Pass the `usePrivy()` user instead and every linked wallet is identified under that user's DID, clustering them into one:
 
   // React / Next.js, Privy
-  const { user } = usePrivy();       // null when the session isn't a Privy one
-  const { address } = useAccount();  // plain wallet connect
+  const { user } = usePrivy();                        // null on non-Privy sessions
+  const { wallets, ready: walletsReady } = useWallets();
+  const { address } = useAccount();                   // plain wallet connect
+  const activeAddress = address ?? wallets[0]?.address;
+
   useEffect(() => {
     if (!analytics) return;
-    if (user) { analytics.identify(user); }
+    // Wait for Privy to finish discovering wallets: identify runs before the
+    // wagmi connect event on first load, so without this the active address is
+    // unresolved and attribution falls back to the embedded wallet.
+    if (!walletsReady) return;
+
+    if (user) { analytics.identify(user, { activeAddress }); }
     else if (address) { analytics.identify({ address }); }
-  }, [user, address, analytics]);
+  }, [user, address, activeAddress, walletsReady, analytics]);
 
   Key the effect on `user` so it re-runs on login and on every account link/unlink. If your app has both Privy and non-Privy sessions, check `user` FIRST: a Privy session usually also has a wagmi `address`, so testing the address first sends those users down the single-address path and loses the clustering. See [Privy integration](/sdks/web#privy-integration).
 

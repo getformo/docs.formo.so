@@ -268,7 +268,7 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
       // Depend on the address string, not the `wallets` array - useWallets()
       // returns a new reference on many renders.
-      const activeAddress = wallets[0]?.address;
+      const activeAddress = address ?? wallets[0]?.address;
 
       useEffect(() => {
         if (!formo) return;
