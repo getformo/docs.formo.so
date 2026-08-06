@@ -214,7 +214,11 @@
               "api/boards/get-chart",
               "api/boards/create-chart",
               "api/boards/update-chart",
-              "api/boards/delete-chart"
+              "api/boards/delete-chart",
+              "api/boards/query-chart",
+              "api/boards/duplicate-chart",
+              "api/boards/move-chart",
+              "api/boards/reorder-charts"
             ]
           },
           {

@@ -2049,6 +2049,50 @@
           }
         },
         "required": ["field", "op"]
+      },
+      "ChartSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "board_id",
+          "chart_type",
+          "title",
+          "position",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "board_id": {
+            "type": "string"
+          },
+          "chart_type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": ["string", "null"]
+          },
+          "position": {
+            "type": "integer",
+            "description": "Display position of the chart on its board."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        }
       }
     },
     "parameters": {
@@ -3205,7 +3249,7 @@
       "get": {
         "operationId": "listCharts",
         "summary": "List charts for a board",
-        "description": "List charts in a board with their executed query results. Paginated. Includes the parent `board` for caller convenience and an optional `warnings` sidecar carrying per-chart query failures (the failing charts are excluded from `data` so the page renders cleanly).",
+        "description": "List charts in a board. By default returns lightweight chart summaries (no queries executed). Pass `include=results` to execute each chart’s stored query server-side and receive full charts with `results`, the parent `board`, and an optional `warnings` sidecar carrying per-chart query failures (failing charts are excluded from `data` so the page renders cleanly).",
         "tags": ["Charts"],
         "parameters": [
           {
@@ -3217,6 +3261,16 @@
             }
           },
           {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["results", "meta"]
+            },
+            "description": "Response detail. Omitted (or `meta`): lightweight summaries only — fast, no query execution. `results`: execute every chart’s stored query and include `results`, `board`, and `warnings`."
+          },
+          {
             "$ref": "#/components/parameters/Page"
           },
           {
@@ -3225,82 +3279,78 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated charts plus parent board and any partial-failure warnings",
+            "description": "Paginated chart summaries (default), or full charts with results when `include=results`",
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
+                  "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PaginatedListMeta"
-                    },
-                    {
-                      "type": "object",
-                      "required": ["data", "board"],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Chart"
-                          }
+                      "title": "Chart summaries (default)",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/PaginatedListMeta"
                         },
-                        "board": {
-                          "$ref": "#/components/schemas/Board"
-                        },
-                        "warnings": {
+                        {
                           "type": "object",
-                          "description": "Present only if some charts failed to execute. Failures are excluded from `data`.",
+                          "required": ["data"],
                           "properties": {
-                            "failedCharts": {
-                              "type": "integer"
-                            },
-                            "errors": {
+                            "data": {
                               "type": "array",
                               "items": {
-                                "type": "object",
-                                "properties": {
-                                  "chartId": {
-                                    "type": "string"
-                                  },
-                                  "error": {
-                                    "type": "string"
+                                "$ref": "#/components/schemas/ChartSummary"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Full charts with results (include=results)",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/PaginatedListMeta"
+                        },
+                        {
+                          "type": "object",
+                          "required": ["data", "board"],
+                          "properties": {
+                            "data": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Chart"
+                              }
+                            },
+                            "board": {
+                              "$ref": "#/components/schemas/Board"
+                            },
+                            "warnings": {
+                              "type": "object",
+                              "description": "Present only if some charts failed to execute. Failures are excluded from `data`.",
+                              "properties": {
+                                "failedCharts": {
+                                  "type": "integer"
+                                },
+                                "errors": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "chartId": {
+                                        "type": "string"
+                                      },
+                                      "error": {
+                                        "type": "string"
+                                      }
+                                    }
                                   }
                                 }
                               }
                             }
                           }
                         }
-                      }
+                      ]
                     }
                   ]
-                },
-                "example": {
-                  "data": [
-                    {
-                      "id": "cht_x1y2z3a4b5c6",
-                      "project_id": "proj_abc123",
-                      "board_id": "brd_a1b2c3d4e5f6",
-                      "chart_type": "line",
-                      "title": "Daily revenue (last 30 days)",
-                      "description": null,
-                      "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
-                      "x_axis": "day",
-                      "y_axis": ["revenue"],
-                      "group_by": null,
-                      "steps": null,
-                      "settings": null
-                    }
-                  ],
-                  "page": 1,
-                  "size": 100,
-                  "total": 1,
-                  "has_more": false,
-                  "board": {
-                    "id": "brd_a1b2c3d4e5f6",
-                    "project_id": "proj_abc123",
-                    "title": "Revenue Dashboard",
-                    "description": "Weekly revenue, conversion, and retention metrics.",
-                    "enabled": false
-                  }
                 }
               }
             }
@@ -3640,6 +3690,57 @@
         "x-required-scope": "boards:write"
       }
     },
+    "/v0/boards/{boardId}/charts/reorder": {
+      "put": {
+        "operationId": "reorderCharts",
+        "summary": "Reorder charts",
+        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["chartIds"],
+                "properties": {
+                  "chartIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "Chart ids in the desired display order."
+                  }
+                }
+              },
+              "example": {
+                "chartIds": ["cht_x1y2z3a4b5c6", "cht_q7r8s9t0u1v2"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Charts reordered"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-required-scope": "boards:write"
+      }
+    },
     "/v0/boards/{boardId}/charts/{chartId}": {
       "get": {
         "operationId": "getChart",
@@ -3766,6 +3867,180 @@
           }
         },
         "x-required-scope": "boards:write"
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}/move": {
+      "put": {
+        "operationId": "moveChart",
+        "summary": "Move chart to another board",
+        "description": "Moves the chart to a different board in the same project. The target board must differ from the current one.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["targetBoardId"],
+                "properties": {
+                  "targetBoardId": {
+                    "type": "string",
+                    "description": "The board to move the chart to."
+                  }
+                }
+              },
+              "example": {
+                "targetBoardId": "brd_f6e5d4c3b2a1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The moved chart",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chart"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-required-scope": "boards:write"
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}/duplicate": {
+      "post": {
+        "operationId": "duplicateChart",
+        "summary": "Duplicate chart",
+        "description": "Creates a copy of the chart on the same board and returns the new chart id.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Id of the newly created chart",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "cht_n3w1d2e3f4a5"
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:write"
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}/query": {
+      "get": {
+        "operationId": "queryChartWithDateRange",
+        "summary": "Execute saved chart query",
+        "description": "Runs the saved chart's query with `{{date_from}}`/`{{date_to}}` substituted from the query parameters; the chart's query must contain both template variables. Dune-backed charts run against the project's configured Dune API key.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Start date (YYYY-MM-DD), substituted for `{{date_from}}`."
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "End date (YYYY-MM-DD), substituted for `{{date_to}}`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Query result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["result"],
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "JSON-encoded query result: `{ meta, data, rows }`."
+                    }
+                  }
+                },
+                "example": {
+                  "result": "{\"meta\":[{\"name\":\"day\",\"type\":\"Date\"},{\"name\":\"revenue\",\"type\":\"Float64\"}],\"data\":[{\"day\":\"2026-08-01\",\"revenue\":1204.5}],\"rows\":1}"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-required-scope": "boards:read"
       }
     },
     "/v0/contracts": {

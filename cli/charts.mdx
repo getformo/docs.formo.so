@@ -9,7 +9,7 @@ The `formo charts` command group manages charts within dashboard boards. Every c
 
 ## `formo charts list`
 
-List charts for a board, including executed results when available.
+List charts for a board. Returns lightweight summaries by default; pass `--results` to execute each chart’s query and include full results.
 
 <Note>
 Requires `boards:read` scope on your API key.
@@ -18,6 +18,7 @@ Requires `boards:read` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--board-id` | `string` | ✅ | Board ID to list charts from |
+| `--results` | `boolean` | ❌ | Execute each chart’s query and include results (slower; hits the analytics backend) |
 | `--page` | `number` | ❌ | Page number, 1-indexed |
 | `--size` | `number` | ❌ | Page size |
 

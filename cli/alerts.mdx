@@ -141,34 +141,6 @@ formo alerts toggle alert_abc123 --status active
 
 ---
 
-## `formo alerts test <alertId>`
-
-Send a test delivery for an alert.
-
-<Note>
-Requires `alerts:write` scope on your API key.
-</Note>
-
-### Options
-
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `--sample-event` | `string` | ❌ | JSON object to use as the sample event |
-| `--sample-user` | `string` | ❌ | JSON object to use as the sample user/profile |
-| `--recipient-overrides` | `string` | ❌ | JSON array of recipient objects to test instead of saved recipients |
-
-```bash
-formo alerts test alert_abc123 \
-  --sample-event '{"event":"transaction","revenue":250}' \
-  --recipient-overrides '[{"type":"webhook","value":["https://example.com/formo-webhook"]}]'
-```
-
-<Note>
-Webhook tests require a public webhook URL. Localhost and private-network URLs are blocked by backend SSRF protections.
-</Note>
-
----
-
 ## `formo alerts delete <alertId>`
 
 Delete an alert.
