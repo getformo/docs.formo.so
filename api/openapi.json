@@ -2050,65 +2050,6 @@
         },
         "required": ["field", "op"]
       },
-      "TestAlertResponse": {
-        "type": "object",
-        "required": ["delivered", "failed", "results"],
-        "properties": {
-          "delivered": {
-            "type": "integer",
-            "description": "Number of webhook deliveries that succeeded."
-          },
-          "failed": {
-            "type": "integer",
-            "description": "Number of webhook deliveries that failed."
-          },
-          "results": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["url", "ok"],
-              "properties": {
-                "url": {
-                  "type": "string"
-                },
-                "ok": {
-                  "type": "boolean"
-                },
-                "status": {
-                  "type": "integer",
-                  "description": "HTTP status returned by the webhook, when reached."
-                },
-                "error": {
-                  "type": "string",
-                  "description": "Failure reason, when the delivery failed."
-                }
-              }
-            }
-          }
-        }
-      },
-      "ContractRecommendation": {
-        "type": "object",
-        "required": ["address", "chain", "interaction_count", "last_seen"],
-        "properties": {
-          "address": {
-            "type": "string",
-            "description": "Checksummed contract address."
-          },
-          "chain": {
-            "type": "integer",
-            "description": "EVM chain ID."
-          },
-          "interaction_count": {
-            "type": "integer",
-            "description": "Interactions from this project in the last 90 days."
-          },
-          "last_seen": {
-            "type": "string",
-            "description": "Timestamp of the most recent interaction."
-          }
-        }
-      },
       "ChartSummary": {
         "type": "object",
         "required": [
@@ -3041,101 +2982,6 @@
         "x-required-scope": "alerts:write"
       }
     },
-    "/v0/alerts/{alertId}/test": {
-      "post": {
-        "operationId": "testAlert",
-        "summary": "Test alert delivery",
-        "description": "Sends a signed test delivery to the alert's webhook recipients, or to `recipientOverrides` when provided. Real HTTP requests are made to the configured webhook URLs. Returns 400 when the alert has no webhook recipient.",
-        "tags": ["Alerts"],
-        "parameters": [
-          {
-            "name": "alertId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "sampleEvent": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "description": "Optional sample event payload used in the test delivery."
-                  },
-                  "sampleUser": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "description": "Optional sample user payload used in the test delivery."
-                  },
-                  "recipientOverrides": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": ["type", "value"],
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "enum": ["email", "slack", "webhook"]
-                        },
-                        "value": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "description": "Recipients to deliver to instead of the ones saved on the alert."
-                  }
-                }
-              },
-              "example": {
-                "recipientOverrides": [
-                  {
-                    "type": "webhook",
-                    "value": ["https://hooks.myapp.com/formo"]
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Delivery results per webhook URL",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TestAlertResponse"
-                },
-                "example": {
-                  "delivered": 1,
-                  "failed": 0,
-                  "results": [
-                    {
-                      "url": "https://hooks.myapp.com/formo",
-                      "ok": true,
-                      "status": 200
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          }
-        },
-        "x-required-scope": "alerts:write"
-      }
-    },
     "/v0/boards": {
       "get": {
         "operationId": "listBoards",
@@ -3403,7 +3249,7 @@
       "get": {
         "operationId": "listCharts",
         "summary": "List charts for a board",
-        "description": "List charts in a board with their executed query results. Paginated. Includes the parent `board` for caller convenience and an optional `warnings` sidecar carrying per-chart query failures (the failing charts are excluded from `data` so the page renders cleanly).",
+        "description": "List charts in a board. By default returns lightweight chart summaries (no queries executed). Pass `include=results` to execute each chart’s stored query server-side and receive full charts with `results`, the parent `board`, and an optional `warnings` sidecar carrying per-chart query failures (failing charts are excluded from `data` so the page renders cleanly).",
         "tags": ["Charts"],
         "parameters": [
           {
@@ -3415,6 +3261,16 @@
             }
           },
           {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["results", "meta"]
+            },
+            "description": "Response detail. Omitted (or `meta`): lightweight summaries only — fast, no query execution. `results`: execute every chart’s stored query and include `results`, `board`, and `warnings`."
+          },
+          {
             "$ref": "#/components/parameters/Page"
           },
           {
@@ -3423,82 +3279,78 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated charts plus parent board and any partial-failure warnings",
+            "description": "Paginated chart summaries (default), or full charts with results when `include=results`",
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
+                  "oneOf": [
                     {
-                      "$ref": "#/components/schemas/PaginatedListMeta"
-                    },
-                    {
-                      "type": "object",
-                      "required": ["data", "board"],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Chart"
-                          }
+                      "title": "Chart summaries (default)",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/PaginatedListMeta"
                         },
-                        "board": {
-                          "$ref": "#/components/schemas/Board"
-                        },
-                        "warnings": {
+                        {
                           "type": "object",
-                          "description": "Present only if some charts failed to execute. Failures are excluded from `data`.",
+                          "required": ["data"],
                           "properties": {
-                            "failedCharts": {
-                              "type": "integer"
-                            },
-                            "errors": {
+                            "data": {
                               "type": "array",
                               "items": {
-                                "type": "object",
-                                "properties": {
-                                  "chartId": {
-                                    "type": "string"
-                                  },
-                                  "error": {
-                                    "type": "string"
+                                "$ref": "#/components/schemas/ChartSummary"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "title": "Full charts with results (include=results)",
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/PaginatedListMeta"
+                        },
+                        {
+                          "type": "object",
+                          "required": ["data", "board"],
+                          "properties": {
+                            "data": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Chart"
+                              }
+                            },
+                            "board": {
+                              "$ref": "#/components/schemas/Board"
+                            },
+                            "warnings": {
+                              "type": "object",
+                              "description": "Present only if some charts failed to execute. Failures are excluded from `data`.",
+                              "properties": {
+                                "failedCharts": {
+                                  "type": "integer"
+                                },
+                                "errors": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "chartId": {
+                                        "type": "string"
+                                      },
+                                      "error": {
+                                        "type": "string"
+                                      }
+                                    }
                                   }
                                 }
                               }
                             }
                           }
                         }
-                      }
+                      ]
                     }
                   ]
-                },
-                "example": {
-                  "data": [
-                    {
-                      "id": "cht_x1y2z3a4b5c6",
-                      "project_id": "proj_abc123",
-                      "board_id": "brd_a1b2c3d4e5f6",
-                      "chart_type": "line",
-                      "title": "Daily revenue (last 30 days)",
-                      "description": null,
-                      "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
-                      "x_axis": "day",
-                      "y_axis": ["revenue"],
-                      "group_by": null,
-                      "steps": null,
-                      "settings": null
-                    }
-                  ],
-                  "page": 1,
-                  "size": 100,
-                  "total": 1,
-                  "has_more": false,
-                  "board": {
-                    "id": "brd_a1b2c3d4e5f6",
-                    "project_id": "proj_abc123",
-                    "title": "Revenue Dashboard",
-                    "description": "Weekly revenue, conversion, and retention metrics.",
-                    "enabled": false
-                  }
                 }
               }
             }
@@ -3836,78 +3688,6 @@
           }
         },
         "x-required-scope": "boards:write"
-      }
-    },
-    "/v0/boards/{boardId}/charts/meta": {
-      "get": {
-        "operationId": "listChartSummaries",
-        "summary": "List chart summaries",
-        "description": "Lightweight metadata for a board's charts (no queries or axes), in display order.",
-        "tags": ["Charts"],
-        "parameters": [
-          {
-            "name": "boardId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "$ref": "#/components/parameters/Page"
-          },
-          {
-            "$ref": "#/components/parameters/Size"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Paginated list of chart summaries",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PaginatedListMeta"
-                    },
-                    {
-                      "type": "object",
-                      "required": ["data"],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/ChartSummary"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "example": {
-                  "data": [
-                    {
-                      "id": "cht_x1y2z3a4b5c6",
-                      "project_id": "proj_abc123",
-                      "board_id": "brd_a1b2c3d4e5f6",
-                      "chart_type": "line",
-                      "title": "Daily revenue (last 30 days)",
-                      "description": null,
-                      "position": 0,
-                      "created_at": "2026-04-12T09:32:18.000Z",
-                      "updated_at": null
-                    }
-                  ],
-                  "page": 1,
-                  "size": 100,
-                  "total": 1,
-                  "has_more": false
-                }
-              }
-            }
-          }
-        },
-        "x-required-scope": "boards:read"
       }
     },
     "/v0/boards/{boardId}/charts/reorder": {
@@ -4515,46 +4295,6 @@
         "x-required-scope": "contracts:write"
       }
     },
-    "/v0/contracts/recommendations": {
-      "get": {
-        "operationId": "listContractRecommendations",
-        "summary": "List contract recommendations",
-        "description": "Recommends contracts this project's users interacted with in the last 90 days that are not yet tracked. Best-effort: returns an empty list when analytics data is unavailable.",
-        "tags": ["Contracts"],
-        "responses": {
-          "200": {
-            "description": "Recommended contracts, most-interacted first",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": ["recommendations"],
-                  "properties": {
-                    "recommendations": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ContractRecommendation"
-                      }
-                    }
-                  }
-                },
-                "example": {
-                  "recommendations": [
-                    {
-                      "address": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
-                      "chain": 1,
-                      "interaction_count": 421,
-                      "last_seen": "2026-08-01 14:03:22"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "x-required-scope": "contracts:read"
-      }
-    },
     "/v0/contracts/{chain}/{address}": {
       "get": {
         "operationId": "getContract",
@@ -4715,72 +4455,6 @@
                 }
               }
             }
-          }
-        },
-        "x-required-scope": "contracts:write"
-      }
-    },
-    "/v0/contracts/{chain}/{address}/pipeline": {
-      "patch": {
-        "operationId": "updateContractPipeline",
-        "summary": "Toggle contract pipeline inclusion",
-        "description": "Includes or excludes the contract from the project's on-chain events pipeline without touching its ABI or tracked events.",
-        "tags": ["Contracts"],
-        "parameters": [
-          {
-            "name": "chain",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "description": "EVM chain ID (e.g. `1` for Ethereum mainnet, `8453` for Base)."
-          },
-          {
-            "name": "address",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^0x[0-9a-fA-F]{40}$"
-            },
-            "description": "Contract address (0x-prefixed, 40 hex chars)."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["include_in_pipeline"],
-                "properties": {
-                  "include_in_pipeline": {
-                    "type": "boolean",
-                    "description": "Whether the contract is included in the events pipeline."
-                  }
-                }
-              },
-              "example": {
-                "include_in_pipeline": false
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The updated contract",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Contract"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         },
         "x-required-scope": "contracts:write"
