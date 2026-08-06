@@ -2,7 +2,7 @@
 title: "Contracts"
 sidebarTitle: "Contracts"
 icon: file-contract
-description: "Register, list, inspect, update, recommend, and remove tracked smart contracts from the terminal. Manage ABIs, monitored events, and pipeline inclusion."
+description: "Register, list, inspect, update, and remove tracked smart contracts from the terminal. Manage ABIs, monitored events, and pipeline inclusion."
 ---
 
 The `formo contracts` command group manages smart contracts tracked by your project for decoding and event ingestion.
@@ -24,20 +24,6 @@ Requires `contracts:read` scope on your API key.
 
 ```bash
 formo contracts list --size 25
-```
-
----
-
-## `formo contracts recommendations`
-
-List contracts your project already interacts with but has not added yet.
-
-<Note>
-Requires `contracts:read` scope on your API key.
-</Note>
-
-```bash
-formo contracts recommendations
 ```
 
 ---
@@ -118,25 +104,6 @@ formo contracts update 1 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
   --name "USD Coin" \
   --abi '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[]}]' \
   --events '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[]}]'
-```
-
----
-
-## `formo contracts pipeline <chain> <address>`
-
-Toggle whether a tracked contract is included in the project events pipeline without resending its ABI.
-
-<Note>
-Requires `contracts:write` scope on your API key.
-</Note>
-
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `--include-in-pipeline` | `boolean` | ✅ | `true` to include the contract, `false` to exclude it |
-
-```bash
-formo contracts pipeline 1 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
-  --include-in-pipeline false
 ```
 
 ---
