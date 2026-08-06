@@ -2049,6 +2049,109 @@
           }
         },
         "required": ["field", "op"]
+      },
+      "TestAlertResponse": {
+        "type": "object",
+        "required": ["delivered", "failed", "results"],
+        "properties": {
+          "delivered": {
+            "type": "integer",
+            "description": "Number of webhook deliveries that succeeded."
+          },
+          "failed": {
+            "type": "integer",
+            "description": "Number of webhook deliveries that failed."
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["url", "ok"],
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "status": {
+                  "type": "integer",
+                  "description": "HTTP status returned by the webhook, when reached."
+                },
+                "error": {
+                  "type": "string",
+                  "description": "Failure reason, when the delivery failed."
+                }
+              }
+            }
+          }
+        }
+      },
+      "ContractRecommendation": {
+        "type": "object",
+        "required": ["address", "chain", "interaction_count", "last_seen"],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Checksummed contract address."
+          },
+          "chain": {
+            "type": "integer",
+            "description": "EVM chain ID."
+          },
+          "interaction_count": {
+            "type": "integer",
+            "description": "Interactions from this project in the last 90 days."
+          },
+          "last_seen": {
+            "type": "string",
+            "description": "Timestamp of the most recent interaction."
+          }
+        }
+      },
+      "ChartSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "board_id",
+          "chart_type",
+          "title",
+          "position",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "board_id": {
+            "type": "string"
+          },
+          "chart_type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": ["string", "null"]
+          },
+          "position": {
+            "type": "integer",
+            "description": "Display position of the chart on its board."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        }
       }
     },
     "parameters": {
@@ -2938,6 +3041,101 @@
         "x-required-scope": "alerts:write"
       }
     },
+    "/v0/alerts/{alertId}/test": {
+      "post": {
+        "operationId": "testAlert",
+        "summary": "Test alert delivery",
+        "description": "Sends a signed test delivery to the alert's webhook recipients, or to `recipientOverrides` when provided. Real HTTP requests are made to the configured webhook URLs. Returns 400 when the alert has no webhook recipient.",
+        "tags": ["Alerts"],
+        "parameters": [
+          {
+            "name": "alertId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sampleEvent": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Optional sample event payload used in the test delivery."
+                  },
+                  "sampleUser": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Optional sample user payload used in the test delivery."
+                  },
+                  "recipientOverrides": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["type", "value"],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": ["email", "slack", "webhook"]
+                        },
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "description": "Recipients to deliver to instead of the ones saved on the alert."
+                  }
+                }
+              },
+              "example": {
+                "recipientOverrides": [
+                  {
+                    "type": "webhook",
+                    "value": ["https://hooks.myapp.com/formo"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Delivery results per webhook URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestAlertResponse"
+                },
+                "example": {
+                  "delivered": 1,
+                  "failed": 0,
+                  "results": [
+                    {
+                      "url": "https://hooks.myapp.com/formo",
+                      "ok": true,
+                      "status": 200
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-required-scope": "alerts:write"
+      }
+    },
     "/v0/boards": {
       "get": {
         "operationId": "listBoards",
@@ -3640,6 +3838,129 @@
         "x-required-scope": "boards:write"
       }
     },
+    "/v0/boards/{boardId}/charts/meta": {
+      "get": {
+        "operationId": "listChartSummaries",
+        "summary": "List chart summaries",
+        "description": "Lightweight metadata for a board's charts (no queries or axes), in display order.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of chart summaries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedListMeta"
+                    },
+                    {
+                      "type": "object",
+                      "required": ["data"],
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ChartSummary"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": "cht_x1y2z3a4b5c6",
+                      "project_id": "proj_abc123",
+                      "board_id": "brd_a1b2c3d4e5f6",
+                      "chart_type": "line",
+                      "title": "Daily revenue (last 30 days)",
+                      "description": null,
+                      "position": 0,
+                      "created_at": "2026-04-12T09:32:18.000Z",
+                      "updated_at": null
+                    }
+                  ],
+                  "page": 1,
+                  "size": 100,
+                  "total": 1,
+                  "has_more": false
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:read"
+      }
+    },
+    "/v0/boards/{boardId}/charts/reorder": {
+      "put": {
+        "operationId": "reorderCharts",
+        "summary": "Reorder charts",
+        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["chartIds"],
+                "properties": {
+                  "chartIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "Chart ids in the desired display order."
+                  }
+                }
+              },
+              "example": {
+                "chartIds": ["cht_x1y2z3a4b5c6", "cht_q7r8s9t0u1v2"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Charts reordered"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-required-scope": "boards:write"
+      }
+    },
     "/v0/boards/{boardId}/charts/{chartId}": {
       "get": {
         "operationId": "getChart",
@@ -3766,6 +4087,180 @@
           }
         },
         "x-required-scope": "boards:write"
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}/move": {
+      "put": {
+        "operationId": "moveChart",
+        "summary": "Move chart to another board",
+        "description": "Moves the chart to a different board in the same project. The target board must differ from the current one.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["targetBoardId"],
+                "properties": {
+                  "targetBoardId": {
+                    "type": "string",
+                    "description": "The board to move the chart to."
+                  }
+                }
+              },
+              "example": {
+                "targetBoardId": "brd_f6e5d4c3b2a1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The moved chart",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chart"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-required-scope": "boards:write"
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}/duplicate": {
+      "post": {
+        "operationId": "duplicateChart",
+        "summary": "Duplicate chart",
+        "description": "Creates a copy of the chart on the same board and returns the new chart id.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Id of the newly created chart",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "cht_n3w1d2e3f4a5"
+              }
+            }
+          }
+        },
+        "x-required-scope": "boards:write"
+      }
+    },
+    "/v0/boards/{boardId}/charts/{chartId}/query": {
+      "get": {
+        "operationId": "queryChartWithDateRange",
+        "summary": "Execute saved chart query",
+        "description": "Runs the saved chart's query with `{{date_from}}`/`{{date_to}}` substituted from the query parameters; the chart's query must contain both template variables. Dune-backed charts run against the project's configured Dune API key.",
+        "tags": ["Charts"],
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chartId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Start date (YYYY-MM-DD), substituted for `{{date_from}}`."
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "End date (YYYY-MM-DD), substituted for `{{date_to}}`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Query result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["result"],
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "JSON-encoded query result: `{ meta, data, rows }`."
+                    }
+                  }
+                },
+                "example": {
+                  "result": "{\"meta\":[{\"name\":\"day\",\"type\":\"Date\"},{\"name\":\"revenue\",\"type\":\"Float64\"}],\"data\":[{\"day\":\"2026-08-01\",\"revenue\":1204.5}],\"rows\":1}"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "x-required-scope": "boards:read"
       }
     },
     "/v0/contracts": {
@@ -4020,6 +4515,46 @@
         "x-required-scope": "contracts:write"
       }
     },
+    "/v0/contracts/recommendations": {
+      "get": {
+        "operationId": "listContractRecommendations",
+        "summary": "List contract recommendations",
+        "description": "Recommends contracts this project's users interacted with in the last 90 days that are not yet tracked. Best-effort: returns an empty list when analytics data is unavailable.",
+        "tags": ["Contracts"],
+        "responses": {
+          "200": {
+            "description": "Recommended contracts, most-interacted first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["recommendations"],
+                  "properties": {
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ContractRecommendation"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "recommendations": [
+                    {
+                      "address": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+                      "chain": 1,
+                      "interaction_count": 421,
+                      "last_seen": "2026-08-01 14:03:22"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "contracts:read"
+      }
+    },
     "/v0/contracts/{chain}/{address}": {
       "get": {
         "operationId": "getContract",
@@ -4180,6 +4715,72 @@
                 }
               }
             }
+          }
+        },
+        "x-required-scope": "contracts:write"
+      }
+    },
+    "/v0/contracts/{chain}/{address}/pipeline": {
+      "patch": {
+        "operationId": "updateContractPipeline",
+        "summary": "Toggle contract pipeline inclusion",
+        "description": "Includes or excludes the contract from the project's on-chain events pipeline without touching its ABI or tracked events.",
+        "tags": ["Contracts"],
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "EVM chain ID (e.g. `1` for Ethereum mainnet, `8453` for Base)."
+          },
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$"
+            },
+            "description": "Contract address (0x-prefixed, 40 hex chars)."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["include_in_pipeline"],
+                "properties": {
+                  "include_in_pipeline": {
+                    "type": "boolean",
+                    "description": "Whether the contract is included in the events pipeline."
+                  }
+                }
+              },
+              "example": {
+                "include_in_pipeline": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated contract",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contract"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "x-required-scope": "contracts:write"

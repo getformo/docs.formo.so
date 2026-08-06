@@ -199,7 +199,8 @@
               "api/alerts/create",
               "api/alerts/update",
               "api/alerts/delete",
-              "api/alerts/toggle"
+              "api/alerts/toggle",
+              "api/alerts/test"
             ]
           },
           {
@@ -211,19 +212,26 @@
               "api/boards/update",
               "api/boards/delete",
               "api/boards/list-charts",
+              "api/boards/list-chart-summaries",
               "api/boards/get-chart",
               "api/boards/create-chart",
               "api/boards/update-chart",
-              "api/boards/delete-chart"
+              "api/boards/delete-chart",
+              "api/boards/query-chart",
+              "api/boards/duplicate-chart",
+              "api/boards/move-chart",
+              "api/boards/reorder-charts"
             ]
           },
           {
             "group": "Contracts API",
             "pages": [
               "api/contracts/list",
+              "api/contracts/recommendations",
               "api/contracts/get",
               "api/contracts/create",
               "api/contracts/update",
+              "api/contracts/toggle-pipeline",
               "api/contracts/delete"
             ]
           },

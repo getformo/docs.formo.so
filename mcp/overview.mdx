@@ -90,12 +90,17 @@ Permission: `query:read`.
 
 ### Profiles API
 
-Wallet enrichment.
-Permission: `profiles:read`.
+Wallet enrichment and profile writes.
 
-| Tool | Description |
-|:-----|:------------|
-| `search_profile` | Look up enrichment for a single wallet address (net worth, tokens, labels) |
+| Tool | Description | Permission |
+|:-----|:------------|:-----------|
+| `search_profile` | Look up enrichment for a single wallet address (net worth, tokens, labels) | `profiles:read` |
+| `update_profile_properties` | Set profile properties on a wallet (address or ENS name) | `profiles:write` |
+| `upsert_profile_labels` | Add or update labels on a wallet | `profiles:write` |
+| `delete_profile_label` | Delete a label from a wallet | `profiles:write` |
+| `batch_update_profile_properties` | Set profile properties on up to 100 wallets in one call | `profiles:write` |
+| `batch_upsert_profile_labels` | Add or update labels on up to 100 wallets in one call | `profiles:write` |
+| `import_wallets` | Import wallets as identified users (Scale and Enterprise plans; imported wallets count toward monthly active user billing) | `profiles:write` |
 
 ### Alerts
 
@@ -103,14 +108,16 @@ Permission: `profiles:read`.
 |:-----|:------------|:-----------|
 | `list_alerts`, `get_alert` | Read alerts | `alerts:read` |
 | `create_alert`, `update_alert`, `toggle_alert`, `delete_alert` | Manage alerts | `alerts:write` |
+| `test_alert` | Send a test delivery to an alert's webhook recipients (makes real HTTP requests) | `alerts:write` |
 
 ### Charts
 
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
 | `list_boards`, `get_board`, `list_charts`, `get_chart` | Read boards and charts | `boards:read` |
+| `execute_saved_chart` | Run a saved chart's query with a chosen date range | `boards:read` |
 | `create_board`, `update_board`, `delete_board` | Manage boards | `boards:write` |
-| `create_chart`, `update_chart`, `delete_chart`, `duplicate_chart`, `move_chart` | Manage charts | `boards:write` |
+| `create_chart`, `update_chart`, `delete_chart`, `duplicate_chart`, `move_chart`, `reorder_charts` | Manage charts | `boards:write` |
 | `preview_chart` | Run a chart's SQL without saving | `query:read` |
 
 ### Contracts
@@ -118,6 +125,7 @@ Permission: `profiles:read`.
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
 | `list_contracts`, `get_contract` | Read tracked contracts | `contracts:read` |
+| `list_contract_recommendations` | Recommend recently-interacted contracts that are not yet tracked | `contracts:read` |
 | `create_contract`, `update_contract`, `toggle_contract_pipeline`, `delete_contract` | Manage tracked contracts | `contracts:write` |
 
 ### Segments
