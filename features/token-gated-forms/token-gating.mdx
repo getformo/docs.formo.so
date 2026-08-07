@@ -205,34 +205,20 @@ Available on both **Connect Wallet (EVM)** and **Connect Wallet (Solana)**.
 
 ### How it works
 
-Your browser turns the CSV into a **Bloom filter**, a compact bit array that answers "is this address on the list?" without containing the addresses. Each address is hashed with a random salt unique to that list, and the bits are merged into one array. Formo stores only that array, its salt, and how many addresses you uploaded, so the plaintext never leaves your device and your list cannot be leaked. A 100,000-address list is about 350 KB.
-
-A complete two-address allowlist looks like this:
-
-```
-salt   4f2a9c71e08b3d6a5c1e7f90ab24d635
-
-0x7e6ca77a...a6a255   sets bits  0,1,6,7,11,12,17,18,23,24,29,30,35,36,41,42,46,47,52,53,58,59
-0x457ab1aa...5eae53   sets bits  2,5,8,11,14,17,20,23,24,27,30,33,36,39,42,45,48,51,54,57,60,63
-
-stored   11100111 10011010 01101001 10010110 01011001 01100111 10011110 01111001
-```
-
-Respondents connect and sign with their wallet to prove they own the address. Formo hashes that proven address the same way and reads the bits it points to, then re-checks on the server at submission so the gate can't be bypassed from the browser. An address that lands on any unset bit was never added, so it is rejected.
-
-One trade-off: a Bloom filter never rejects someone who is on your list, but roughly **1 address in 1,000,000** that is not on your list may pass. If you need an exact guarantee, gate on token or NFT ownership instead.
+Your browser turns the CSV into a **Bloom filter**, a compact bit array that answers "is this address on the list?". The original allowlist is never stored anywhere. 
+Respondents connect and sign with their wallet to prove they own the address. Formo verifies that proven address is in the allowlist.
 
 ### Setup
 
 <Steps>
-  <Step title="Save your form">
-    Save the form first, since the allowlist is stored against it.
+  <Step title="Open the form settings page">
+    On your form, go to Settings > Access.
   </Step>
   <Step title="Enable a wallet requirement">
     Turn on **Connect Wallet (EVM)** or **Connect Wallet (Solana)**.
   </Step>
   <Step title="Add the Allowlist condition">
-    Click **Add requirement** under that wallet requirement and select **Allowlist (CSV)**.
+    For each Connect Wallet, click **Add requirement** and select **Allowlist (CSV)**.
   </Step>
   <Step title="Upload your CSV">
     Click **Upload CSV** and choose your file. Formo shows how many unique addresses it found.
