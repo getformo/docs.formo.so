@@ -260,41 +260,6 @@ Notice what the stored array does *not* contain: no addresses, and nothing that 
   </Step>
 </Steps>
 
-### CSV format
-
-One wallet address per row, up to **100,000** addresses. Other columns and a header row are ignored, so a spreadsheet export works as-is:
-
-```csv
-wallet_address,notes
-0x7E6CA77a7E044BA836a97beB796c124Ca3a6A255,investor
-0x457AB1aacA14D6ADc2F109959AcB1A9B2B5EAe53,team
-```
-
-A bare list of addresses works equally well:
-
-```csv
-0x7E6CA77a7E044BA836a97beB796c124Ca3a6A255
-0x457AB1aacA14D6ADc2F109959AcB1A9B2B5EAe53
-```
-
-Duplicates are removed automatically, and rows without a valid address are skipped with a notice showing how many.
-
-<Tip>
-EVM addresses are matched case-insensitively, so checksummed and lowercase entries both work. Solana addresses are case-sensitive, so paste them exactly as they appear.
-</Tip>
-
-### Updating the list
-
-Open the requirement and click **Replace CSV** to upload a new file. The previous list is discarded; there's no way to add to a list without re-uploading the full set, since Formo doesn't hold the original addresses.
-
-### Example
-
-| Field | Value |
-|-------|-------|
-| Type | Allowlist (CSV) |
-| Wallet requirement | Connect Wallet (EVM) |
-| Addresses | 2,500 uploaded from `investors.csv` |
-
 ## Solana
 
 Alongside EVM chains, you can gate forms on Solana wallets. Enable **Connect Wallet (Solana)** in your form settings, then add one or more conditions:
