@@ -95,11 +95,11 @@ Wallet enrichment and profile writes.
 | Tool | Description | Permission |
 |:-----|:------------|:-----------|
 | `search_profile` | Look up enrichment for a single wallet address (net worth, tokens, labels) | `profiles:read` |
-| `update_profile_properties` | Set profile properties on a wallet (address or ENS name) | `profiles:write` |
+| `update_profile_properties` | Set or unset profile properties on a wallet (address or ENS name); a `null` value deletes the property | `profiles:write` |
 | `upsert_profile_labels` | Add or update labels on a wallet | `profiles:write` |
 | `delete_profile_label` | Delete a label from a wallet | `profiles:write` |
-| `batch_update_profile_properties` | Set profile properties on up to 100 wallets in one call | `profiles:write` |
-| `batch_upsert_profile_labels` | Add or update labels on up to 100 wallets in one call | `profiles:write` |
+| `batch_update_profile_properties` | Set or unset profile properties on up to 100 wallets in one call; `null` values delete | `profiles:write` |
+| `batch_upsert_profile_labels` | Add, update, or delete labels on up to 100 wallets in one call (`_is_deleted: 1` rows tombstone) | `profiles:write` |
 | `import_wallets` | Import wallets as identified users (Scale and Enterprise plans; imported wallets count toward monthly active user billing) | `profiles:write` |
 
 ### Alerts

@@ -5248,7 +5248,7 @@
       "put": {
         "operationId": "updateUserProperties",
         "summary": "Update user properties",
-        "description": "Set first-party properties for a wallet profile. Override display name, email, socials, avatar, location, and other identity fields.",
+        "description": "Set or unset first-party properties for a wallet profile. Override display name, email, socials, avatar, location, and other identity fields. Send `null` as a value to delete (unset) that property: the field then reads as null everywhere, including over any globally-enriched fallback value, until a new value is set. `user_id` cannot be unset (it participates in identity stitching). Set-and-unset compose in a single call. Note: profile enrichment snapshots are versioned, but first-party property overrides (and their deletions) are always current; a point-in-time read (`timestamp`) reflects the latest overrides, so a deletion also masks historical reads.",
         "tags": ["Profiles"],
         "parameters": [
           {
@@ -5267,7 +5267,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "description": "Merge-update of profile properties. Only the listed keys are accepted; unknown keys are rejected. At least one key must be provided.",
+                "description": "Merge-update of profile properties. Only the listed keys are accepted; unknown keys are rejected. At least one key must be provided. A `null` value unsets the property (not allowed for `user_id`). The literal string `__formo_deleted__` is a reserved internal tombstone and is rejected as a value.",
                 "minProperties": 1,
                 "additionalProperties": false,
                 "properties": {
@@ -5275,67 +5275,67 @@
                     "type": "string"
                   },
                   "display_name": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "email": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "farcaster": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "discord": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "twitter": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "telegram": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "instagram": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "website": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "github": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "linkedin": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "facebook": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "tiktok": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "youtube": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "reddit": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "avatar": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "description": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "location": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "ens": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "lens": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "basenames": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   },
                   "linea": {
-                    "type": "string"
+                    "type": ["string", "null"]
                   }
                 }
               },
@@ -5346,6 +5346,13 @@
                     "display_name": "alice.eth",
                     "email": "alice@example.com",
                     "twitter": "alice"
+                  }
+                },
+                "unsetProperties": {
+                  "summary": "Unset email, set a new display name",
+                  "value": {
+                    "display_name": "alice.eth",
+                    "email": null
                   }
                 }
               }
@@ -5389,7 +5396,7 @@
       "post": {
         "operationId": "batchUpdateUserProperties",
         "summary": "Batch update user properties",
-        "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
+        "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. A `null` value unsets (deletes) that property (`user_id` cannot be unset); the reserved tombstone string `__formo_deleted__` is rejected as a value. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
         "tags": ["Profiles"],
         "requestBody": {
           "required": true,
@@ -5401,7 +5408,7 @@
                 "maxItems": 100,
                 "items": {
                   "type": "object",
-                  "description": "Flat { address, ...keys } object. `address` is required; only the listed profile keys are persisted (all string-valued). Unknown keys are accepted but ignored.",
+                  "description": "Flat { address, ...keys } object. `address` is required; only the listed profile keys are persisted (string-valued, or null to unset; user_id cannot be unset). Unknown keys are accepted but ignored.",
                   "required": ["address"],
                   "additionalProperties": true,
                   "properties": {
@@ -5413,67 +5420,67 @@
                       "type": "string"
                     },
                     "display_name": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "email": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "farcaster": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "discord": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "twitter": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "telegram": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "instagram": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "website": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "github": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "linkedin": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "facebook": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "tiktok": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "youtube": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "reddit": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "avatar": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "description": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "location": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "ens": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "lens": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "basenames": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     },
                     "linea": {
-                      "type": "string"
+                      "type": ["string", "null"]
                     }
                   }
                 }
@@ -5726,7 +5733,7 @@
       "post": {
         "operationId": "batchUpsertUserLabels",
         "summary": "Batch add or update user labels",
-        "description": "Upsert up to 100 labels across many wallets in one request; each item carries its own `address`. Modelled on the events ingest API: rows with an invalid address (ENS names are NOT resolved here; pass a literal EVM `0x...` or Solana address) are quarantined (skipped and reported in the response) rather than failing the whole batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
+        "description": "Upsert up to 100 labels across many wallets in one request; each item carries its own `address`. Modelled on the events ingest API: rows with an invalid address (ENS names are NOT resolved here; pass a literal EVM `0x...` or Solana address) are quarantined (skipped and reported in the response) rather than failing the whole batch. A request where every row is invalid returns 400. Requires profiles:write scope. Batch delete: send rows with `_is_deleted: 1` to tombstone labels in bulk; omit `timestamp` to delete as of now, or pair it with a past `timestamp` to record a historical removal (the equivalent of DELETE /v0/profiles/{address}/labels, one row per wallet/label).",
         "tags": ["Profiles"],
         "requestBody": {
           "required": true,

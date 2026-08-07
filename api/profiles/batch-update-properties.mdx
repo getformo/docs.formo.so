@@ -1,5 +1,24 @@
 ---
 title: 'Batch Update Properties'
-description: 'Set first-party profile properties for up to 100 wallets in a single request. Each item is a flat object with a required address; unknown keys are ignored and invalid rows are quarantined rather than failing the whole batch.'
+description: 'Set or unset first-party profile properties for up to 100 wallets in a single request. Each item is a flat object with a required address; null values delete properties, unknown keys are ignored, and invalid rows are quarantined rather than failing the whole batch.'
 openapi: 'POST /v0/profiles/properties'
 ---
+
+## Deleting properties in a batch
+
+A `null` value deletes (unsets) that property, exactly as on the [single-wallet endpoint](/api/profiles/update-properties#deleting-properties). Set and unset can mix freely within and across rows:
+
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '[
+    { "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045", "display_name": "alice.eth", "email": null },
+    { "address": "EPjFWaYbrgqCC2Qbg4EV4FjUreEMKwMn1zNbiboXXKV", "twitter": null }
+  ]' \
+  "https://api.formo.so/v0/profiles/properties"
+```
+
+<Note>
+`user_id` cannot be unset (it participates in identity stitching); a row with `"user_id": null` fails request validation with [`400 BAD_REQUEST`](/api/errors#bad_request). The literal string `__formo_deleted__` is a reserved internal value and is rejected wherever a property value is accepted.
+</Note>

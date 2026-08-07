@@ -160,7 +160,7 @@ The vocabulary is shared, but each field implements a subset — an unsupported 
 
 ## `formo profiles update <address>`
 
-Merge-update identity properties on a single wallet profile.
+Merge-update identity properties on a single wallet profile. Provide `--properties`, `--unset`, or both.
 
 <Note>
 Requires `profiles:write` scope on your API key.
@@ -170,7 +170,8 @@ Requires `profiles:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--properties` | `string` | ✅ | JSON object of properties to merge |
+| `--properties` | `string` | One of the two | JSON object of properties to merge; a `null` value deletes (unsets) that property |
+| `--unset` | `string` | One of the two | Comma-separated property keys to delete, e.g. `email,twitter` (shorthand for `null` values in `--properties`) |
 
 Allowed property keys:
 
@@ -180,6 +181,20 @@ Allowed property keys:
 formo profiles update 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
   --properties '{"display_name":"Vitalik","twitter":"VitalikButerin"}'
 ```
+
+Delete properties by key, or mix set and unset in one call:
+
+```bash
+formo profiles update 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --unset email,twitter
+
+formo profiles update 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
+  --properties '{"display_name":"alice.eth"}' --unset email
+```
+
+<Note>
+A deleted property reads as `null` everywhere, including over any globally-enriched fallback value, until a new value is set. `user_id` cannot be unset (it participates in identity stitching).
+</Note>
 
 ---
 
@@ -195,11 +210,18 @@ Requires `profiles:write` scope on your API key.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
-| `--rows` | `string` | ✅ | JSON array of flat `{address, ...properties}` objects |
+| `--rows` | `string` | ✅ | JSON array of flat `{address, ...properties}` objects; a `null` value deletes (unsets) that property (`user_id` cannot be unset) |
 
 ```bash
 formo profiles properties batch \
   --rows '[{"address":"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045","display_name":"alice.eth","email":"alice@example.com"}]'
+```
+
+Delete properties in a batch with `null` values:
+
+```bash
+formo profiles properties batch \
+  --rows '[{"address":"0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045","email":null}]'
 ```
 
 <Note>
