@@ -5267,7 +5267,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "description": "Merge-update of profile properties. Only the listed keys are accepted; unknown keys are rejected. At least one key must be provided. A `null` value unsets the property (not allowed for `user_id`). The literal string `__formo_deleted__` is a reserved internal tombstone and is rejected as a value.",
+                "description": "Merge-update of profile properties. Only the listed keys are accepted; unknown keys are rejected. At least one key must be provided. A `null` value unsets the property (not allowed for `user_id`). The literal string `_is_deleted` is a reserved internal tombstone and is rejected as a value.",
                 "minProperties": 1,
                 "additionalProperties": false,
                 "properties": {
@@ -5396,7 +5396,7 @@
       "post": {
         "operationId": "batchUpdateUserProperties",
         "summary": "Batch update user properties",
-        "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. A `null` value unsets (deletes) that property (`user_id` cannot be unset); the reserved tombstone string `__formo_deleted__` is rejected as a value. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
+        "description": "Set first-party properties for up to 100 wallets in one request. Each item is a flat object with a required `address` (literal EVM `0x...` or Solana; ENS names are NOT resolved here) plus any of the allowed profile keys. A `null` value unsets (deletes) that property (`user_id` cannot be unset); the reserved tombstone string `_is_deleted` is rejected as a value. Unknown keys are ignored; a row left with no valid keys, or with an invalid address, is quarantined (skipped and reported) rather than failing the batch. A request where every row is invalid returns 400. Requires profiles:write scope.",
         "tags": ["Profiles"],
         "requestBody": {
           "required": true,

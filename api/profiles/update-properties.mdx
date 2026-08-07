@@ -19,7 +19,7 @@ curl -sS -X PUT \
 A deleted property reads as `null` everywhere (profile reads, the Users table, search, and filters such as `notEmpty`), including over any globally-enriched fallback value, until a new value is set. One exception: a deleted `location` falls back to device geo rather than reading as absent.
 
 <Note>
-`user_id` cannot be unset; it participates in identity stitching, so `{ "user_id": null }` fails validation with [`400 BAD_REQUEST`](/api/errors#bad_request). The literal string `__formo_deleted__` is a reserved internal value and is rejected wherever a property value is accepted.
+`user_id` cannot be unset; it participates in identity stitching, so `{ "user_id": null }` fails validation with [`400 BAD_REQUEST`](/api/errors#bad_request). The literal string `_is_deleted` is a reserved internal value and is rejected wherever a property value is accepted.
 </Note>
 
 <Note>
