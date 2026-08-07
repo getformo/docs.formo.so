@@ -1,5 +1,27 @@
 ---
 title: 'Update Properties'
-description: 'Merge-update profile properties for a wallet. Set display name, email, socials, avatar, location, and other identity fields via a single PUT request.'
+description: 'Merge-update profile properties for a wallet. Set display name, email, socials, avatar, location, and other identity fields, or send null to delete a property, via a single PUT request.'
 openapi: 'PUT /v0/profiles/{address}/properties'
 ---
+
+## Deleting properties
+
+Send `null` as a property value to delete (unset) it. Set and unset compose in a single call, and every key you did not mention is left untouched:
+
+```bash
+curl -sS -X PUT \
+  -H "Authorization: Bearer <your_workspace_api_key>" \
+  -H "Content-Type: application/json" \
+  -d '{ "display_name": "alice.eth", "email": null }' \
+  "https://api.formo.so/v0/profiles/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045/properties"
+```
+
+A deleted property reads as `null` everywhere (profile reads, the Users table, search, and filters such as `notEmpty`), including over any globally-enriched fallback value, until a new value is set. One exception: a deleted `location` falls back to device geo rather than reading as absent.
+
+<Note>
+`user_id` cannot be unset; it participates in identity stitching, so `{ "user_id": null }` fails validation with [`400 BAD_REQUEST`](/api/errors#bad_request). The literal string `__formo_deleted__` is a reserved internal value and is rejected wherever a property value is accepted.
+</Note>
+
+<Note>
+Wallet-enrichment snapshots are versioned, but first-party property overrides (and their deletions) are always current. A point-in-time read with `timestamp` reflects the latest overrides, so a deletion also masks reads of snapshots taken before it.
+</Note>
