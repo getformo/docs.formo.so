@@ -20,5 +20,5 @@ curl -sS -X POST \
 ```
 
 <Note>
-`user_id` cannot be unset (it participates in identity stitching); a row with `"user_id": null` fails request validation with [`400 BAD_REQUEST`](/api/errors#bad_request). The literal string `__formo_deleted__` is a reserved internal value and is rejected wherever a property value is accepted.
+`user_id` cannot be unset (it participates in identity stitching); a row with `"user_id": null` fails request validation with [`400 BAD_REQUEST`](/api/errors#bad_request). The literal string `_is_deleted` is a reserved internal value and is rejected wherever a property value is accepted.
 </Note>
