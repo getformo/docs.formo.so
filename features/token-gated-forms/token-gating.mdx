@@ -1,6 +1,6 @@
 ---
 title: 'Token gating'
-description: 'Restrict form access by requiring responders to hold specific ERC-20 tokens, NFTs, or complete identity verification before submitting responses.'
+description: 'Restrict form access by requiring responders to hold specific ERC-20 tokens, NFTs, or SPL tokens, be on an uploaded allowlist, or complete identity verification before submitting responses.'
 ---
 
 <Frame>
@@ -197,6 +197,97 @@ Contract Read supports any `view` or `pure` function that:
 
 Common use cases include `balanceOf`, `stakedBalance`, `getVotes`, `isWhitelisted`, `hasRole`, and any custom getter function on your contract.
 
+## Allowlist (CSV)
+
+Restrict a form to a fixed list of wallet addresses you upload as a CSV. Useful for private betas, investor updates, airdrop claims, and any form where the audience is a list you already hold rather than an onchain condition.
+
+Available on both **Connect Wallet (EVM)** and **Connect Wallet (Solana)**.
+
+### How it works
+
+Addresses are hashed in your browser, so the original allowlist is never stored anywhere and cannot be leaked. Only the hashes are uploaded — the plaintext addresses never leave your device, and Formo never holds your list.
+
+When someone opens your form, they connect and sign with their wallet to prove they own the address. Formo then checks that proven address against your uploaded list and re-checks it on the server when the response is submitted, so the gate can't be bypassed from the browser.
+
+### Setup
+
+<Steps>
+  <Step title="Save your form">
+    Save the form first — the allowlist is stored against it.
+  </Step>
+  <Step title="Enable a wallet requirement">
+    Turn on **Connect Wallet (EVM)** or **Connect Wallet (Solana)**. Keep the *Verify identity* condition it adds: the allowlist is checked against the wallet address that condition proves, so removing it blocks every submission.
+  </Step>
+  <Step title="Add the Allowlist condition">
+    Click **Add requirement** under that wallet requirement and select **Allowlist (CSV)**.
+  </Step>
+  <Step title="Upload your CSV">
+    Click **Upload CSV** and choose your file. Formo shows how many unique addresses it found.
+  </Step>
+  <Step title="Name and save">
+    Give the requirement a name (e.g. *Wallet is on the allowlist*) and save, then publish your form.
+  </Step>
+</Steps>
+
+### CSV format
+
+One wallet address per row, up to **100,000** addresses. Other columns and a header row are ignored, so a spreadsheet export works as-is:
+
+```csv
+wallet_address,notes
+0x7E6CA77a7E044BA836a97beB796c124Ca3a6A255,investor
+0x457AB1aacA14D6ADc2F109959AcB1A9B2B5EAe53,team
+```
+
+A bare list of addresses works equally well:
+
+```csv
+0x7E6CA77a7E044BA836a97beB796c124Ca3a6A255
+0x457AB1aacA14D6ADc2F109959AcB1A9B2B5EAe53
+```
+
+Duplicates are removed automatically, and rows without a valid address are skipped with a notice showing how many.
+
+<Tip>
+EVM addresses are matched case-insensitively, so checksummed and lowercase entries both work. Solana addresses are case-sensitive — paste them exactly as they appear.
+</Tip>
+
+### Updating the list
+
+Open the requirement and click **Replace CSV** to upload a new file. The previous list is discarded; there's no way to add to a list without re-uploading the full set, since Formo doesn't hold the original addresses.
+
+### Example
+
+| Field | Value |
+|-------|-------|
+| Type | Allowlist (CSV) |
+| Wallet requirement | Connect Wallet (EVM) |
+| Addresses | 2,500 uploaded from `investors.csv` |
+
+## Solana
+
+Alongside EVM chains, you can gate forms on Solana wallets. Enable **Connect Wallet (Solana)** in your form settings, then add one or more conditions:
+
+| Condition | Requires |
+|-----------|----------|
+| **Native Token** | A minimum SOL balance |
+| **SPL Token** | A minimum balance of an SPL token, by mint address |
+| **NFT** | An NFT from a specific collection |
+| **Allowlist (CSV)** | Membership of a list you upload (see [above](#allowlist-csv)) |
+
+Responders connect a Solana wallet (Phantom or Solflare) and sign a message to prove ownership before their balances are checked.
+
+### Setup
+
+1. In your form settings, enable **Connect Wallet (Solana)**
+2. Click **Add requirement** and choose a condition
+3. For SPL Token, paste the **token mint address** and set the **minimum balance**
+4. For NFT, paste the **collection address** and set the **minimum quantity**
+
+<Tip>
+EVM and Solana requirements can be combined on one form. Pair them with **Should meet some** if responders may hold assets on either ecosystem.
+</Tip>
+
 ## World ID
 
 Require responders to verify with World ID's proof-of-personhood check before submitting. See [World ID integration](/features/token-gated-forms/world-id) for setup.
@@ -251,3 +342,9 @@ Under **Access gating** in your form settings, choose how many requirements a re
 
 - **Should meet all** (default): responders must satisfy every requirement you've added
 - **Should meet some**: responders must satisfy at least N of your requirements, where you set N
+
+## Require unique wallet addresses
+
+Under a **Connect Wallet** requirement, enable **Require unique wallet addresses** to block the same wallet from submitting more than once. Use it for airdrops, claims, and one-vote-per-wallet forms.
+
+The equivalent toggle for World ID is **Require unique World ID**, which blocks the same verified human rather than the same wallet.
