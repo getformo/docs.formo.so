@@ -197,7 +197,7 @@ Contract Read supports any `view` or `pure` function that:
 
 Common use cases include `balanceOf`, `stakedBalance`, `getVotes`, `isWhitelisted`, `hasRole`, and any custom getter function on your contract.
 
-## Allowlist (CSV)
+## Allowlist
 
 Restrict a form to a fixed list of wallet addresses you upload as a CSV. Useful for private betas, airdrop claims, and any form where the audience is a list you already hold rather than an onchain condition.
 
@@ -205,40 +205,22 @@ Available on both **Connect Wallet (EVM)** and **Connect Wallet (Solana)**.
 
 ### How it works
 
-Addresses are hashed in your browser, so the original allowlist is never stored anywhere and cannot be leaked. The plaintext addresses never leave your device, and Formo never holds your list.
+Your browser turns the CSV into a **Bloom filter**, a compact bit array that answers "is this address on the list?" without containing the addresses. Each address is hashed with a random salt unique to that list, and the bits are merged into one array. Formo stores only that array, its salt, and how many addresses you uploaded, so the plaintext never leaves your device and your list cannot be leaked. A 100,000-address list is about 350 KB.
 
-When someone opens your form, they connect and sign with their wallet to prove they own the address. Formo then checks that proven address against your uploaded list and re-checks it on the server when the response is submitted, so the gate can't be bypassed from the browser.
-
-Your browser turns the CSV into a **Bloom filter**, a compact bit array that can answer "is this address on the list?" without containing the addresses. Each address is hashed with a random salt unique to that list, and the resulting bits are combined into one array. Because the bits overlap between entries, the array can't be unpicked back into the addresses that produced it.
-
-Formo stores only that bit array, its salt, and the number of addresses you uploaded. A 100,000-address list is about 350 KB; your addresses appear nowhere in it.
-
-This makes the list cheap to check and impossible to read back, with one trade-off worth knowing: a Bloom filter never rejects someone who is on your list, but roughly **1 address in 1,000,000** that is *not* on your list may pass. For a typical allowlist that is a fraction of a single address. If you need an exact guarantee with no chance of a stranger passing, gate on token or NFT ownership instead.
-
-Here is a complete two-address allowlist. Each address is hashed with the list's salt, and the digest is split into two numbers that together pick the bit positions to set:
+A complete two-address allowlist looks like this:
 
 ```
 salt   4f2a9c71e08b3d6a5c1e7f90ab24d635
 
-0x7e6ca77a...a6a255
-  sha256(salt:address) = a4c5b2eabd59525c...
-  sets bits  0,1,6,7,11,12,17,18,23,24,29,30,35,36,41,42,46,47,52,53,58,59
+0x7e6ca77a...a6a255   sets bits  0,1,6,7,11,12,17,18,23,24,29,30,35,36,41,42,46,47,52,53,58,59
+0x457ab1aa...5eae53   sets bits  2,5,8,11,14,17,20,23,24,27,30,33,36,39,42,45,48,51,54,57,60,63
 
-0x457ab1aa...5eae53
-  sha256(salt:address) = 2b8ed5586928b143...
-  sets bits  2,5,8,11,14,17,20,23,24,27,30,33,36,39,42,45,48,51,54,57,60,63
+stored   11100111 10011010 01101001 10010110 01011001 01100111 10011110 01111001
 ```
 
-Those bits are merged into one array, and that array is the entire stored allowlist, eight bytes for this list:
+Respondents connect and sign with their wallet to prove they own the address. Formo hashes that proven address the same way and reads the bits it points to, then re-checks on the server at submission so the gate can't be bypassed from the browser. An address that lands on any unset bit was never added, so it is rejected.
 
-```
-hex     e75996699ae6799e
-binary  11100111 10011010 01101001 10010110 01011001 01100111 10011110 01111001
-```
-
-To check a wallet, Formo hashes it the same way and looks at the bits it points to. `0x0000...dEaD` points at bit 19, which is unset, so it is rejected immediately. A single unset bit proves the address was never added. Both of the addresses above find all of their bits set, so both pass.
-
-Notice what the stored array does *not* contain: no addresses, and nothing that can be turned back into them. Someone holding this row can only test addresses they already have, one at a time, and the random salt means work spent attacking one list is useless against any other.
+One trade-off: a Bloom filter never rejects someone who is on your list, but roughly **1 address in 1,000,000** that is not on your list may pass. If you need an exact guarantee, gate on token or NFT ownership instead.
 
 ### Setup
 
@@ -247,7 +229,7 @@ Notice what the stored array does *not* contain: no addresses, and nothing that 
     Save the form first, since the allowlist is stored against it.
   </Step>
   <Step title="Enable a wallet requirement">
-    Turn on **Connect Wallet (EVM)** or **Connect Wallet (Solana)**. Keep the *Verify identity* condition it adds: the allowlist is checked against the wallet address that condition proves, so removing it blocks every submission.
+    Turn on **Connect Wallet (EVM)** or **Connect Wallet (Solana)**.
   </Step>
   <Step title="Add the Allowlist condition">
     Click **Add requirement** under that wallet requirement and select **Allowlist (CSV)**.
@@ -269,7 +251,7 @@ Alongside EVM chains, you can gate forms on Solana wallets. Enable **Connect Wal
 | **Native Token** | A minimum SOL balance |
 | **SPL Token** | A minimum balance of an SPL token, by mint address |
 | **NFT** | An NFT from a specific collection |
-| **Allowlist (CSV)** | Membership of a list you upload (see [above](#allowlist-csv)) |
+| **Allowlist (CSV)** | Membership of a list you upload (see [above](#allowlist)) |
 
 Responders connect a Solana wallet (Phantom or Solflare) and sign a message to prove ownership before their balances are checked.
 
