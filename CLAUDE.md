@@ -12,7 +12,7 @@ Guidance for AI agents working in this repository (the Formo docs site, built wi
 
 Define each concept once and link to it elsewhere rather than restating the details (which drift out of sync).
 
-- **User lifecycle stages** (New, Returning, Power User, Resurrected, Churned): the authoritative definition with exact rules and thresholds lives in `features/wallet-intelligence/wallet-profiles.mdx` (`#user-lifecycle`). Other pages should give a brief, contextual mention and link to it. The SQL-oriented restatement in `data/catalog.mdx` is the one allowed exception, since it serves query writers in-context.
+- **User lifecycle stages** (New, Returning, Power user, At Risk, Churned, Resurrected): the authoritative definition with exact rules and thresholds lives in `features/wallet-intelligence/wallet-profiles.mdx` (`#user-lifecycle`). Other pages should give a brief, contextual mention and link to it. The SQL-oriented restatement in `data/catalog.mdx` is the one allowed exception, since it serves query writers in-context.
 
 ## API reference
 

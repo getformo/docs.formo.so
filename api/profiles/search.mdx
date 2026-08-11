@@ -257,7 +257,7 @@ Filter by user engagement and profile data. Use the format `users.{attribute}`.
 
 #### Lifecycle Filter
 
-Filter by user lifecycle stage. Valid values: `At Risk`, `Churned`, `New`, `Power user`, `Resurrected`, `Returning`.
+Filter by user lifecycle stage. Valid values: `New`, `Returning`, `Power user`, `At Risk`, `Churned`, `Resurrected`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -710,7 +710,7 @@ Each profile in the `data` array includes:
 | `tx_count` | integer | Total transaction count |
 | `first_onchain` | string | First on-chain activity timestamp (ISO 8601) |
 | `last_onchain` | string | Last on-chain activity timestamp (ISO 8601) |
-| `lifecycle` | string | User lifecycle stage: `At Risk`, `Churned`, `New`, `Power user`, `Resurrected`, `Returning` |
+| `lifecycle` | string | User lifecycle stage: `New`, `Returning`, `Power user`, `At Risk`, `Churned`, `Resurrected` |
 | `ens` | string \| null | ENS name |
 | `farcaster` | string \| null | Farcaster username |
 | `twitter` | string \| null | Twitter/X handle |
