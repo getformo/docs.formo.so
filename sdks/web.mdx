@@ -35,10 +35,17 @@ If you're already using [Wagmi](https://wagmi.sh), this is the recommended way t
 When `wagmi` options are provided, the SDK hooks directly into Wagmi's state management instead of wrapping EIP-1193 providers. This provides:
 - Native event handling via Wagmi's built-in state system
 - Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
-- Full tracking of signatures and transactions via TanStack Query's mutation cache
+- Tracking of signatures and transactions via TanStack Query's mutation cache
+- **Coverage of WalletConnect wallets**, which the EIP-1193 install methods cannot see at all
 
 Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration).
 </Note>
+
+<Warning>
+**WalletConnect requires Wagmi mode.** The other install methods discover wallets through `window.ethereum` and [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) announcements. A WalletConnect provider uses neither: it is created inside the connector when the user connects, is never attached to the page's global scope, and never announces itself. No events of any kind are captured for those sessions.
+
+This affects every wallet that connects over WalletConnect, including **Ledger Live**, plus the Coinbase Wallet SDK popup, the MetaMask SDK on mobile, and Safe.
+</Warning>
 
 Install the Web SDK via NPM.
 
@@ -800,7 +807,30 @@ For apps using [Wagmi](https://wagmi.sh), enable native integration by providing
 ```
 
 <Warning>
-Transaction and signature autocapture requires the use of [wagmi React hooks](https://wagmi.sh/react/api/hooks) (`useWriteContract`, `useSendTransaction`, `useSignMessage`). Calls via `@wagmi/core` or viem directly bypass the mutation cache and won't be tracked. If you are not using these hooks, use the non-wagmi React or Next.js installation methods instead.
+**Transaction and signature autocapture requires [wagmi React hooks](https://wagmi.sh/react/api/hooks)** (`useWriteContract`, `useSendTransaction`, `useSignMessage`). The SDK reads these from TanStack Query's mutation cache. Calls made through `@wagmi/core` or a viem wallet client directly never reach that cache, so they produce no events.
+
+Check before you switch. If your app sends transactions from a plain module rather than a hook, for example a shared `sendTransaction` util that calls `walletClient.request(...)`, Wagmi mode captures **no** transaction or signature events.
+</Warning>
+
+<Warning>
+**Migrating from an EIP-1193 install method?** Wagmi mode replaces provider wrapping, it does not run alongside it. If your app does not use the wagmi hooks above, enabling Wagmi mode will **stop** the transaction and signature events you are getting today, while adding WalletConnect connection coverage.
+
+If that applies to you, keep the connection coverage and re-add the two event types explicitly at your own send and sign call sites:
+
+```ts
+import { TransactionStatus } from '@formo/analytics';
+
+analytics?.transaction({
+  status: TransactionStatus.BROADCASTED,
+  chainId,
+  address: account,
+  to: contractAddress,
+  data: callData,
+  transactionHash: hash,
+});
+```
+
+See [`transaction`](/data/events/transaction) and [`signature`](/data/events/signature) for the full parameter list.
 </Warning>
 
 When Wagmi mode is enabled, the SDK:
