@@ -145,7 +145,7 @@ The most recent date and time when a user or wallet was observed interacting wit
 
 ### User lifecycle
 
-The lifecycle stage of each wallet or visitor (New, Returning, Power user, Resurrected, At Risk, or Churned), computed from their activity recency and frequency relative to a reference date.
+The lifecycle stage of each wallet or visitor (New, Returning, Power user, At Risk, Churned, or Resurrected), computed from their activity recency and frequency relative to a reference date.
 
 See [User Lifecycle](/features/wallet-intelligence/wallet-profiles#user-lifecycle) for the exact rules and thresholds for each stage.
 
@@ -157,10 +157,6 @@ Users who visit your site or app for the first time within the selected time per
 
 Users who have visited your site or app in previous time periods and return within the current period.
 
-### Resurrected Users
-
-Users who were previously active, became inactive for a period of time, and then return after being inactive.
-
 ### At Risk Users
 
 Previously active users whose activity has slowed but who haven't churned yet: last seen at least 14 days ago, fewer than 5 active days in the last 30 days, and no 30+ day gap, with at least 1 active day in the prior 30 to 60 days.
@@ -168,6 +164,10 @@ Previously active users whose activity has slowed but who haven't churned yet: l
 ### Churned Users
 
 Users with no activity within the project's churn window.
+
+### Resurrected Users
+
+Users who were previously active, became inactive for a period of time, and then return after being inactive.
 
 ### Events
 

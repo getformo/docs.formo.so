@@ -1117,9 +1117,9 @@
               "New",
               "Returning",
               "Power user",
-              "Resurrected",
               "At Risk",
-              "Churned"
+              "Churned",
+              "Resurrected"
             ]
           },
           "num_sessions": {
@@ -7498,7 +7498,7 @@
     "/v0/lifecycle": {
       "get": {
         "operationId": "getAnalyticsLifecycle",
-        "summary": "Get user lifecycle stages (New / Returning / Power user / Resurrected / At Risk / Churned)",
+        "summary": "Get user lifecycle stages (New / Returning / Power user / At Risk / Churned / Resurrected)",
         "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
         "tags": ["Query"],
         "x-required-scope": "query:read",
@@ -7587,11 +7587,6 @@
                     },
                     {
                       "project_id": "proj_abc",
-                      "user_type": "Resurrected",
-                      "user_count": 11
-                    },
-                    {
-                      "project_id": "proj_abc",
                       "user_type": "At Risk",
                       "user_count": 14
                     },
@@ -7599,6 +7594,11 @@
                       "project_id": "proj_abc",
                       "user_type": "Churned",
                       "user_count": 142
+                    },
+                    {
+                      "project_id": "proj_abc",
+                      "user_type": "Resurrected",
+                      "user_count": 11
                     }
                   ],
                   "rows": 6,

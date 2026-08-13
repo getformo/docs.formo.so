@@ -24,11 +24,11 @@ Each user's lifecycle stage is computed relative to a **reference date** (the en
 | Lifecycle | Definition |
 |:----------|:------------|
 | **New** | First seen within the last 30 days and still active. |
+| **Returning** | Established active users who don't fit another stage: active recently but not New, Power, At Risk, or Resurrected. |
 | **Power user** | First seen more than 30 days ago, still active, and active on at least 5 distinct days in the last 30 days. |
-| **Resurrected** | First seen more than 30 days ago and re-engaged within the last 30 days after a 30+ day inactivity gap. |
 | **At Risk** | Previously active wallet whose activity has slowed but that hasn't churned yet: last seen at least 14 days ago, fewer than 5 active days in the last 30 days, and no 30+ day gap, with at least 1 active day in the prior 30 to 60 days. |
-| **Returning** | Established active users who don't fit another stage: active recently but not New, Power, Resurrected, or At Risk. |
 | **Churned** | Last seen at least 30 days ago. |
+| **Resurrected** | First seen more than 30 days ago and re-engaged within the last 30 days after a 30+ day inactivity gap. |
 
 Stages are mutually exclusive and evaluated in precedence order: Churned, New, Power user, Resurrected, At Risk, Returning. **At Risk** carves out fading users that would otherwise sit in Returning, surfacing established wallets to re-engage before they churn.
 
@@ -159,7 +159,7 @@ The profile header shows key information at a glance:
 | **Address** | Wallet address with copy button |
 | **ENS** | ENS name, if resolved (falls back to a shortened address) |
 | **Net Worth** | Total value across all chains |
-| **Lifecycle** | New, Returning, Power user, Resurrected, At Risk, or Churned |
+| **Lifecycle** | New, Returning, Power user, At Risk, Churned, or Resurrected |
 | **First Seen** | When they first visited your app |
 | **Last Seen** | Most recent activity |
 
