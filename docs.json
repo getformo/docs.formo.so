@@ -348,7 +348,7 @@
   "appearance": {
     "default": "light"
   },
-  "description": "Documentation for Formo product analytics, onchain attribution, wallet intelligence, SDKs, CLI, MCP, and APIs for crypto apps.",
+  "description": "Guides and API documentation for Formo, the analytics and attribution platform for onchain apps.",
   "seo": {
     "metatags": {
       "msvalidate.01": "71E42B1EAE01EE25D08368832DB15087"
