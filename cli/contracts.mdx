@@ -106,9 +106,8 @@ Requires `contracts:write` scope on your API key.
 | `--include-in-pipeline` | `boolean` | ❌ | Deploy this contract to the events pipeline. Omit to keep the stored setting. |
 
 <Note>
-Boolean flags do not read a following value. Write `--include-in-pipeline` to enable, and
-`--include-in-pipeline=false` or `--no-include-in-pipeline` to disable. `--include-in-pipeline false` sets it to **true** and
-leaves `false` as a stray argument.
+`--include-in-pipeline` is a boolean flag: pass `--include-in-pipeline=false` or `--no-include-in-pipeline` to disable it. See
+[boolean flags](#formo-contracts-create) above.
 </Note>
 
 ```bash

@@ -92,9 +92,8 @@ Requires `boards:write` scope on your API key.
 | `--is-public` | `boolean` | ❌ | Make the board publicly viewable. Omit to keep the stored setting. |
 
 <Note>
-Boolean flags do not read a following value. Write `--is-public` to enable, and
-`--is-public=false` or `--no-is-public` to disable. `--is-public false` sets it to **true** and
-leaves `false` as a stray argument.
+`--is-public` is a boolean flag: pass `--is-public=false` or `--no-is-public` to disable it. See
+[boolean flags](#formo-boards-create) above.
 </Note>
 
 ```bash
