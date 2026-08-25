@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Formo Public API",
-    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat.\n\n**Auth.** All endpoints require a workspace API key with the appropriate scopes (see `x-api-scopes`).\n\n**Response shape.** Successful responses return the resource directly (or `{ data: [...], total, page, size, has_more }` for paginated lists). HTTP status carries success/failure; there is no envelope wrapping success bodies.\n\n**Errors.** Every non-2xx response uses the `Error` envelope: `{ error: { code, message, doc_url, param?, details? } }`. Branch on the machine-readable `code` (see `ErrorCode` enum) and follow `doc_url` to the matching section of the [errors reference](https://docs.formo.so/api/errors).\n\n**Idempotency.** Pass an `Idempotency-Key` header on POST/PUT/PATCH/DELETE to make retries safe; the response is cached for 24 h and replayed on duplicate keys.",
+    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat.\n\n**Auth.** Every endpoint on `api.formo.so` requires a workspace API key with the appropriate scopes (see `x-api-scopes`). The one exception is `POST /v0/raw_events`, which runs on `events.formo.so` and authenticates with the project SDK write key instead.\n\n**Response shape.** Successful responses return the resource directly (or `{ data: [...], total, page, size, has_more }` for paginated lists). HTTP status carries success/failure; there is no envelope wrapping success bodies.\n\n**Errors.** Non-2xx responses from `api.formo.so` use the `Error` envelope, with two exceptions: some rate-limit rejections reply in plain text, and `POST /v0/raw_events` returns a plain `{ \"error\": \"...\" }` object. Treat the HTTP status as authoritative and parse defensively: `{ error: { code, message, doc_url, param?, details? } }`. Branch on the machine-readable `code` (see `ErrorCode` enum) and follow `doc_url` to the matching section of the [errors reference](https://docs.formo.so/api/errors).\n\n**Idempotency.** Pass an `Idempotency-Key` header on write requests to alerts, boards, charts, contracts, segments, and import to make retries safe; the response is cached for 24 h and replayed on duplicate keys. Profile writes and `POST /v0/query` do not support it.",
     "version": "0.1.0",
     "contact": {
       "name": "Formo",
@@ -42,6 +42,12 @@
         "in": "header",
         "name": "Authorization",
         "description": "MPP payment authorization header, formatted as `Payment <payload>`, generated after the gateway returns a 402 challenge."
+      },
+      "SdkWriteKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Project SDK write key (a JWT), sent as `Authorization: Bearer <write key>`. This is NOT the `formo_...` workspace API key used on api.formo.so. Find it in the Formo dashboard under the project’s settings."
       }
     },
     "schemas": {
@@ -2744,8 +2750,19 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       }
     },
     "/v0/alerts/{alertId}": {
@@ -2806,6 +2823,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "x-required-scope": "alerts:read"
@@ -2822,6 +2842,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -2904,6 +2927,12 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "alerts:write"
@@ -2920,6 +2949,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "responses": {
@@ -2932,6 +2964,15 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "alerts:write"
@@ -2948,6 +2989,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -2994,6 +3038,12 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "alerts:write"
@@ -3116,9 +3166,20 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
-        "x-required-scope": "boards:write"
+        "x-required-scope": "boards:write",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       }
     },
     "/v0/boards/{boardId}": {
@@ -3171,6 +3232,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -3227,6 +3291,12 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write",
@@ -3245,6 +3315,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "responses": {
@@ -3257,6 +3330,12 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -3387,6 +3466,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -3702,6 +3784,12 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -3711,7 +3799,7 @@
       "put": {
         "operationId": "reorderCharts",
         "summary": "Reorder charts",
-        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.",
+        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.\n\nThis endpoint does not support the `Idempotency-Key` header.",
         "tags": ["Charts"],
         "parameters": [
           {
@@ -3829,6 +3917,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -3852,6 +3943,12 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -3876,11 +3973,20 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "responses": {
           "200": {
             "description": "Chart deleted"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -3908,6 +4014,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -3943,6 +4052,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
           }
         },
         "x-required-scope": "boards:write"
@@ -3970,6 +4082,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "responses": {
@@ -3983,6 +4098,12 @@
                 "example": "cht_n3w1d2e3f4a5"
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -4319,9 +4440,20 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
-        "x-required-scope": "contracts:write"
+        "x-required-scope": "contracts:write",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       }
     },
     "/v0/contracts/{chain}/{address}": {
@@ -4401,6 +4533,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -4455,6 +4590,12 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "contracts:write"
@@ -4479,6 +4620,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "responses": {
@@ -4491,6 +4635,12 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "contracts:write"
@@ -4753,9 +4903,20 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
-        "x-required-scope": "segments:write"
+        "x-required-scope": "segments:write",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       }
     },
     "/v0/segments/{segmentId}": {
@@ -4771,6 +4932,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "responses": {
@@ -4783,6 +4947,12 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "segments:write"
@@ -5951,9 +6121,20 @@
         "responses": {
           "201": {
             "description": "Wallets imported successfully"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
-        "x-required-scope": "profiles:write"
+        "x-required-scope": "profiles:write",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       }
     },
     "/v0/query": {
@@ -8527,7 +8708,7 @@
         ],
         "security": [
           {
-            "WorkspaceApiKey": []
+            "SdkWriteKey": []
           }
         ],
         "requestBody": {
@@ -8741,23 +8922,77 @@
         },
         "responses": {
           "200": {
-            "description": "Events ingested",
+            "description": "Batch accepted. The body carries an ingestion summary when one is available, otherwise `{}`.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "successful_rows": {
-                      "type": "integer"
-                    },
-                    "quarantined_rows": {
-                      "type": "integer"
-                    }
-                  }
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "202": {
+            "description": "Batch accepted for asynchronous processing. Returns `{ \"queued\": true }` when the batch was buffered for retry, an ingestion summary when one is available, otherwise `{}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 },
                 "example": {
-                  "successful_rows": 1,
-                  "quarantined_rows": 0
+                  "queued": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request body is missing. A body that is present but not valid JSON returns 500 instead.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "error": "Invalid request body"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request could not be authenticated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "error": "Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing or invalid SDK write key. The body for this status is not the shape shown here.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "Message": "User is not authorized to access this resource with an explicit deny"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The batch could not be ingested, or the request body was not valid JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "error": "Internal Server Error"
                 }
               }
             }
