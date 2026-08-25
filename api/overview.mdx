@@ -108,7 +108,7 @@ The header is opt-in. See [Idempotency](/api/idempotency) for the full contract,
 
 ## Errors
 
-Every non-2xx response uses the same envelope:
+Almost every non-2xx response uses the same envelope (see the exceptions below):
 
 ```json
 {
@@ -122,6 +122,13 @@ Every non-2xx response uses the same envelope:
 ```
 
 Branch on `error.code` (a stable enum), not `message` or HTTP status alone. The `doc_url` field anchors to the matching section of the [Errors reference](/api/errors), so AI agents can fetch remediation context without escalating to a human.
+
+<Note>
+Two paths do not use this envelope, so treat the status code as authoritative and parse the body defensively:
+
+- **The per-IP rate limiters** (1,000 requests/15 min, and 10,000/15 min on Profiles) reply with a plain-text body. Only the per-workspace limiter (100/second) returns the envelope.
+- **The events endpoint** (`POST /v0/raw_events` on `events.formo.so`) returns plain `{ "error": "..." }` objects.
+</Note>
 
 See [Errors](/api/errors) for the full list of codes.
 

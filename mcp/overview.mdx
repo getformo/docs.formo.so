@@ -63,7 +63,7 @@ Permission: `query:read`.
 | Tool | Description |
 |:-----|:------------|
 | `explore_data` | Natural language data exploration with Formo-specific context |
-| `execute_query` | Run SQL queries against your analytics data |
+| `execute_query` | Run SQL queries against your analytics data (see the note below) |
 | `text_to_sql` | Convert natural language to SQL |
 | `list_endpoints` | List available API endpoints |
 | `list_datasources` | List available data sources |
@@ -87,6 +87,10 @@ Permission: `query:read`.
 | `cohort_analysis` | Cohort-based behavioral analysis |
 | `funnel` | Multi-step conversion funnels |
 | `flow` | User journey and path analysis |
+
+<Note>
+`execute_query` is not the same as the REST [Query API](/api/query). The REST endpoint validates your SQL first: one statement, no comments, and a `LIMIT` ceiling. The MCP tool forwards the query to the analytics backend as written, so those checks do not apply and the backend's own limits govern instead. Your query is still scoped to the connected project either way.
+</Note>
 
 ### Profiles API
 
@@ -158,7 +162,10 @@ Wallet enrichment and profile writes.
 - **Project-scoped:** each connection is limited to one project, either selected on the OAuth consent page or attached to the API key.
 - **Permission-scoped:** every tool call requires the matching permission (e.g. `query:read` to read analytics, `alerts:write` to change alerts); deletes additionally require `"confirm": true`.
 - **Owner/admin only:** only a workspace owner or admin can create a connection.
-- **Nothing retained:** the MCP server itself stores no data.
+- **No customer data stored:** the MCP server keeps no copy of your analytics or wallet
+  data. It does record request telemetry for each tool call, including the tool name and
+  its arguments (truncated at 4,000 characters), so SQL text and any addresses passed as
+  arguments are retained in Formo's internal usage analytics.
 - **Manage anytime:** review, change, or revoke access under **Settings** → **Connected apps**. Disconnects apply immediately; permission changes apply on reconnect. Sessions expire after 1 hour of inactivity.
 
 ## FAQ

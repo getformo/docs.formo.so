@@ -114,7 +114,11 @@ The `chain` parameter is not a supported EVM chain ID. See [Supported Chains](/c
 
 **HTTP:** `429`
 
-The per-workspace rate limit has been exceeded. Inspect the `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` response headers and back off until `RateLimit-Reset`. Use exponential backoff with jitter for retries.
+A rate limit has been exceeded. The per-workspace limiter (100 requests/second) returns this envelope and sets `Retry-After: 1` plus the [draft-7](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-ratelimit-headers-07) `RateLimit` and `RateLimit-Policy` headers. Wait for `Retry-After`, then use exponential backoff with jitter.
+
+<Note>
+The two per-IP limiters (1,000 requests/15 min, and 10,000/15 min on Profiles) are separate. They reply with a plain-text body rather than this envelope, and send legacy `X-RateLimit-*` headers. Treat any 429 as back-off regardless of the body you get.
+</Note>
 
 ### `context_limit_exceeded`
 
