@@ -75,9 +75,14 @@ Select your client below to configure Formo with API key authentication.
     2. Find the "MCP" section in the settings sidebar.
     3. Click "Add new MCP server" and configure:
        - **Name:** `formo`
-       - **Type:** `sse`
+       - **Type:** `http`
        - **URL:** `https://api.formo.so/v0/mcp/`
        - **Headers:** `Authorization: Bearer YOUR_API_KEY`
+
+    <Note>
+    Formo MCP uses the Streamable HTTP transport. Selecting the legacy `sse`
+    type makes the connection fail, because the server has no SSE endpoint.
+    </Note>
 
     Alternatively, add this to `.cursor/mcp.json` in your project:
 

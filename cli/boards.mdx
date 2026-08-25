@@ -57,13 +57,19 @@ Requires `boards:write` scope on your API key.
 | `--title` | `string` | ✅ | Board title |
 | `--name` | `string` | ❌ | Deprecated alias for `--title` |
 | `--description` | `string` | ❌ | Board description |
-| `--is-public` | `boolean` | ❌ | Whether the board is publicly viewable |
+| `--is-public` | `boolean` | ❌ | Make the board publicly viewable. Omit to keep it private (the default). |
+
+<Note>
+Boolean flags do not read a following value. Write `--is-public` to enable, and
+`--is-public=false` or `--no-is-public` to disable. `--is-public false` sets it to **true** and
+leaves `false` as a stray argument.
+</Note>
 
 ### Examples
 
 ```bash
 formo boards create --title "KPI Dashboard"
-formo boards create --title "Revenue Metrics" --description "Weekly revenue tracking" --is-public false
+formo boards create --title "Revenue Metrics" --description "Weekly revenue tracking" --is-public
 ```
 
 ---
@@ -83,11 +89,16 @@ Requires `boards:write` scope on your API key.
 | `--title` | `string` | ❌ | New board title |
 | `--name` | `string` | ❌ | Deprecated alias for `--title` |
 | `--description` | `string` | ❌ | New board description |
-| `--is-public` | `boolean` | ❌ | Whether the board is publicly viewable |
+| `--is-public` | `boolean` | ❌ | Make the board publicly viewable. Omit to keep the stored setting. |
+
+<Note>
+`--is-public` is a boolean flag: pass `--is-public=false` or `--no-is-public` to disable it. See
+[boolean flags](#formo-boards-create) above.
+</Note>
 
 ```bash
 formo boards update board_abc123 --title "Renamed Board"
-formo boards update board_abc123 --description "Updated weekly metrics" --is-public true
+formo boards update board_abc123 --description "Updated weekly metrics" --is-public
 ```
 
 ---

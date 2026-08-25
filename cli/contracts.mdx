@@ -60,7 +60,13 @@ Requires `contracts:write` scope on your API key.
 | `--abi` | `string` | ✅ | Contract ABI as a JSON array string |
 | `--events` | `string` | ✅ | JSON array of ABI event objects to monitor, max 10 |
 | `--start-block` | `number` | ❌ | Optional start block |
-| `--include-in-pipeline` | `boolean` | ❌ | Whether to include this contract in the events pipeline |
+| `--include-in-pipeline` | `boolean` | ❌ | Deploy this contract to the events pipeline. Omit for decode-only (the default). |
+
+<Note>
+Boolean flags do not read a following value. Write `--include-in-pipeline` to enable, and
+`--include-in-pipeline=false` or `--no-include-in-pipeline` to disable. `--include-in-pipeline false` sets it to **true** and
+leaves `false` as a stray argument.
+</Note>
 
 ### Example
 
@@ -72,7 +78,7 @@ formo contracts create \
   --abi '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}]}]' \
   --events '[{"anonymous":false,"type":"event","name":"Transfer","inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}]}]' \
   --start-block 6082465 \
-  --include-in-pipeline true
+  --include-in-pipeline
 ```
 
 <Note>
@@ -97,7 +103,12 @@ Requires `contracts:write` scope on your API key.
 | `--abi` | `string` | ✅ | Updated ABI as a JSON array string |
 | `--events` | `string` | ✅ | Updated JSON array of ABI event objects to monitor |
 | `--start-block` | `number` | ❌ | Optional start block |
-| `--include-in-pipeline` | `boolean` | ❌ | Whether to include this contract in the events pipeline |
+| `--include-in-pipeline` | `boolean` | ❌ | Deploy this contract to the events pipeline. Omit to keep the stored setting. |
+
+<Note>
+`--include-in-pipeline` is a boolean flag: pass `--include-in-pipeline=false` or `--no-include-in-pipeline` to disable it. See
+[boolean flags](#formo-contracts-create) above.
+</Note>
 
 ```bash
 formo contracts update 1 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 \
