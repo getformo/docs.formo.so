@@ -969,9 +969,20 @@
               },
               "required": ["anonymous", "inputs", "name", "type"]
             }
+          },
+          "include_in_pipeline": {
+            "type": "boolean",
+            "description": "Whether the contract is deployed to the project contract-events pipeline."
           }
         },
-        "required": ["name", "chain", "address", "abi", "events"]
+        "required": [
+          "name",
+          "chain",
+          "address",
+          "abi",
+          "events",
+          "include_in_pipeline"
+        ]
       },
       "Segment": {
         "type": "object",
@@ -1954,7 +1965,7 @@
       },
       "SourceFilterCondition": {
         "type": "object",
-        "description": "Filters the raw event source. `field` must be `source`.",
+        "description": "Filters the raw event source. `field` must be `source` on user/lifecycle endpoints; Overview endpoint `filters` use the raw `channel` field for the same Web/Mobile/API/Import/Server/Onchain values.",
         "properties": {
           "field": {
             "type": "string",
@@ -1996,7 +2007,7 @@
                 "type": "null"
               }
             ],
-            "description": "Value to compare against. For `in` / `nin`, pass a non-empty array or a pipe-delimited string."
+            "description": "Value to compare against. Raw event source values are `web`, `mobile`, `api`, `import`, `server`, and `onchain`. For `in` / `nin`, pass a non-empty array or a pipe-delimited string."
           }
         },
         "required": ["field", "op"]
@@ -2150,7 +2161,7 @@
       "AnalyticsFilters": {
         "name": "filters",
         "in": "query",
-        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. For `in` / `nin`, pass a non-empty array value such as `[\"chrome\",\"firefox\"]` or a pipe-delimited string such as `\"chrome|firefox\"`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator. Optional one-level nested `filters` use the same canonical envelope and membership rule. On the user-aggregate endpoints (lifecycle, frequency) the same array also carries profile-family entries: profile metrics (net_worth_usd, volume, revenue, points), social identity fields, a lifecycle entry ({\"field\":\"lifecycle\",\"op\":\"in\",\"value\":\"New|Power user\"}), and resource entries using the stable fields chains.balance, apps.balance, tokens.balance, and labels.value with named qualifier properties (chain_id, app_id, token_address, scope, tag_id). The retired per-family parameters (socials, chain_filters, app_filters, token_filters, label_filters, profile_filters, lifecycle_filter) are rejected.",
+        "description": "Array of filter conditions, JSON-encoded in the query string. Entries use `{ field, op, value }` and are combined with implicit AND. For example, filter traffic referred by Google with `[{\"field\":\"referrer\",\"op\":\"contains\",\"value\":\"google\"}]`, or filter a page with `[{\"field\":\"page\",\"op\":\"eq\",\"value\":\"/pricing\"}]`. For `in` / `nin`, pass a non-empty array value such as `[\"chrome\",\"firefox\"]` or a pipe-delimited string such as `\"chrome|firefox\"`. Array string members cannot contain a literal `|`, which is reserved as the Tinybird membership separator. Optional one-level nested `filters` use the same canonical envelope and membership rule. On the user-aggregate endpoints (lifecycle, frequency) the same array also carries profile-family entries: profile metrics (net_worth_usd, volume, revenue, points), social identity fields, a lifecycle entry ({\"field\":\"lifecycle\",\"op\":\"in\",\"value\":\"New|Power user\"}), and resource entries using the stable fields chains.balance, apps.balance, tokens.balance, and labels.value with named qualifier properties (chain_id, app_id, token_address, scope, tag_id). The retired per-family parameters (socials, chain_filters, app_filters, token_filters, label_filters, profile_filters, lifecycle_filter) are rejected. Overview also accepts raw Data source filters with `field` set to `channel`, ops `eq`/`neq`/`in`/`nin`, and values `web`, `mobile`, `api`, `import`, `server`, `onchain`; this is distinct from acquisition Channel (`channel_type`) and the two can be combined.",
         "schema": {
           "type": "string"
         },
@@ -2279,7 +2290,7 @@
       "AnalyticsSourceFilter": {
         "name": "source_filter",
         "in": "query",
-        "description": "JSON array filtering users by raw event source. Entries use the canonical envelope and `field` must be `source`. Distinct from `channel_filter`, which matches the classified acquisition channel.",
+        "description": "JSON array filtering users by raw event source. Entries use the canonical envelope and `field` must be `source`; accepted values are `web`, `mobile`, `api`, `import`, `server`, and `onchain`. Distinct from `channel_filter`, which matches the classified acquisition channel. Overview endpoints carry the same raw event source through the general `filters` parameter as `field: \"channel\"`.",
         "schema": {
           "type": "string"
         },
@@ -2288,7 +2299,7 @@
       "AnalyticsChannelFilter": {
         "name": "channel_filter",
         "in": "query",
-        "description": "JSON array filtering users by classified acquisition channel. Entries use the canonical envelope and `field` must be `channel_type`. Distinct from `source_filter`, which matches the raw SDK source.",
+        "description": "JSON array filtering users by classified acquisition channel. Entries use the canonical envelope and `field` must be `channel_type`. Distinct from `source_filter`, which matches the raw event source.",
         "schema": {
           "type": "string"
         },
@@ -4233,7 +4244,14 @@
                     }
                   },
                   "start_block": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Block height the events pipeline starts indexing from. Defaults to 0."
+                  },
+                  "include_in_pipeline": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to deploy this contract to the project contract-events pipeline. When false the ABI is still cached for transaction decoding, but no events are indexed. Defaults to false (decode-only)."
                   }
                 },
                 "required": ["address", "chain", "name", "abi", "events"]
@@ -4401,7 +4419,12 @@
                     }
                   },
                   "start_block": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Block height the events pipeline starts indexing from. Omit to preserve the stored value."
+                  },
+                  "include_in_pipeline": {
+                    "type": "boolean",
+                    "description": "Whether to deploy this contract to the project contract-events pipeline. Omit to preserve the stored value; send false to keep the ABI cached for transaction decoding without indexing events."
                   }
                 },
                 "required": ["address", "chain", "name", "abi", "events"]
@@ -5842,7 +5865,7 @@
       "post": {
         "operationId": "importWallets",
         "summary": "Import wallet addresses",
-        "description": "Import wallet addresses into the project. Requires profiles:write scope and Scale/Enterprise plan.",
+        "description": "Import wallet addresses into the project as identified users. Send either `addresses` (plain list) or `rows` (addresses with first-party properties); `rows` wins when both are present. Imported wallets count toward monthly active user billing. Requires profiles:write scope and Scale/Enterprise plan.",
         "tags": ["Profiles"],
         "requestBody": {
           "required": true,
@@ -5856,14 +5879,31 @@
                     "items": {
                       "type": "string"
                     },
-                    "description": "Wallet addresses to import"
+                    "description": "Wallet addresses to import. Used when `rows` is absent or empty; each address is imported with no properties. EVM (0x...) and Solana addresses are accepted; invalid entries are skipped."
                   },
-                  "writeKey": {
-                    "type": "string",
-                    "description": "SDK write key"
+                  "rows": {
+                    "type": "array",
+                    "description": "Wallets to import with optional first-party properties. Takes precedence over `addresses` when present and non-empty. Only the allowed profile keys are persisted (string values); unknown keys are ignored. Rows with an invalid address are skipped, and a request where no row has a valid address returns 400.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "string",
+                          "description": "EVM (0x...) or Solana wallet address"
+                        },
+                        "properties": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "description": "Optional first-party profile properties for this wallet"
+                        }
+                      },
+                      "required": ["address"]
+                    }
                   }
                 },
-                "required": ["addresses", "writeKey"]
+                "required": ["addresses"]
               },
               "examples": {
                 "importWallets": {
@@ -5872,8 +5912,22 @@
                     "addresses": [
                       "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
                       "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
-                    ],
-                    "writeKey": "sk_write_xxxxx"
+                    ]
+                  }
+                },
+                "importWalletsWithProperties": {
+                  "summary": "Import wallet addresses with profile properties",
+                  "value": {
+                    "addresses": [],
+                    "rows": [
+                      {
+                        "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                        "properties": {
+                          "display_name": "alice.eth",
+                          "email": "alice@example.com"
+                        }
+                      }
+                    ]
                   }
                 }
               }
