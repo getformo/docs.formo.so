@@ -2753,6 +2753,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "parameters": [
@@ -2927,6 +2930,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "alerts:write"
@@ -2964,6 +2970,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "alerts:write"
@@ -3032,6 +3041,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "alerts:write"
@@ -3157,6 +3169,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write",
@@ -3279,6 +3294,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write",
@@ -3315,6 +3333,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -3766,6 +3787,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -3775,7 +3799,7 @@
       "put": {
         "operationId": "reorderCharts",
         "summary": "Reorder charts",
-        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.",
+        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.\n\nThis endpoint answers 204 with an empty body. The idempotency layer only records JSON responses, so `Idempotency-Key` is not supported here: sending one would hold the key in-flight until its lock expires and reject retries in the meantime.",
         "tags": ["Charts"],
         "parameters": [
           {
@@ -3785,9 +3809,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -3820,9 +3841,6 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
           }
         },
         "x-required-scope": "boards:write"
@@ -3928,6 +3946,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -3963,6 +3984,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -4077,6 +4101,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "boards:write"
@@ -4416,6 +4443,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "contracts:write",
@@ -4563,6 +4593,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "contracts:write"
@@ -4605,6 +4638,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "contracts:write"
@@ -4870,6 +4906,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "segments:write",
@@ -4911,6 +4950,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "segments:write"
@@ -6082,6 +6124,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "x-required-scope": "profiles:write",

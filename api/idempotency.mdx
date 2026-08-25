@@ -9,6 +9,8 @@ Public unsafe methods (POST / PUT / PATCH / DELETE) on the Alerts, Boards, Chart
 
 <Note>
 Profile writes (`/v0/profiles/...`) and `POST /v0/query` do **not** support the header. Sending it there has no effect, so retries on those endpoints are not de-duplicated.
+
+`PUT /v0/boards/{boardId}/charts/reorder` is also excluded: it answers `204` with an empty body, which the idempotency layer does not record. Sending a key there would hold it in-flight until the lock expires and reject retries in the meantime.
 </Note>
 
 The header is **opt-in** - omit it and every request is processed independently.
