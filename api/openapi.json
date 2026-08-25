@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Formo Public API",
-    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat.\n\n**Auth.** All endpoints require a workspace API key with the appropriate scopes (see `x-api-scopes`).\n\n**Response shape.** Successful responses return the resource directly (or `{ data: [...], total, page, size, has_more }` for paginated lists). HTTP status carries success/failure; there is no envelope wrapping success bodies.\n\n**Errors.** Every non-2xx response uses the `Error` envelope: `{ error: { code, message, doc_url, param?, details? } }`. Branch on the machine-readable `code` (see `ErrorCode` enum) and follow `doc_url` to the matching section of the [errors reference](https://docs.formo.so/api/errors).\n\n**Idempotency.** Pass an `Idempotency-Key` header on write requests to alerts, boards, charts, contracts, segments, and import to make retries safe; the response is cached for 24 h and replayed on duplicate keys. Profile writes and `POST /v0/query` do not support it.",
+    "description": "REST API for managing Formo projects, analytics, alerts, boards, charts, contracts, segments, and AI chat.\n\n**Auth.** Every endpoint on `api.formo.so` requires a workspace API key with the appropriate scopes (see `x-api-scopes`). The one exception is `POST /v0/raw_events`, which runs on `events.formo.so` and authenticates with the project SDK write key instead.\n\n**Response shape.** Successful responses return the resource directly (or `{ data: [...], total, page, size, has_more }` for paginated lists). HTTP status carries success/failure; there is no envelope wrapping success bodies.\n\n**Errors.** Every non-2xx response from `api.formo.so` uses the `Error` envelope, except the per-IP rate limiters (which reply in plain text) and `POST /v0/raw_events` (which returns a plain `{ \"error\": \"...\" }` object): `{ error: { code, message, doc_url, param?, details? } }`. Branch on the machine-readable `code` (see `ErrorCode` enum) and follow `doc_url` to the matching section of the [errors reference](https://docs.formo.so/api/errors).\n\n**Idempotency.** Pass an `Idempotency-Key` header on write requests to alerts, boards, charts, contracts, segments, and import to make retries safe; the response is cached for 24 h and replayed on duplicate keys. Profile writes and `POST /v0/query` do not support it.",
     "version": "0.1.0",
     "contact": {
       "name": "Formo",
@@ -8877,7 +8877,7 @@
         },
         "responses": {
           "200": {
-            "description": "Events forwarded to the ingestion backend. The upstream status is passed through on the direct path, so a successful batch may return 200 or 202.",
+            "description": "Batch accepted. On the direct path the upstream ingestion status is passed through verbatim, so any 2xx the ingestion backend returns can appear here. The body is its ingestion summary, parsed best-effort: an empty or malformed upstream body is normalised to `{}`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8888,7 +8888,7 @@
             }
           },
           "202": {
-            "description": "Events accepted. Returns `{ \"queued\": true }` when the batch was buffered for retry, or `{}` when the batch contained only transaction events.",
+            "description": "Batch accepted asynchronously. Returns `{ \"queued\": true }` when the batch was buffered for retry, `{}` when it contained only transaction events, or the upstream ingestion summary when the backend itself answered 202 (also `{}` if that body was empty or malformed).",
             "content": {
               "application/json": {
                 "schema": {
@@ -8901,7 +8901,7 @@
             }
           },
           "400": {
-            "description": "Missing or unparseable request body. Note: this endpoint returns a plain `{ \"error\": \"...\" }` object, not the api.formo.so error envelope.",
+            "description": "Request body is missing. A body that is present but not valid JSON fails while parsing and returns 500, not 400.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8914,7 +8914,7 @@
             }
           },
           "401": {
-            "description": "Missing or invalid SDK write key.",
+            "description": "No authorizer context reached the handler. In normal operation a missing or invalid write key is rejected earlier with 403.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8926,8 +8926,21 @@
               }
             }
           },
+          "403": {
+            "description": "Missing or invalid SDK write key. The API Gateway authorizer denies the request before it reaches the handler, so the body is gateway-generated and is not the shape shown here.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "Message": "User is not authorized to access this resource with an explicit deny"
+                }
+              }
+            }
+          },
           "500": {
-            "description": "Ingestion failure.",
+            "description": "Ingestion failure, or a request body that could not be parsed as JSON.",
             "content": {
               "application/json": {
                 "schema": {
