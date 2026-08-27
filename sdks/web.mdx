@@ -37,7 +37,7 @@ When `wagmi` options are provided, the SDK hooks directly into Wagmi's state man
 - Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
 - Full tracking of signatures and transactions via TanStack Query's mutation cache
 
-Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration).
+Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration). If your app also sends imperatively through viem (`walletClient.sendTransaction`, `.signMessage`, `.writeContract`), those calls create no wagmi mutation and are not captured by default; opt in with `wagmi: { eip1193Fallback: true }` (SDK 1.38.0+) and the SDK instruments the active connector's provider with the same request wrapper the default mode uses. Hook-driven calls are never double-counted. The flag is off by default so wagmi mode never touches the signing transport without an explicit, auditable decision.
 </Note>
 
 Install the Web SDK via NPM.
