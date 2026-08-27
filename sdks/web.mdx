@@ -1031,6 +1031,10 @@ For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-11
 
 ### WalletConnect and constructed providers
 
+<Note>
+If your app uses Wagmi (RainbowKit, ConnectKit, AppKit, Privy, and most React dapps), WalletConnect sessions are already tracked through the [Wagmi integration](#wagmi); `registerProvider` refuses there on purpose, because wrapping the same provider twice would double-report. This API is for apps that drive `@walletconnect/ethereum-provider` (or any constructed EIP-1193 provider) directly.
+</Note>
+
 Wallet discovery covers [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) announcements and `window.ethereum`: every injected browser wallet, and nothing else. A [WalletConnect](https://walletconnect.network) or Ledger provider is constructed by your app and announces nothing, so on the EIP-1193 path its whole session is invisible to analytics unless you hand it to the SDK.
 
 `registerProvider` (SDK 1.38.0+) is that handoff:
@@ -1048,10 +1052,6 @@ formo.registerProvider(provider);
 - Events name the wallet behind the transport ("Ledger Live", "MetaMask Wallet") from the session's peer metadata, resolved live per event, so a session swap renames correctly.
 - Optional second argument overrides the metadata: `formo.registerProvider(provider, { name: 'My Wallet', rdns: 'com.example' })`. A name of exactly `WalletConnect` counts as the generic transport name and still gets peer naming.
 - Returns `false` when it refuses: in Wagmi mode, when EVM tracking is disabled, on a cleaned-up instance, or when the object is not a valid EIP-1193 provider. `true` means capture verifiably works.
-
-<Note>
-If your app uses Wagmi (RainbowKit, ConnectKit, AppKit, Privy, and most React dapps), WalletConnect sessions are already tracked through the [Wagmi integration](#wagmi); `registerProvider` refuses there on purpose, because wrapping the same provider twice would double-report. This API is for apps that drive `@walletconnect/ethereum-provider` (or any constructed EIP-1193 provider) directly.
-</Note>
 
 See the [with-walletconnect example](https://github.com/getformo/examples/tree/main/with-walletconnect) for a complete reference integration.
 
