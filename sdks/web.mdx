@@ -1029,31 +1029,27 @@ formo.signature({ status: SignatureStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['
 For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-1193 / EIP-6963). This prevents unnecessary tracking of injected EVM wallets.
 </Note>
 
-### WalletConnect and constructed providers
+### WalletConnect
 
 <Note>
-If your app uses Wagmi (RainbowKit, ConnectKit, AppKit, Privy, and most React dapps), WalletConnect sessions are already tracked through the [Wagmi integration](#wagmi); `registerProvider` refuses there on purpose, because wrapping the same provider twice would double-report. This API is for apps that drive `@walletconnect/ethereum-provider` (or any constructed EIP-1193 provider) directly.
+Using Wagmi (RainbowKit, ConnectKit, AppKit, Privy, and most React dapps)? WalletConnect is already tracked through the [Wagmi integration](#wagmi); skip this section. `registerProvider` refuses in Wagmi mode to prevent double-reporting.
 </Note>
 
-Wallet discovery covers [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) announcements and `window.ethereum`: every injected browser wallet, and nothing else. A [WalletConnect](https://walletconnect.network) or Ledger provider is constructed by your app and announces nothing, so on the EIP-1193 path its whole session is invisible to analytics unless you hand it to the SDK.
-
-`registerProvider` (SDK 1.38.0+) is that handoff:
+The SDK discovers wallets that announce themselves ([EIP-6963](https://eips.ethereum.org/EIPS/eip-6963)) or sit at `window.ethereum`, which covers injected browser wallets only. A WalletConnect provider is different: your app constructs it in code with `EthereumProvider.init(...)`, so the SDK cannot find it on its own. Hand it over with `registerProvider` (SDK 1.38.0+):
 
 ```tsx
 import { EthereumProvider } from '@walletconnect/ethereum-provider';
 
 const provider = await EthereumProvider.init({ projectId, chains: [1] });
-
-// The one line that matters: same pipeline as a discovered wallet.
 formo.registerProvider(provider);
 ```
 
-- Call it as soon as the provider exists; before or after the wallet connects both work. A session that already exists at registration is adopted on the spot, with no RPC issued on the wallet transport.
-- Events name the wallet behind the transport ("Ledger Live", "MetaMask Wallet") from the session's peer metadata, resolved live per event, so a session swap renames correctly.
-- Optional second argument overrides the metadata: `formo.registerProvider(provider, { name: 'My Wallet', rdns: 'com.example' })`. A name of exactly `WalletConnect` counts as the generic transport name and still gets peer naming.
-- Returns `false` when it refuses: in Wagmi mode, when EVM tracking is disabled, on a cleaned-up instance, or when the object is not a valid EIP-1193 provider. `true` means capture verifiably works.
+- Call it as soon as the provider exists, before or after the wallet connects; an already-connected session is adopted on the spot.
+- Events name the wallet behind WalletConnect ("Ledger Live", "MetaMask Wallet") from the session's peer metadata.
+- Returns `true` when capture works; `false` when it refuses (Wagmi mode, EVM tracking disabled, or not a valid EIP-1193 provider).
+- The same call works for any other provider your app constructs rather than discovers; pass `{ name, rdns }` as a second argument to label a custom one.
 
-See the [with-walletconnect example](https://github.com/getformo/examples/tree/main/with-walletconnect) for a complete reference integration.
+See the [with-walletconnect example](https://github.com/getformo/examples/tree/main/with-walletconnect) for a complete integration.
 
 ### Privy integration
 
