@@ -37,7 +37,7 @@ When `wagmi` options are provided, the SDK hooks directly into Wagmi's state man
 - Better compatibility with wallet connection libraries (RainbowKit, ConnectKit, etc.)
 - Full tracking of signatures and transactions via TanStack Query's mutation cache
 
-Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration).
+Note that transaction and signature autocapture requires the use of [wagmi React hooks](#wagmi-integration). If your app also sends imperatively through viem (`walletClient.sendTransaction`, `.signMessage`, `.writeContract`), those calls create no wagmi mutation and are not captured by default; opt in with `wagmi: { eip1193Fallback: true }` (SDK 1.38.0+) and the SDK instruments the active connector's provider with the same request wrapper the default mode uses. Hook-driven calls are never double-counted. The flag is off by default so wagmi mode never touches the signing transport without an explicit, auditable decision.
 </Note>
 
 Install the Web SDK via NPM.
@@ -1028,6 +1028,28 @@ formo.signature({ status: SignatureStatus.CONFIRMED, chainId: SOLANA_CHAIN_IDS['
 <Note>
 For Solana-only apps, set `evm: false` to disable EVM provider detection (EIP-1193 / EIP-6963). This prevents unnecessary tracking of injected EVM wallets.
 </Note>
+
+### WalletConnect
+
+<Note>
+Using Wagmi (RainbowKit, ConnectKit, AppKit, Privy, and most React dapps)? WalletConnect is already tracked through the [Wagmi integration](#wagmi); skip this section. `registerProvider` refuses in Wagmi mode to prevent double-reporting.
+</Note>
+
+The SDK discovers wallets that announce themselves ([EIP-6963](https://eips.ethereum.org/EIPS/eip-6963)) or sit at `window.ethereum`, which covers injected browser wallets only. A WalletConnect provider is different: your app constructs it in code with `EthereumProvider.init(...)`, so the SDK cannot find it on its own. Hand it over with `registerProvider` (SDK 1.38.0+):
+
+```tsx
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
+
+const provider = await EthereumProvider.init({ projectId, chains: [1] });
+formo.registerProvider(provider);
+```
+
+- Call it as soon as the provider exists, before or after the wallet connects; an already-connected session is adopted on the spot.
+- Events name the wallet behind WalletConnect ("Ledger Live", "MetaMask Wallet") from the session's peer metadata.
+- Returns `true` when capture works; `false` when it refuses (Wagmi mode, EVM tracking disabled, or not a valid EIP-1193 provider).
+- The same call works for any other provider your app constructs rather than discovers; pass `{ name, rdns }` as a second argument to label a custom one.
+
+See the [with-walletconnect example](https://github.com/getformo/examples/tree/main/with-walletconnect) for a complete integration.
 
 ### Privy integration
 
