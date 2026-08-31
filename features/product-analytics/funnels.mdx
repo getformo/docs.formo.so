@@ -56,6 +56,27 @@ In this mode, users must complete all defined steps, but the order does not matt
 Start with **Sequential** (the default). Switch to **Any order** only if your funnel represents actions that genuinely happen in variable order: for example, multi-step DeFi flows where users may borrow before swapping, or complete approvals in any sequence.
 </Tip>
 
+## Multiple Events per Step (OR)
+
+A step can match more than one event. Click the **OR** button on a step to add alternative events. A user completes the step when they perform any event in the group.
+
+For example, a "Transaction Initiated" step can match `Swap Initiated` OR `Limit Order Placed` OR `Liquidity Added`. A user who performs any one of these counts for the step.
+
+- Step filters apply to every event in the group.
+- The chart labels the step with the first event plus the number of alternatives, for example "Swap Initiated or 2 others".
+- Via the API, add an `events` array to the step (max 10 entries). The primary `type` and `event` stay the step label and are part of the group:
+
+```json
+{
+  "type": "track",
+  "event": "Swap Initiated",
+  "events": [
+    { "type": "track", "event": "Swap Initiated" },
+    { "type": "track", "event": "Limit Order Placed" }
+  ]
+}
+```
+
 ## Funnel Breakdowns
 
 Break down funnel steps by key dimensions to understand how different user segments convert:
