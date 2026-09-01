@@ -66,20 +66,26 @@ A step can match more than one event. Click the **OR** button on a step to add a
 
 For example, a "Transaction Initiated" step can match `Swap Initiated` OR `Limit Order Placed` OR `Liquidity Added`. A user who performs any one of these counts for the step.
 
-- Step filters apply to every event in the group.
-- The chart labels the step with the first event plus the number of alternatives, for example "Swap Initiated or 2 others".
-- Via the API, add an `events` array to the step (max 10 entries). The primary `type` and `event` stay the step label and are part of the group:
+- Each event in the group has its own filters. Use the filter button on a row to add a condition that applies to that event only, for example `Connect wallet` where `ref` is `foo` OR `Page view` where `ref` is `bar`.
+- The chart labels a two-event step with both names ("Connect Wallet or Detect Wallet") and a larger group with a count ("Swap Initiated or 2 others"). The bar tooltip lists every event with its filters.
+- Via the API, add an `events` array to the step (max 10 entries). Each member may carry `filters` in the same `{field, op, value}` envelope as a step filter. The primary `type` and `event` stay the step label and are part of the group:
 
 ```json
 {
   "type": "track",
   "event": "Swap Initiated",
   "events": [
-    { "type": "track", "event": "Swap Initiated" },
+    {
+      "type": "track",
+      "event": "Swap Initiated",
+      "filters": [{ "field": "source", "op": "eq", "value": "widget" }]
+    },
     { "type": "track", "event": "Limit Order Placed" }
   ]
 }
 ```
+
+A member's filters apply to that member only: the step above matches `Swap Initiated` from the widget, or any `Limit Order Placed`. A `filters` array on the step itself applies to every member.
 
 ## Funnel Breakdowns
 
