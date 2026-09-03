@@ -43,7 +43,7 @@ Wallets that appear on published airdrop sybil / farmer lists. These are one-tim
 
 ### DeFi behaviour
 
-Behavioural labels computed from a wallet's current onchain positions. Formo groups every protocol a wallet holds a position in into a category (lending, DEX, perps, staking, and so on) and applies one rule per label. Each label carries a value you can filter on with `>`, `>=`, `<` and `<=`: the USD amount behind the label, or the number of apps for the interaction labels.
+Behavioural labels computed from a wallet's current onchain positions. Formo groups every protocol a wallet holds a position in into a category (lending, DEX, perps, staking, and so on) and applies one rule per label. Each label carries a value: the USD amount behind the label, which you can filter with `>`, `>=`, `<` and `<=`, or for the bridge and aggregator labels the names of the protocols the wallet used, which you can filter by protocol.
 
 Rules that apply to every label below:
 
@@ -63,8 +63,8 @@ Rules that apply to every label below:
 | **Options Trader** | Holds at least $100 in an options venue such as Stryke, Ribbon, Derive or Premia. | Position USD |
 | **Basis Trader** | Holds at least $100 in a delta-neutral dollar product such as Ethena, Resolv, Falcon or Theo. | Deposit USD |
 | **RWA Holder** | Holds at least $100 in tokenised real-world assets: tokenised gold (PAXG, XAUt), treasury and cash notes (USDY, OUSG, BUIDL, Midas), tokenised stocks (xStocks, Backed), private credit pools (Maple, Goldfinch, Centrifuge), carbon or real estate. | Position USD |
-| **Bridge User** | Has used a bridge or bridge aggregator such as Stargate, Across, Hop, LI.FI or Relay, detected from transaction history or a bridge liquidity position. | Number of bridges |
-| **Aggregator User** | Has swapped through a swap aggregator such as KyberSwap, 1inch, Paraswap, CoW or Odos, detected from transaction history. | Number of aggregators |
+| **Bridge User** | Has used a bridge or bridge aggregator such as Stargate, Across, Hop, LI.FI or Relay, detected from transaction history or a bridge liquidity position. | Bridges used, for example "Stargate, Across" |
+| **Aggregator User** | Has swapped through a swap aggregator such as KyberSwap, 1inch, Paraswap, CoW or Odos, detected from transaction history. | Aggregators used, for example "KyberSwap, 1inch" |
 | **Prediction Market User** | Has a Polymarket account, or holds a position in an onchain prediction market such as Limitless, Myriad or Azuro. | Open position USD |
 
 ### Others
