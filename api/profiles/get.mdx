@@ -272,7 +272,7 @@ Array of wallet labels:
 | `id` | string | Label ID |
 | `value` | string | Label value |
 | `chain_id` | string | Chain ID where label applies |
-| `source` | string | Label source (e.g., manual, automated) |
+| `source` | string | Where the label came from: `formo` for behavioural labels computed from onchain positions, the provider name for attestations (for example `chainalysis`, `coinbase`, `human.tech`), or `import` for labels you added yourself |
 
 #### `apps` (when `expand=apps`)
 
