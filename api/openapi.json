@@ -281,9 +281,31 @@
         },
         "required": ["field", "op"]
       },
+      "FunnelStepEvent": {
+        "type": "object",
+        "description": "One alternative inside a funnel step's OR group. `filters` uses the same canonical `{field, op, value}` envelope as `FunnelStep.filters` and binds to this member only: `(A AND filtersA) OR (B AND filtersB)`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["event", "track", "decoded_log"]
+          },
+          "event": {
+            "type": "string",
+            "minLength": 1
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StepFilterCondition"
+            },
+            "description": "Member-scoped predicates, AND-joined within this member."
+          }
+        },
+        "required": ["type", "event"]
+      },
       "FunnelStep": {
         "type": "object",
-        "description": "A single funnel or user-path step. Event-property predicates are stored in `filters`, using the same canonical `{field, op, value}` envelope as every other filter surface.",
+        "description": "A single funnel or user-path step. Event-property predicates are stored in `filters`, using the same canonical `{field, op, value}` envelope as every other filter surface. Funnel steps (not user-path anchors or retention filters) may also carry `events`, an OR group: the step then matches any listed event. `type`/`event` stay the step's primary event and are always part of the group; `filters` apply to the whole group.",
         "properties": {
           "type": {
             "type": "string",
@@ -294,6 +316,14 @@
             "type": "string",
             "minLength": 1,
             "description": "Event name (e.g. `page`, `connect`, `transaction`, or a custom track event name)."
+          },
+          "events": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/FunnelStepEvent"
+            },
+            "description": "Optional OR group (funnel steps only, max 10). When present and non-empty the step matches any of these events, e.g. `[{\"type\":\"track\",\"event\":\"Swap Initiated\"},{\"type\":\"track\",\"event\":\"Limit Order Placed\"}]`. The primary `type`/`event` is always included."
           },
           "filters": {
             "type": "array",
@@ -1967,7 +1997,7 @@
             "type": "string"
           }
         },
-        "required": ["field", "value"]
+        "required": ["field", "op", "value"]
       },
       "SourceFilterCondition": {
         "type": "object",
@@ -3364,7 +3394,7 @@
               "type": "string",
               "enum": ["results", "meta"]
             },
-            "description": "Response detail. Omitted (or `meta`): lightweight summaries only — fast, no query execution. `results`: execute every chart’s stored query and include `results`, `board`, and `warnings`."
+            "description": "Response detail. Omitted (or `meta`): lightweight summaries only, fast, with no query execution. `results`: execute every chart’s stored query and include `results`, `board`, and `warnings`."
           },
           {
             "$ref": "#/components/parameters/Page"
@@ -3799,7 +3829,7 @@
       "put": {
         "operationId": "reorderCharts",
         "summary": "Reorder charts",
-        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.\n\nThis endpoint does not support the `Idempotency-Key` header.",
+        "description": "Sets the display order of a board's charts to the given id list. Charts omitted from `chartIds` keep their relative order after the listed ones. Duplicate or unknown chart ids are rejected.",
         "tags": ["Charts"],
         "parameters": [
           {
@@ -3809,6 +3839,9 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
           }
         ],
         "requestBody": {
@@ -3841,6 +3874,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
           }
         },
         "x-required-scope": "boards:write"
@@ -6567,7 +6603,7 @@
                 "paid_source"
               ]
             },
-            "description": "Column to break down sources by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Use `paid_source` for the session-entry acquiring ad network (paid sessions only; see docs/ads.md)."
+            "description": "Column to break down sources by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/product-analytics/key-metrics#channels)). Use `paid_source` for the session-entry acquiring ad network (paid sessions only; see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads))."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -7171,7 +7207,7 @@
                 "event"
               ]
             },
-            "description": "Column to group revenue by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only — see docs/ads.md). Unknown values return zero rows."
+            "description": "Column to group revenue by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/product-analytics/key-metrics#channels)). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only, see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads)). Unknown values return zero rows."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -7298,7 +7334,7 @@
                 "event"
               ]
             },
-            "description": "Column to group volume by. Use `channel` for the 12-channel acquisition classifier (see docs/channels.md). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only — see docs/ads.md). Unknown values return zero rows."
+            "description": "Column to group volume by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/product-analytics/key-metrics#channels)). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only, see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads)). Unknown values return zero rows."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -7401,7 +7437,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Breakdown dimension. Valid options: referrer, location, device, browser, os, utm_source, utm_medium, utm_campaign, utm_content, utm_term, ref, builder_codes, channel_type, paid_source. Unknown values are ignored (ungrouped totals). `paid_source` is the acquiring ad network (per-event sticky attribution; empty bucket is 'None' — see docs/ads.md)."
+            "description": "Breakdown dimension. Valid options: referrer, location, device, browser, os, utm_source, utm_medium, utm_campaign, utm_content, utm_term, ref, builder_codes, channel_type, paid_source. Unknown values are ignored (ungrouped totals). `paid_source` is the acquiring ad network (per-event sticky attribution; empty bucket is 'None'; see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads))."
           },
           {
             "name": "limit",
