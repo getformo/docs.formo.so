@@ -48,21 +48,21 @@ Behavioural labels computed from a wallet's current onchain positions. Formo gro
 Rules that apply to every label below:
 
 - Only positions from the wallet's latest profile snapshot count. A position the wallet has closed never lingers.
-- USD labels need at least $1,000 across the category. Interaction labels have no floor.
+- USD labels need at least $100 across the category. Interaction labels have no floor. Filter on the value when you want a higher bar.
 - Labels refresh daily and are removed automatically when the rule stops holding. A wallet is never labeled permanently.
 - Coverage follows profile freshness: a wallet is re-profiled every 30 days (or 60 days below $100 net worth) while it stays active in your project.
 
 | Label | Rule | Value |
 |-------|------|-------|
-| **DeFi Lender** | Supplies at least $1,000 to lending markets such as Aave, Compound, Morpho or Spark. Collateral locked in a CDP does not count. | Supplied USD |
-| **DeFi Borrower** | Owes at least $1,000 across lending markets and CDPs such as Maker, Sky, Liquity or Lista. | Borrowed USD |
-| **Liquidity Provider** | Holds at least $1,000 in DEX liquidity positions on Uniswap, Curve, Aerodrome, PancakeSwap and similar. | Position USD |
-| **Yield Farmer** | Holds at least $1,000 in vaults or yield aggregators such as Pendle, Beefy, Yearn or Morpho vault curators. | Deposit USD |
-| **Staker** | Holds at least $1,000 in liquid staking, restaking or native chain staking (Lido, ether.fi, EigenLayer, Kelp), or at least $1,000 of liquid staking tokens such as stETH, wstETH, rETH or weETH in the wallet. | Staked USD |
-| **Perp Trader** | Holds at least $1,000 of open margin or liquidity in a perpetuals venue such as GMX, Hyperliquid, Vertex or Avantis. Closed trades leave no position and are not counted. | Position USD |
-| **Options Trader** | Holds at least $1,000 in an options venue such as Stryke, Ribbon, Derive or Premia. | Position USD |
-| **Basis Trader** | Holds at least $1,000 in a delta-neutral dollar product such as Ethena, Resolv, Falcon or Theo. | Deposit USD |
-| **RWA Holder** | Holds at least $1,000 in tokenised real-world assets: treasuries, private credit, carbon or real estate (Ondo, OpenEden, Midas, Centrifuge, Plume ecosystem). | Position USD |
+| **DeFi Lender** | Supplies at least $100 to lending markets such as Aave, Compound, Morpho or Spark. Collateral locked in a CDP does not count. | Supplied USD |
+| **DeFi Borrower** | Owes at least $100 across lending markets and CDPs such as Maker, Sky, Liquity or Lista. | Borrowed USD |
+| **Liquidity Provider** | Holds at least $100 in DEX liquidity positions on Uniswap, Curve, Aerodrome, PancakeSwap and similar. | Position USD |
+| **Yield Farmer** | Holds at least $100 in vaults or yield aggregators such as Pendle, Beefy, Yearn or Morpho vault curators. | Deposit USD |
+| **Staker** | Holds at least $100 in liquid staking, restaking or native chain staking (Lido, ether.fi, EigenLayer, Kelp), or at least $100 of liquid staking tokens such as stETH, wstETH, rETH or weETH in the wallet. | Staked USD |
+| **Perp Trader** | Holds at least $100 of open margin or liquidity in a perpetuals venue such as GMX, Hyperliquid, Vertex or Avantis. Closed trades leave no position and are not counted. | Position USD |
+| **Options Trader** | Holds at least $100 in an options venue such as Stryke, Ribbon, Derive or Premia. | Position USD |
+| **Basis Trader** | Holds at least $100 in a delta-neutral dollar product such as Ethena, Resolv, Falcon or Theo. | Deposit USD |
+| **RWA Holder** | Holds at least $100 in tokenised real-world assets: tokenised gold (PAXG, XAUt), treasury and cash notes (USDY, OUSG, BUIDL, Midas), tokenised stocks (xStocks, Backed), private credit pools (Maple, Goldfinch, Centrifuge), carbon or real estate. | Position USD |
 | **Bridge User** | Has used a bridge or bridge aggregator such as Stargate, Across, Hop, LI.FI or Relay, detected from transaction history or a bridge liquidity position. | Number of bridges |
 | **Aggregator User** | Has swapped through a swap aggregator such as KyberSwap, 1inch, Paraswap, CoW or Odos, detected from transaction history. | Number of aggregators |
 | **Prediction Market User** | Has a Polymarket account, or holds a position in an onchain prediction market such as Limitless, Myriad or Azuro. | Open position USD |
@@ -87,6 +87,7 @@ Formo automatically analyzes each wallet's onchain activity and assigns relevant
 **Label sources:**
 - **Lifecycle** - Engagement stage derived from each wallet's recency and active days
 - **Attestations** - Verified credentials from Coinbase, Binance, Human Passport, and OFAC sanction lists
+- **DeFi behaviour** - What the wallet currently does onchain: lending, borrowing, liquidity provision, staking, perps, options, basis trading, real-world assets, bridges, aggregators and prediction markets
 - **Sybil lists** - Membership in published airdrop sybil / farmer lists (LayerZero, Hop, Optimism)
 - **Campaigns** - Participation in incentive campaigns such as Merkl
 - **Onchain registries** - Standards such as ERC-8004 that identify AI agent wallets
@@ -119,6 +120,7 @@ Use labels to find specific user types:
 | Find Coinbase users | Label = "Coinbase Verified Account" |
 | Find active lenders | DeFi Lender >= 10,000 |
 | Find leveraged users | DeFi Borrower >= 1,000 |
+| Find gold and treasury holders | RWA Holder >= 500 |
 
 ### Step 3: Combine labels with other filters
 
