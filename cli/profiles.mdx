@@ -128,7 +128,8 @@ When `--timestamp` is present, wallet-enrichment fields come from the stored bas
   { "field": "chains.balance", "op": "gte", "value": 1000, "chain_id": "1" },
   { "field": "apps.balance", "op": "gt", "value": 500, "app_id": "uniswap-v3" },
   { "field": "tokens.balance", "op": "gt", "value": 0, "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "scope": "any" },
-  { "field": "labels.value", "op": "eq", "value": "tier-1", "tag_id": "vip" }
+  { "field": "labels.value", "op": "eq", "value": "tier-1", "tag_id": "vip" },
+  { "field": "labels.value", "op": "gte", "value": "10000", "tag_id": "defi.lender" }
 ]
 ```
 
