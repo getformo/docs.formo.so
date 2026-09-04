@@ -994,13 +994,6 @@ This applies to every installation method above. If you use the HTML snippet, al
   <Accordion title="Which installation method should I use?">
     If your app uses [Wagmi](https://wagmi.sh/) for wallet connections and its hooks for transactions, use the [Wagmi integration](/sdks/web#wagmi). For Solana apps, use the [Solana integration](/sdks/web#solana-integration). For React or Next.js apps without Wagmi, use the [React integration](/sdks/web#react--nextjs-without-wagmi). For static sites or non-React apps, use the [HTML snippet](/sdks/web#html-snippet). For mobile apps, use the [React Native SDK](/sdks/mobile).
   </Accordion>
-  <Accordion title="Why are my Solana wallet connections not showing up?">
-    Check that `solana.cluster` matches your chain. If the wallet does not implement Wallet Standard, use the [manual connection fallback](/sdks/web#wallets-without-wallet-standard).
-
-    Connections are reported on `mainnet-beta` unless you set `solana.cluster`, so a devnet app that filters by chain will find them under the wrong cluster rather than missing.
-
-    Sending connections as a custom `track()` event instead will not work: they are stored as track events rather than the `connect` type, so the **Connect wallet** funnel step and wallet connection charts stay empty.
-  </Accordion>
   <Accordion title="How do I verify that the Formo SDK is installed correctly?">
     After installing the Formo SDK, visit your site and open the [Activity page](/features/product-analytics/activity) in the Formo dashboard. You should see your pageview appear under the most recent events. You can also check your browser's Network tab for requests to `events.formo.so` to inspect if events are sent successfully with a 2XX status code.
   </Accordion>

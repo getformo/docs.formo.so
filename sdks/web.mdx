@@ -1242,11 +1242,6 @@ To verify the proxy is working:
   <Accordion title="Can I use Formo with Privy or other embedded wallet providers?">
     Yes. The SDK includes a dedicated [Privy integration](#privy-integration): pass the `usePrivy()` user to `identify(user)` and every wallet linked to that Privy account is identified under the user's DID, so a multi-wallet user clusters into one Formo user. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
-  <Accordion title="Why are my Solana wallet connections not showing up?">
-    Check that `solana.cluster` matches your chain. If the wallet does not implement Wallet Standard, use the [manual connection fallback](#wallets-without-wallet-standard).
-
-    Sending connections as a custom `track()` event instead will not work: they are stored as track events rather than the built-in `connect` type, so the **Connect wallet** funnel step and every wallet connection chart stay empty.
-  </Accordion>
   <Accordion title="Do I need framework-kit to use Formo on Solana?">
     No. Wallet Standard autocaptures `detect`, `connect`, and `disconnect`. framework-kit adds cluster switches and transactions recorded in its store. Signatures and other transactions require explicit tracking.
   </Accordion>
