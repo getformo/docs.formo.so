@@ -829,21 +829,65 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 
 ### Solana integration
 
-- **[framework-kit](#solana-with-framework-kit) (Recommended)**: autocaptures wallet connections, cluster switches, and transactions recorded in its store.
-- **[Wallet Standard](#solana-wallet-discovery)**: autocaptures wallet `detect`, `connect`, and `disconnect` for compatible wallets, regardless of library.
+- **[Solana Kit](#solana-kit-recommended) (Recommended)**: wallet `detect`, `connect`, and `disconnect` are autocaptured through Wallet Standard.
+- **[framework-kit](#solana-with-framework-kit)**: existing `@solana/client` apps can additionally pass their store for cluster and transaction lifecycle events.
+
+`@solana/kit` and framework-kit are different projects. Solana Kit provides the core client and plugins; framework-kit provides the separate `@solana/client` and `@solana/react-hooks` packages and is built on top of Kit.
+
+#### Solana Kit (Recommended)
+
+Install Formo alongside the current Solana Kit wallet stack:
+
+```bash
+npm install @formo/analytics @solana/kit @solana/kit-plugin-rpc @solana/kit-plugin-wallet @solana/react
+```
+
+Create a Kit client and give Formo the same cluster. Formo observes the wallet's Wallet Standard events independently, so it does not need the Kit client or a store:
+
+```tsx
+'use client';
+
+import { createClient } from '@solana/kit';
+import { solanaRpc } from '@solana/kit-plugin-rpc';
+import { walletSigner } from '@solana/kit-plugin-wallet';
+import { ClientProvider } from '@solana/react';
+import { FormoAnalyticsProvider } from '@formo/analytics';
+
+const client = createClient()
+  .use(walletSigner({ chain: 'solana:devnet' }))
+  .use(solanaRpc({ rpcUrl: 'https://api.devnet.solana.com' }));
+
+function App({ children }) {
+  return (
+    <ClientProvider client={client}>
+      <FormoAnalyticsProvider
+        writeKey="<YOUR_WRITE_KEY>"
+        options={{
+          evm: false, // Optional for a Solana-only app
+          solana: { cluster: 'devnet' },
+        }}
+      >
+        {children}
+      </FormoAnalyticsProvider>
+    </ClientProvider>
+  );
+}
+```
+
+See the complete [Solana Kit example](https://github.com/getformo/examples/tree/main/with-solana).
 
 #### Solana with framework-kit
 
-Passing a framework-kit store adds cluster switches and transactions recorded in that store. Wallet events hand off to the store without double-counting. React transaction hooks do not write to the store and still need [explicit tracking](#manually-tracking-solana-transactions-and-signatures).
+If your app uses framework-kit (`@solana/client`), pass `client.store` to add cluster switches and transactions recorded in that store. Wallet events hand off to the store without double-counting. React transaction hooks do not write to the store and still need [explicit tracking](#manually-tracking-solana-transactions-and-signatures).
 
-See the full [Solana example app](https://github.com/getformo/examples/tree/main/with-solana) for a working implementation.
+See the focused [framework-kit example](https://github.com/getformo/examples/tree/main/with-solana-framework-kit).
 
 ```bash
 npm install @formo/analytics @solana/client @solana/react-hooks
 ```
 
 <Tabs>
-  <Tab title="React (Recommended)">
+  <Tab title="React">
     Pass `client.store` in the Solana options. This adds network changes and transactions recorded in the store; hook-based transactions still need explicit tracking.
 
     ```tsx
@@ -924,7 +968,7 @@ The following events are autocaptured via zustand store subscription:
 
 Wallet `detect` events still come from Wallet Standard discovery.
 
-#### Solana wallet discovery
+#### Other Wallet Standard integrations
 
 The SDK observes [Wallet Standard](https://github.com/wallet-standard/wallet-standard) account changes without wrapping wallet methods or adding a Solana dependency.
 
@@ -932,7 +976,7 @@ The SDK observes [Wallet Standard](https://github.com/wallet-standard/wallet-sta
 npm install @formo/analytics --save
 ```
 
-Wrap your app with `FormoAnalyticsProvider`. This example uses `@solana/wallet-adapter-react`, but discovery works with any library connected to a Wallet Standard wallet:
+This `@solana/wallet-adapter-react` example needs only `FormoAnalyticsProvider`. Discovery works whenever the connected wallet registers with the page through Wallet Standard:
 
 ```tsx
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
@@ -1003,7 +1047,7 @@ Solana has no numeric chain ID, so Formo maps each cluster to a reserved ID abov
 | `devnet` | `900003` |
 | `localnet` | `900004` |
 
-Mainnet has two spellings: `@solana/client` takes `cluster: 'mainnet'`, while `SOLANA_CHAIN_IDS` is keyed on `'mainnet-beta'`. Map between them when you derive one from the other.
+Mainnet has several spellings: Solana Kit's wallet plugin takes `solana:mainnet`, framework-kit's client takes `mainnet`, and Formo uses `mainnet-beta`. Map between them when deriving one from another.
 
 `connect()` validates the address against the chain ID, so a base58 Solana address paired with an EVM chain ID is rejected. Rejected calls log a warning and emit nothing. Enable logging while integrating so you see them:
 
@@ -1015,7 +1059,7 @@ Connections are also skipped when tracking is suppressed for the visitor, for ex
 
 #### Manually tracking Solana transactions and signatures
 
-Track Solana signatures explicitly. Track transactions too, except those recorded in a framework-kit store. Its React hooks (`useSolTransfer`, `useSendTransaction`, `useTransactionPool`) do not write to that store.
+Track Solana Kit signatures and transactions explicitly. Framework-kit transactions are autocaptured only when they are recorded in the supplied store; its React hooks (`useSolTransfer`, `useSendTransaction`, `useTransactionPool`) do not write to that store.
 
 ```tsx
 import { useFormo, TransactionStatus, SignatureStatus, SOLANA_CHAIN_IDS } from '@formo/analytics';
@@ -1243,6 +1287,6 @@ To verify the proxy is working:
     Yes. The SDK includes a dedicated [Privy integration](#privy-integration): pass the `usePrivy()` user to `identify(user)` and every wallet linked to that Privy account is identified under the user's DID, so a multi-wallet user clusters into one Formo user. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
   <Accordion title="Do I need framework-kit to use Formo on Solana?">
-    No. Wallet Standard autocaptures `detect`, `connect`, and `disconnect`. framework-kit adds cluster switches and transactions recorded in its store. Signatures and other transactions require explicit tracking.
+    No. Wallet Standard autocaptures `detect`, `connect`, and `disconnect` for compatible wallets, including wallets used through Solana Kit. If your app already uses framework-kit, its store can additionally supply cluster switches and recorded transaction lifecycle events. Signatures and other transactions require explicit tracking.
   </Accordion>
 </AccordionGroup>
