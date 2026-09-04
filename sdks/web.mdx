@@ -336,7 +336,7 @@ Starting in Web SDK 1.39.0, `reset()` preserves the anonymous id and visit attri
 analytics.reset();
 ```
 
-Call `reset()` on a real logout or disconnect in an integration where the SDK cannot see the disconnect itself, for example a custom connector where you call `connect()` and `disconnect()` yourself. In Wagmi mode the SDK observes the disconnect and clears the wallet identity on its own, so you rarely need it.
+Call `reset()` when an application account logs out and you need to forget its user and wallet identity while retaining the browser identity. For a manual wallet integration, call `disconnect()` when the wallet disconnects; that already clears the active wallet. Wagmi mode observes disconnects automatically. If your app has no separate login identity, you can usually omit `reset()` entirely.
 
 Do not call `reset()` when the wallet address changes, and do not return it as the cleanup of an effect keyed on the address. React runs that cleanup on every account switch, and `identify()` already replaces the active wallet. Identify the new address directly:
 
