@@ -831,12 +831,12 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 
 Solana wallets are discovered through the [Wallet Standard](https://github.com/wallet-standard/wallet-standard), the Solana counterpart of EIP-6963. Every modern Solana wallet (Phantom, Solflare, Backpack, and the rest) announces itself through it, and every wallet library sits on top of it, so wallet `detect`, `connect`, and `disconnect` events are autocaptured for `@solana/wallet-adapter`, framework-kit, Privy, Dynamic, Reown, and custom connectors alike. No Solana configuration is needed.
 
-- **[Any wallet library](#solana-wallet-discovery)**: initialize the SDK and wallet events are autocaptured.
-- **[framework-kit](#solana-with-framework-kit)** (`@solana/client` + `@solana/react-hooks`): additionally pass `client.store` and the transaction lifecycle and cluster switches are autocaptured too.
+- **[Any wallet library](#solana-wallet-discovery)**: wallet `detect`, `connect`, and `disconnect` are autocaptured.
+- **[framework-kit](#solana-with-framework-kit)** (`@solana/client` + `@solana/react-hooks`): additionally pass `client.store` to autocapture cluster switches and transactions recorded in the store.
 - **[Manual wallet events](#solana-manual-wallet-events)**: for `solana: false`, or a wallet that does not implement the Wallet Standard.
 
 <Note>
-Wallet Standard discovery requires `@formo/analytics` 1.39.0 or later. On earlier versions, Solana wallet events are only autocaptured with a framework-kit store.
+Wallet Standard discovery requires `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections through a framework-kit store.
 </Note>
 
 #### Solana wallet discovery
@@ -1306,6 +1306,6 @@ To verify the proxy is working:
     Sending connections as a custom `track()` event instead will not work: they are stored as track events rather than the built-in `connect` type, so the **Connect wallet** funnel step and every wallet connection chart stay empty.
   </Accordion>
   <Accordion title="Do I need framework-kit to use Formo on Solana?">
-    No. framework-kit gives you autocapture for connects, disconnects and cluster switches, but any Solana app can integrate by calling [`formo.connect()`](/data/events/connect) and `formo.disconnect()` directly. Both paths produce the same `connect` and `disconnect` event types, so the dashboard treats them identically. Transactions and signatures need explicit `formo.transaction()` and `formo.signature()` calls on either path.
+    No. Wallet Standard discovery autocaptures `detect`, `connect`, and `disconnect` with any Solana wallet library. framework-kit additionally provides cluster switches and the lifecycle of transactions recorded in its store. Signatures and transactions outside that store require explicit `formo.signature()` and `formo.transaction()` calls.
   </Accordion>
 </AccordionGroup>
