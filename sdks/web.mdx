@@ -324,6 +324,28 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
   </Tab>
 </Tabs>
 
+### Reset identity
+
+`reset()` forgets the current user: the user id, the active wallet and the per-session wallet markers. It keeps the anonymous id and the traffic-source attribution (referrer, UTM). The anonymous id identifies the browser, not the user. It is what the Visitors metric counts and what links a wallet to the anonymous activity before it connected, so a wallet switch must not rotate it. Attribution describes the visit, so a wallet identified later in the same visit still gets it.
+
+```ts
+analytics.reset();
+```
+
+Call `reset()` on a real logout or disconnect in an integration where the SDK cannot see the disconnect itself, for example a custom connector where you call `connect()` and `disconnect()` yourself. In Wagmi mode the SDK observes the disconnect and clears the wallet identity on its own, so you rarely need it.
+
+Do not call `reset()` when the wallet address changes, and do not return it as the cleanup of an effect keyed on the address. React runs that cleanup on every account switch, and `identify()` already replaces the active wallet. Identify the new address directly:
+
+```tsx
+useEffect(() => {
+  if (address && analytics) {
+    analytics.identify({ address });
+  }
+}, [address, analytics]);
+```
+
+To clear the anonymous id and the attribution as well, use `optOutTracking()`. See [Consent management](#consent-management).
+
 ## Track events
 
 > The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc.) with full attribution (referrer, UTM, referrals). You do not need to manually track them.
