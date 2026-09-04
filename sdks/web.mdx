@@ -832,10 +832,6 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 - **[framework-kit](#solana-with-framework-kit) (Recommended)**: autocaptures wallet connections, cluster switches, and transactions recorded in its store.
 - **[Wallet Standard](#solana-wallet-discovery)**: autocaptures wallet `detect`, `connect`, and `disconnect` for compatible wallets, regardless of library.
 
-<Note>
-Wallet Standard discovery requires `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections from a framework-kit store.
-</Note>
-
 #### Solana with framework-kit
 
 Passing a framework-kit store adds cluster switches and transactions recorded in that store. Wallet events hand off to the store without double-counting. React transaction hooks do not write to the store and still need [explicit tracking](#manually-tracking-solana-transactions-and-signatures).
@@ -1247,7 +1243,7 @@ To verify the proxy is working:
     Yes. The SDK includes a dedicated [Privy integration](#privy-integration): pass the `usePrivy()` user to `identify(user)` and every wallet linked to that Privy account is identified under the user's DID, so a multi-wallet user clusters into one Formo user. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
   <Accordion title="Why are my Solana wallet connections not showing up?">
-    Use `@formo/analytics` 1.39.0 or later. Earlier versions require a [framework-kit](#solana-with-framework-kit) store. Also check that `solana.cluster` matches your chain. If the wallet does not implement Wallet Standard, use the [manual connection fallback](#wallets-without-wallet-standard).
+    Check that `solana.cluster` matches your chain. If the wallet does not implement Wallet Standard, use the [manual connection fallback](#wallets-without-wallet-standard).
 
     Sending connections as a custom `track()` event instead will not work: they are stored as track events rather than the built-in `connect` type, so the **Connect wallet** funnel step and every wallet connection chart stay empty.
   </Accordion>
