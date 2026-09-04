@@ -328,6 +328,10 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
 
 `reset()` forgets the current user: the user id, the active wallet and the per-session wallet markers. It keeps the anonymous id and the traffic-source attribution (referrer, UTM). The anonymous id identifies the browser, not the user. It is what the Visitors metric counts and what links a wallet to the anonymous activity before it connected, so a wallet switch must not rotate it. Attribution describes the visit, so a wallet identified later in the same visit still gets it.
 
+<Note>
+Starting in Web SDK 1.39.0, `reset()` preserves the anonymous id and visit attribution. Earlier versions removed both. Existing calls need no signature change, but logout flows will now keep the same browser identity.
+</Note>
+
 ```ts
 analytics.reset();
 ```
@@ -344,7 +348,7 @@ useEffect(() => {
 }, [address, analytics]);
 ```
 
-To clear the anonymous id and the attribution as well, use `optOutTracking()`. See [Consent management](#consent-management).
+When the visitor withdraws consent, use `optOutTracking()` to clear the anonymous id and attribution as well. See [Consent management](#consent-management).
 
 ## Track events
 

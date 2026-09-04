@@ -681,7 +681,11 @@ const formo = useFormo();
 formo.reset();
 ```
 
-Call `reset()` on a real logout or wallet disconnect, not when the wallet address changes. To clear the anonymous id as well, use `optOutTracking()`.
+<Note>
+Starting in Mobile SDK 1.2.0, `reset()` preserves the anonymous id and visit attribution. Earlier versions removed both. Existing calls need no signature change, but logout flows will now keep the same device identity.
+</Note>
+
+Call `reset()` on a real application logout, not when the wallet address changes. In Wagmi mode the SDK observes wallet disconnects itself. When the user withdraws consent, use `optOutTracking()` to clear the anonymous id and attribution as well.
 
 ## Manual event flushing
 
