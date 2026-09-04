@@ -839,6 +839,7 @@ Transaction and signature autocapture requires the use of [wagmi React hooks](ht
 When Wagmi mode is enabled, the SDK:
 - Hooks directly into Wagmi's state management for connection events
 - Uses TanStack Query's mutation cache for signature and transaction tracking
+- Uses EIP-6963 only to report installed browser wallets with `detect` events
 - Skips EIP-1193 provider wrapping (no proxy behavior)
 
 | Event Type | Without QueryClient | With QueryClient |
