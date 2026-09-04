@@ -665,7 +665,7 @@ The SDK assigns a `session_id` to every event. A session groups one user's burst
 | Session start | The first event after install, or the first event after a session expires. |
 | Session timeout | 30 minutes of inactivity. The next event after that starts a new session. |
 | Persistence | A session survives app restarts; it expires on inactivity, not on close. |
-| Reset | `reset()` ends the current session and starts a new one. It keeps the anonymous id. |
+| Reset | In Mobile SDK 1.2.0+, `reset()` starts a new session and keeps the anonymous id. Earlier versions remove it. |
 
 <Note>
 This differs from the web SDK, where `session_id` is derived server-side as a daily-changing value. That derivation relies on the request's origin, IP and browser user agent (signals a native app does not provide meaningfully), so the mobile SDK supplies its own session instead.
@@ -677,7 +677,7 @@ Reset the current user session:
 const formo = useFormo();
 
 // Forget the current user (user_id, wallet identity) and start a new session.
-// The anonymous id is kept: it identifies the device, not the user.
+// Mobile SDK 1.2.0+ keeps the anonymous id.
 formo.reset();
 ```
 
