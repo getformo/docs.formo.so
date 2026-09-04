@@ -419,7 +419,7 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
     #### 2. Choose your integration
 
-    We recommend framework-kit for the fullest autocapture. Other compatible wallet libraries get `detect`, `connect`, and `disconnect` through [Wallet Standard](https://github.com/wallet-standard/wallet-standard).
+    We recommend framework-kit for the fullest autocapture. With other libraries, compatible wallets get `detect`, `connect`, and `disconnect` through [Wallet Standard](https://github.com/wallet-standard/wallet-standard).
 
     <Note>
     Requires `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections from a framework-kit store.
@@ -455,7 +455,7 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
         Note the two spellings of mainnet: `@solana/client` takes `cluster: 'mainnet'`, while Formo's `SOLANA_CHAIN_IDS` is keyed on `'mainnet-beta'`.
       </Accordion>
-      <Accordion title="Other Wallet Standard libraries">
+      <Accordion title="Other wallet libraries">
         Wrap your existing wallet provider with `FormoAnalyticsProvider`:
 
         ```tsx
@@ -483,7 +483,7 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
         For runtime switches, call `formo.solana.setCluster('devnet')`. This also emits a `chain` event.
       </Accordion>
-      <Accordion title="Wallet without Wallet Standard">
+      <Accordion title="Wallets without Wallet Standard">
         For a custom or legacy wallet that does not publish Wallet Standard account changes, follow the [manual connection fallback](/sdks/web#wallets-without-wallet-standard).
       </Accordion>
     </AccordionGroup>

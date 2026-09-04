@@ -830,7 +830,7 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 ### Solana integration
 
 - **[framework-kit](#solana-with-framework-kit) (Recommended)**: autocaptures wallet connections, cluster switches, and transactions recorded in its store.
-- **[Wallet Standard](#solana-wallet-discovery)**: autocaptures wallet `detect`, `connect`, and `disconnect` with any compatible wallet library.
+- **[Wallet Standard](#solana-wallet-discovery)**: autocaptures wallet `detect`, `connect`, and `disconnect` for compatible wallets, regardless of library.
 
 <Note>
 Wallet Standard discovery requires `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections from a framework-kit store.
@@ -936,7 +936,7 @@ The SDK observes [Wallet Standard](https://github.com/wallet-standard/wallet-sta
 npm install @formo/analytics --save
 ```
 
-Wrap your app with `FormoAnalyticsProvider`. This example uses `@solana/wallet-adapter-react`, but any Wallet Standard-compatible library works:
+Wrap your app with `FormoAnalyticsProvider`. This example uses `@solana/wallet-adapter-react`, but discovery works with any library connected to a Wallet Standard wallet:
 
 ```tsx
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
