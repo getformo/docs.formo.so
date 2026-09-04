@@ -829,64 +829,12 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 
 ### Solana integration
 
-- **[Any wallet library](#solana-wallet-discovery)**: wallet `detect`, `connect`, and `disconnect` are autocaptured.
-- **[framework-kit](#solana-with-framework-kit)** (`@solana/client` + `@solana/react-hooks`): additionally pass `client.store` to autocapture cluster switches and transactions recorded in the store.
-- **[Manual wallet events](#solana-manual-wallet-events)**: for `solana: false`, or a wallet that does not implement the Wallet Standard.
+- **[framework-kit](#solana-with-framework-kit) (Recommended)**: autocaptures wallet connections, cluster switches, and transactions recorded in its store.
+- **[Wallet Standard](#solana-wallet-discovery)**: autocaptures wallet `detect`, `connect`, and `disconnect` with any compatible wallet library.
 
 <Note>
 Wallet Standard discovery requires `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections from a framework-kit store.
 </Note>
-
-#### Solana wallet discovery
-
-The SDK observes [Wallet Standard](https://github.com/wallet-standard/wallet-standard) account changes without wrapping wallet methods or adding a Solana dependency.
-
-```bash
-npm install @formo/analytics --save
-```
-
-Wrap your app with `FormoAnalyticsProvider`. The integration is wallet-library agnostic; this example uses `@solana/wallet-adapter-react`:
-
-```tsx
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { FormoAnalyticsProvider } from '@formo/analytics';
-
-function App() {
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={[]} autoConnect>
-        <FormoAnalyticsProvider
-          writeKey="<YOUR_WRITE_KEY>"
-          options={{ evm: false }} // Optional: disable EVM tracking for Solana-only apps
-        >
-          <YourApp />
-        </FormoAnalyticsProvider>
-      </WalletProvider>
-    </ConnectionProvider>
-  );
-}
-```
-
-**Autocaptured events**
-
-| Event | Trigger |
-|-------|---------|
-| Detect | A wallet registers with the page |
-| Connect | The wallet authorizes an account, including a session restored on page load |
-| Disconnect | The wallet revokes its accounts |
-| Chain change | `formo.solana.setCluster()` is called while a wallet is connected |
-
-**Cluster**
-
-Wallet Standard does not expose your app's active cluster, so Formo defaults to `mainnet-beta`. Set non-mainnet apps explicitly:
-
-```tsx
-options={{ evm: false, solana: { cluster: 'devnet' } }}
-```
-
-For runtime switches, call `formo.solana.setCluster('devnet')`. This also emits a `chain` event. See [manual transaction and signature tracking](#manually-tracking-solana-transactions-and-signatures).
-
-To turn Solana discovery off entirely, pass `solana: false`.
 
 #### Solana with framework-kit
 
@@ -980,75 +928,75 @@ The following events are autocaptured via zustand store subscription:
 
 Wallet `detect` events still come from Wallet Standard discovery.
 
-#### Solana manual wallet events
+#### Solana wallet discovery
 
-Use manual events only with `solana: false` or a wallet that does not implement Wallet Standard. Call `formo.connect()` and `formo.disconnect()` when wallet state changes.
+The SDK observes [Wallet Standard](https://github.com/wallet-standard/wallet-standard) account changes without wrapping wallet methods or adding a Solana dependency.
 
-<Warning>
-Do not report wallet connections with `formo.track()`. A custom event such as `formo.track('Connect', { address })` is stored as a track event, not as the built-in `connect` type, so it will not reach anything that reads wallet connections:
-
-- the **Connect wallet** step in [funnels](/guides/funnels) and [flows](/guides/flows) returns zero
-- first-time and daily wallet connection charts stay empty
-- breakdowns by wallet provider are unavailable
-- sessions are not attributed to the wallet
-
-Use `formo.connect()` for wallet connections and reserve `formo.track()` for product events such as swaps, deposits, and mints.
-</Warning>
-
-Initialize the SDK with `solana: false`, so discovery and your own calls never both report the same connection:
-
-```tsx
-<FormoAnalyticsProvider
-  writeKey="<YOUR_WRITE_KEY>"
-  options={{ evm: false, solana: false }}
->
-  <YourApp />
-</FormoAnalyticsProvider>
+```bash
+npm install @formo/analytics --save
 ```
 
-Then emit the events. This example uses `@solana/wallet-adapter-react`, but the same shape applies to any library that exposes a connected address:
+Wrap your app with `FormoAnalyticsProvider`. This example uses `@solana/wallet-adapter-react`, but any Wallet Standard-compatible library works:
 
 ```tsx
-import { useEffect, useRef } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useFormo, SOLANA_CHAIN_IDS } from '@formo/analytics';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { FormoAnalyticsProvider } from '@formo/analytics';
 
-const CHAIN_ID = SOLANA_CHAIN_IDS['mainnet-beta'];
-
-function WalletTracking() {
-  const formo = useFormo();
-  const { publicKey, wallet, connected } = useWallet();
-  const lastAddress = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!formo) return;
-    const address = publicKey?.toBase58() ?? null;
-
-    if (connected && address && address !== lastAddress.current) {
-      formo.connect(
-        { chainId: CHAIN_ID, address },
-        { providerName: wallet?.adapter.name },
-      );
-      lastAddress.current = address;
-    }
-
-    if (!connected && lastAddress.current) {
-      formo.disconnect({ chainId: CHAIN_ID, address: lastAddress.current });
-      lastAddress.current = null;
-    }
-  }, [formo, connected, publicKey, wallet]);
-
-  return null;
+function App() {
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={[]} autoConnect>
+        <FormoAnalyticsProvider
+          writeKey="<YOUR_WRITE_KEY>"
+          options={{ evm: false }} // Optional: disable EVM tracking for Solana-only apps
+        >
+          <YourApp />
+        </FormoAnalyticsProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  );
 }
 ```
 
-Render `<WalletTracking />` once inside your wallet provider.
+**Autocaptured events**
 
-<Note>
-Emit `connect` whenever the wallet becomes connected, including when your app restores a session on page load. If you only call `formo.connect()` from the wallet modal's success handler, returning users are never counted and your first-time connection numbers will be too low. Driving the call from an effect on wallet state (as above) covers both cases.
-</Note>
+| Event | Trigger |
+|-------|---------|
+| Detect | A wallet registers with the page |
+| Connect | The wallet authorizes an account, including a session restored on page load |
+| Disconnect | The wallet revokes its accounts |
+| Chain change | `formo.solana.setCluster()` is called while a wallet is connected |
 
-**Solana chain IDs**
+**Cluster**
+
+Wallet Standard does not expose your app's active cluster, so Formo defaults to `mainnet-beta`. Set non-mainnet apps explicitly:
+
+```tsx
+options={{ evm: false, solana: { cluster: 'devnet' } }}
+```
+
+For runtime switches, call `formo.solana.setCluster('devnet')`. This also emits a `chain` event. See [manual transaction and signature tracking](#manually-tracking-solana-transactions-and-signatures).
+
+#### Wallets without Wallet Standard
+
+Most Solana wallets require no manual connection tracking. If a custom or legacy wallet does not publish Wallet Standard account changes, call `formo.connect()` and `formo.disconnect()` when its state changes.
+
+<Warning>
+Use `formo.connect()` for wallet connections. `formo.track('Connect', ...)` creates a custom event and does not populate wallet connection analytics.
+</Warning>
+
+Emit `connect` from wallet state, including restored sessions, and `disconnect` when the account is revoked:
+
+```tsx
+import { SOLANA_CHAIN_IDS } from '@formo/analytics';
+
+const chainId = SOLANA_CHAIN_IDS['mainnet-beta'];
+
+formo.connect({ chainId, address }, { providerName });
+formo.disconnect({ chainId, address });
+```
+
+#### Solana chain IDs
 
 Solana has no numeric chain ID, so Formo maps each cluster to a reserved ID above 900000 to avoid colliding with EVM chains. Use the exported constant rather than hardcoding the number.
 
@@ -1069,7 +1017,7 @@ options={{ logger: { enabled: true, levels: ['info', 'warn', 'error'] } }}
 
 Connections are also skipped when tracking is suppressed for the visitor, for example by an opt-out or an excluded host, timezone, or path.
 
-**Manually tracking Solana transactions and signatures**
+#### Manually tracking Solana transactions and signatures
 
 Track Solana signatures explicitly. Track transactions too, except those recorded in a framework-kit store. Its React hooks (`useSolTransfer`, `useSendTransaction`, `useTransactionPool`) do not write to that store.
 
@@ -1299,7 +1247,7 @@ To verify the proxy is working:
     Yes. The SDK includes a dedicated [Privy integration](#privy-integration): pass the `usePrivy()` user to `identify(user)` and every wallet linked to that Privy account is identified under the user's DID, so a multi-wallet user clusters into one Formo user. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
   <Accordion title="Why are my Solana wallet connections not showing up?">
-    Use `@formo/analytics` 1.39.0 or later. Earlier versions require a [framework-kit](#solana-with-framework-kit) store. Also check that discovery is enabled and `solana.cluster` matches your chain. See [Solana manual wallet events](#solana-manual-wallet-events).
+    Use `@formo/analytics` 1.39.0 or later. Earlier versions require a [framework-kit](#solana-with-framework-kit) store. Also check that `solana.cluster` matches your chain. If the wallet does not implement Wallet Standard, use the [manual connection fallback](#wallets-without-wallet-standard).
 
     Sending connections as a custom `track()` event instead will not work: they are stored as track events rather than the built-in `connect` type, so the **Connect wallet** funnel step and every wallet connection chart stay empty.
   </Accordion>

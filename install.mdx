@@ -417,42 +417,21 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
       npm install @formo/analytics --save
     ```
 
-    #### 2. Wrap your app
+    #### 2. Choose your integration
 
-    [Wallet Standard](https://github.com/wallet-standard/wallet-standard) autocaptures `detect`, `connect`, and `disconnect` regardless of wallet library. Wrap your app with `FormoAnalyticsProvider`:
-
-    ```tsx
-      import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-      import { FormoAnalyticsProvider } from '@formo/analytics';
-
-      <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={[]} autoConnect>
-          <FormoAnalyticsProvider
-            writeKey="<YOUR_WRITE_KEY>"
-            options={{ evm: false }}
-          >
-            <YourApp />
-          </FormoAnalyticsProvider>
-        </WalletProvider>
-      </ConnectionProvider>
-    ```
+    We recommend framework-kit for the fullest autocapture. Other compatible wallet libraries get `detect`, `connect`, and `disconnect` through [Wallet Standard](https://github.com/wallet-standard/wallet-standard).
 
     <Note>
     Requires `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections from a framework-kit store.
     </Note>
 
     <AccordionGroup>
-      <Accordion title="Not on mainnet?">
-        Formo defaults Solana connections to `mainnet-beta`. Set non-mainnet apps explicitly:
-
-        ```tsx
-          options={{ evm: false, solana: { cluster: 'devnet' } }}
-        ```
-
-        For runtime switches, call `formo.solana.setCluster('devnet')`. This also emits a `chain` event.
-      </Accordion>
-      <Accordion title="framework-kit (store events too)">
+      <Accordion title="framework-kit (Recommended)">
         Pass `client.store` to add cluster switches and transactions recorded in the store. Hook-based transactions still need explicit tracking.
+
+        ```bash
+          npm install @solana/client @solana/react-hooks
+        ```
 
         ```tsx
           import { createClient, autoDiscover } from '@solana/client';
@@ -476,44 +455,36 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
         Note the two spellings of mainnet: `@solana/client` takes `cluster: 'mainnet'`, while Formo's `SOLANA_CHAIN_IDS` is keyed on `'mainnet-beta'`.
       </Accordion>
-      <Accordion title="Opting out of discovery">
-        Pass `solana: false` to disable discovery, then emit [`connect`](/data/events/connect) and [`disconnect`](/data/events/disconnect) yourself. Do not combine discovery with manual wallet events.
+      <Accordion title="Other Wallet Standard libraries">
+        Wrap your existing wallet provider with `FormoAnalyticsProvider`:
 
         ```tsx
-          import { useEffect, useRef } from 'react';
-          import { useWallet } from '@solana/wallet-adapter-react';
-          import { useFormo, SOLANA_CHAIN_IDS } from '@formo/analytics';
+          import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+          import { FormoAnalyticsProvider } from '@formo/analytics';
 
-          const CHAIN_ID = SOLANA_CHAIN_IDS['mainnet-beta'];
+          <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider wallets={[]} autoConnect>
+              <FormoAnalyticsProvider
+                writeKey="<YOUR_WRITE_KEY>"
+                options={{ evm: false }}
+              >
+                <YourApp />
+              </FormoAnalyticsProvider>
+            </WalletProvider>
+          </ConnectionProvider>
+        ```
+      </Accordion>
+      <Accordion title="Not on mainnet?">
+        Formo defaults Solana connections to `mainnet-beta`. Set non-mainnet apps explicitly:
 
-          function WalletTracking() {
-            const formo = useFormo();
-            const { publicKey, wallet, connected } = useWallet();
-            const lastAddress = useRef<string | null>(null);
-
-            useEffect(() => {
-              if (!formo) return;
-              const address = publicKey?.toBase58() ?? null;
-
-              if (connected && address && address !== lastAddress.current) {
-                formo.connect(
-                  { chainId: CHAIN_ID, address },
-                  { providerName: wallet?.adapter.name },
-                );
-                lastAddress.current = address;
-              }
-
-              if (!connected && lastAddress.current) {
-                formo.disconnect({ chainId: CHAIN_ID, address: lastAddress.current });
-                lastAddress.current = null;
-              }
-            }, [formo, connected, publicKey, wallet]);
-
-            return null;
-          }
+        ```tsx
+          options={{ evm: false, solana: { cluster: 'devnet' } }}
         ```
 
-        Render `<WalletTracking />` once inside your wallet provider. Driving it from an effect (rather than the wallet modal's success handler) means restored sessions are counted too.
+        For runtime switches, call `formo.solana.setCluster('devnet')`. This also emits a `chain` event.
+      </Accordion>
+      <Accordion title="Wallet without Wallet Standard">
+        For a custom or legacy wallet that does not publish Wallet Standard account changes, follow the [manual connection fallback](/sdks/web#wallets-without-wallet-standard).
       </Accordion>
     </AccordionGroup>
 
@@ -1028,7 +999,7 @@ This applies to every installation method above. If you use the HTML snippet, al
     If your app uses [Wagmi](https://wagmi.sh/) for wallet connections and its hooks for transactions, use the [Wagmi integration](/sdks/web#wagmi). For Solana apps, use the [Solana integration](/sdks/web#solana-integration). For React or Next.js apps without Wagmi, use the [React integration](/sdks/web#react--nextjs-without-wagmi). For static sites or non-React apps, use the [HTML snippet](/sdks/web#html-snippet). For mobile apps, use the [React Native SDK](/sdks/mobile).
   </Accordion>
   <Accordion title="Why are my Solana wallet connections not showing up?">
-    Use `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections from a [framework-kit](/sdks/web#solana-with-framework-kit) store. Also check that discovery is enabled and `solana.cluster` matches your chain. See [Solana manual wallet events](/sdks/web#solana-manual-wallet-events).
+    Use `@formo/analytics` 1.39.0 or later. Earlier versions only autocapture Solana connections from a [framework-kit](/sdks/web#solana-with-framework-kit) store. Also check that `solana.cluster` matches your chain. If the wallet does not implement Wallet Standard, use the [manual connection fallback](/sdks/web#wallets-without-wallet-standard).
 
     Connections are reported on `mainnet-beta` unless you set `solana.cluster`, so a devnet app that filters by chain will find them under the wrong cluster rather than missing.
 
