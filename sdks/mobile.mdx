@@ -665,7 +665,7 @@ The SDK assigns a `session_id` to every event. A session groups one user's burst
 | Session start | The first event after install, or the first event after a session expires. |
 | Session timeout | 30 minutes of inactivity. The next event after that starts a new session. |
 | Persistence | A session survives app restarts; it expires on inactivity, not on close. |
-| Reset | `reset()` ends the current session and starts a new one. |
+| Reset | In Mobile SDK 1.2.0+, `reset()` starts a new session and keeps the anonymous id. Earlier versions remove it. |
 
 <Note>
 This differs from the web SDK, where `session_id` is derived server-side as a daily-changing value. That derivation relies on the request's origin, IP and browser user agent (signals a native app does not provide meaningfully), so the mobile SDK supplies its own session instead.
@@ -676,9 +676,16 @@ Reset the current user session:
 ```tsx
 const formo = useFormo();
 
-// Clear current user identifiers (anonymous_id, session_id, user_id)
+// Forget the current user (user_id, wallet identity) and start a new session.
+// Mobile SDK 1.2.0+ keeps the anonymous id.
 formo.reset();
 ```
+
+<Note>
+Starting in Mobile SDK 1.2.0, `reset()` preserves the anonymous id. Earlier versions removed it; attribution was already preserved. Existing calls need no signature change, but logout flows will now keep the same device identity.
+</Note>
+
+Call `reset()` on a real application logout, not when the wallet address changes. For a manual wallet integration, call `disconnect()` when the wallet disconnects; Wagmi mode observes this automatically. If your app has no separate login identity, you can usually omit `reset()` entirely. When the user withdraws consent, use `optOutTracking()` to clear the anonymous id and attribution as well.
 
 ## Manual event flushing
 

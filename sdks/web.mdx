@@ -324,6 +324,32 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
   </Tab>
 </Tabs>
 
+### Reset identity
+
+In Web SDK 1.39.0+, `reset()` forgets the current user: the user id, the active wallet and the per-session wallet markers. It keeps the anonymous id and the traffic-source attribution (referrer, UTM). The anonymous id identifies the browser, not the user. It is what the Visitors metric counts and what links a wallet to the anonymous activity before it connected, so a wallet switch must not rotate it. Attribution describes the visit, so a wallet identified later in the same visit still gets it.
+
+<Note>
+Starting in Web SDK 1.39.0, `reset()` preserves the anonymous id and visit attribution. Earlier versions removed both. Existing calls need no signature change, but logout flows will now keep the same browser identity.
+</Note>
+
+```ts
+analytics.reset();
+```
+
+Call `reset()` when an application account logs out and you need to forget its user and wallet identity while retaining the browser identity. For a manual wallet integration, call `disconnect()` when the wallet disconnects; that already clears the active wallet. Wagmi mode observes disconnects automatically. If your app has no separate login identity, you can usually omit `reset()` entirely.
+
+Do not call `reset()` when the wallet address changes, and do not return it as the cleanup of an effect keyed on the address. React runs that cleanup on every account switch, and `identify()` already replaces the active wallet. Identify the new address directly:
+
+```tsx
+useEffect(() => {
+  if (address && analytics) {
+    analytics.identify({ address });
+  }
+}, [address, analytics]);
+```
+
+When the visitor withdraws consent, use `optOutTracking()` to clear the anonymous id and attribution as well. See [Consent management](#consent-management).
+
 ## Track events
 
 > The Web SDK automatically captures common events such as page views and wallet events (connect, disconnect, signature, transaction, etc.) with full attribution (referrer, UTM, referrals). You do not need to manually track them.
@@ -813,6 +839,7 @@ Transaction and signature autocapture requires the use of [wagmi React hooks](ht
 When Wagmi mode is enabled, the SDK:
 - Hooks directly into Wagmi's state management for connection events
 - Uses TanStack Query's mutation cache for signature and transaction tracking
+- Uses EIP-6963 only to report installed browser wallets with `detect` events
 - Skips EIP-1193 provider wrapping (no proxy behavior)
 
 | Event Type | Without QueryClient | With QueryClient |
