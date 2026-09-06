@@ -677,13 +677,8 @@ Reset the current user session:
 const formo = useFormo();
 
 // Clear the user and wallet identity, then start a new session.
-// The anonymous id is kept: it identifies the device, not the user.
 formo.reset();
 ```
-
-<Note>
-Starting in Mobile SDK 1.2.0, `reset()` keeps the anonymous id. Earlier versions removed it. Call `reset()` on a real logout, not when the wallet address changes. To clear the anonymous id and the stored attribution as well, use `optOutTracking()`.
-</Note>
 
 ## Manual event flushing
 
