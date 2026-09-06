@@ -56,36 +56,35 @@ In this mode, users must complete all defined steps, but the order does not matt
 Start with **Sequential** (the default). Switch to **Any order** only if your funnel represents actions that genuinely happen in variable order: for example, multi-step DeFi flows where users may borrow before swapping, or complete approvals in any sequence.
 </Tip>
 
-## Multiple Events per Step (OR)
+## Combine Events with OR
 
-<Frame caption="Add alternative events to a funnel step with the OR button. The step matches any event in the group.">
+<Frame caption="Use OR to count multiple events as one funnel step.">
   <img src="/images/funnel-or-steps.jpg" alt="Funnel step OR group" />
 </Frame>
 
-A step can match more than one event. Click the **OR** button on a step to add alternative events. A user completes the step when they perform any event in the group.
+A funnel step can match any event in an OR group. Click **OR** to add up to 10 alternative events; performing any one of them completes the step.
 
-For example, a "Transaction Initiated" step can match `Swap Initiated` OR `Limit Order Placed` OR `Liquidity Added`. A user who performs any one of these counts for the step.
+For example, a "Trade Completed" step could match `Swap Completed` OR `Limit Order Filled` OR `Perpetual Position Opened`.
 
-- Each event in the group has its own filters. Use the filter button on a row to add a condition that applies to that event only, for example `Connect wallet` where `ref` is `foo` OR `Page view` where `ref` is `bar`.
-- The chart labels a two-event step with both names ("Connect Wallet or Detect Wallet") and a larger group with a count ("Swap Initiated or 2 others"). The bar tooltip lists every event with its filters.
-- Via the API, add an `events` array to the step (max 10 entries). Each member may carry `filters` in the same `{field, op, value}` envelope as a step filter. The primary `type` and `event` stay the step label and are part of the group:
+Filters on an event apply only to that event. Filters on the step apply to every event in the group.
+
+Via the API, add the alternatives to the step's `events` array:
 
 ```json
 {
   "type": "track",
-  "event": "Swap Initiated",
+  "event": "Swap Completed",
   "events": [
     {
       "type": "track",
-      "event": "Swap Initiated",
+      "event": "Swap Completed",
       "filters": [{ "field": "source", "op": "eq", "value": "widget" }]
     },
-    { "type": "track", "event": "Limit Order Placed" }
+    { "type": "track", "event": "Limit Order Filled" },
+    { "type": "track", "event": "Perpetual Position Opened" }
   ]
 }
 ```
-
-A member's filters apply to that member only: the step above matches `Swap Initiated` from the widget, or any `Limit Order Placed`. A `filters` array on the step itself applies to every member.
 
 ## Funnel Breakdowns
 
