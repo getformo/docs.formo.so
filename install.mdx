@@ -9,7 +9,7 @@ Developers integrate Formo using SDKs, APIs, SQL access, webhooks, and data expo
 ## Install with AI
 
 <Tip>
-Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com/link/prompt?text=Install%20Formo%20Analytics%20using%20the%20instructions%20at%20https%3A%2F%2Fdocs.formo.so%2Finstall%20and%20https%3A%2F%2Fdocs.formo.so%2Fsdks%2Fweb.%20Detect%20the%20framework%20and%20follow%20the%20matching%20setup.%20For%20Solana%2C%20prefer%20the%20Solana%20Kit%20setup%20and%20let%20Formo%20autocapture%20compatible%20Wallet%20Standard%20detect%2C%20connect%2C%20and%20disconnect%20events.%20Set%20options.solana.cluster%20for%20non-mainnet%20apps.%20If%20the%20app%20already%20uses%20framework-kit%2C%20pass%20options.solana.store%20for%20additional%20cluster%20and%20recorded%20transaction%20lifecycle%20events.%20Track%20Solana%20signatures%20and%20other%20transactions%20explicitly.%20After%20setup%2C%20identify%20connected%20users%20and%20suggest%20relevant%20custom%20events.)
+Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com/link/prompt?text=Install%20Formo%20Analytics%20using%20the%20instructions%20at%20https%3A%2F%2Fdocs.formo.so%2Finstall%20and%20https%3A%2F%2Fdocs.formo.so%2Fsdks%2Fweb.%20Detect%20the%20framework%20and%20follow%20the%20matching%20setup.%20For%20Solana%20dapps%2C%20prefer%20framework-kit%20and%20pass%20options.solana.store.%20Formo%20autocaptures%20compatible%20Wallet%20Standard%20detect%2C%20connect%2C%20and%20disconnect%20events%2C%20cluster%20changes%2C%20and%20transaction%20lifecycle%20events%20recorded%20in%20the%20store.%20Set%20options.solana.cluster%20for%20non-mainnet%20apps%20without%20a%20store.%20Use%20the%20Solana%20Kit%20setup%20when%20the%20app%20does%20not%20use%20framework-kit.%20Track%20signatures%20and%20transactions%20not%20recorded%20in%20framework-kit%20explicitly.%20After%20setup%2C%20identify%20connected%20users%20and%20suggest%20relevant%20custom%20events.)
 </Tip>
 
 <Accordion title="Copy prompt">
@@ -30,11 +30,11 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
   - **Wagmi (React)** - Recommended for EVM apps with wallet connection (RainbowKit, ConnectKit, Reown, etc.)
   - **React (without Wagmi)** - For standalone React apps without Wagmi
   - **Next.js** - For Next.js apps (App Router or Pages Router). Requires a client component wrapper.
-  - **Solana Kit** - Recommended for new Solana apps; Wallet Standard autocaptures detect, connect, and disconnect.
+  - **framework-kit** - Recommended for Solana dapps; pass its store for the fullest autocapture.
 
   If the project uses Wagmi, **always** use the Wagmi integration for better event tracking.
 
-  For Solana Kit and other compatible wallets, set the app's cluster and let Wallet Standard supply wallet events. If an existing app uses framework-kit, pass its store for additional cluster and recorded transaction lifecycle events.
+  For Solana dapps, prefer framework-kit and pass its store. Solana Kit and other Wallet Standard integrations still autocapture wallet detection and connections without a store.
 
   If the project uses **Privy** (`@privy-io/react-auth`), install via the matching framework option above; with `@privy-io/wagmi`, use Wagmi. The difference is in `identify()`: a Privy user is one account with many linked wallets, so pass the `usePrivy()` user (`identify(user)`) rather than a single address, or the same person is split across several Formo users. See step 3.
 
@@ -148,17 +148,17 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
 
   ### **Option E: Solana**
 
-  npm install @formo/analytics @solana/kit @solana/kit-plugin-rpc @solana/kit-plugin-wallet @solana/react
+  npm install @formo/analytics @solana/client @solana/react-hooks
 
-  Prefer the Solana Kit wallet stack for new apps. Wallet Standard autocaptures detect, connect, and disconnect for compatible wallets, so do NOT add connect/disconnect glue:
+  Prefer framework-kit for Solana dapps. Pass its store to autocapture wallet events, cluster switches, and transaction lifecycle events recorded in the store:
 
-  <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>" options={{ evm: false, solana: { cluster: 'devnet' } }}>
+  <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>" options={{ evm: false, solana: { store: client.store } }}>
 
-  If the app already uses framework-kit, pass its store instead to add cluster switches and transactions recorded there:
+  If the app uses Solana Kit or another Wallet Standard integration, no store or connection glue is required. Set non-mainnet clusters explicitly:
 
-  options={{ evm: false, solana: { store: client.store } }}
+  options={{ evm: false, solana: { cluster: 'devnet' } }}
 
-  framework-kit can autocapture transactions recorded in its store. Otherwise, track signatures and transactions explicitly.
+  Track signatures and any transactions not recorded in a framework-kit store explicitly.
 
   ---
 
@@ -415,10 +415,37 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
     #### 2. Choose your integration
 
-    Solana Kit is recommended for new apps. Formo autocaptures `detect`, `connect`, and `disconnect` whenever a compatible wallet registers through [Wallet Standard](https://github.com/wallet-standard/wallet-standard).
+    framework-kit is recommended for Solana dapps. Its store adds cluster and recorded transaction lifecycle events to the wallet events Formo autocaptures through [Wallet Standard](https://github.com/wallet-standard/wallet-standard).
 
     <AccordionGroup>
-      <Accordion title="Solana Kit (Recommended)">
+      <Accordion title="framework-kit (Recommended)">
+        Pass `client.store` for cluster switches and transaction lifecycle events recorded in the store.
+
+        ```bash
+          npm install @solana/client @solana/react-hooks
+        ```
+
+        ```tsx
+          import { autoDiscover, createClient } from '@solana/client';
+          import { SolanaProvider } from '@solana/react-hooks';
+          import { FormoAnalyticsProvider } from '@formo/analytics';
+
+          const client = createClient({
+            cluster: 'devnet',
+            walletConnectors: autoDiscover(),
+          });
+
+          <SolanaProvider client={client}>
+            <FormoAnalyticsProvider
+              writeKey="<YOUR_WRITE_KEY>"
+              options={{ evm: false, solana: { store: client.store } }}
+            >
+              <YourApp />
+            </FormoAnalyticsProvider>
+          </SolanaProvider>
+        ```
+      </Accordion>
+      <Accordion title="Solana Kit">
         Formo only needs the same cluster as your Kit client; no store or manual wallet events are required.
 
         ```bash
@@ -444,20 +471,6 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
               <YourApp />
             </FormoAnalyticsProvider>
           </ClientProvider>
-        ```
-      </Accordion>
-      <Accordion title="framework-kit">
-        If your app uses `@solana/client`, pass `client.store` for additional cluster and recorded transaction lifecycle events.
-
-        ```tsx
-          import { FormoAnalyticsProvider } from '@formo/analytics';
-
-          <FormoAnalyticsProvider
-            writeKey="<YOUR_WRITE_KEY>"
-            options={{ evm: false, solana: { store: client.store } }}
-          >
-            <YourApp />
-          </FormoAnalyticsProvider>
         ```
       </Accordion>
       <Accordion title="Not on mainnet?">
@@ -494,7 +507,7 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
     #### 4. Track custom events
 
-    [framework-kit](/sdks/web#solana-with-framework-kit) can autocapture transactions recorded in its store. Otherwise, track signatures and transactions explicitly. Use [`track`](/sdks/web#track-events) for app-specific actions.
+    Track signatures and transactions that are not recorded in a [framework-kit](/sdks/web#solana-with-framework-kit) store explicitly. Use [`track`](/sdks/web#track-events) for app-specific actions.
 
     ```tsx
       analytics.track('Vault Deposit Completed', { vault_name: 'USD*', volume: 100 });

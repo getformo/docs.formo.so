@@ -829,56 +829,14 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 
 ### Solana integration
 
-- **[Solana Kit](#solana-kit-recommended) (Recommended)**: wallet `detect`, `connect`, and `disconnect` are autocaptured through Wallet Standard.
-- **[framework-kit](#solana-with-framework-kit)**: existing `@solana/client` apps can additionally pass their store for cluster and transaction lifecycle events.
+- **[framework-kit](#solana-with-framework-kit) (Recommended)**: pass its store for wallet, cluster, and recorded transaction lifecycle events.
+- **[Solana Kit](#solana-kit)**: wallet `detect`, `connect`, and `disconnect` are autocaptured through Wallet Standard without a store.
 
 `@solana/kit` and framework-kit are different projects. Solana Kit provides the core client and plugins; framework-kit provides the separate `@solana/client` and `@solana/react-hooks` packages and is built on top of Kit.
 
-#### Solana Kit (Recommended)
-
-Install Formo alongside the current Solana Kit wallet stack:
-
-```bash
-npm install @formo/analytics @solana/kit @solana/kit-plugin-rpc @solana/kit-plugin-wallet @solana/react
-```
-
-Create a Kit client and give Formo the same cluster. Formo observes the wallet's Wallet Standard events independently, so it does not need the Kit client or a store:
-
-```tsx
-'use client';
-
-import { createClient } from '@solana/kit';
-import { solanaRpc } from '@solana/kit-plugin-rpc';
-import { walletSigner } from '@solana/kit-plugin-wallet';
-import { ClientProvider } from '@solana/react';
-import { FormoAnalyticsProvider } from '@formo/analytics';
-
-const client = createClient()
-  .use(walletSigner({ chain: 'solana:devnet' }))
-  .use(solanaRpc({ rpcUrl: 'https://api.devnet.solana.com' }));
-
-function App({ children }) {
-  return (
-    <ClientProvider client={client}>
-      <FormoAnalyticsProvider
-        writeKey="<YOUR_WRITE_KEY>"
-        options={{
-          evm: false, // Optional for a Solana-only app
-          solana: { cluster: 'devnet' },
-        }}
-      >
-        {children}
-      </FormoAnalyticsProvider>
-    </ClientProvider>
-  );
-}
-```
-
-See the complete [Solana Kit example](https://github.com/getformo/examples/tree/main/with-solana).
-
 #### Solana with framework-kit
 
-If your app uses framework-kit (`@solana/client`), pass `client.store` to add cluster switches and transactions recorded in that store. Wallet events hand off to the store without double-counting. React transaction hooks do not write to the store and still need [explicit tracking](#manually-tracking-solana-transactions-and-signatures).
+For Solana dapps, use framework-kit (`@solana/client`) and pass `client.store`. Wallet events hand off to the store without double-counting, while the store adds cluster switches and transactions recorded in it. React transaction hooks do not write to the store and still need [explicit tracking](#manually-tracking-solana-transactions-and-signatures).
 
 See the focused [framework-kit example](https://github.com/getformo/examples/tree/main/with-solana-framework-kit).
 
@@ -967,6 +925,46 @@ The following events are autocaptured via zustand store subscription:
 | Transaction | Started, broadcasted, confirmed, reverted, or rejected, for transactions framework-kit records in the store (see the note on hooks [below](#manually-tracking-solana-transactions-and-signatures)) |
 
 Wallet `detect` events still come from Wallet Standard discovery.
+
+#### Solana Kit
+
+If your app uses Solana Kit directly, give Formo the same cluster. Formo observes Wallet Standard independently, so it does not need the Kit client or a store.
+
+```bash
+npm install @formo/analytics @solana/kit @solana/kit-plugin-rpc @solana/kit-plugin-wallet @solana/react
+```
+
+```tsx
+'use client';
+
+import { createClient } from '@solana/kit';
+import { solanaRpc } from '@solana/kit-plugin-rpc';
+import { walletSigner } from '@solana/kit-plugin-wallet';
+import { ClientProvider } from '@solana/react';
+import { FormoAnalyticsProvider } from '@formo/analytics';
+
+const client = createClient()
+  .use(walletSigner({ chain: 'solana:devnet' }))
+  .use(solanaRpc({ rpcUrl: 'https://api.devnet.solana.com' }));
+
+function App({ children }) {
+  return (
+    <ClientProvider client={client}>
+      <FormoAnalyticsProvider
+        writeKey="<YOUR_WRITE_KEY>"
+        options={{
+          evm: false, // Optional for a Solana-only app
+          solana: { cluster: 'devnet' },
+        }}
+      >
+        {children}
+      </FormoAnalyticsProvider>
+    </ClientProvider>
+  );
+}
+```
+
+See the complete [Solana Kit example](https://github.com/getformo/examples/tree/main/with-solana).
 
 #### Other Wallet Standard integrations
 
@@ -1287,6 +1285,6 @@ To verify the proxy is working:
     Yes. The SDK includes a dedicated [Privy integration](#privy-integration): pass the `usePrivy()` user to `identify(user)` and every wallet linked to that Privy account is identified under the user's DID, so a multi-wallet user clusters into one Formo user. For other wallet providers, use the standard [React integration](#react--nextjs-without-wagmi). If your wallet provider uses Wagmi under the hood (many do, including Privy), you can also use the [Wagmi integration](#wagmi) for automatic wallet event tracking.
   </Accordion>
   <Accordion title="Do I need framework-kit to use Formo on Solana?">
-    No. Wallet Standard autocaptures `detect`, `connect`, and `disconnect` for compatible wallets, including wallets used through Solana Kit. If your app already uses framework-kit, its store can additionally supply cluster switches and recorded transaction lifecycle events. Signatures and other transactions require explicit tracking.
+    framework-kit is recommended for Solana dapps because its store supplies cluster switches and recorded transaction lifecycle events. It is not required: Wallet Standard still autocaptures `detect`, `connect`, and `disconnect` for compatible wallets used through Solana Kit or other integrations. Signatures and transactions outside the store require explicit tracking.
   </Accordion>
 </AccordionGroup>
