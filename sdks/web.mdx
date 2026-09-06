@@ -1009,7 +1009,7 @@ function App() {
 
 **Cluster**
 
-Wallet Standard does not expose your app's active cluster, so Formo defaults to `mainnet-beta`. Set non-mainnet apps explicitly:
+Wallet Standard does not expose your app's active cluster, only the clusters a wallet supports. Formo reports `mainnet-beta` when the wallet supports it, and otherwise the first Solana cluster the wallet lists. Set non-mainnet apps explicitly:
 
 ```tsx
 options={{ evm: false, solana: { cluster: 'devnet' } }}
