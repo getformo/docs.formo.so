@@ -73,6 +73,27 @@ analytics.track('Swap Completed', {
 });
 ```
 
+### Deduplicating events
+
+The Web and Mobile SDKs deduplicate custom events in two ways.
+
+**Automatically, for 60 seconds.** When `track()` is called twice within 60 seconds with the same event name, properties, and context, for the same wallet and user, the SDK sends the event once. This handles accidental double-fires, such as a React effect that runs twice. It applies within one page or app session.
+
+**With an idempotency key, for retries.** For business-critical events, add the reserved `idempotency_key` property with a stable identifier for the action, such as an order ID. Every call that reuses the key for the same event name gets the same message ID, so ingestion keeps one event however many times it is sent, including across page reloads and app restarts.
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `idempotency_key` | String or Integer | A stable identifier for one action, such as an order ID. The key is hashed into the message ID and is not sent as a property. |
+
+```typescript
+analytics.track('Order Placed', {
+  market: 'ETH-USDC',
+  side: 'buy',
+  volume: 2500,
+  idempotency_key: order.id,
+});
+```
+
 ## Sample Payload
 
 ```json
