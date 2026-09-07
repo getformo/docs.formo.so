@@ -94,6 +94,18 @@ analytics.track('Order Placed', {
 });
 ```
 
+#### Delivery callback
+
+`track()` accepts a callback as its fourth argument. It runs once the SDK's delivery attempt for that event settles:
+
+```typescript
+analytics.track('Order Placed', properties, undefined, (error) => {
+  if (error) console.error('Event delivery failed', error);
+});
+```
+
+A callback without an error means the events API accepted the batch, not that downstream processing has finished. A call the SDK recognises as a duplicate is never sent and does not invoke its callback.
+
 ## Sample Payload
 
 ```json
