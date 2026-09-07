@@ -75,15 +75,15 @@ analytics.track('Swap Completed', {
 
 ### Deduplicating events
 
-The Web SDK deduplicates custom events in two ways.
+The Web and Mobile SDKs deduplicate custom events in two ways.
 
-**Automatically, for 60 seconds.** When `track()` is called twice with the same event name and properties within 60 seconds, the SDK sends the event once. This handles accidental double-fires, such as a React effect that runs twice. It applies within one page session.
+**Automatically, for 60 seconds.** When `track()` is called twice with the same event name and properties within 60 seconds, the SDK sends the event once. This handles accidental double-fires, such as a React effect that runs twice. It applies within one page or app session.
 
-**With an idempotency key, for retries.** For business-critical events, add the reserved `idempotency_key` property with a stable identifier for the occurrence, such as an order ID. Every call that reuses the key for the same event name gets the same message ID, so ingestion keeps one event however many times it is sent, including across reloads.
+**With an idempotency key, for retries.** For business-critical events, add the reserved `idempotency_key` property with a stable identifier for the occurrence, such as an order ID. Every call that reuses the key for the same event name gets the same message ID, so ingestion keeps one event however many times it is sent, including across page reloads and app restarts.
 
 | Property | Type | Description |
 |:---------|:-----|:------------|
-| `idempotency_key` | String or Number | A stable identifier for one occurrence of the event, such as an order ID. The key is hashed into the message ID and is not sent as a property. Any other value is rejected with a warning and the event is not sent. |
+| `idempotency_key` | String or Number | A stable identifier for one occurrence of the event, such as an order ID. The key is hashed into the message ID and is not sent as a property. |
 
 ```typescript
 analytics.track('Order Placed', {
@@ -94,7 +94,7 @@ analytics.track('Order Placed', {
 });
 ```
 
-Use a unique key for each real occurrence. The same key can be reused across different event names, for example `Order Placed` and `Order Filled` for one order. A call the SDK recognises as a duplicate does not invoke its callback. Server-side deduplication applies within one ingestion session and one storage partition. Requires Web SDK 1.41 or later.
+Use a unique key for each real occurrence. The same key can be reused across different event names, for example `Order Placed` and `Order Filled` for one order. Requires Web SDK 1.40.1 or Mobile SDK 1.2.1 or later.
 
 ## Sample Payload
 
