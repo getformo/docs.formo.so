@@ -73,6 +73,26 @@ analytics.track('Swap Completed', {
 });
 ```
 
+### Deduplicating events
+
+The Web SDK drops a `track()` call that is identical to one it accepted less than 60 seconds earlier. This catches accidental double-fires such as a React effect that runs twice. It is a best-effort guard, not a guarantee.
+
+For business-critical events, name each logical occurrence with the reserved `idempotency_key` property. Calls that reuse the key for the same event name share one event identity, so retries and repeated calls collapse into one event at ingestion.
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `idempotency_key` | String or Number | A stable identifier for one occurrence of the event, such as an order ID. The key is hashed into the event identity and removed from the sent properties. An empty or invalid value drops the call with a warning. |
+
+```typescript
+analytics.track('Order Placed', {
+  market: 'ETH/USDC',
+  volume: 4500,
+  idempotency_key: order.id,
+});
+```
+
+Use a unique key for each real occurrence. The same key can be reused across different event names, for example `Order Placed` and `Order Filled` for one order. Server-side collapse applies within one ingestion session and one storage partition. It is not a global, indefinite exactly-once guarantee. Requires Web SDK 1.41 or later.
+
 ## Sample Payload
 
 ```json
