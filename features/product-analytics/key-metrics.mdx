@@ -1,9 +1,16 @@
 ---
 title: "Key metrics"
-description: "Track key growth metrics like visitors, wallets, transactions, sessions, page views, volume, and revenue to understand your product performance."
+sidebarTitle: "Marketing attribution"
+description: "Connect marketing sources to visitors, wallets, transactions, volume, and revenue with channel, referrer, referral, ad, UTM, and builder-code attribution."
 ---
 
 These are the core metrics on your project's Overview page in the Formo dashboard: how many people show up, how many connect a wallet, and how much they transact, spend, and earn you.
+
+## Attribution
+
+Attribution connects the source that brought someone to your app with what they do next, from the first visit and wallet connect through transactions, volume, and revenue. This matters because traffic alone cannot tell you which channels attract valuable onchain users; attribution lets you compare acquisition spend against conversions and user quality.
+
+Formo captures marketing context from channels, browser referrers, referral codes, ad click IDs, and UTM parameters, then connects it to users and sessions with first-touch and last-touch properties. It also detects builder codes for transaction-level onchain attribution. See [How attribution works](/data/attribution) for the identity and attribution model, or read [Onchain Attribution: The Complete Guide](https://formo.so/blog/onchain-attribution-defi-2026) for a practical overview.
 
 ## Visitors
 
@@ -47,7 +54,7 @@ Total revenue (USD) tracked through your [custom events](/features/product-analy
 
 ## Breakdowns
 
-Break down visitors, page views, wallets, transactions, sessions, volume, or revenue by acquisition channel, referrer, referral, UTM parameter, device, browser, OS, or country, plus onchain builder codes for wallets, transactions, volume, and revenue. Session duration and bounce rate are not breakdown-eligible. Click any item in a breakdown to drill down into the [users](/features/wallet-intelligence/overview) behind it.
+Break down visitors, page views, wallets, transactions, sessions, volume, or revenue by acquisition channel, referrer, referral, ad network, UTM parameter, device, browser, OS, or country, plus onchain builder codes for wallets, transactions, volume, and revenue. Session duration and bounce rate are not breakdown-eligible. Click any item in a breakdown to drill down into the [users](/features/wallet-intelligence/overview) behind it.
 
 <Frame caption="Referrer shown here as an example dimension.">
   <img
@@ -91,6 +98,44 @@ See what's moving the needle with a breakdown of your metrics by referrer. Easil
 
 Getting the specific referrer URL (not just the domain) requires the right `Referrer-Policy` header on your site. See [Referrer URL tracking](/sdks/web#referrer-url-tracking) for how to configure it.
 
+## Ad attribution
+
+Formo attributes traffic and users to the ad network that acquired them. When someone clicks your ad, the platform appends a click ID to your landing page URL; Formo captures it automatically so you can measure ad performance across the dashboard.
+
+### Supported ad platforms
+
+| Platform | Click ID parameter |
+| --- | --- |
+| Google Ads | `gclid`, `gad_source` |
+| Meta Ads | `fbclid` |
+| Microsoft Ads | `msclkid` |
+| TikTok Ads | `ttclid` |
+| X Ads | `twclid` |
+| LinkedIn Ads | `li_fat_id` |
+| Reddit Ads | `rdt_cid` |
+| Other Paid | any paid `utm_medium` (`cpc`, `cpm`, `ppc`, `paid*`, etc.) without a click ID |
+
+There is nothing to configure. Keep auto-tagging enabled on your ad platform (it is the default on all of them) and the click IDs arrive on your landing URLs.
+
+We recommend adding UTM parameters as well to give you campaign-level detail on top of the network-level attribution; see [UTM parameter basics](/guides/onchain-attribution#utm-parameter-basics).
+
+### How ad attribution works
+
+- **Sessions** attribute to the session's first paid touch. An organic landing followed by an ad click in the same session still counts for the ad network.
+- **Users** carry first-touch and last-touch ad attribution across their whole history, so you can analyze acquisition (first touch) or conversion influence (last touch).
+- Click IDs also feed [channel classification](/data/attribution): a click from a known ad platform classifies as Paid Search or Paid Social even when the referrer is missing (common with in-app browsers).
+- Ad attribution is one level more granular than [Channels](/data/attribution): the Paid Search and Paid Social channels group networks by ad format, while Ads shows the individual network.
+
+### How to measure ad performance
+
+- **Overview → Acquisition card → Ads tab**: paid sessions and visitors by network. Click a row to jump to the Users page filtered to that network.
+- **Overview chart breakdown**: break Visitors, Sessions, Page views, Wallets, or Transactions down by Ads (Acquisition group in the breakdown picker).
+- **Users page**: filter by **Ads** (network) or **Ad Click ID** (raw token) in first-touch, last-touch, or any-touch mode. The users table has an **Ad** column, and each profile shows **Ad** and **Ad Click ID** rows with first and last touch.
+- **Activity page**: filter the event feed and chart by Ads or Ad Click ID.
+- **Funnels**: break conversion funnels down by Ads to compare conversion rates per network, or restrict a funnel to a saved segment with an Ads filter.
+- **Retention**: segment retention cohorts by Ads.
+- **API**: `/v0/top_sources?metric_column=paid_source` for the breakdown, and `/v0/profiles` returns and filters the user-level attribution columns. See the [API reference](/api).
+
 ## Builder codes
 
 For wallets, transactions, volume, and revenue, Formo defaults to breaking down by [builder codes](/data/events/transaction#builder-codes), an onchain attribution standard (ERC-8021) that lets apps identify themselves directly in transaction calldata.
@@ -110,6 +155,12 @@ Break down any metric by UTM source, medium, campaign, content, or term. See [UT
 ## Referrals
 
 See how many users arrive through a referral link, tracked via the `ref` query parameter (or `utm_medium=affiliate`/`referral`). See [Referrals](/data/metrics#referrals) for details.
+
+The Web SDK autodetects `ref`, `referral`, `refcode`, `af`, and `referrer`. You can also configure custom query parameter names or extract a code from a URL path such as `/referral/alice`; see [Web SDK referrals](/sdks/web#referrals).
+
+## Mobile attribution
+
+The React Native SDK captures UTM parameters and referral codes from deep and universal links. On Android, it can also read the Google Play Install Referrer on first launch to connect a website or campaign to an app install. Deep-link attribution works on iOS, but Apple does not expose an install-referrer API. See [Deep link attribution](/sdks/mobile#deep-link-attribution) and [Web-to-mobile attribution](/sdks/mobile#web-to-mobile-attribution).
 
 ## Countries
 
@@ -156,4 +207,4 @@ See the top chains your wallets and transactions are active on. Formo supports E
 
 ---
 
-For a complete walkthrough of analyzing traffic sources, setting up UTM and referral tracking, comparing attribution models, and optimizing acquisition spend, see [How to Set Up Attribution](/guides/onchain-attribution).
+For a complete walkthrough of analyzing referrers, referral codes, ads, UTM campaigns, mobile links, and builder codes, comparing attribution models, and optimizing acquisition spend, see [How to Set Up Attribution](/guides/onchain-attribution).
