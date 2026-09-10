@@ -8,6 +8,16 @@
     "dark": "#0D9373"
   },
   "favicon": "/favicon.svg",
+  "redirects": [
+    {
+      "source": "/features/product-analytics/ads",
+      "destination": "/features/attribution/ads"
+    },
+    {
+      "source": "/features/product-analytics/key-metrics",
+      "destination": "/features/attribution/key-metrics"
+    }
+  ],
   "navigation": {
     "tabs": [
       {
@@ -21,24 +31,32 @@
             "group": "Features",
             "pages": [
               {
-                "group": "Product Analytics",
+                "group": "Analytics",
                 "icon": "compass",
                 "pages": [
                   "features/product-analytics/overview",
-                  "features/product-analytics/key-metrics",
-                  "features/product-analytics/ads",
+                  "features/product-analytics/ai",
+                  "features/product-analytics/insights",
                   "features/product-analytics/activity",
                   "features/product-analytics/live-view",
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
                   "features/product-analytics/charts",
-                  "features/product-analytics/explore",
                   "features/product-analytics/funnels",
                   "features/product-analytics/flows",
-                  "features/product-analytics/alerts",
                   "features/product-analytics/retention",
-                  "features/product-analytics/insights",
-                  "features/product-analytics/ai"
+                  "features/product-analytics/alerts",
+                  "features/product-analytics/explore"
+                ]
+              },
+              {
+                "group": "Attribution",
+                "icon": "bullseye",
+                "pages": [
+                  "features/attribution/overview",
+                  "features/attribution/key-metrics",
+                  "features/attribution/ads",
+                  "data/attribution"
                 ]
               },
               {
@@ -97,12 +115,9 @@
         "tab": "Data",
         "groups": [
           {
-            "group": "Methodology",
-            "pages": ["data/what-we-collect", "data/attribution"]
-          },
-          {
-            "group": "Data",
+            "group": "Data catalog",
             "pages": [
+              "data/what-we-collect",
               "data/metrics",
               {
                 "group": "Events",

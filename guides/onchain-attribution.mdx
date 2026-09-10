@@ -1,16 +1,17 @@
 ---
-title: 'How to Set Up Attribution'
+title: 'How to Set Up Onchain Attribution'
 sidebarTitle: 'How to Set Up Attribution'
-description: 'Track user journeys from crypto marketing campaigns to onchain conversions with UTM, referral, first-touch, and last-touch attribution.'
+description: 'Connect referrers, referral codes, ads, UTM campaigns, and builder codes to wallet connects, transactions, volume, and revenue.'
 ---
 
-This guide covers setting up attribution tracking, comparing attribution models, and analyzing which channels drive onchain conversions.
+This guide covers every attribution source Formo supports, how the SDK captures each one, and how to connect acquisition touchpoints to onchain conversions. Use it to compare referrers, referral codes, ad networks, UTM campaigns, and builder codes across wallet connects, transactions, volume, and revenue.
 
 ## What you'll learn
 
-- Set up UTM tracking for all marketing channels
+- Understand what Formo and its SDK capture automatically
+- Track referrers, referral codes, ads, UTM campaigns, and builder codes
 - Understand first-touch vs. last-touch attribution
-- Measure true ROI by channel (to the transaction level)
+- Measure performance by source through wallet connects and transactions
 - Optimize budget allocation based on conversion data
 
 ## Part 1: The Attribution Challenge in Crypto
@@ -38,7 +39,26 @@ A typical onchain user touches multiple channels:
 
 Each touchpoint matters. The question is: which one gets credit?
 
-## Part 2: How to Set Up UTM Tracking
+## Part 2: How Formo Captures Attribution Sources
+
+The Formo SDK captures attribution context from landing URLs, browser referrers, and onchain transaction data. You do not need UTMs for every attribution method:
+
+| Source | What Formo captures | Setup |
+|--------|---------------------|-------|
+| **Referrers** | Previous site and referring URL when the browser provides them | Automatic; configure `Referrer-Policy` for full URLs |
+| **Referral codes** | `ref` and supported referral parameters | Add the referral code to links you control |
+| **Ads** | Click IDs such as `gclid`, `fbclid`, and `twclid` | Keep ad-platform auto-tagging enabled |
+| **UTM** | Source, medium, campaign, content, and term | Add UTMs to links you control |
+| **Builder codes** | ERC-8021 attribution embedded in EVM transaction calldata | Add a builder code when constructing transactions |
+| **Mobile links and installs** | UTM and referral data from deep links; Android Play Install Referrer data | Enabled by default; Android install attribution requires its native module |
+
+Each source remains independently useful. For example, one visit can carry a browser referrer, a referral code, UTM campaign details, and an ad click ID at the same time.
+
+### Mobile deep links and install referrers
+
+The React Native SDK parses UTM parameters and referral codes from deep and universal links. On Android, the optional Google Play Install Referrer integration connects the website or campaign that led to an install with the first app launch. Apple does not expose an equivalent install-referrer API, so iOS supports deep-link attribution but not SDK-only install attribution. See [Deep link attribution](/sdks/mobile#deep-link-attribution) and [Web-to-mobile attribution](/sdks/mobile#web-to-mobile-attribution).
+
+## Part 3: How to Set Up UTM Tracking
 
 ### UTM parameter basics
 
@@ -97,7 +117,7 @@ Use consistent naming to make analysis easier:
 - Underscores for spaces
 - Include date/month for campaigns: `campaign_name_mmyy`
 
-## Part 3: How to Set Up Referral Tracking
+## Part 4: How to Set Up Referral Tracking
 
 Formo automatically captures referral codes alongside UTM parameters.
 
@@ -110,6 +130,8 @@ https://yourapp.xyz/?ref=alice
 ```
 
 When a user lands with a `ref` parameter, Formo captures it and associates it with the user's session. You can then trace connect sessions, events, and users back to specific referral codes.
+
+The Web SDK also recognizes `referral`, `refcode`, `af`, and `referrer` by default. If your program uses another convention, configure custom query parameter names or a URL path pattern; see [Web SDK referrals](/sdks/web#referrals).
 
 ### Where to add referral codes
 
@@ -156,7 +178,29 @@ GROUP BY referrer
 ORDER BY wallets DESC
 ```
 
-## Part 4: Understand Attribution Models
+## Part 5: Referrer Attribution
+
+Formo automatically records the referring site when the browser sends it. Referrers are useful for links you do not control—such as editorial coverage, search results, community posts, or directory listings—where no UTM or referral code was added.
+
+By default, browsers may send only the referring origin. To capture the specific referring page URL, configure your site's `Referrer-Policy` header. See [Referrer URL tracking](/sdks/web#referrer-url-tracking) for the recommended setup and privacy tradeoffs.
+
+Same-domain referrers are removed before channel classification so internal navigation does not appear as a new acquisition source. See [Referrers](/data/metrics#referrers) for counting details.
+
+## Part 6: Ad Attribution
+
+Ad platforms append click IDs to landing URLs. The Formo SDK captures supported IDs automatically and attributes the session and user to the acquiring network—even when an in-app browser does not provide a referrer.
+
+Keep auto-tagging enabled in your ad platforms. Add UTMs when you also want campaign, creative, or keyword detail; the click ID identifies the network while UTMs provide your naming taxonomy.
+
+Formo supports Google, Meta, Microsoft, TikTok, X, LinkedIn, and Reddit click IDs, plus paid `utm_medium` values without a known click ID. See [Ad attribution](/features/attribution/ads) for the complete parameter list, attribution behavior, and dashboard surfaces.
+
+## Part 7: Builder Code Attribution
+
+[Builder codes](/data/events/transaction#builder-codes) attribute EVM transactions directly to the app that built them by appending an ERC-8021 code to transaction calldata. Unlike referrers, referral codes, ads, and UTMs, builder codes describe transaction-level onchain provenance rather than the user's landing source.
+
+Use builder codes when your app constructs transactions and you want durable attribution that survives wallets, RPC providers, and aggregators. Formo detects supported codes from transaction data and makes them available as breakdowns for wallets, transactions, volume, and revenue.
+
+## Part 8: Understand Attribution Models
 
 Formo supports multiple attribution models. Each gives credit differently.
 
@@ -193,13 +237,13 @@ Formo supports multiple attribution models. Each gives credit differently.
 | Grow awareness | First-touch | Shows which channels introduce new users |
 | Optimize conversions | Last-touch | Shows what pushes users to convert |
 
-## Part 5: How to Analyze Attribution in Formo
+## Part 9: How to Analyze Attribution in Formo
 
 ### View attribution in Overview
 
 <Steps>
   <Step title="Go to Overview in the Formo Dashboard" />
-  <Step title="Find the Channels, Referrers, Referrals, and UTM tabs">
+  <Step title="Find the Channels, Referrers, Referrals, Ads, and UTM tabs">
     These sit alongside your other traffic breakdowns (Pages, Countries, Devices).
   </Step>
   <Step title="Select different units (users, volume, revenue)" />
@@ -209,18 +253,20 @@ Formo supports multiple attribution models. Each gives credit differently.
 
 Each tab answers a different attribution question:
 
-| Tab | Shows |
+| View | Shows |
 |-----|-------|
 | **Channels** | Traffic auto-classified into one of 13 acquisition channels (Paid Search, Organic Social, Direct, etc.) |
 | **Referrers** | The specific referring domain (twitter.com, google.com, defillama.com) |
 | **Referrals** | Traffic from `ref` codes, plus `affiliate`/`referral` UTM traffic |
+| **Ads** | Paid sessions and visitors grouped by the acquiring ad network |
 | **UTM** | Breakdown by `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and `utm_term` |
+| **Builder codes** | Wallets, transactions, volume, and revenue attributed through ERC-8021 transaction calldata |
 
-Formo automatically classifies every session into a channel at ingestion time, using a priority-ordered ladder over the referrer domain, `utm_medium`, and ad-platform click IDs. See the full [channel classification table](/features/product-analytics/key-metrics#channels) for how each of the 13 channels is detected.
+Formo automatically classifies every session into a channel at ingestion time, using a priority-ordered ladder over the referrer domain, `utm_medium`, and ad-platform click IDs. See the full [channel classification table](/features/attribution/key-metrics#channels) for how each of the 13 channels is detected.
 
 ### Key metrics by source
 
-For each traffic source, the Channels/Referrers/Referrals/UTM tabs show raw counts:
+For each acquisition source, the Channels, Referrers, Referrals, Ads, and UTM tabs show raw counts. Builder codes are available as a breakdown for onchain metrics:
 
 | Metric | What it tells you |
 |--------|-------------------|
@@ -243,23 +289,25 @@ Beyond the built-in tabs, build custom charts to track attribution over time. Us
 
 > "What are the top 5 first-touch sources for users who transacted?"
 
-> "Which utm_source has the highest transaction volume per visitor?"
+> "Compare transactions by ad network and referral code"
+
+> "Which referrer or builder code generated the most transaction volume?"
 
 **Attribution chart ideas:**
 
 | Chart | Query |
 |-------|-------|
-| **Visitors by Source** | Daily visitors grouped by utm_source |
-| **Conversion by Source** | Transaction rate by first-touch source |
-| **Revenue by Campaign** | Volume grouped by utm_campaign |
-| **Source Trend** | Weekly wallet connects by top 5 sources |
+| **Visitors by Source** | Daily visitors grouped by referrer or UTM source |
+| **Conversion by Source** | Transaction rate by first-touch channel, referral, or ad network |
+| **Revenue by Campaign** | Revenue grouped by UTM campaign |
+| **Onchain Attribution** | Transaction volume grouped by builder code |
 
 **Attribution funnel:**
 
 <Steps>
   <Step title="Go to Dashboards, click Add Chart, and select the Funnel chart type" />
   <Step title="Add steps: Visit → Connect → Transaction" />
-  <Step title="Add a breakdown dimension: Referrer, Referral, UTM Source/Medium/Campaign/Content/Term, Builder Codes, Device, Country, Browser, or OS" />
+  <Step title="Add a breakdown dimension: Referrer, Referral, Ads, UTM Source/Medium/Campaign/Content/Term, Builder Codes, Device, Country, Browser, or OS" />
   <Step title="Compare conversion rates across each value" />
 </Steps>
 
@@ -281,7 +329,7 @@ Cost per Transaction = Campaign Spend / Transactions from Campaign
 
 In this example, Twitter Ads has the best ROI.
 
-## Part 6: How to Optimize Your Marketing
+## Part 10: How to Optimize Your Marketing
 
 ### Identify your best channels
 
@@ -311,7 +359,7 @@ From your attribution data, categorize channels:
 
 Don't just measure conversions. Measure user quality:
 
-- Filter users by UTM source
+- Filter users by referrer, referral code, ad network, or UTM source
 - Compare average net worth by source
 - Compare retention by source
 - Compare volume per user by source
@@ -319,20 +367,18 @@ Don't just measure conversions. Measure user quality:
 **Example insight:**
 > Twitter drives more users, but Discord users have 3x higher average net worth and 2x better retention.
 
-### Multi-touch optimization
-
-If using linear attribution:
+### Assisted journey analysis
 
 - Identify common multi-touch paths
 - Ensure each touchpoint is optimized
-- Don't cut channels that assist conversions
+- Don't cut discovery channels just because another source received last-touch credit
 
 **Example path:**
 Twitter (awareness) → DeFiLlama (research) → Direct (conversion)
 
 All three channels contributed. Cutting Twitter would reduce DeFiLlama traffic.
 
-## Part 7: Advanced Attribution Tactics
+## Part 11: Advanced Attribution Tactics
 
 ### Cross-channel attribution
 
@@ -340,6 +386,7 @@ Track users across marketing channels:
 
 - Use consistent UTM naming
 - Track first-touch and last-touch separately
+- Compare referral, referrer, ad, and UTM properties together
 - Analyze common paths with Flows
 
 ### Cohort-based attribution
@@ -364,6 +411,11 @@ Compare user quality by acquisition cohort:
 - [ ] UTM parameters on all partner links
 - [ ] UTM parameters on all paid ads
 - [ ] Referral codes on all partner and influencer links
+- [ ] Ad-platform auto-tagging enabled
+- [ ] `Referrer-Policy` configured if full referring URLs are needed
+- [ ] Builder codes added to app-built EVM transactions
+- [ ] Deep-link capture reviewed for mobile apps
+- [ ] Google Play Install Referrer module installed if Android install attribution is needed
 - [ ] Consistent naming conventions
 - [ ] Attribution dashboard created
 - [ ] Weekly review of channel performance
@@ -372,18 +424,18 @@ Compare user quality by acquisition cohort:
 
 You've learned how to:
 
-1. **Set up UTM tracking** across all marketing channels
-2. **Set up referral tracking** with ref codes
-3. **Understand attribution models** and when to use each
-4. **Analyze attribution** in Formo with Channels, Referrers, Referrals, and UTM, plus custom charts
-5. **Calculate true ROI** including conversion and user quality
-6. **Optimize budget allocation** based on data
+1. **Use automatic attribution capture** from the web and mobile SDKs and Formo's onchain data
+2. **Set up controlled links** with referral codes and UTM parameters
+3. **Measure referrers and ad networks** without relying on UTMs alone
+4. **Attribute onchain activity** with builder codes
+5. **Compare first-touch and last-touch models** across users and sessions
+6. **Analyze and optimize sources** through conversions, volume, revenue, and user quality
 
 ## FAQ
 
 <AccordionGroup>
 <Accordion title="Does Formo capture attribution parameters automatically?">
-Yes. When a user lands on your app, Formo automatically captures UTM parameters, the referrer, and any `ref` referral code in the URL, and associates them with the user's session and wallet.
+Yes. When a user lands on your app, Formo automatically captures UTM parameters, browser referrers, supported referral parameters, and ad click IDs, then associates them with the session and user. Formo also detects supported builder codes from EVM transaction calldata.
 </Accordion>
 
 <Accordion title="What happens if a user visits from multiple sources before converting?">

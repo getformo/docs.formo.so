@@ -6603,7 +6603,7 @@
                 "paid_source"
               ]
             },
-            "description": "Column to break down sources by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/product-analytics/key-metrics#channels)). Use `paid_source` for the session-entry acquiring ad network (paid sessions only; see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads))."
+            "description": "Column to break down sources by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/attribution/key-metrics#channels)). Use `paid_source` for the session-entry acquiring ad network (paid sessions only; see [Ad attribution](https://docs.formo.so/features/attribution/ads))."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -7207,7 +7207,7 @@
                 "event"
               ]
             },
-            "description": "Column to group revenue by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/product-analytics/key-metrics#channels)). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only, see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads)). Unknown values return zero rows."
+            "description": "Column to group revenue by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/attribution/key-metrics#channels)). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only, see [Ad attribution](https://docs.formo.so/features/attribution/ads)). Unknown values return zero rows."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -7334,7 +7334,7 @@
                 "event"
               ]
             },
-            "description": "Column to group volume by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/product-analytics/key-metrics#channels)). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only, see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads)). Unknown values return zero rows."
+            "description": "Column to group volume by. Use `channel` for the 13-channel acquisition classifier (see the [channel classification table](https://docs.formo.so/features/attribution/key-metrics#channels)). Use `paid_source` for the acquiring ad network (per-event sticky attribution; paid rows only, see [Ad attribution](https://docs.formo.so/features/attribution/ads)). Unknown values return zero rows."
           },
           {
             "$ref": "#/components/parameters/AnalyticsLimit"
@@ -7437,7 +7437,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Breakdown dimension. Valid options: referrer, location, device, browser, os, utm_source, utm_medium, utm_campaign, utm_content, utm_term, ref, builder_codes, channel_type, paid_source. Unknown values are ignored (ungrouped totals). `paid_source` is the acquiring ad network (per-event sticky attribution; empty bucket is 'None'; see [Ad Attribution](https://docs.formo.so/features/product-analytics/ads))."
+            "description": "Breakdown dimension. Valid options: referrer, location, device, browser, os, utm_source, utm_medium, utm_campaign, utm_content, utm_term, ref, builder_codes, channel_type, paid_source. Unknown values are ignored (ungrouped totals). `paid_source` is the acquiring ad network (per-event sticky attribution; empty bucket is 'None'; see [Ad attribution](https://docs.formo.so/features/attribution/ads))."
           },
           {
             "name": "limit",

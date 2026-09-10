@@ -47,7 +47,7 @@ Total revenue (USD) tracked through your [custom events](/features/product-analy
 
 ## Breakdowns
 
-Break down visitors, page views, wallets, transactions, sessions, volume, or revenue by acquisition channel, referrer, referral, UTM parameter, device, browser, OS, or country, plus onchain builder codes for wallets, transactions, volume, and revenue. Session duration and bounce rate are not breakdown-eligible. Click any item in a breakdown to drill down into the [users](/features/wallet-intelligence/overview) behind it.
+Break down visitors, page views, wallets, transactions, sessions, volume, or revenue by acquisition channel, referrer, referral, ad network, UTM parameter, device, browser, OS, or country, plus onchain builder codes for wallets, transactions, volume, and revenue. Session duration and bounce rate are not breakdown-eligible. Click any item in a breakdown to drill down into the [users](/features/wallet-intelligence/overview) behind it.
 
 <Frame caption="Referrer shown here as an example dimension.">
   <img
@@ -91,6 +91,10 @@ See what's moving the needle with a breakdown of your metrics by referrer. Easil
 
 Getting the specific referrer URL (not just the domain) requires the right `Referrer-Policy` header on your site. See [Referrer URL tracking](/sdks/web#referrer-url-tracking) for how to configure it.
 
+## Ad attribution
+
+Formo captures ad-platform click IDs automatically and attributes paid sessions, users, conversions, volume, and revenue to the acquiring network. See [Ad attribution](/features/attribution/ads) for supported platforms, attribution behavior, dashboard surfaces, and API access.
+
 ## Builder codes
 
 For wallets, transactions, volume, and revenue, Formo defaults to breaking down by [builder codes](/data/events/transaction#builder-codes), an onchain attribution standard (ERC-8021) that lets apps identify themselves directly in transaction calldata.
@@ -110,6 +114,12 @@ Break down any metric by UTM source, medium, campaign, content, or term. See [UT
 ## Referrals
 
 See how many users arrive through a referral link, tracked via the `ref` query parameter (or `utm_medium=affiliate`/`referral`). See [Referrals](/data/metrics#referrals) for details.
+
+The Web SDK autodetects `ref`, `referral`, `refcode`, `af`, and `referrer`. You can also configure custom query parameter names or extract a code from a URL path such as `/referral/alice`; see [Web SDK referrals](/sdks/web#referrals).
+
+## Mobile attribution
+
+The React Native SDK captures UTM parameters and referral codes from deep and universal links. On Android, it can also read the Google Play Install Referrer on first launch to connect a website or campaign to an app install. Deep-link attribution works on iOS, but Apple does not expose an install-referrer API. See [Deep link attribution](/sdks/mobile#deep-link-attribution) and [Web-to-mobile attribution](/sdks/mobile#web-to-mobile-attribution).
 
 ## Countries
 
@@ -156,4 +166,4 @@ See the top chains your wallets and transactions are active on. Formo supports E
 
 ---
 
-For a complete walkthrough of analyzing traffic sources, setting up UTM and referral tracking, comparing attribution models, and optimizing acquisition spend, see [How to Set Up Attribution](/guides/onchain-attribution).
+For a complete walkthrough of analyzing referrers, referral codes, ads, UTM campaigns, mobile links, and builder codes, comparing attribution models, and optimizing acquisition spend, see [How to Set Up Attribution](/guides/onchain-attribution).
