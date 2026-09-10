@@ -11,7 +11,11 @@
   "redirects": [
     {
       "source": "/features/product-analytics/ads",
-      "destination": "/features/product-analytics/key-metrics"
+      "destination": "/features/attribution/ads"
+    },
+    {
+      "source": "/features/product-analytics/key-metrics",
+      "destination": "/features/attribution/key-metrics"
     }
   ],
   "navigation": {
@@ -27,7 +31,7 @@
             "group": "Features",
             "pages": [
               {
-                "group": "Product Analytics",
+                "group": "Analytics",
                 "icon": "compass",
                 "pages": [
                   "features/product-analytics/overview",
@@ -48,7 +52,12 @@
               {
                 "group": "Attribution",
                 "icon": "bullseye",
-                "pages": ["features/product-analytics/key-metrics"]
+                "pages": [
+                  "features/attribution/overview",
+                  "features/attribution/key-metrics",
+                  "features/attribution/ads",
+                  "data/attribution"
+                ]
               },
               {
                 "group": "Wallet Intelligence",
@@ -106,12 +115,9 @@
         "tab": "Data",
         "groups": [
           {
-            "group": "Methodology",
-            "pages": ["data/what-we-collect", "data/attribution"]
-          },
-          {
-            "group": "Data",
+            "group": "Data catalog",
             "pages": [
+              "data/what-we-collect",
               "data/metrics",
               {
                 "group": "Events",

@@ -192,7 +192,7 @@ Ad platforms append click IDs to landing URLs. The Formo SDK captures supported 
 
 Keep auto-tagging enabled in your ad platforms. Add UTMs when you also want campaign, creative, or keyword detail; the click ID identifies the network while UTMs provide your naming taxonomy.
 
-Formo supports Google, Meta, Microsoft, TikTok, X, LinkedIn, and Reddit click IDs, plus paid `utm_medium` values without a known click ID. See [Ad attribution](/features/product-analytics/key-metrics#ad-attribution) for the complete parameter list, attribution behavior, and dashboard surfaces.
+Formo supports Google, Meta, Microsoft, TikTok, X, LinkedIn, and Reddit click IDs, plus paid `utm_medium` values without a known click ID. See [Ad attribution](/features/attribution/ads) for the complete parameter list, attribution behavior, and dashboard surfaces.
 
 ## Part 7: Builder Code Attribution
 
@@ -262,7 +262,7 @@ Each tab answers a different attribution question:
 | **UTM** | Breakdown by `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and `utm_term` |
 | **Builder codes** | Wallets, transactions, volume, and revenue attributed through ERC-8021 transaction calldata |
 
-Formo automatically classifies every session into a channel at ingestion time, using a priority-ordered ladder over the referrer domain, `utm_medium`, and ad-platform click IDs. See the full [channel classification table](/features/product-analytics/key-metrics#channels) for how each of the 13 channels is detected.
+Formo automatically classifies every session into a channel at ingestion time, using a priority-ordered ladder over the referrer domain, `utm_medium`, and ad-platform click IDs. See the full [channel classification table](/features/attribution/key-metrics#channels) for how each of the 13 channels is detected.
 
 ### Key metrics by source
 
