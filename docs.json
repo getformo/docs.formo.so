@@ -31,7 +31,6 @@
                 "icon": "compass",
                 "pages": [
                   "features/product-analytics/overview",
-                  "features/product-analytics/key-metrics",
                   "features/product-analytics/activity",
                   "features/product-analytics/live-view",
                   "features/product-analytics/custom-events",
@@ -45,6 +44,11 @@
                   "features/product-analytics/insights",
                   "features/product-analytics/ai"
                 ]
+              },
+              {
+                "group": "Attribution",
+                "icon": "bullseye",
+                "pages": ["features/product-analytics/key-metrics"]
               },
               {
                 "group": "Wallet Intelligence",
