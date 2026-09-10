@@ -31,18 +31,18 @@
                 "icon": "compass",
                 "pages": [
                   "features/product-analytics/overview",
+                  "features/product-analytics/ai",
+                  "features/product-analytics/insights",
                   "features/product-analytics/activity",
                   "features/product-analytics/live-view",
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
                   "features/product-analytics/charts",
-                  "features/product-analytics/explore",
                   "features/product-analytics/funnels",
                   "features/product-analytics/flows",
-                  "features/product-analytics/alerts",
                   "features/product-analytics/retention",
-                  "features/product-analytics/insights",
-                  "features/product-analytics/ai"
+                  "features/product-analytics/alerts",
+                  "features/product-analytics/explore"
                 ]
               },
               {
