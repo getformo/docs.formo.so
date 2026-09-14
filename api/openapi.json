@@ -4149,7 +4149,7 @@
       "get": {
         "operationId": "queryChartWithDateRange",
         "summary": "Execute saved chart query",
-        "description": "Runs the saved chart's query with `{{date_from}}`/`{{date_to}}` substituted from the query parameters; the chart's query must contain both template variables. Dune-backed charts run against the project's configured Dune API key.",
+        "description": "Runs the saved chart's query with `{{date_from}}`/`{{date_to}}` substituted from the query parameters; the chart's query must contain both template variables. Dune integration is currently unavailable. Request access at https://formo.so/support to discuss re-enabling it; a configured API key alone does not enable Dune-backed charts.",
         "tags": ["Charts"],
         "parameters": [
           {
