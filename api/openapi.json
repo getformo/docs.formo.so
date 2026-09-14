@@ -117,6 +117,7 @@
           "UNAUTHORIZED",
           "BAD_REQUEST",
           "FORBIDDEN",
+          "DUNE_INTEGRATION_RETIRED",
           "NOT_FOUND",
           "CONFLICT",
           "INVALID_CHAIN_ID",
@@ -4124,6 +4125,10 @@
           }
         ],
         "responses": {
+          "410": {
+            "description": "Dune integration retired. Request access at https://formo.so/support.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
           "201": {
             "description": "Id of the newly created chart",
             "content": {
@@ -4190,6 +4195,10 @@
           }
         ],
         "responses": {
+          "410": {
+            "description": "Dune integration retired. Request access at https://formo.so/support.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          },
           "200": {
             "description": "Query result",
             "content": {
