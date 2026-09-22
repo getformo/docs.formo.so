@@ -88,16 +88,6 @@ Permission: `query:read`.
 | `funnel` | Multi-step conversion funnels |
 | `flow` | User journey and path analysis |
 
-<Note>
-  Formo keeps the curated endpoint names above available as stable MCP tools,
-  even when the upstream analytics service exposes only the generic
-  `call_endpoint` dispatcher. Prefer the named tools because they provide
-  endpoint-specific descriptions and parameter schemas. Use `list_endpoints`
-  for discovery and `call_endpoint` only as a low-level fallback. For custom
-  questions that no endpoint covers, use `text_to_sql` followed by
-  `execute_query`.
-</Note>
-
 ### Profiles API
 
 Wallet enrichment and profile writes.
