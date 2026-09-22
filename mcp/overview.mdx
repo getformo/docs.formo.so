@@ -62,11 +62,11 @@ Permission: `query:read`.
 
 | Tool | Description |
 |:-----|:------------|
-| `explore_data` | Natural language data exploration with Formo-specific context |
 | `execute_query` | Run SQL queries against your analytics data |
 | `text_to_sql` | Convert natural language to SQL |
 | `list_endpoints` | List available API endpoints |
 | `list_datasources` | List available data sources |
+| `call_endpoint` | Low-level compatibility dispatcher for published endpoints |
 | `kpis` | Get key performance indicators |
 | `distinct_values` | Get unique values for filtering |
 | `top_events` | View most common events |
@@ -81,12 +81,22 @@ Permission: `query:read`.
 | `top_wallets` | Most active wallets |
 | `top_chains` | Activity by blockchain |
 | `revenue_overview` | Revenue analytics |
-| `revenue_timeseries` | Revenue over time |
+| `revenue_timeseries` | Revenue over time for a wallet address (`address` is required) |
 | `revenue_by_metric` | Revenue broken down by a dimension |
 | `volume_by_metric` | Transaction volume broken down by a dimension |
 | `cohort_analysis` | Cohort-based behavioral analysis |
 | `funnel` | Multi-step conversion funnels |
 | `flow` | User journey and path analysis |
+
+<Note>
+  Formo keeps the curated endpoint names above available as stable MCP tools,
+  even when the upstream analytics service exposes only the generic
+  `call_endpoint` dispatcher. Prefer the named tools because they provide
+  endpoint-specific descriptions and parameter schemas. Use `list_endpoints`
+  for discovery and `call_endpoint` only as a low-level fallback. For custom
+  questions that no endpoint covers, use `text_to_sql` followed by
+  `execute_query`.
+</Note>
 
 ### Profiles API
 
