@@ -552,7 +552,7 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 ```
 
 ```html HTML snippet
-<script src="https://cdn.jsdelivr.net/npm/web-vitals@6/dist/web-vitals.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web-vitals@6.2.2/dist/web-vitals.iife.js" integrity="sha384-sKh//42d8+X4ztiyB4ChMShr0tmbWDWrkHfy9pLz9napB81dM74xVylUQVmZ94PE" crossorigin="anonymous"></script>
 <script>
   window.formofy('YOUR_API_KEY', {
     webVitals: window.webVitals
@@ -562,7 +562,7 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 
 </CodeGroup>
 
-Load the `web-vitals` script before the Formo SDK initializes. With `FormoAnalyticsProvider`, pass it the same way: `options={{ webVitals }}`. Consent and [tracking exclusions](#environments) apply as for other events.
+Load the `web-vitals` script before the Formo SDK initializes. Pin an exact version with its `integrity` hash (see [Subresource Integrity](/security/sri)); the hash above is for 6.2.2. With `FormoAnalyticsProvider`, pass it the same way: `options={{ webVitals }}`. Consent and [tracking exclusions](#environments) apply as for other events.
 
 A few things to know:
 
