@@ -1,0 +1,80 @@
+---
+title: 'Web vitals event'
+description: 'Reference for the web_vitals event the web SDK sends once per page load, with the Core Web Vitals (LCP, INP, CLS, FCP, TTFB) measured from real visitors.'
+---
+
+The `web_vitals` event records how fast and stable a page load was for a real visitor. The [web SDK](/sdks/web#web-vitals) sends it automatically, once per page load, when the visitor first leaves or hides the page. At that point the layout shift and responsiveness values are final for most visits.
+
+It is a technical event: it is not counted as visitor activity, and it does not show in the Activity feed, Live view, or a user's last event.
+
+## Properties
+
+| Property | Type | Description |
+|:---------|:-----|:------------|
+| `lcp` | Number | Largest Contentful Paint, in ms: when the largest image or text block in the viewport was painted. |
+| `inp` | Number | Interaction to Next Paint, in ms: how long the page took to respond to clicks, taps, and key presses (about the 98th percentile of the interactions on the page). |
+| `cls` | Number | Cumulative Layout Shift, unitless: how much visible content moved unexpectedly (largest burst of shifts). |
+| `fcp` | Number | First Contentful Paint, in ms: when the first text or image was painted. |
+| `ttfb` | Number | Time to First Byte, in ms: when the first byte of the page response arrived. |
+| `navigation_type` | String | How the page was loaded: `navigate`, `reload`, `back_forward`, `prerender`, or `restore`. |
+
+A metric is left out when the browser does not measure it. For example, Safari does not report INP or CLS, and a visitor who never interacts with the page has no INP. A missing metric is not the same as 0.
+
+## Thresholds
+
+Formo rates each value with Google's thresholds, and the dashboard reports the 75th percentile (p75) of all page loads.
+
+| Metric | Good | Needs improvement | Poor |
+|:-------|:-----|:------------------|:-----|
+| LCP | 2.5 s or less | 4 s or less | More than 4 s |
+| INP | 200 ms or less | 500 ms or less | More than 500 ms |
+| CLS | 0.1 or less | 0.25 or less | More than 0.25 |
+| FCP | 1.8 s or less | 3 s or less | More than 3 s |
+| TTFB | 800 ms or less | 1.8 s or less | More than 1.8 s |
+
+## Page and time
+
+The event describes the page load it measured:
+
+- The page URL in its context (and so its page path) is the URL the page was loaded with. In a single-page app, a later route change does not move the measurement to the new route.
+- Its timestamp is the start of that page load, not the time the event was sent.
+
+## Query
+
+Read a metric as `Nullable(Float64)`, so that a metric the browser did not measure is `NULL` and stays out of the percentile. Reading it as a plain number turns it into 0.
+
+```sql
+SELECT
+    page_path,
+    count() AS page_loads,
+    quantileIf(0.75)(lcp, lcp IS NOT NULL) AS lcp_p75
+FROM (
+    SELECT page_path, JSONExtract(properties, 'lcp', 'Nullable(Float64)') AS lcp
+    FROM events
+    WHERE type = 'web_vitals' AND timestamp >= now() - INTERVAL 7 DAY
+)
+GROUP BY page_path
+ORDER BY page_loads DESC
+LIMIT 20
+```
+
+## Sample Payload
+
+Here's the payload of a typical call with most common fields removed:
+
+```json
+{
+    "type": "web_vitals",
+    "context": {
+        "page_url": "https://app.example.com/swap"
+    },
+    "properties": {
+        "lcp": 1830,
+        "inp": 96,
+        "cls": 0.04,
+        "fcp": 910,
+        "ttfb": 240,
+        "navigation_type": "navigate"
+    }
+}
+```

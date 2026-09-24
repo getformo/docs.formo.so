@@ -509,7 +509,7 @@ Logging is disabled by default (`logger.enabled: false`); no logs print unless y
 
 ### Autocapture
 
-You can configure which wallet events are automatically captured by the SDK:
+You can configure which wallet events and [web vitals](#web-vitals) are automatically captured by the SDK:
 
 ```javascript
 // Enable full autocapture (default)
@@ -524,7 +524,8 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
     disconnect: true,
     signature: false,    // Disable signature tracking
     transaction: false,  // Disable transaction tracking
-    chain: true
+    chain: true,
+    webVitals: true
   }
 });
 
@@ -533,6 +534,28 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
   autocapture: false
 });
 ```
+
+### Web vitals
+
+The SDK measures the [Core Web Vitals](/data/events/web-vitals) of each page load from real visitors: LCP, INP, CLS, FCP, and TTFB. It sends one `web_vitals` event per page load, when the visitor first leaves or hides the page, and adds no extra script or dependency. The Overview dashboard shows the 75th percentile of each metric and the slowest pages.
+
+Web vitals are on by default (SDK 1.42.0+). To turn them off:
+
+```javascript
+const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
+  autocapture: {
+    webVitals: false
+  }
+});
+```
+
+`autocapture: false` also turns them off. Consent and [tracking exclusions](#environments) apply as for other events.
+
+A few things to know:
+
+- Chrome and Edge report all five metrics. Firefox and Safari report fewer (Safari has no INP or CLS); a metric the browser cannot measure is left out.
+- A single-page app sends one report per full page load. Route changes after the load are not measured on their own, and CLS and INP cover the whole visit, as in Google's Chrome UX Report.
+- A page loaded in a background tab reports only TTFB, because nothing was painted for the visitor.
 
 ### Batching
 
