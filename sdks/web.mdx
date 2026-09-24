@@ -552,21 +552,25 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 ```
 
 ```html HTML snippet
-<script src="https://cdn.jsdelivr.net/npm/web-vitals@6.2.2/dist/web-vitals.iife.js" integrity="sha384-sKh//42d8+X4ztiyB4ChMShr0tmbWDWrkHfy9pLz9napB81dM74xVylUQVmZ94PE" crossorigin="anonymous"></script>
-<script>
-  window.formofy('YOUR_API_KEY', {
-    webVitals: window.webVitals
-  });
-</script>
+<script
+  src="https://cdn.jsdelivr.net/npm/web-vitals@6.2.2/dist/web-vitals.iife.js"
+  integrity="sha384-sKh//42d8+X4ztiyB4ChMShr0tmbWDWrkHfy9pLz9napB81dM74xVylUQVmZ94PE"
+  crossorigin="anonymous"
+  defer
+></script>
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer onload="window.formofy('<YOUR_WRITE_KEY>', { webVitals: window.webVitals });"
+></script>
 ```
 
 </CodeGroup>
 
-Load the `web-vitals` script before the Formo SDK initializes. Pin an exact version with its `integrity` hash (see [Subresource Integrity](/security/sri)); the hash above is for 6.2.2. With `FormoAnalyticsProvider`, pass it the same way: `options={{ webVitals }}`. Consent and [tracking exclusions](#environments) apply as for other events.
+This replaces the [HTML snippet](#html-snippet) above. Deferred scripts run in order, so `window.webVitals` is ready when the SDK's `onload` calls `formofy`. Pin an exact `web-vitals` version with its `integrity` hash (see [Subresource Integrity](/security/sri)); the hash above is for 6.2.2. With `FormoAnalyticsProvider`, pass it the same way: `options={{ webVitals }}`. Consent and [tracking exclusions](#environments) apply as for other events.
 
 A few things to know:
 
-- Chrome and Edge report all five metrics. Firefox and Safari report fewer (Safari has no INP or CLS); a metric the browser cannot measure is left out.
+- Browser support differs by metric and version. Chromium browsers report all five; other browsers may report fewer. A metric the browser cannot measure is left out.
 - A single-page app sends one report per full page load. Route changes after the load are not measured on their own, and CLS and INP cover the whole visit, as in Google's Chrome UX Report.
 - A return to the page from the back/forward cache is not reported again.
 

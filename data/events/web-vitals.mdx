@@ -18,7 +18,7 @@ It is a technical event: it is not counted as visitor activity, and it does not 
 | `ttfb` | Number | Time to First Byte, in ms: when the first byte of the page response arrived. |
 | `navigation_type` | String | How the page was loaded: `navigate`, `reload`, `back-forward`, `prerender`, or `restore`. |
 
-A metric is left out when the browser does not measure it. For example, Safari does not report INP or CLS, and a visitor who never interacts with the page has no INP. A missing metric is not the same as 0.
+A metric is left out when it was not measured. For example, some browsers do not report every metric, and a visitor who never interacts with the page has no INP. A missing metric is not the same as 0.
 
 ## Thresholds
 
@@ -26,11 +26,11 @@ Formo rates each value with Google's thresholds, and the dashboard reports the 7
 
 | Metric | Good | Needs improvement | Poor |
 |:-------|:-----|:------------------|:-----|
-| LCP | 2.5 s or less | 4 s or less | More than 4 s |
-| INP | 200 ms or less | 500 ms or less | More than 500 ms |
-| CLS | 0.1 or less | 0.25 or less | More than 0.25 |
-| FCP | 1.8 s or less | 3 s or less | More than 3 s |
-| TTFB | 800 ms or less | 1.8 s or less | More than 1.8 s |
+| LCP | 2.5 s or less | More than 2.5 s, up to 4 s | More than 4 s |
+| INP | 200 ms or less | More than 200 ms, up to 500 ms | More than 500 ms |
+| CLS | 0.1 or less | More than 0.1, up to 0.25 | More than 0.25 |
+| FCP | 1.8 s or less | More than 1.8 s, up to 3 s | More than 3 s |
+| TTFB | 800 ms or less | More than 800 ms, up to 1.8 s | More than 1.8 s |
 
 ## Page and time
 
