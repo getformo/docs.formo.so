@@ -1,9 +1,9 @@
 ---
 title: 'Web vitals event'
-description: 'Reference for the web_vitals event the web SDK sends once per page load, with the Core Web Vitals (LCP, INP, CLS, FCP, TTFB) measured from real visitors.'
+description: 'Reference for the web_vitals event the web SDK can send once per page load, with the Core Web Vitals (LCP, INP, CLS, FCP, TTFB) measured from real visitors.'
 ---
 
-The `web_vitals` event records how fast and stable a page load was for a real visitor. The [web SDK](/sdks/web#web-vitals) sends it automatically, once per page load, when the visitor first leaves or hides the page. At that point the layout shift and responsiveness values are final for most visits.
+The `web_vitals` event records how fast and stable a page load was for a real visitor. When you turn on [web vitals](/sdks/web#web-vitals), the web SDK sends it once per page load, when the visitor first leaves or hides the page. At that point the layout shift and responsiveness values are final for most visits.
 
 It is a technical event: it is not counted as visitor activity, and it does not show in the Activity feed, Live view, or a user's last event.
 
@@ -16,7 +16,7 @@ It is a technical event: it is not counted as visitor activity, and it does not 
 | `cls` | Number | Cumulative Layout Shift, unitless: how much visible content moved unexpectedly (largest burst of shifts). |
 | `fcp` | Number | First Contentful Paint, in ms: when the first text or image was painted. |
 | `ttfb` | Number | Time to First Byte, in ms: when the first byte of the page response arrived. |
-| `navigation_type` | String | How the page was loaded: `navigate`, `reload`, `back_forward`, `prerender`, or `restore`. |
+| `navigation_type` | String | How the page was loaded: `navigate`, `reload`, `back-forward`, `prerender`, or `restore`. |
 
 A metric is left out when the browser does not measure it. For example, Safari does not report INP or CLS, and a visitor who never interacts with the page has no INP. A missing metric is not the same as 0.
 
