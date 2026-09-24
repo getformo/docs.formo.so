@@ -685,6 +685,58 @@ window.formo.optOutTracking();
 window.formo.optInTracking();
 ```
 
+### Session replay
+
+Session replay records what visitors see and do on your app, so you can watch a session back from a user's profile. The SDK records the page with [rrweb](https://www.rrweb.io/) and sends the recording in small compressed chunks. Replay is off by default.
+
+For browser installations, turn it on with `replay: true`. The SDK then loads the rrweb recorder from jsDelivr, pinned to one version and checked with subresource integrity:
+
+```html
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer
+  onload="window.formofy('<YOUR_WRITE_KEY>', { replay: true });"
+></script>
+```
+
+For npm installations, install `@rrweb/record` and pass its `record` function. The recorder is then bundled with your app and no script is loaded at runtime:
+
+```tsx
+import { record } from '@rrweb/record';
+
+<FormoAnalyticsProvider
+    writeKey={WRITE_KEY}
+    options={{
+        replay: {
+            record,
+            sampleRate: 0.5, // record half of the tabs (default: 1)
+        },
+    }}
+>
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `sampleRate` | `1` | Share of browser tabs to record, from 0 to 1. |
+| `record` | | rrweb's `record` function from `@rrweb/record`. |
+| `scriptUrl` | pinned jsDelivr URL | Load the recorder from your own origin instead. |
+| `maskAllInputs` | `true` | Mask the value of every input, textarea and select. |
+| `maskTextSelector` | | CSS selector whose text is masked. |
+| `blockSelector` | | CSS selector whose elements are not recorded. |
+
+**Privacy.** Input values are always masked unless you set `maskAllInputs: false`, and password fields are always masked. Mark other sensitive content in your markup:
+
+```html
+<span data-formo-mask>1,234.56 ETH</span>   <!-- text is replaced with * -->
+<div data-formo-block>...</div>             <!-- not recorded, shown as an empty box -->
+```
+
+Canvas and fonts are not recorded. The page URL in a recording follows the same query parameter rules as your events (see `excludeQueryParams`). Replay follows consent: `optOutTracking()` stops the recording and drops what has not been sent, and pages excluded with `excludePaths` or `excludeHosts` are not recorded.
+
+**Sessions.** Each browser tab records its own replay. A replay continues across page loads in the same tab, and a new one starts after 30 minutes without input, or when you call `reset()`. While a replay is recording, every event carries its `replay_id`, so you can jump from an event to the moment it happened.
+
+**Content security policy.** If your site sets a CSP and you use the CDN recorder, allow `https://cdn.jsdelivr.net` in `script-src`, or host the file yourself with `scriptUrl`. Replay chunks go to the same endpoint as your events, so the [proxy](#proxy) setup applies to them too.
+
 ### Cross subdomain tracking
 
 By default, Formo sets identity cookies on the root domain, sharing visitor identity across all subdomains. This ensures accurate visitor counts and consistent attribution across your subdomains out of the box.
