@@ -309,7 +309,7 @@ Visualize how users navigate your app through an ordered list of path anchors. `
 | ------------------ | ------------------ | ------- | ---------------------------------------------------------------- |
 | `anchors`          | `FunnelStep[]`     | -       | **Required.** Ordered path anchors; one entry is open-ended       |
 | `maxSteps`         | integer (2 to 5)   | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5   |
-| `nodesPerStep`     | integer (2 to 8)   | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8 |
+| `nodesPerStep`     | integer (2 to 100) | `20`    | Max events shown per step; less frequent events group into "Others" |
 | `conversionWindow` | `ConversionWindow` | -       | Time window to group the flow                                    |
 | `filters`          | string             | -       | JSON-encoded string of additional path filters                   |
 
@@ -734,7 +734,7 @@ Visualize how users navigate your app through an ordered list of path anchors. `
 | ------------------ | ------------------ | ------- | ---------------------------------------------------------------- |
 | `anchors`          | `FunnelStep[]`     | -       | **Required.** Ordered path anchors; one entry is open-ended       |
 | `maxSteps`         | integer (2 to 5)   | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5   |
-| `nodesPerStep`     | integer (2 to 8)   | `5`     | Max unique event nodes per step. Values above 8 are clamped to 8 |
+| `nodesPerStep`     | integer (2 to 100) | `20`    | Max events shown per step; less frequent events group into "Others" |
 | `conversionWindow` | `ConversionWindow` | 2 weeks | Time window to group the flow                                    |
 | `filters`          | string             | -       | JSON-encoded string of additional path filters                   |
 
