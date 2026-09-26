@@ -3,9 +3,9 @@ title: 'Web vitals event'
 description: 'Reference for the web_vitals event the web SDK can send once per page load, with the Core Web Vitals (LCP, INP, CLS, FCP, TTFB) measured from real visitors.'
 ---
 
-The `web_vitals` event records the [Core Web Vitals](https://web.dev/articles/vitals) of a page load: how fast and stable it was for a real visitor. When you turn on [web vitals](/sdks/web#web-vitals), the web SDK sends it once per page load, when the visitor first leaves or hides the page. At that point the layout shift and responsiveness values are final for most visits.
+The `web_vitals` event records the [Core Web Vitals](https://web.dev/articles/vitals) of a page load: how fast and stable it was for a real visitor. When you turn on [web vitals](/sdks/web#web-vitals), the web SDK sends it once per page load, when the visitor first leaves or hides the page.
 
-It is a technical event: it is not counted as visitor activity, and it does not show in the Activity feed, Live view, or a user's last event.
+Web vitals events are not counted as visitor activity, and they do not show in the Activity feed, Live view, or a user's last event.
 
 ## Properties
 
@@ -20,6 +20,11 @@ It is a technical event: it is not counted as visitor activity, and it does not 
 
 A metric is left out when it was not measured. For example, some browsers do not report every metric, and a visitor who never interacts with the page has no INP. A missing metric is not the same as 0.
 
+The event describes the page load it measured:
+
+- The page URL in its context (and so its page path) is the URL the page was loaded with.
+- Its timestamp is the start of that page load, not the time the event was sent.
+
 ## Thresholds
 
 Formo rates each value with [Google's thresholds](https://web.dev/articles/vitals). Google rates a page on the 75th percentile (p75) of its page loads; the dashboard shows the 90th percentile by default, and you can pick p50, p75, p90, or p99. Choose p75 to match Google Search Console.
@@ -32,14 +37,7 @@ Formo rates each value with [Google's thresholds](https://web.dev/articles/vital
 | FCP | 1.8 s or less | More than 1.8 s, up to 3 s | More than 3 s |
 | TTFB | 800 ms or less | More than 800 ms, up to 1.8 s | More than 1.8 s |
 
-## Page and time
-
-The event describes the page load it measured:
-
-- The page URL in its context (and so its page path) is the URL the page was loaded with. In a single-page app, a later route change does not move the measurement to the new route.
-- Its timestamp is the start of that page load, not the time the event was sent.
-
-## Query
+## Example Query
 
 Read a metric as `Nullable(Float64)`, so that a metric the browser did not measure is `NULL` and stays out of the percentile. Reading it as a plain number turns it into 0.
 

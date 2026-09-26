@@ -536,7 +536,7 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 
 ### Web vitals
 
-The SDK can measure the [Core Web Vitals](https://web.dev/articles/vitals) of each page load from real visitors: LCP, INP, CLS, FCP, and TTFB. It uses Google's [`web-vitals`](https://github.com/GoogleChrome/web-vitals) library, which you pass in, and sends one [`web_vitals` event](/data/events/web-vitals) per page load when the visitor first leaves or hides the page. The Overview dashboard shows each metric as a percentile (P90 by default; P50, P75 and P99 available), its trend over time, and a breakdown by page, device, and country.
+The Web SDK can measure the [Core Web Vitals](https://web.dev/articles/vitals) from real visitors: LCP, INP, CLS, FCP, and TTFB. It uses Google's [`web-vitals`](https://github.com/GoogleChrome/web-vitals) library. The Overview page shows each metric as a percentile (P90 by default; P50, P75 and P99 available), its trend over time, and a breakdown by page, device, and country.
 
 Web vitals are off until you pass the library (SDK 1.42.0+, `web-vitals` 5 or later). The SDK does not bundle it, so apps that do not use web vitals do not load it.
 
@@ -551,7 +551,22 @@ const analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
 });
 ```
 
-```html HTML snippet (unpkg + SRI)
+```tsx Next.js
+'use client'; // import web-vitals in the client component that builds options
+
+import { FormoAnalyticsProvider } from '@formo/analytics';
+import * as webVitals from 'web-vitals';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>" options={{ webVitals }}>
+      {children}
+    </FormoAnalyticsProvider>
+  );
+}
+```
+
+```html HTML snippet
 <script
   src="https://unpkg.com/web-vitals@6.2.2/dist/web-vitals.iife.js"
   integrity="sha384-sKh//42d8+X4ztiyB4ChMShr0tmbWDWrkHfy9pLz9napB81dM74xVylUQVmZ94PE"
@@ -564,30 +579,7 @@ const analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
 ></script>
 ```
 
-```html HTML snippet (self-hosted)
-<!-- Serve web-vitals.iife.js from your own domain (copy it from
-     node_modules/web-vitals/dist/ or the npm package). -->
-<script src="/js/web-vitals.iife.js" defer></script>
-<script
-  src="https://cdn.formo.so/analytics@latest"
-  defer onload="window.formofy('<YOUR_WRITE_KEY>', { webVitals: window.webVitals });"
-></script>
-```
-
 </CodeGroup>
-
-The HTML snippets replace the [HTML snippet](#html-snippet) above. Deferred scripts run in order, so `window.webVitals` is ready when the SDK's `onload` calls `formofy`.
-
-- **Self-hosting is the most reliable option.** Google does not run a CDN for `web-vitals`; its README uses unpkg as an example and recommends serving the file yourself.
-- **From unpkg, always pin an exact version with its `integrity` hash** (see [Subresource Integrity](/security/sri)). The hash above is for 6.2.2; if you change the version, use the new file's hash.
-
-With `FormoAnalyticsProvider`, pass it the same way: `options={{ webVitals }}`. In Next.js, import `web-vitals` in the `"use client"` component that builds `options`: a Server Component such as `app/layout.tsx` cannot pass the library to a Client Component. Next's own `next/web-vitals` only provides a hook, so install `web-vitals` itself. Consent and [tracking exclusions](#environments) apply as for other events.
-
-A few things to know:
-
-- Browser support differs by metric and version. Chromium browsers report all five; other browsers may report fewer. A metric the browser cannot measure is left out.
-- A single-page app sends one report per full page load. Route changes after the load are not measured on their own, and CLS and INP cover the whole visit, as in Google's Chrome UX Report.
-- A return to the page from the back/forward cache is not reported again.
 
 ### Batching
 
