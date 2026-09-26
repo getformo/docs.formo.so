@@ -551,9 +551,9 @@ const analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
 });
 ```
 
-```html HTML snippet
+```html HTML snippet (unpkg + SRI)
 <script
-  src="https://cdn.jsdelivr.net/npm/web-vitals@6.2.2/dist/web-vitals.iife.js"
+  src="https://unpkg.com/web-vitals@6.2.2/dist/web-vitals.iife.js"
   integrity="sha384-sKh//42d8+X4ztiyB4ChMShr0tmbWDWrkHfy9pLz9napB81dM74xVylUQVmZ94PE"
   crossorigin="anonymous"
   defer
@@ -564,9 +564,24 @@ const analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
 ></script>
 ```
 
+```html HTML snippet (self-hosted)
+<!-- Serve web-vitals.iife.js from your own domain (copy it from
+     node_modules/web-vitals/dist/ or the npm package). -->
+<script src="/js/web-vitals.iife.js" defer></script>
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer onload="window.formofy('<YOUR_WRITE_KEY>', { webVitals: window.webVitals });"
+></script>
+```
+
 </CodeGroup>
 
-This replaces the [HTML snippet](#html-snippet) above. Deferred scripts run in order, so `window.webVitals` is ready when the SDK's `onload` calls `formofy`. Pin an exact `web-vitals` version with its `integrity` hash (see [Subresource Integrity](/security/sri)); the hash above is for 6.2.2. With `FormoAnalyticsProvider`, pass it the same way: `options={{ webVitals }}`. Consent and [tracking exclusions](#environments) apply as for other events.
+The HTML snippets replace the [HTML snippet](#html-snippet) above. Deferred scripts run in order, so `window.webVitals` is ready when the SDK's `onload` calls `formofy`.
+
+- **Self-hosting is the most reliable option.** Google does not run a CDN for `web-vitals`; its README uses unpkg as an example and recommends serving the file yourself.
+- **From unpkg, always pin an exact version with its `integrity` hash** (see [Subresource Integrity](/security/sri)). The hash above is for 6.2.2; if you change the version, use the new file's hash.
+
+With `FormoAnalyticsProvider`, pass it the same way: `options={{ webVitals }}`. In Next.js, import `web-vitals` in the `"use client"` component that builds `options`: a Server Component such as `app/layout.tsx` cannot pass the library to a Client Component. Next's own `next/web-vitals` only provides a hook, so install `web-vitals` itself. Consent and [tracking exclusions](#environments) apply as for other events.
 
 A few things to know:
 
