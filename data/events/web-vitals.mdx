@@ -3,7 +3,7 @@ title: 'Web vitals event'
 description: 'Reference for the web_vitals event the web SDK can send once per page load, with the Core Web Vitals (LCP, INP, CLS, FCP, TTFB) measured from real visitors.'
 ---
 
-The `web_vitals` event records how fast and stable a page load was for a real visitor. When you turn on [web vitals](/sdks/web#web-vitals), the web SDK sends it once per page load, when the visitor first leaves or hides the page. At that point the layout shift and responsiveness values are final for most visits.
+The `web_vitals` event records the [Core Web Vitals](https://web.dev/articles/vitals) of a page load: how fast and stable it was for a real visitor. When you turn on [web vitals](/sdks/web#web-vitals), the web SDK sends it once per page load, when the visitor first leaves or hides the page. At that point the layout shift and responsiveness values are final for most visits.
 
 It is a technical event: it is not counted as visitor activity, and it does not show in the Activity feed, Live view, or a user's last event.
 
@@ -22,7 +22,7 @@ A metric is left out when it was not measured. For example, some browsers do not
 
 ## Thresholds
 
-Formo rates each value with Google's thresholds, and the dashboard reports the 75th percentile (p75) of all page loads.
+Formo rates each value with [Google's thresholds](https://web.dev/articles/vitals). Google rates a page on the 75th percentile (p75) of its page loads; the dashboard shows the 90th percentile by default, and you can pick p50, p75, p90, or p99. Choose p75 to match Google Search Console.
 
 | Metric | Good | Needs improvement | Poor |
 |:-------|:-----|:------------------|:-----|

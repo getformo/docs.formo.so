@@ -536,7 +536,7 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 
 ### Web vitals
 
-The SDK can measure the [Core Web Vitals](/data/events/web-vitals) of each page load from real visitors: LCP, INP, CLS, FCP, and TTFB. It uses Google's [`web-vitals`](https://github.com/GoogleChrome/web-vitals) library, which you pass in, and sends one `web_vitals` event per page load when the visitor first leaves or hides the page. The Overview dashboard shows the 75th percentile of each metric and the slowest pages.
+The SDK can measure the [Core Web Vitals](https://web.dev/articles/vitals) of each page load from real visitors: LCP, INP, CLS, FCP, and TTFB. It uses Google's [`web-vitals`](https://github.com/GoogleChrome/web-vitals) library, which you pass in, and sends one [`web_vitals` event](/data/events/web-vitals) per page load when the visitor first leaves or hides the page. The Overview dashboard shows each metric as a percentile (P90 by default; P50, P75 and P99 available), its trend over time, and a breakdown by page, device, and country.
 
 Web vitals are off until you pass the library (SDK 1.42.0+, `web-vitals` 5 or later). The SDK does not bundle it, so apps that do not use web vitals do not load it.
 
