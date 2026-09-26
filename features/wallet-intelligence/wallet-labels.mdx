@@ -70,7 +70,7 @@ Rules that apply to every label below:
 
 | Label | Description |
 |-------|-------------|
-| **Merkl Campaigns** | Tracks rewards earned in [Merkl](https://merkl.xyz) incentive programs. Merkl calls a program an *opportunity*, and each reward period of it a *campaign*. For each program, Formo stores the opportunity ID, the program name and protocol, how many of its campaigns the wallet earned from, and the total reward value in USD at the token price when the wallet was profiled. Programs stay on the wallet after Merkl stops listing them. Filter users by an opportunity ID, or leave the ID blank to find users in any Merkl program. |
+| **Merkl Campaigns** | Tracks rewards earned in [Merkl](https://merkl.xyz) incentive programs. Merkl calls a program an *opportunity*, and each reward period of it a *campaign*. For each program, Formo stores the opportunity ID, the program name and protocol, each campaign the wallet earned from, and the reward value in USD at the token price when the wallet was profiled. Programs and campaigns stay on the wallet after Merkl stops listing them. Filter users by an opportunity ID or a campaign ID, or leave the ID blank to find users in any Merkl program. |
 | **ERC-8004 AI Agent** | Automatically detects wallets registered as AI agents via the [ERC-8004](https://erc8004.org) standard. Formo queries onchain registries across 11 chains to identify agent wallets (agent discovery runs via subgraph on 5 of them; the rest are used for RPC and reputation lookups once an agent is found) and surfaces the agent name, ID, and reputation score on the wallet profile. |
 
 ---
