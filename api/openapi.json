@@ -1463,7 +1463,8 @@
               "track",
               "decoded_log",
               "detect",
-              "identify"
+              "identify",
+              "web_vitals"
             ]
           },
           "channel": {

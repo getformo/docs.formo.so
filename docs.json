@@ -133,6 +133,7 @@
                   "data/events/chain",
                   "data/events/signature",
                   "data/events/transaction",
+                  "data/events/web-vitals",
                   "data/events/common"
                 ]
               }

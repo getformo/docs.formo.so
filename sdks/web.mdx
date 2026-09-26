@@ -534,6 +534,53 @@ const analytics = await FormoAnalytics.init('YOUR_API_KEY', {
 });
 ```
 
+### Web vitals
+
+The Web SDK can measure the [Core Web Vitals](https://web.dev/articles/vitals) from real visitors: LCP, INP, CLS, FCP, and TTFB. It uses Google's [`web-vitals`](https://github.com/GoogleChrome/web-vitals) library. The Overview page shows each metric as a percentile (P90 by default; P50, P75 and P99 available), its trend over time, and a breakdown by page, device, and country.
+
+Web vitals are off until you pass the library (SDK 1.42.0+, `web-vitals` 5 or later). The SDK does not bundle it, so apps that do not use web vitals do not load it.
+
+<CodeGroup>
+
+```javascript npm
+// npm install web-vitals
+import * as webVitals from 'web-vitals';
+
+const analytics = await FormoAnalytics.init('<YOUR_WRITE_KEY>', {
+  webVitals
+});
+```
+
+```tsx Next.js
+'use client'; // import web-vitals in the client component that builds options
+
+import { FormoAnalyticsProvider } from '@formo/analytics';
+import * as webVitals from 'web-vitals';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <FormoAnalyticsProvider writeKey="<YOUR_WRITE_KEY>" options={{ webVitals }}>
+      {children}
+    </FormoAnalyticsProvider>
+  );
+}
+```
+
+```html HTML snippet
+<script
+  src="https://unpkg.com/web-vitals@6.2.2/dist/web-vitals.iife.js"
+  integrity="sha384-sKh//42d8+X4ztiyB4ChMShr0tmbWDWrkHfy9pLz9napB81dM74xVylUQVmZ94PE"
+  crossorigin="anonymous"
+  defer
+></script>
+<script
+  src="https://cdn.formo.so/analytics@latest"
+  defer onload="window.formofy('<YOUR_WRITE_KEY>', { webVitals: window.webVitals });"
+></script>
+```
+
+</CodeGroup>
+
 ### Batching
 
 To support high-performance environments, the SDK sends events in batches. 
