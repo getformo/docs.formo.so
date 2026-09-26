@@ -689,7 +689,9 @@ window.formo.optInTracking();
 
 Session replay records what visitors see and do on your app, so you can watch a session back from a user's profile. The SDK records the page with [rrweb](https://www.rrweb.io/) and sends the recording in small compressed chunks. Replay is off by default.
 
-For browser installations, turn it on with `replay: true`. The SDK then loads the rrweb recorder from jsDelivr, pinned to one version and checked with subresource integrity:
+The recorder is not part of the main SDK file, so sites that do not use replay do not download it.
+
+For browser installations, turn it on with `replay: true`. The SDK then loads its replay file (about 26 KB) only when recording starts. It comes from jsDelivr, or from unpkg if jsDelivr fails, is pinned to your SDK version, and is checked with subresource integrity:
 
 ```html
 <script
@@ -699,27 +701,30 @@ For browser installations, turn it on with `replay: true`. The SDK then loads th
 ></script>
 ```
 
-For npm installations, install `@rrweb/record` and pass its `record` function. The recorder is then bundled with your app and no script is loaded at runtime:
+For npm installations, install `@rrweb/record` and use `replay()` from `@formo/analytics/replay`. The recorder is then bundled with your app and no script is loaded at runtime. Apps that do not import `@formo/analytics/replay` do not include any replay code:
 
 ```tsx
 import { record } from '@rrweb/record';
+import { replay } from '@formo/analytics/replay';
 
 <FormoAnalyticsProvider
     writeKey={WRITE_KEY}
     options={{
-        replay: {
+        replay: replay({
             record,
             sampleRate: 0.5, // record half of the tabs (default: 1)
-        },
+        }),
     }}
 >
 ```
 
+You can also pass `replay: true` from npm. The SDK then loads the replay file from the CDN, as for browser installations.
+
 | Option | Default | Description |
 |---|---|---|
 | `sampleRate` | `1` | Share of browser tabs to record, from 0 to 1. |
-| `record` | | rrweb's `record` function from `@rrweb/record`. |
-| `scriptUrl` | pinned jsDelivr URL | Load the recorder from your own origin instead. |
+| `record` | | rrweb's `record` function, passed to `replay()` from `@formo/analytics/replay`. |
+| `scriptUrl` | jsDelivr, then unpkg | Load the replay file (`dist/replay.umd.min.js` from the npm package) from your own origin instead. |
 | `maskAllInputs` | `true` | Mask the value of every input, textarea and select. |
 | `maskTextSelector` | | CSS selector whose text is masked. |
 | `blockSelector` | | CSS selector whose elements are not recorded. |
@@ -735,7 +740,7 @@ Canvas and fonts are not recorded. The page URL in a recording follows the same 
 
 **Sessions.** Each browser tab records its own replay. A replay continues across page loads in the same tab, and a new one starts after 30 minutes without input, or when you call `reset()`. While a replay is recording, every event carries its `replay_id`, so you can jump from an event to the moment it happened.
 
-**Content security policy.** If your site sets a CSP and you use the CDN recorder, allow `https://cdn.jsdelivr.net` in `script-src`, or host the file yourself with `scriptUrl`. Replay chunks go to the same endpoint as your events, so the [proxy](#proxy) setup applies to them too.
+**Content security policy.** If your site sets a CSP and loads the replay file from the CDN, allow `https://cdn.jsdelivr.net` and `https://unpkg.com` in `script-src`, or host the file yourself with `scriptUrl`. Replay chunks go to the same endpoint as your events, so the [proxy](#proxy) setup applies to them too.
 
 ### Cross subdomain tracking
 
