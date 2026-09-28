@@ -5,7 +5,7 @@ icon: terminal
 description: "Query wallet profiles, run SQL analytics, manage dashboards, alerts, contracts, segments, and more - directly from your terminal or via AI agents."
 ---
 
-The Formo CLI (`@formo/cli`) gives you full access to the Formo API from the command line. Use it interactively in your terminal, in shell scripts, or as a tool for AI agents.
+The Formo CLI (`@formo/cli`) provides access to Formo analytics and API resources from the command line. Use it interactively in your terminal, in shell scripts, or as a tool for AI agents.
 
 <CardGroup cols={2}>
   <Card title="Profiles" icon="user" href="/cli/profiles">
@@ -191,7 +191,7 @@ By default, commands print compact, human-readable TOON output. Pass one of the 
 |------|-------------|
 | `--format <toon\|json\|yaml\|md\|jsonl>` | Output format (default: `toon`) |
 | `--json` | Shorthand for `--format json` |
-| `--verbose` | Include the full response envelope (`ok`, `data`, `meta`) |
+| `--full-output` | Include the full response envelope (`ok`, `data`, `meta`) |
 | `--filter-output <keys>` | Filter output by key paths (e.g. `data,meta.duration`) |
 
 Status messages (login confirmation, errors, and similar) are written to stderr in interactive terminals, so they never pollute piped output.
@@ -233,8 +233,14 @@ The CLI is designed to work as a tool for AI agents. It includes built-in sugges
 The CLI is built with `incur`, so agents can discover and call commands through structured metadata:
 
 ```bash
-# Print an LLM-readable command manifest
+# Print a compact command manifest for discovery
 formo --llms
+
+# Print detailed command documentation, including options and examples
+formo --llms-full
+
+# Inspect one command's argument and option schema
+formo profiles search --schema
 
 # Register the CLI as an MCP server
 formo mcp add
@@ -245,3 +251,16 @@ formo --mcp
 # Sync Formo CLI skill files for compatible agents
 formo skills add
 ```
+
+`--llms` and `--llms-full` print documentation without executing API operations. Use `--llms` to find a command, then its `--help` or `--schema` output to construct a request. For scripts and agents, use `--format json` and supply `FORMO_API_KEY` through the environment. The key determines the active project and permitted scopes.
+
+### Formo Analytics skill
+
+Install the repository's analytics skill for Claude Code and Codex:
+
+```bash
+npx skills add getformo/cli --skill formo-analytics --global \
+  --agent claude-code --agent codex
+```
+
+The skill explains when to use the CLI, REST API, or [hosted Formo MCP](/mcp/overview). The hosted MCP additionally provides live schema and endpoint discovery, documentation search, natural-language SQL, and tools such as `project_users`, `distinct_values`, `cohort_analysis`, and `web_vitals`. These MCP-only endpoints are not CLI analytics subcommands or public REST pipe routes.

@@ -194,7 +194,7 @@ formo profiles update 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
 ```
 
 <Note>
-A deleted property reads as `null` everywhere, including over any globally-enriched fallback value, until a new value is set. `user_id` cannot be unset (it participates in identity stitching).
+`--unset` takes precedence when the same key also appears in `--properties`. A deleted property reads as `null` everywhere, including over any globally-enriched fallback value and in historical snapshot reads, until a new value is set. A deleted `location` falls back to device geo. `user_id` cannot be unset (it participates in identity stitching).
 </Note>
 
 ---

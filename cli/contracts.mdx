@@ -59,7 +59,7 @@ Requires `contracts:write` scope on your API key.
 | `--name` | `string` | ✅ | Human-readable contract name |
 | `--abi` | `string` | ✅ | Contract ABI as a JSON array string |
 | `--events` | `string` | ✅ | JSON array of ABI event objects to monitor, max 10 |
-| `--start-block` | `number` | ❌ | Optional start block |
+| `--start-block` | `number` | ❌ | Starting block number saved on the contract. Historical backfill is not supported. |
 | `--include-in-pipeline` | `boolean` | ❌ | Deploy this contract to the events pipeline. Omit for decode-only (the default). |
 
 <Note>
@@ -82,7 +82,7 @@ formo contracts create \
 ```
 
 <Note>
-`--abi` is sent to the API as an ABI JSON string. `--events` is sent as an array of ABI event objects.
+`--abi` is sent to the API as an ABI JSON string. `--events` is sent as an array of ABI event objects. `--start-block` must be a non-negative safe integer. The events pipeline opens sources at the chain head; recording a start block does not request historical backfill.
 </Note>
 
 ---
@@ -102,7 +102,7 @@ Requires `contracts:write` scope on your API key.
 | `--name` | `string` | ✅ | Updated contract name |
 | `--abi` | `string` | ✅ | Updated ABI as a JSON array string |
 | `--events` | `string` | ✅ | Updated JSON array of ABI event objects to monitor |
-| `--start-block` | `number` | ❌ | Optional start block |
+| `--start-block` | `number` | ❌ | Starting block number saved on the contract. Historical backfill is not supported. |
 | `--include-in-pipeline` | `boolean` | ❌ | Deploy this contract to the events pipeline. Omit to keep the stored setting. |
 
 <Note>
