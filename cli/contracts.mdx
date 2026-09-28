@@ -59,7 +59,7 @@ Requires `contracts:write` scope on your API key.
 | `--name` | `string` | ✅ | Human-readable contract name |
 | `--abi` | `string` | ✅ | Contract ABI as a JSON array string |
 | `--events` | `string` | ✅ | JSON array of ABI event objects to monitor, max 10 |
-| `--start-block` | `number` | ❌ | Non-negative safe integer recorded on the contract; does not backfill historical events |
+| `--start-block` | `number` | ❌ | Starting block number saved on the contract. Historical backfill is not supported. |
 | `--include-in-pipeline` | `boolean` | ❌ | Deploy this contract to the events pipeline. Omit for decode-only (the default). |
 
 <Note>
@@ -102,7 +102,7 @@ Requires `contracts:write` scope on your API key.
 | `--name` | `string` | ✅ | Updated contract name |
 | `--abi` | `string` | ✅ | Updated ABI as a JSON array string |
 | `--events` | `string` | ✅ | Updated JSON array of ABI event objects to monitor |
-| `--start-block` | `number` | ❌ | Non-negative safe integer recorded on the contract; does not backfill historical events |
+| `--start-block` | `number` | ❌ | Starting block number saved on the contract. Historical backfill is not supported. |
 | `--include-in-pipeline` | `boolean` | ❌ | Deploy this contract to the events pipeline. Omit to keep the stored setting. |
 
 <Note>
