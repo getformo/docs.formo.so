@@ -23,7 +23,7 @@ Bulk import wallet addresses into the project.
 | `--rows` | `string` | ❌ | JSON array of `{address, properties?}` objects for imports with profile properties |
 | `--write-key` | `string` | ❌ | Deprecated and ignored; import now uses the project write key server-side |
 
-Provide either `--addresses` or `--rows`.
+Provide exactly one of `--addresses` or `--rows`, with a non-empty array. The CLI rejects empty imports locally. When using `--rows`, it derives the required API `addresses` array from those rows.
 
 ### Examples
 

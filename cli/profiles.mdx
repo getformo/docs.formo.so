@@ -74,7 +74,7 @@ Requires `profiles:read` scope on your API key.
 | `--filters` | `string` | ❌ | JSON array of canonical `{field, op, value}` filter objects |
 | `--logic` | `enum` | ❌ | Combine filters with `and` or `or` |
 
-The lifecycle threshold options listed above are also supported.
+The lifecycle threshold options listed above are also supported. Resource qualifiers (`chain_id`, `app_id`, `token_address`, `scope`, `tag_id`) must be non-empty strings; missing required qualifiers and qualifiers invalid for the selected field are rejected locally.
 
 ### `--order-by` Values
 
@@ -194,7 +194,7 @@ formo profiles update 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 \
 ```
 
 <Note>
-A deleted property reads as `null` everywhere, including over any globally-enriched fallback value, until a new value is set. `user_id` cannot be unset (it participates in identity stitching).
+`--unset` takes precedence when the same key also appears in `--properties`. A deleted property reads as `null` everywhere, including over any globally-enriched fallback value and in historical snapshot reads, until a new value is set. `user_id` cannot be unset (it participates in identity stitching).
 </Note>
 
 ---

@@ -98,7 +98,7 @@ Requires `boards:write` scope on your API key.
 | `--y-axis` | `string` | ❌ | Comma-separated or JSON array of y-axis columns |
 | `--group-by` | `string` | ❌ | Column used to group or stack series |
 | `--steps` | `string` | ❌ | JSON array of funnel step objects |
-| `--settings` | `string` | ❌ | JSON chart settings. User Paths require `anchors`; retention requires an `entryFilter` key. |
+| `--settings` | `string` | ❌ | JSON chart settings. User Paths require `anchors` and accept `maxSteps` and `nodesPerStep` (2–100, default 20; less frequent events are grouped as Others); retention requires an `entryFilter` key. |
 
 Provide either `--body` or typed chart fields such as `--title`, `--chart-type`, and `--query`.
 

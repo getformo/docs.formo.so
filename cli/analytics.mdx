@@ -54,7 +54,21 @@ Requires `query:read` scope on your API key.
 
 A JSON array of `{ field, op, value }` filters, e.g. `[{"field":"location","op":"eq","value":"US"}]`. For multi-value matching, use `in` / `nin` with an array value (e.g. `["chrome","firefox"]`); pipe-delimited strings remain supported by the analytics query boundary.
 
-This one array carries every predicate. On the user-aggregate pipes (`lifecycle`, `frequency`) it also takes profile metrics, social identity fields, a lifecycle entry (`{"field":"lifecycle","op":"in","value":["New","Power user"]}`), and resource entries using the stable fields `chains.balance`, `apps.balance`, `tokens.balance` and `labels.value` with named qualifiers (`chain_id`, `app_id`, `token_address`, `scope`, `tag_id`).
+Use this array for event and user-attribute predicates. On the user-aggregate pipes (`lifecycle`, `frequency`) it also takes profile metrics, social identity fields, a lifecycle entry (`{"field":"lifecycle","op":"in","value":["New","Power user"]}`), and resource entries using the stable fields `chains.balance`, `apps.balance`, `tokens.balance` and `labels.value` with named qualifiers (`chain_id`, `app_id`, `token_address`, `scope`, `tag_id`). Qualifiers must be non-empty strings; the CLI validates required and forbidden qualifiers before sending the request.
+
+```bash
+formo analytics lifecycle \
+  --filters '[{"field":"chains.balance","op":"gt","value":1000,"chain_id":"1"}]'
+```
+
+On `lifecycle` and `frequency`, either-touch attribution filters can use a `fields` pair instead of `field`. Supply exactly two non-empty column names and only one selector:
+
+```bash
+formo analytics lifecycle \
+  --filters '[{"fields":["first_utm_source","last_utm_source"],"op":"eq","value":"twitter"}]'
+```
+
+Overview Data source filters use `field: "channel"` with `web`, `mobile`, `api`, `import`, `server`, or `onchain`. Acquisition channel uses `channel_type`. User-aggregate source filters use `source_filter` through `--params` with `field: "source"`.
 
 <Warning>
 The retired per-family params — `socials`, `chain_filters`, `app_filters`, `token_filters`, `label_filters`, `profile_filters`, `lifecycle_filter` — are rejected with a `400` if passed through `--params`. Forwarding them would silently drop the predicate and broaden the result set, so the API fails loud instead. Send a canonical entry in `--filters`.
@@ -68,15 +82,32 @@ Some pipes take additional, pipe-specific parameters. Pass them as a JSON object
 |------|------------|
 | `kpis` | `group_by`, `include_previous_period` |
 | `revenue_overview` | `group_by`, `rank_by`, `include_previous_period` |
-| `funnel` | `steps` (required, a JSON array of `{type,event,name,filters?}`), `window_seconds`, `funnel_type`, `group_by`, `limit`, `attribution` |
+| `funnel` | `steps` (required, a JSON array of `{type,event,name,filters?,events?}`), `window_seconds`, `funnel_type`, `group_by`, `limit`, `attribution` |
 | `flow` | `start_step` (required, a JSON `{type,event,resolved_event,...}`), `end_step`, `global_filters`, `window_seconds`, `max_steps` |
-| `retention` | `id_type`, `event_type`, `event_name`, `min_users` |
+| `retention` | `retention_type` (`rolling` by default or `recurring`), `id_type`, `event_type`, `event_name`, `min_users` |
 | `revenue_timeseries` | `address` (required) |
 | `revenue_by_metric`, `volume_by_metric`, `top_sources` | `metric_column`, `limit`, `offset` |
 | `top_chains`, `top_events`, `top_locations`, `top_pages`, `top_wallets` | `limit`, `offset` |
 | `kpis`, `top_*`, `revenue_*`, `volume_by_metric` | `page_scope` — `page` (default) or `session` |
 
 `page_scope` only affects requests that carry a `page` filter. The default scopes metrics to activity on that page; `session` restores the legacy behaviour where metrics include all activity in any session that viewed the page.
+
+### Funnel OR groups
+
+A funnel step can include `events` to match alternatives with OR logic. The executable group can contain at most 10 events in total, including the primary `type`/`event`, which is always included. Step-level `filters` apply to the whole group; each alternative's `filters` apply only to that member. This feature applies to funnel steps, rather than user-path anchors or retention entry filters.
+
+```bash
+formo analytics funnel \
+  --params '{"steps":[{"type":"track","event":"Swap","name":"trade","events":[{"type":"track","event":"Limit Order","filters":[{"field":"amount","op":"gte","value":100}]}]},{"type":"track","event":"Complete","name":"complete"}]}'
+```
+
+### Rolling and recurring retention
+
+Rolling retention counts cohort members active in week N or any later week. Recurring retention counts members active in exactly week N. Rolling is the default; select recurring explicitly:
+
+```bash
+formo analytics retention --params '{"retention_type":"recurring"}'
+```
 
 ### Examples
 
