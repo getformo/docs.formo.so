@@ -82,7 +82,7 @@ formo contracts create \
 ```
 
 <Note>
-`--abi` is sent to the API as an ABI JSON string. `--events` is sent as an array of ABI event objects. `--start-block` is validated locally and must be between `0` and `9007199254740991`. The events pipeline opens sources at the chain head; recording a start block does not request historical backfill.
+`--abi` is sent to the API as an ABI JSON string. `--events` is sent as an array of ABI event objects. `--start-block` must be a non-negative safe integer. The events pipeline opens sources at the chain head; recording a start block does not request historical backfill.
 </Note>
 
 ---
