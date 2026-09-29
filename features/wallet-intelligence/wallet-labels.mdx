@@ -64,7 +64,6 @@ Rules that apply to every label below:
 | **RWA Holder** | Holds at least $100 in tokenised real-world assets: tokenised gold (PAXG, XAUt), treasury and cash notes (USDY, OUSG, BUIDL, Midas), tokenised stocks (xStocks, Backed), private credit pools (Maple, Goldfinch, Centrifuge), carbon or real estate. | Position USD |
 | **Bridge User** | Has used a bridge or bridge aggregator such as Stargate, Across, Hop, LI.FI or Relay, detected from transaction history or a bridge liquidity position. | Bridges used, for example "Stargate, Across" |
 | **Aggregator User** | Has swapped through a swap aggregator such as KyberSwap, 1inch, Paraswap, CoW, detected from transaction history. | Aggregators used, for example "KyberSwap, 1inch" |
-| **Prediction Market User** | Has a Polymarket account, or holds a position in another onchain prediction market. | Open position USD |
 
 ### Others
 
@@ -86,7 +85,7 @@ Formo automatically analyzes each wallet's onchain activity and assigns relevant
 **Label sources:**
 - **Lifecycle** - Engagement stage derived from each wallet's recency and active days
 - **Attestations** - Verified credentials from Coinbase, Binance, Human Passport, and OFAC sanction lists
-- **Behavioural labels** - What the wallet currently does onchain: lending, borrowing, liquidity provision, staking, perps, options, basis trading, real-world assets, bridges, aggregators and prediction markets
+- **Behavioural labels** - What the wallet currently does onchain: lending, borrowing, liquidity provision, staking, perps, options, basis trading, real-world assets, bridges and aggregators
 - **Sybil lists** - Membership in published airdrop sybil / farmer lists (LayerZero, Hop, Optimism)
 - **Campaigns** - Participation in incentive campaigns such as Merkl
 - **Onchain registries** - Standards such as ERC-8004 that identify AI agent wallets
