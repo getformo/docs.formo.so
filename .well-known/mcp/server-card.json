@@ -10,5 +10,5 @@
   "remotes": [
     { "url": "https://api.formo.so/v0/mcp", "transport": "http", "supportedProtocolVersions": ["2025-06-18"] }
   ],
-  "capabilities": { "tools": true, "resources": false, "prompts": false }
+  "capabilities": { "tools": true, "resources": true, "prompts": false }
 }
