@@ -174,18 +174,29 @@ Automatically track all screen transitions:
 ```tsx
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { useFormo } from '@formo/analytics-react-native';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function App() {
   const analytics = useFormo();
   const navigationRef = useNavigationContainerRef();
   const routeNameRef = useRef<string>();
+  const [navigationReady, setNavigationReady] = useState(false);
+
+  // Track the first screen. onStateChange does not fire for the initial
+  // route, and calls made before the SDK finishes initializing are dropped,
+  // so this re-runs once `analytics` changes to the initialized SDK.
+  useEffect(() => {
+    if (!navigationReady) return;
+    const initialRouteName = navigationRef.getCurrentRoute()?.name;
+    if (initialRouteName) analytics.screen(initialRouteName);
+  }, [navigationReady, analytics]);
 
   return (
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
         routeNameRef.current = navigationRef.getCurrentRoute()?.name;
+        setNavigationReady(true);
       }}
       onStateChange={() => {
         const previousRouteName = routeNameRef.current;
@@ -314,39 +325,23 @@ formo.track('Swap Executed', {
 
 ## Deep link attribution
 
-Parse UTM parameters and referral codes from deep links:
-
-```tsx
-import { Linking } from 'react-native';
-import { useFormo } from '@formo/analytics-react-native';
-import { useEffect } from 'react';
-
-function App() {
-  const formo = useFormo();
-
-  useEffect(() => {
-    // Handle initial deep link (app opened via link)
-    Linking.getInitialURL().then((url) => {
-      if (url) formo.setTrafficSourceFromUrl(url);
-    });
-
-    // Handle deep links while app is open
-    const subscription = Linking.addEventListener('url', (event) => {
-      formo.setTrafficSourceFromUrl(event.url);
-    });
-
-    return () => subscription.remove();
-  }, [formo]);
-
-  return <YourApp />;
-}
-```
-
-The SDK automatically extracts and stores:
+The SDK captures deep links automatically. On startup it reads the URL the app was opened with, and it listens for links that arrive while the app is running. For each link it records a [`Deep Link Opened`](#mobile-lifecycle-events) event and stores these parameters as the traffic source for the events that follow:
 - UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`)
 - Referral codes (`ref`, `referral`, `refcode`, `referrer_code`)
 
-Example deep link: `myapp://home?utm_source=twitter&utm_campaign=launch&ref=friend123`
+No extra code is needed. Put the parameters in your campaign links, for example: `myapp://home?utm_source=twitter&utm_campaign=launch&ref=friend123`
+
+Parameters merge field by field: a later link without UTM parameters, such as `myapp://home`, does not erase the attribution that an earlier link stored. To turn capture off, see [Attribution](#attribution) and [Autocapture](#autocapture).
+
+### Set the traffic source manually
+
+If you receive links outside React Native's `Linking` API, for example from a push notification payload or a third-party deep linking SDK, pass the URL to `setTrafficSourceFromUrl()`:
+
+```tsx
+const formo = useFormo();
+
+formo.setTrafficSourceFromUrl('myapp://home?utm_source=push&utm_campaign=winback');
+```
 
 ## Web-to-mobile attribution
 
@@ -665,18 +660,19 @@ The SDK assigns a `session_id` to every event. A session groups one user's burst
 | Session start | The first event after install, or the first event after a session expires. |
 | Session timeout | 30 minutes of inactivity. The next event after that starts a new session. |
 | Persistence | A session survives app restarts; it expires on inactivity, not on close. |
-| Reset | `reset()` ends the current session and starts a new one. |
+| Reset | `reset()` keeps the current session. `optOutTracking()` ends it and clears the device identity. |
 
 <Note>
 This differs from the web SDK, where `session_id` is derived server-side as a daily-changing value. That derivation relies on the request's origin, IP and browser user agent (signals a native app does not provide meaningfully), so the mobile SDK supplies its own session instead.
 </Note>
 
-Reset the current user session:
+Call `reset()` when a user logs out:
 
 ```tsx
 const formo = useFormo();
 
-// Clear the user and wallet identity, then start a new session.
+// Clear the user and wallet identity. The device identity, the session
+// and the stored attribution are kept.
 formo.reset();
 ```
 
