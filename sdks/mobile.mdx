@@ -174,21 +174,29 @@ Automatically track all screen transitions:
 ```tsx
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { useFormo } from '@formo/analytics-react-native';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function App() {
   const analytics = useFormo();
   const navigationRef = useNavigationContainerRef();
   const routeNameRef = useRef<string>();
+  const [navigationReady, setNavigationReady] = useState(false);
+
+  // Track the first screen. onStateChange does not fire for the initial
+  // route, and calls made before the SDK finishes initializing are dropped,
+  // so this re-runs once `analytics` changes to the initialized SDK.
+  useEffect(() => {
+    if (!navigationReady) return;
+    const initialRouteName = navigationRef.getCurrentRoute()?.name;
+    if (initialRouteName) analytics.screen(initialRouteName);
+  }, [navigationReady, analytics]);
 
   return (
     <NavigationContainer
       ref={navigationRef}
       onReady={() => {
-        // onStateChange does not fire for the initial route, so track it here
-        const initialRouteName = navigationRef.getCurrentRoute()?.name;
-        if (initialRouteName) analytics.screen(initialRouteName);
-        routeNameRef.current = initialRouteName;
+        routeNameRef.current = navigationRef.getCurrentRoute()?.name;
+        setNavigationReady(true);
       }}
       onStateChange={() => {
         const previousRouteName = routeNameRef.current;
@@ -664,7 +672,7 @@ Call `reset()` when a user logs out:
 const formo = useFormo();
 
 // Clear the user and wallet identity. The device identity, the session
-// and the stored attribution are kept, the same as in the web SDK.
+// and the stored attribution are kept.
 formo.reset();
 ```
 
