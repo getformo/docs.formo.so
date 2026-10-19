@@ -1,0 +1,70 @@
+---
+title: 'Web vitals'
+description: 'Measure page speed and stability from real visitors with web vitals (LCP, INP, CLS, FCP, TTFB) on the Overview page.'
+---
+
+Web vitals show how fast and stable your app is for real visitors. The web SDK measures five web vitals on each page load: the three [Core Web Vitals](https://web.dev/articles/vitals) (LCP, INP, CLS), plus FCP and TTFB. The **Web Vitals** card on the Overview page shows them by percentile, over time, and by page, device, and country.
+
+Use web vitals to:
+
+- **Find slow landing pages** that lose visitors before they connect a wallet
+- **Catch regressions** after a release, with the trend and the previous period comparison
+- **Compare devices and countries**, for example mobile against desktop
+
+## Set up web vitals
+
+Web vitals are off by default. Turn them on in the web SDK: pass Google's [`web-vitals`](https://github.com/GoogleChrome/web-vitals) library to the SDK (SDK 1.42.0 or later). See [Web SDK: Web vitals](/sdks/web#web-vitals) for the npm, Next.js, and HTML snippet setup.
+
+<Note>
+The Web Vitals card shows on the Overview page only when there is web vitals data for the selected date range and filters. After you turn on web vitals, the card appears when the first page loads are measured. The SDK sends the measurement when a visitor leaves or hides the page, so allow a few minutes.
+</Note>
+
+## Read the Web Vitals card
+
+### Metrics and percentile
+
+The card has one tab for each metric: **LCP**, **INP**, **CLS**, **FCP**, and **TTFB**. A colored dot on each tab shows its rating: green for good, amber for needs improvement, and red for poor. See [Thresholds](/data/events/web-vitals#thresholds) for the values behind each rating.
+
+The percentile toggle sets the value on the tabs, in the headline, and in the trend: **P50**, **P75**, **P90** (default), or **P99**. P90 means that 90% of page loads were at this value or better. Google rates a page on P75, so choose P75 to match Google Search Console.
+
+### Headline, trend, and rating bar
+
+For the selected metric, the card shows:
+
+- **Headline**: the selected percentile, its rating, and the number of samples (page loads that measured the metric)
+- **Trend**: the selected percentile for each day, with the good and poor thresholds as reference lines. When the date range is a single day, the trend shows each hour.
+- **Rating bar**: the share of page loads rated good, needs improvement, and poor
+
+### Breakdown
+
+The breakdown table shows the top 50 **Pages**, **Devices**, or **Countries** for the selected metric, ranked by samples. Each row shows its samples and its P75, colored by its rating. The breakdown always uses P75, whatever percentile you select above it.
+
+### Compare with the previous period
+
+Turn on **Compare** next to the date range to see the change against the previous period of the same length:
+
+- The headline shows the change of the selected percentile.
+- Each breakdown row shows the change of its P75.
+
+For web vitals, lower is better: a fall shows in green and a rise shows in red.
+
+### Filters
+
+The Overview filters also apply to the Web Vitals card. With a page filter set to **Exact page only**, the card keeps the vitals measured on that page. With **Includes page**, it keeps the vitals from sessions that viewed that page.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why don't I see the Web Vitals card?">
+    The card shows only when there is web vitals data for the selected date range and filters. Check that the SDK has the `web-vitals` library ([setup](/sdks/web#web-vitals)), then choose a longer date range or clear the filters.
+  </Accordion>
+  <Accordion title="Why does a metric have no samples?">
+    Some browsers, such as Safari, do not report every metric. A visitor who never clicks, taps, or types on the page has no INP. A metric that was not measured is left out; it is not counted as 0.
+  </Accordion>
+  <Accordion title="Do web vitals count as visitor activity?">
+    No. Web vitals events do not count as activity, and they do not show in the Activity feed, Live view, or a user's last event. See the [web vitals event](/data/events/web-vitals) reference.
+  </Accordion>
+  <Accordion title="Can I query web vitals with SQL?">
+    Yes. Web vitals are `web_vitals` events in the `events` table. See the [example query](/data/events/web-vitals#example-query).
+  </Accordion>
+</AccordionGroup>

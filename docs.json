@@ -39,6 +39,7 @@
                   "features/product-analytics/insights",
                   "features/product-analytics/activity",
                   "features/product-analytics/live-view",
+                  "features/product-analytics/web-vitals",
                   "features/product-analytics/custom-events",
                   "features/product-analytics/contract-events",
                   "features/product-analytics/charts",
