@@ -56,26 +56,6 @@ Ask AI can:
 
 Export the results of any query into a CSV file for use elsewhere in your data stack.
 
-### Dune Integration
-
-<Warning>
-  **Request access.** Dune charts are not generally available. [Request access](/integrations/dune) before following these instructions.
-</Warning>
-
-Charts can query on-chain data from [Dune](/integrations/dune).
-
-```sql
-SELECT date_trunc('day', block_time) AS day, count(*) AS txns
-FROM dune.ethereum.transactions
-WHERE block_time > now() - interval '7' day
-GROUP BY 1
-ORDER BY 1
-```
-
-Autocomplete switches to Dune (Trino) functions and tables while you're writing a `dune` query. 
-
-Dune charts require a Dune API key set in **Project Settings → Integrations**. See [Dune integration](/integrations/dune) for setup instructions. 
-
 ## Chart types
 
 Here is the current list of supported chart types on Formo:

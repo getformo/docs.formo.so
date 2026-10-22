@@ -10,6 +10,10 @@
   "favicon": "/favicon.svg",
   "redirects": [
     {
+      "source": "/integrations/dune",
+      "destination": "/integrations/overview"
+    },
+    {
       "source": "/features/product-analytics/ads",
       "destination": "/features/attribution/ads"
     },
@@ -85,7 +89,7 @@
               {
                 "group": "Integrations",
                 "icon": "plug",
-                "pages": ["integrations/overview", "integrations/dune"]
+                "pages": ["integrations/overview"]
               },
               "chains/overview"
             ]
