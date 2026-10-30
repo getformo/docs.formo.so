@@ -43,7 +43,7 @@ Enable SRI on the browser [install](/install) snippet by updating the `src` and 
 > [Get the latest version number and integrity hash on GitHub](https://github.com/getformo/sdk/releases).
 
 <Warning>
-Do not load `analytics@latest`. That URL changes on every release, so it cannot carry an integrity hash, and the browser runs whatever the URL serves. Always pin a version with its hash. For apps that hold user funds, install the SDK from npm or serve the pinned file from your own domain.
+Do not load `analytics@latest`. That URL serves a new file on every release, so a fixed integrity hash stops matching and the script stops loading. Without a hash, the browser runs whatever the URL serves. Always pin a version with its hash. For apps that hold user funds, install the SDK from npm or serve the pinned file from your own domain.
 </Warning>
 
 The hash in the integrity attribute within the Formo install script works with SRI to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
