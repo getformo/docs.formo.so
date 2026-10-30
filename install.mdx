@@ -522,7 +522,9 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
     ```tsx
     <script
-      src="https://cdn.formo.so/analytics@latest"
+      src="https://cdn.formo.so/analytics@1.42.1"
+      integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+      crossorigin="anonymous"
       defer
       onload="
         window.formofy('<YOUR_WRITE_KEY>', {
@@ -536,7 +538,7 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
     Calling [`identify`](/data/events/identify) at the start of every session or page load links wallets to user sessions.
 
-    To improve security, enable [Subresource Integrity (SRI)](/security/sri).
+    The snippet pins one SDK version and uses [Subresource Integrity (SRI)](/security/sri), so the browser refuses to run the script if it changes. Do not replace the version with `@latest`. To update, copy the newest snippet from your project settings or from the [GitHub releases](https://github.com/getformo/sdk/releases).
 
     #### 2. Track custom events
 
