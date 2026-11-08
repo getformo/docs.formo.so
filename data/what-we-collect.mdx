@@ -139,7 +139,7 @@ When a request comes through your [reverse proxy](/sdks/web#geolocation), the ed
 
 In both cases Formo keeps only the country code. The IP address is never stored.
 
-Country is the only geographic granularity we collect: we do not derive or store region or city. Where the edge cannot resolve a country, the value falls back to `unknown`.
+Country is the only geographic granularity we collect: we do not derive or store region or city. Where no country can be resolved from the IP address, Formo keeps the country the SDK sent (the web SDK estimates it from the browser time zone), or `unknown` when there is none.
 
 <Note>
   Previously, country was inferred from the browser timezone (`Intl.DateTimeFormat().resolvedOptions().timeZone`) on the client side. Edge-based geolocation is more accurate because a single timezone can span multiple countries (for example, the UTC+7 band covers both Thailand and Vietnam). For events sent from a server-side SDK (`server`, `api`, or `import` channels), the location provided by the SDK is preserved, since the request IP belongs to your backend rather than the end user.

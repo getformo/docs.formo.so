@@ -21,7 +21,7 @@ Traditional web analytics count "active users" by sessions or page views. For cr
 
 | Metric | Traditional Analytics | Formo |
 |--------|----------------------|-----------------|
-| **Active user** | Any visitor with a session | Wallet connected OR transaction completed |
+| **Active user** | Any visitor with a session | Any event that carries a wallet address |
 | **Unique users** | Cookie-based (easily duplicated) | Wallet address (unique by design) |
 | **Engagement** | Time on page, clicks | Transactions, signatures, value moved |
 
@@ -29,9 +29,9 @@ Traditional web analytics count "active users" by sessions or page views. For cr
 
 | Metric | Definition | Why it matters |
 |--------|------------|----------------|
-| **DAU** | Unique wallets active in the last 24 hours | Daily engagement health |
-| **WAU** | Unique wallets active in the last 7 days | Weekly usage patterns |
-| **MAU** | Unique wallets active in the last 30 days | Monthly reach |
+| **DAU** | Unique wallets with any event on one UTC calendar day | Daily engagement health |
+| **WAU** | Unique wallets with any event over 7 UTC calendar days | Weekly usage patterns |
+| **MAU** | Unique wallets with any event over 30 UTC calendar days | Monthly reach |
 | **DAU/MAU ratio** | DAU divided by MAU | Stickiness (higher = more engaged) |
 | **New users** | First-time wallet connects | Growth rate |
 | **Returning users** | Wallets with multiple sessions | Retention quality |
@@ -52,8 +52,8 @@ Traditional web analytics count "active users" by sessions or page views. For cr
 </Steps>
 
 You'll see top-line metrics including:
-- **Visitors** (page views)
-- **Wallets** (connected wallets)
+- **Visitors** (unique visitors with a page view)
+- **Wallets** (unique wallet addresses with any event)
 - **Transactions** (completed transactions)
 
 ### Step 2: Adjust the date range
@@ -91,7 +91,7 @@ Build a dedicated dashboard to monitor active user metrics.
 
 <Steps>
   <Step title="Click Ask AI in the sidebar" />
-  <Step title='Type: "Show me daily unique connected wallets for the last 30 days"' />
+  <Step title='Type: "Show me daily unique wallets for the last 30 days"' />
   <Step title="Save the generated chart to your dashboard" />
   <Step title="Or, click Add Chart to add a visualization yourself with SQL" />
 </Steps>
@@ -103,8 +103,8 @@ SELECT
   toDate(timestamp) AS date,
   countDistinct(address) AS daily_active_wallets
 FROM events
-WHERE type = 'connect'
-  AND timestamp >= now() - INTERVAL 30 DAY
+WHERE address != ''
+  AND toDate(timestamp) >= today() - 29
 GROUP BY date
 ORDER BY date
 ```
@@ -121,17 +121,18 @@ Type: "Show me 7-day rolling unique wallets"
 
 ```sql
 SELECT
-  toDate(timestamp) AS date,
-  countDistinct(address) AS wallets
+  day AS date,
+  countDistinct(address) AS weekly_active_wallets
 FROM events
-WHERE type = 'connect'
-  AND timestamp >= now() - INTERVAL 37 DAY
+ARRAY JOIN arrayMap(i -> toDate(timestamp) + i, range(7)) AS day
+WHERE address != ''
+  AND toDate(timestamp) >= today() - 35
 GROUP BY date
-HAVING date >= now() - INTERVAL 30 DAY
+HAVING date BETWEEN today() - 29 AND today()
 ORDER BY date
 ```
 
-<Note>For a true rolling 7-day WAU, you'll need a window function. The Ask AI assistant can help generate this query.</Note>
+<Note>Each row counts the unique wallets with any event in the 7 UTC calendar days that end on that date.</Note>
 
 ## Part 4: How to Segment Active Users
 
@@ -230,7 +231,7 @@ You've learned how to:
 
 <AccordionGroup>
 <Accordion title="What counts as an active user in Formo?">
-A user who connected a wallet or completed a transaction within the time period. Page-only visitors are counted separately as visitors.
+A wallet address that appears on at least one event in the time period, on UTC calendar days. Visitors without a wallet are counted separately as visitors.
 </Accordion>
 
 <Accordion title="What's the difference between visitors and wallets?">

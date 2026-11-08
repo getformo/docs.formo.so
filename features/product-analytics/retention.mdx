@@ -61,14 +61,16 @@ You can also narrow the cohort with the **Segment** filter: device, browser, OS,
 The retention chart displays:
 
 - **Rows**: Cohorts, grouped by start week, plus a pinned "Mean retention" row (the unweighted average across all visible cohorts)
-- **Columns**: Weeks after the cohort's start (Week 0 through however many weeks have fully elapsed)
+- **Columns**: Calendar weeks (Monday to Sunday, UTC) after the cohort's start week, from Week 0 to Week 12
 - **Cells**: Percentage of the cohort still active in that week
 
 <Frame caption="Cohort retention shows which user groups stick around.">
   <img src="/images/retention.png" alt="Retention Chart" />
 </Frame>
 
-**Color coding:** cells shade from light to dark green as the retention percentage increases (darkest at 100%). Week 0 is always 100% by definition. Weeks whose observation window hasn't fully elapsed yet are shown blank or dashed rather than colored.
+**Color coding:** cells shade from light to dark green as the retention percentage increases (darkest at 100%). Week 0 is always 100% by definition. Weeks that have not started yet are blank. The week in progress shows its partial value with a dashed border.
+
+**Headline 7, 30 and 90 day retention:** these rates count days from each user's first activity, not calendar weeks. A user is retained at day N if they come back on or after day N. Only users whose first activity was at least N days ago are counted.
 
 ### Step 4: Identify patterns
 

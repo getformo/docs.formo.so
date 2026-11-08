@@ -106,12 +106,19 @@ Paid acquisition is attributed with ad-platform click IDs (`gclid`, `fbclid`, `t
 
 ### Attribution models
 
-Formo helps you understand the impact of touchpoints in each user journey using single-touch attribution, crediting either the first or the last touchpoint within the lookback window.
+Formo helps you understand the impact of touchpoints in each user journey using single-touch attribution, crediting either the first or the last touchpoint.
 
 | Model | Description |
 | :-- | :-- |
-| First Touch | Gives 100% credit to the first touchpoint within the attribution lookback window |
-| Last Touch | Gives 100% credit to the last touchpoint within the attribution lookback window |
+| First Touch | Gives 100% credit to the first touchpoint |
+| Last Touch | Gives 100% credit to the last touchpoint |
+
+Which touchpoints count depends on the report:
+
+- **Wallet profiles:** first touch and last touch use the wallet's full history. Each field (each UTM parameter, the referrer, the referral code, and the ad click) is resolved on its own, so a wallet's first `utm_source` and its first referrer can come from different events.
+- **Funnels:** breakdowns use each user's first or last real value (not empty and not Direct) inside the selected date range.
+- **Contract events:** an onchain event inherits the attribution (UTM parameters, referrer, and country) of the same wallet's SDK session from the last hour. If the wallet has no SDK session in that hour, the event is attributed to Direct.
+- **Revenue and volume breakdowns:** use the channel of each event. Traffic reports use the channel of the session's entry page view.
 
 > Looking for more attribution models? [Let us know](mailto:support@formo.so).
 
@@ -121,5 +128,4 @@ Formo helps you understand the impact of touchpoints in each user journey using 
 | :-- | :-- |
 | User journey | Consists of touchpoints and the conversion event. It is possible for a conversion event to have no corresponding touchpoints (eg. utm parameters). In this case we consider it a 'direct' conversion |
 | Conversion | The primary event you're interested in attributing. Typically a volume or revenue generating conversion event such as "Mint" or "Swap" or "Stake". |
-| Touchpoint | Actions (events) a user's taken or exposed to along the journey before doing the conversion event. \[Eg. does event A → B → C → D (conversion event) in a 7 day period; For a lookback window of 7 days, A, B, C are all considered touchpoints\] |
-| Lookback window | The time window where a user's events with this attribution property are counted towards the calculation. The window ends when the conversion metric happens. |
+| Touchpoint | Actions (events) a user's taken or exposed to along the journey before doing the conversion event. \[Eg. does event A → B → C → D (conversion event); A, B, C are all considered touchpoints\] |

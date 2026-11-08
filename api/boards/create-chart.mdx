@@ -171,7 +171,7 @@ Each step in the `steps` array has the following shape:
 | Field              | Type                   | Default    | Description                                                                                                    |
 | ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
 | `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` - strict ordering, no events between steps; `open` - ordered but other events may occur between steps |
-| `conversionWindow` | `ConversionWindow`     | 2 days     | Max time from Step 1 for a user to complete all steps                                                          |
+| `conversionWindow` | `ConversionWindow`     | 2 hours    | Max time from Step 1 for a user to complete all steps                                                          |
 | `breakdown`        | string                 | -          | Split each funnel bar by this dimension                                                                        |
 
 #### `ConversionWindow`
@@ -596,7 +596,7 @@ Each step in the `steps` array has the following shape:
 | Field              | Type                   | Default    | Description                                                                                                    |
 | ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
 | `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` - strict ordering, no events between steps; `open` - ordered but other events may occur between steps |
-| `conversionWindow` | `ConversionWindow`     | 2 days     | Max time from Step 1 for a user to complete all steps                                                          |
+| `conversionWindow` | `ConversionWindow`     | 2 hours    | Max time from Step 1 for a user to complete all steps                                                          |
 | `breakdown`        | string                 | -          | Split each funnel bar by this dimension                                                                        |
 
 #### `ConversionWindow`

@@ -9,7 +9,7 @@ This guide covers measuring retention cohorts, identifying churn patterns, and b
 
 ## Part 1: Build a Retention Cohort Chart
 
-Create a retention cohort chart on a dashboard. This shows how each cohort of users (grouped by signup week) retains over time:
+Create a retention cohort chart on a dashboard. This shows how each cohort of users (grouped by the week of their first entry event) retains over time:
 
 <Steps>
 <Step>
@@ -267,7 +267,7 @@ Compare their first-week behavior: sessions count, features used, transaction vo
 <Accordion title="How is retention calculated?">
 Week 1 retention = (Users active in Week 1 / Users in the Week 0 cohort) * 100
 
-A user is considered active in a week if they have at least one session (page view or transaction) during that week.
+A user is considered active in a week if they perform the retention event at least once during that calendar week (Monday to Sunday, UTC). With **Rolling** retention (the default), a user also counts toward every earlier week, so a user active in Week 3 counts in Weeks 1, 2 and 3.
 
 Example: 1000 users enter the cohort in Week 0. 250 of them return and are active in Week 1. Week 1 retention = 25%.
 </Accordion>
