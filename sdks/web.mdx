@@ -1321,9 +1321,9 @@ Alternatively, you can set up your own proxy (with CloudFront, Cloudflare, etc.)
 ></script>
 ```
 
-### Visitor location
+### Geolocation
 
-Formo finds a visitor's country from their IP address. Behind a proxy, Formo receives the request from your proxy, so the proxy must pass the visitor's IP address in the `X-Forwarded-For` header. Otherwise, all your visitors get the country of your proxy server.
+Your proxy must pass the visitor's IP address in the `X-Forwarded-For` header. Otherwise, all your visitors get the country of your proxy server.
 
 - **Next.js rewrites and middleware on Vercel:** no change is needed. Vercel sets `X-Forwarded-For` for you.
 - **Cloudflare Workers:** a copied request does not include the visitor's IP address. Set the header yourself:
