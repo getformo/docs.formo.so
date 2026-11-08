@@ -38,7 +38,7 @@ flowchart TD
 
 **What the SDK does NOT send:** IP addresses, third-party cookies, local storage data, device fingerprints, or social profiles.
 
-**What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only to compute a daily-rotating session hash for session counting, then discards it. The raw IP address is never stored in logs or databases. Separately, the network edge resolves the IP to a country code (see [Country](#country)) and passes only that code to Formo; the IP itself never reaches our servers for this purpose.
+**What happens server-side:** The server receives the IP address via standard HTTP headers (this is true for any HTTP request to any server, including GA4 and Umami). Formo uses the IP address only in memory: to compute a daily-rotating session hash for session counting and, when needed, to find the visitor's country (see [Country](#country)). It then discards the IP. The raw IP address is never stored in logs or databases, and never sent to a third party.
 
 ### What We Do NOT Collect
 
@@ -60,7 +60,7 @@ flowchart TD
 
 > We do NOT store IP addresses.
 
-Every HTTP request to any server (including GA4, Umami, and Plausible) includes the sender's IP address as part of the protocol. Our server uses the IP address **only** to compute the daily session hash above, then discards it. The raw IP address is never written to logs, databases, or anywhere on disk.
+Every HTTP request to any server (including GA4, Umami, and Plausible) includes the sender's IP address as part of the protocol. Our server uses the IP address **only** to compute the daily session hash above and, when needed, the visitor's country, then discards it. The raw IP address is never written to logs, databases, or anywhere on disk.
 
 ### NO Fingerprinting
 
@@ -133,7 +133,11 @@ We collect device screen and browser viewport dimensions to understand how visit
 
 > We collect and store country of each visitor.
 
-We resolve visitor country server-side at the network edge, the same approach used by analytics tools like Google Analytics, Plausible, and OpenPanel. The edge performs an IP lookup and passes only the resolved ISO 3166-1 alpha-2 country code (for example, `US`, `GB`, `DE`) to Formo. The raw IP address never reaches our servers and is never stored.
+We resolve visitor country server-side from the IP address, the same approach used by analytics tools like Google Analytics, Plausible, and OpenPanel. For most requests, our network edge performs the IP lookup and passes the resolved ISO 3166-1 alpha-2 country code (for example, `US`, `GB`, `DE`) to Formo.
+
+When a request comes through your [reverse proxy](/sdks/web#geolocation), the edge sees your proxy, not the visitor. In that case our server looks up the visitor's IP address from the `X-Forwarded-For` header in local databases: Cloudflare's published geofeed, then [IP Geolocation by DB-IP](https://db-ip.com). The lookup runs in memory and sends nothing to a third party.
+
+In both cases Formo keeps only the country code. The IP address is never stored.
 
 Country is the only geographic granularity we collect: we do not derive or store region or city. Where the edge cannot resolve a country, the value falls back to `unknown`.
 
@@ -246,7 +250,7 @@ You are responsible for ensuring that sensitive data is not collected through fo
 
 <AccordionGroup>
   <Accordion title="How does Formo determine a visitor's country without storing IP addresses?">
-    Formo resolves the visitor's country server-side at the network edge, which performs an IP lookup and passes only the resolved ISO 3166-1 alpha-2 country code to our servers. The raw IP address never reaches Formo and is never stored. We collect country only: never region or city. (Earlier versions inferred country from the browser timezone on the client side; edge geolocation replaced this because a single timezone can span multiple countries.)
+    Formo resolves the visitor's country server-side from the IP address. Usually the network edge does the lookup; behind a reverse proxy, our server does it in memory with local databases. Formo keeps only the ISO 3166-1 alpha-2 country code. The IP address is never stored and never sent to a third party. We collect country only: never region or city. (Earlier versions inferred country from the browser timezone on the client side; edge geolocation replaced this because a single timezone can span multiple countries.)
   </Accordion>
   <Accordion title="Does Formo set any cookies?">
     Formo uses first-party cookies for anonymous visitor identification and cross-subdomain tracking (e.g., an `anonymous-id` cookie and session cookies). These are first-party cookies scoped to your domain only. Formo does **not** set any third-party cookies or cross-site tracking cookies. Because Formo does not use third-party cookies, most jurisdictions do not require a cookie consent banner, but consult your legal counsel for your specific case.
