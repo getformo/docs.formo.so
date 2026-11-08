@@ -28,9 +28,12 @@ Each user's lifecycle stage is computed relative to a **reference date** (the en
 | **Power user** | First seen more than 30 days ago, still active, and active on at least 5 distinct days in the last 30 days. |
 | **At Risk** | Previously active wallet whose activity has slowed but that hasn't churned yet: last seen at least 14 days ago, fewer than 5 active days in the last 30 days, and no 30+ day gap, with at least 1 active day in the prior 30 to 60 days. |
 | **Churned** | Last seen at least 30 days ago. |
-| **Resurrected** | First seen more than 30 days ago and re-engaged within the last 30 days after a 30+ day inactivity gap. |
+| **Resurrected** | First seen more than 30 days ago, active within the last 30 days, and has at least one gap of 30+ days between active days at any point in its history. |
+| **Imported** | Wallet that has only imported data and no tracked activity. Shown on the Users list, but not counted in the lifecycle chart. |
 
 Stages are mutually exclusive and evaluated in precedence order: Churned, New, Power user, Resurrected, At Risk, Returning. **At Risk** carves out fading users that would otherwise sit in Returning, surfacing established wallets to re-engage before they churn.
+
+An active day is a UTC calendar day on which the wallet has any event that carries its address. Imported data does not count as activity.
 
 Filter users by lifecycle to create [segments](/features/wallet-intelligence/segments) and audiences. For example, "Show me whales who use app X who are power users" or "Show me high net worth wallets who are at risk."
 
@@ -40,14 +43,16 @@ Each wallet profile includes key metadata aggregated across all chains:
 
 | Field | Description |
 |:------|:------------|
-| **Net Worth** | Total USD value of all token holdings and DeFi positions across all chains, with a per-chain breakdown showing percentage allocation. |
+| **Net Worth** | Total USD value of verified token holdings and, where available, DeFi positions (net of debt), with a per-chain breakdown showing percentage allocation. Solana wallets include token balances only. |
 | **Wallet Age** | Time since the wallet's first onchain transaction. |
 | **Last Onchain** | When the wallet last had onchain activity. |
 | **Total Transactions** | Lifetime transaction count across all chains, with a per-chain breakdown. |
-| **Linked Addresses** | Other wallet addresses that share a session or user ID with this one. See the **Clusters** tab on the Users page for the full multi-wallet group. |
+| **Linked Addresses** | Other wallet addresses seen on the same device as this one (they share an anonymous ID). See the **Clusters** tab on the Users page for the full multi-wallet group. |
 | **Sessions** | Total number of sessions on your app. |
 | **First Seen / Last Seen** | When the user first and last interacted with your app. |
 | **Country, Device, Browser, OS** | Geographic and device information from the user's sessions. |
+
+**How wallets are linked.** Formo links wallets through two shared identifiers only: the anonymous ID cookie (the same browser or device, across sessions and days) and the user ID you set with [`identify`](/data/events/identify). It does not use IP addresses, device fingerprinting, onchain transfers, or funding sources. **Linked Addresses** lists the wallets seen on the same device as this wallet. **Clusters** go further: they group wallets transitively through shared devices and shared user IDs, so a cluster can include wallets that are not in a wallet's Linked Addresses. Guards stop shared devices and bots from merging unrelated wallets, and clusters never cross projects.
 
 ## User Socials
 
@@ -78,7 +83,7 @@ Social cards are displayed in a grid on the wallet profile page. Click any card 
 
 ## User Apps
 
-The **Apps** tab shows a user's complete DeFi positions and portfolio across all major chains. See which protocols a user is active in and the USD value of their positions.
+The **Apps** tab shows a user's DeFi positions on supported EVM chains. Solana wallets show token balances only, with no protocol positions. See which protocols a user is active in and the USD value of their positions.
 
 | Column | Description |
 |:-------|:------------|

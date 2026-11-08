@@ -225,7 +225,7 @@ Use this pre-built prompt to install faster: [Open in Cursor](https://cursor.com
 
   **Event Naming Convention:** Use "[Noun] + [Past-Tense Verb]" format (e.g. "Swap Completed", "Position Opened"). Names are case-sensitive. Track at the moment the action completes, not on button click.
 
-  **Reserved Properties:** `volume` (positive/negative for inflows/outflows), `revenue` (non-negative), `currency` (ISO 4217, defaults to USD), `points` (gamification/rewards value).
+  **Reserved Properties:** `volume` (positive/negative for inflows/outflows), `revenue` (non-negative), `points` (gamification/rewards value). Send `volume` and `revenue` in USD: Formo sums them as sent, with no currency conversion.
 
   ---
 

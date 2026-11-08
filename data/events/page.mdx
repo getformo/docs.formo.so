@@ -30,7 +30,7 @@ On web, any non-UTM query-string parameters are also added as individual propert
 | `context.user_agent` | Browser user agent | Device user agent (if available) |
 | `context.locale` | Browser language | Device locale |
 | `context.timezone` | Resolved IANA timezone | Resolved IANA timezone |
-| `context.location` | Country derived from timezone | Country derived from timezone |
+| `context.location` | Country derived from timezone (replaced server-side by the IP-based country) | Country derived from timezone (replaced server-side by the IP-based country) |
 | `context.library_name` | `"Formo Web SDK"` | `"Formo React Native SDK"` |
 | `context.library_version` | SDK version | SDK version |
 | `context.browser` | Detected browser name | Not set |

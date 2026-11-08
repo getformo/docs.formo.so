@@ -8065,7 +8065,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Restrict the cohort-defining event to a single type (e.g. `page`, `connect`, `track`, `transaction`).",
+            "description": "Restrict the cohort-entry event to a single type (e.g. `page`, `connect`, `track`, `transaction`). When `filters` is not set, it also restricts the returning event.",
             "example": "track"
           },
           {
@@ -8074,7 +8074,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Restrict the cohort-defining event to a custom event name. Combine with `event_type=track`.",
+            "description": "Restrict the cohort-entry event to a custom event name. When `filters` is not set, it also restricts the returning event. Combine with `event_type=track`.",
             "example": "swap"
           },
           {

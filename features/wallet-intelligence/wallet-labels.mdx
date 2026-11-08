@@ -47,21 +47,20 @@ Behavioural labels computed from a wallet's current onchain positions. Formo gro
 
 Rules that apply to every label below:
 
-- Only positions from the wallet's latest profile snapshot count. A position the wallet has closed never lingers.
-- Labels refresh daily and are removed automatically when the rule stops holding.
-- An active wallet is re-profiled every 30 days.
+- Only positions from the wallet's latest profile snapshot count. A position the wallet has closed drops off at the next profile update.
+- Labels reflect the latest available data from each source.
 
 | Label | Rule | Value |
 |-------|------|-------|
-| **DeFi Lender** | Supplies at least $100 to lending markets such as Aave, Compound, Morpho or Spark. Collateral locked in a CDP does not count. | Supplied USD |
-| **DeFi Borrower** | Owes at least $100 across lending markets and CDPs such as Aave, Maker, Sky or Liquity. | Borrowed USD |
-| **Liquidity Provider** | Holds at least $100 in DEX liquidity positions on Uniswap, Curve, Aerodrome, PancakeSwap and similar. | Position USD |
-| **Yield Farmer** | Holds at least $100 in vaults or yield aggregators such as Pendle, Beefy, Yearn or Morpho vault curators. | Deposit USD |
-| **Staker** | Holds at least $100 in liquid staking, restaking or native chain staking (Lido, ether.fi, EigenLayer), or at least $100 of liquid staking tokens such as stETH, wstETH, rETH or weETH in the wallet. | Staked USD |
-| **Perp Trader** | Holds at least $100 of open margin or liquidity in a perpetuals venue such as Hyperliquid or GMX. Closed trades leave no position and are not counted. | Position USD |
-| **Options Trader** | Holds at least $100 in an onchain options venue. | Position USD |
-| **Basis Trader** | Holds at least $100 in a delta-neutral dollar product such as Ethena. | Deposit USD |
-| **RWA Holder** | Holds at least $100 in tokenised real-world assets: tokenised gold (PAXG, XAUt), treasury and cash notes (USDY, OUSG, BUIDL, Midas), tokenised stocks (xStocks, Backed), private credit pools (Maple, Goldfinch, Centrifuge), carbon or real estate. | Position USD |
+| **DeFi Lender** | Supplies assets to lending markets such as Aave, Compound, Morpho or Spark. Collateral locked in a CDP does not count. | Supplied USD |
+| **DeFi Borrower** | Owes debt across lending markets and CDPs such as Aave, Maker, Sky or Liquity. | Borrowed USD |
+| **Liquidity Provider** | Holds DEX liquidity positions on Uniswap, Curve, Aerodrome, PancakeSwap and similar. | Position USD |
+| **Yield Farmer** | Holds deposits in vaults or yield aggregators such as Pendle, Beefy, Yearn or Morpho vault curators. | Deposit USD |
+| **Staker** | Holds liquid staking, restaking or native chain staking positions (Lido, ether.fi, EigenLayer), or liquid staking tokens such as stETH, wstETH, rETH or weETH in the wallet. | Staked USD |
+| **Perp Trader** | Holds open margin or liquidity in a perpetuals venue such as Hyperliquid or GMX. Closed trades leave no position and are not counted. | Position USD |
+| **Options Trader** | Holds a position in an onchain options venue. | Position USD |
+| **Basis Trader** | Holds a deposit in a delta-neutral dollar product such as Ethena. | Deposit USD |
+| **RWA Holder** | Holds tokenised real-world assets: tokenised gold (PAXG, XAUt), treasury and cash notes (USDY, OUSG, BUIDL, Midas), tokenised stocks (xStocks, Backed), private credit pools (Maple, Goldfinch, Centrifuge), carbon or real estate. | Position USD |
 | **Bridge User** | Has used a bridge or bridge aggregator such as Stargate, Across, Hop, LI.FI or Relay, detected from transaction history or a bridge liquidity position. | Bridges used, for example "Stargate, Across" |
 | **Aggregator User** | Has swapped through a swap aggregator such as KyberSwap, 1inch, Paraswap, CoW, detected from transaction history. | Aggregators used, for example "KyberSwap, 1inch" |
 
@@ -80,7 +79,7 @@ This section covers using labels to identify and target specific user types.
 
 ### How labels work
 
-Formo automatically analyzes each wallet's onchain activity and assigns relevant labels. Labels update as users' behavior changes. You can also add your own custom labels to a wallet for information Formo can't detect on its own.
+Formo automatically analyzes each wallet's onchain activity and assigns relevant labels. Labels reflect the latest available data from each source. You can also add your own custom labels to a wallet for information Formo can't detect on its own.
 
 **Label sources:**
 - **Lifecycle** - Engagement stage derived from each wallet's recency and active days

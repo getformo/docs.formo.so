@@ -8,11 +8,11 @@ iconType: solid
 ### Live Visitors
 
 How many visitors are currently active on your site or app.
-It counts unique active sessions with a page view in the last 10 minutes.
+It counts unique people with a page view in the last 10 minutes. A person is counted by their wallet address when one is known, otherwise by their anonymous ID.
 
 ### Visitors
 
-How many unique visitors are interacting with your site or app across the selected period, spanning multiple page views and events.
+How many unique visitors viewed at least one page of your site or app in the selected period. A visitor with no page view is not counted.
 A visitor is identified by a persistent visitor ID (their anonymous ID) and is not stitched to a wallet, so this counts distinct visitors rather than connected wallets.
 
 In the overview, the **Visitors** chart shows the daily unique-visitor count (a visitor active on several days adds to each of those days), while the headline number is de-duplicated across the entire selected period, so a visitor active on multiple days is counted only once.
@@ -25,7 +25,7 @@ How many times a page has been viewed across your site or app.
 
 ### Wallets
 
-Unique wallet addresses active with at least one session during the selected period.
+Unique wallet addresses with at least one event during the selected period. Any event that carries a wallet address counts, for example a page view after connect, a transaction, or an onchain contract event, so no session is required. Days are UTC calendar days.
 
 We also collect other wallet details, such as the wallet address, wallet type, and wallet profiles.
 
@@ -44,7 +44,7 @@ Total revenue (USD) tracked through your [custom events](/features/product-analy
 ### Sessions
 
 A session (also known as a visit) is a set of actions that a user takes on your site.
-Formo counts unique session IDs. With the web SDK, each visitor's session is counted once per day, so one visitor can have multiple sessions across days.
+Formo counts unique session IDs. With the web SDK, each visitor's session is counted once per day, so one visitor can have multiple sessions across days. Only sessions with at least one page view are counted.
 
 ### Session Duration
 
@@ -52,11 +52,11 @@ Session duration measures the observed active time a visitor spends during a sin
 
 ##### How It's Calculated
 
-1. Per-event gaps: The system measures the time between each consecutive event in a session.
+1. Per-page gaps: The system measures the time between consecutive page views in a session. Other events, such as wallet connects or transactions, do not add to the duration.
 
 2. Active time only: It sums those gaps but ignores any gap longer than 30 minutes (1800 seconds); long inactivity is treated as the visitor leaving, not as time on site.
 
-3. Per-session duration: Adding the counted gaps gives the session's active duration. A session with a single event (e.g. one pageview) has a duration of 0.
+3. Per-session duration: Adding the counted gaps gives the session's active duration. A session with a single page view has a duration of 0.
 
 4. Averaging: To get the average session duration shown in your reports, the system adds up all individual session durations and divides by the number of sessions.
 
@@ -72,7 +72,7 @@ For most purposes, this calculation method provides an accurate and useful measu
 ### Bounce Rate
 
 The bounce rate is the percentage of sessions that bounce, measured over sessions (not unique visitors).
-Formo counts a "bounce" when a session has a single pageview, no engagement events, and less than 10 seconds of observed activity. Engagement events are wallet connects, transactions, tracked custom events, and smart contract events (decoded logs).
+Formo counts a "bounce" when a session has a single pageview and no engagement events. There is no time threshold. Engagement events are wallet connects (`connect`), transactions (`transaction`), tracked custom events (`track`), and smart contract events (`decoded_log`).
 
 ### Channels
 
@@ -80,14 +80,14 @@ The acquisition channel that brought a session to your app. Every session is ass
 
 | # | Channel | Definition |
 |---|---------|------------|
-| 1 | Paid Search | Paid signal + referrer is a search engine (Google, Bing, DuckDuckGo, Yahoo, Yandex, Baidu, Brave, Kagi, Naver, ...) |
-| 2 | Paid Video | Paid signal + referrer is a video platform (YouTube, Vimeo, Twitch, Dailymotion, Loom, Wistia) |
-| 3 | Paid Social | Paid signal + referrer is a social platform (Meta, X, LinkedIn, Reddit, TikTok, Pinterest, Snapchat, Threads, Discord, Telegram, Farcaster, ...) |
+| 1 | Paid Search | Paid signal + referrer or `utm_source` is a search engine (Google, Bing, DuckDuckGo, Yahoo, Yandex, Baidu, Brave, Kagi, Naver, ...) |
+| 2 | Paid Video | Paid signal + referrer or `utm_source` is a video platform (YouTube, Vimeo, Twitch, Dailymotion, Loom, Wistia) |
+| 3 | Paid Social | Paid signal + referrer or `utm_source` is a social platform (Meta, X, LinkedIn, Reddit, TikTok, Pinterest, Snapchat, Threads, Discord, Telegram, Farcaster, ...) |
 | 4 | Email | `utm_medium` ∈ \{`email`, `e-mail`, `e_mail`, `newsletter`\}, or referrer is a known email or newsletter domain (Gmail, Proton Mail, Yahoo Mail, Outlook, Substack, Beehiiv, Paragraph) |
 | 5a | Display (network match) | Referrer domain or `utm_source` matches a known ad-network domain (checked before Referrals, so network-matched traffic is never misclassified as a referral) |
 | 5b | Referrals | `utm_medium` ∈ \{`affiliate`, `referral`\} or non-empty `ref` query parameter |
 | 6 | Display (medium match) | `utm_medium` ∈ \{`display`, `banner`, `expandable`, `interstitial`\} (checked after Referrals) |
-| 7 | Paid Other | Paid signal that matched none of the above: a paid `utm_medium` or click ID with no recognized source or ad format. A catch-all so paid traffic is never relabelled as organic or Direct. |
+| 7 | Paid Other | Paid signal that matched none of the above: a paid `utm_medium` with no recognized source or ad format. A catch-all so paid traffic is never relabelled as organic or Direct. |
 | 8 | AI | Referrer is an AI assistant domain (ChatGPT, Claude, Gemini, Copilot, Perplexity, DeepSeek, Phind, Poe, Mistral Chat, Meta AI, You.com, Pi, Grok, Qwen, Kimi, Hugging Face, Genspark) |
 | 9 | Organic Search | `utm_medium=organic` or referrer is a search engine with no paid signal |
 | 10 | Organic Social | `utm_medium` ∈ \{`social`, `social-network`, `social-media`, `sm`, `social network`, `social media`\} or referrer is a social platform with no paid signal |
@@ -96,6 +96,8 @@ The acquisition channel that brought a session to your app. Every session is ass
 | 13 | Direct | No referrer, no UTM, no click ID (typed URL, bookmark, or stripped referrer) |
 
 A session has a **paid signal** when any of the following is true: `utm_medium` is one of `cpc`, `cpm`, `cpv`, `cpa`, `ppc`, `paidsearch`, `paidsocial`, `sem`, `retargeting`; `utm_medium` starts with `paid`; or any of the 8 click IDs above is non-empty. Same-domain referrers (e.g. `blog.example.com` referred from `app.example.com`) are stripped before classification so internal navigation rolls up to **Direct** instead of **Referrers**.
+
+**Ad click IDs without a recognized source:** when a session carries an ad click ID but matches none of rules 1 to 6, the click ID sets the channel before Paid Other is checked. Google and Microsoft click IDs (`gclid`, `gad_source`, `msclkid`) go to **Paid Search**. Meta, TikTok, X, LinkedIn and Reddit click IDs (`fbclid`, `ttclid`, `twclid`, `li_fat_id`, `rdt_cid`) go to **Paid Social**.
 
 ### Referrers
 
@@ -126,6 +128,8 @@ Countries are the statistics for the country of origin of the visitors.
 ### Devices
 
 How many users are using a particular device such as desktop, mobile, tablet, etc.
+
+Formo identifies known crawlers and automated clients from their user agent and labels them with the device type **Bots**. Bot traffic is not removed from Visitors, Sessions, or Bounce Rate. To leave it out, add a **Device** filter that excludes Bots.
 
 ### Browsers
 
@@ -199,7 +203,7 @@ Formo uses the wallet address as a persistent identifier for a visitor where ava
 
 ### Linked Addresses
 
-Other wallet addresses linked to the same user session. See [Wallet Profiles](/features/wallet-intelligence/wallet-profiles#user-wallet-metadata) for details on how wallets are clustered.
+Other wallet addresses seen on the same device as this wallet (they share an anonymous ID). See [Wallet Profiles](/features/wallet-intelligence/wallet-profiles#user-wallet-metadata) for details on how linked addresses and clusters differ.
 
 ### Wallet Type
 
@@ -207,7 +211,7 @@ How many users are using a particular wallet type such as MetaMask, Rainbow Wall
 
 ### Wallet Net Worth
 
-The total net worth of a wallet on the top chains across DeFi positions and token balances.
+The total USD value of a wallet's verified token balances and, where available, its DeFi positions (net of debt).
 
 ### Wallet Age
 
@@ -255,6 +259,8 @@ You can follow the visitor journey from a landing page to a conversion with funn
 ### Retention Rate
 
 Retention rates: the percentage of customers who continue to use your service or product over a predetermined period (7, 30, 90 days.)
+
+Each rate counts days from each user's first activity. A user is retained at day N if they come back on or after day N. Only users whose first activity was at least N days ago are counted.
 
 ### Churn Rate
 
