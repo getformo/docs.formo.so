@@ -31,7 +31,7 @@ Each user's lifecycle stage is computed relative to a **reference date** (the en
 | **Resurrected** | First seen more than 30 days ago, active within the last 30 days, and has at least one gap of 30+ days between active days at any point in its history. |
 | **Imported** | Wallet that has only imported data and no tracked activity. Shown on the Users list, but not counted in the lifecycle chart. |
 
-Stages are mutually exclusive and evaluated in precedence order: Churned, New, Power user, Resurrected, At Risk, Returning. **At Risk** carves out fading users that would otherwise sit in Returning, surfacing established wallets to re-engage before they churn.
+Stages are mutually exclusive and evaluated in precedence order: Churned, New, Power user, Resurrected, At Risk, Returning. Imported applies only to wallets with no tracked activity and sits outside this order. **At Risk** carves out fading users that would otherwise sit in Returning, surfacing established wallets to re-engage before they churn.
 
 An active day is a UTC calendar day on which the wallet has any event that carries its address. Imported data does not count as activity.
 

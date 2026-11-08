@@ -187,7 +187,7 @@ This is an **aggregate table**. Most columns require `-Merge` functions. Always 
 - **Power**: `first_seen` more than 30 days ago and 5+ unique active days in the last 30 days
 - **At Risk**: `first_seen` more than 30 days ago, still active, but `last_seen` 14+ days ago with fewer than 5 active days in the last 30 days, no 30+ day gap, and 1+ active day in the prior window (days 30 to 60 ago)
 - **Churned**: `last_seen` more than 30 days ago
-- **Resurrected**: `first_seen` more than 30 days ago, active within the last 30 days, and at least one 30+ day gap between active days at any point in its history
+- **Resurrected**: `first_seen` more than 30 days ago, active within the last 30 days, not Power, and at least one 30+ day gap between active days at any point in its history
 - **Imported**: empty `activity_dates` (the wallet has only imported data); shown on the Users list, not in the lifecycle chart
 
 **Example:**
