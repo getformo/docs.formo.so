@@ -564,6 +564,47 @@ The top categories are shown individually. The rest collapse into **"Others"**.
 }
 ```
 
+#### Open funnel with a multi-value `in` filter
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "Mobile Onboarding Funnel",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "funnel",
+      "steps": [
+        {
+          "type": "event",
+          "event": "page",
+          "filters": [{ "field": "device", "op": "eq", "value": "mobile" }]
+        },
+        {
+          "type": "event",
+          "event": "connect",
+          "filters": [
+            {
+              "field": "provider_name",
+              "op": "in",
+              "value": ["metamask", "rainbow", "coinbase"]
+            }
+          ]
+        },
+        { "type": "event", "event": "transaction" }
+      ],
+      "settings": {
+        "funnelType": "open",
+        "conversionWindow": { "value": 30, "unit": "day" }
+      }
+    },
+    "view": {
+      "mark": "x-funnel"
+    }
+  }
+}
+```
+
 ---
 
 ## User Paths Charts
