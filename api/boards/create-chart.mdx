@@ -53,10 +53,21 @@ SQL may use the `{{date_from}}` and `{{date_to}}` variables. Project scoping is 
 | Number (KPI card)     | `{ "mark": "text", "encoding": {} }`. The query must return exactly 1 row and 1 column                          |
 | Line, bar, area       | `mark` plus `encoding.x` and `encoding.y`                                                                      |
 | Several y columns     | `transform: [{ "fold": ["a", "b"], "as": ["series", "value"] }]`, `y` = `value`, `color` = `series` (bar also `xOffset` = `series`) |
+| Line split by a column | `mark: "line"` and `color` = the column (one line per value)                                                  |
+| Grouped bars          | `mark: "bar"`, `color` and `xOffset` = the same column (bars side by side)                                     |
 | Stacked bar or area   | `y.stack: true` and `color` = the breakdown column (several y columns on an area: a fold with `y.stack: true`) |
+| 100% stacked          | `y.stack: "normalize"` instead of `true`: each x adds up to 100%                                               |
+| Horizontal bars       | `y` = the category with `"type": "nominal"`, `x` = the value with `"type": "quantitative"` (stack and group with `x.stack` and `yOffset`) |
+| Scatter               | `mark: "point"`, `x` and `y` = two number columns, optional `color`. Each row is one point                      |
+| Bars plus a line      | `layer`: a bar view and a line view with the same `x`. `resolve.scale.y: "independent"` puts the line on a right axis |
+| Goal line             | `layer`: the chart, then `{ "mark": "rule", "encoding": { "y": { "datum": 1000 } } }`                           |
 | Pie                   | `{ "mark": "arc", "encoding": { "theta": { "field": "...", "aggregate": "sum" }, "color": { "field": "..." } } }` |
 
-Channels: `x`, `y`, `color`, `xOffset`, `theta`. Each channel is `{ "field": "<column>" }`; `y` may add `"stack": true` and `theta` needs `"aggregate": "sum"`. Only the combinations in the table above are valid, so a view always draws exactly as written: `color` goes with a stack or a fold, a line has neither. `data`, `params`, expressions, channel `type` and `title`, and transforms other than `fold` are rejected.
+Channels: `x`, `y`, `color`, `xOffset`, `yOffset`, `theta`, `text`. Each channel is `{ "field": "<column>" }`. The value channel (`y`, or `x` on horizontal bars) may add `"stack": true` or `"normalize"` and `"axis": { "format": "..." }`; `x` and `y` may add a Vega-Lite `type`; `theta` needs `"aggregate": "sum"`. Only the combinations in the table above are valid, so a view always draws exactly as written: for example, a line is never stacked, and grouped bars are not also stacked. `data`, `params`, expressions, channel `title`, and transforms other than `fold` are rejected.
+
+**Number formats** use [d3-format](https://d3js.org/d3-format) strings, the same as Vega-Lite: `",.0f"` (1,234), `".2f"` (1234.57), `".3~s"` (1.23k), `".1%"` (12.3%, for values stored as fractions), `"$,.2f"` ($1,234.57). Width and precision have at most 2 digits. A number card takes `"encoding": { "text": { "format": "$,.2f" } }`, and `text.field` picks its column.
+
+**Layers:** at most 2 layers draw data (one bar layer at most, one series each, the same `x`); add any number of `rule` layers for goal lines. Horizontal bars take no layers.
 
 ---
 
@@ -201,6 +212,155 @@ Channels: `x`, `y`, `color`, `xOffset`, `theta`. Each channel is `{ "field": "<c
       }
     }
   }
+}
+```
+
+### Line split by a column
+
+One line per chain, from rows of (date, chain, users).
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "Daily Users by Chain",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT toDate(timestamp) AS date, toString(chain_id) AS chain, countDistinct(address) AS users FROM events WHERE timestamp >= {{date_from}} AND timestamp <= {{date_to}} GROUP BY date, chain ORDER BY date"
+    },
+    "view": {
+      "mark": "line",
+      "encoding": {
+        "x": { "field": "date" },
+        "y": { "field": "users" },
+        "color": { "field": "chain" }
+      }
+    }
+  }
+}
+```
+
+### Grouped bars
+
+```json
+"view": {
+  "mark": "bar",
+  "encoding": {
+    "x": { "field": "month" },
+    "y": { "field": "new_users" },
+    "color": { "field": "channel" },
+    "xOffset": { "field": "channel" }
+  }
+}
+```
+
+### 100% stacked bars
+
+Each month adds up to 100%, so the axis shows each chain's share of volume.
+
+```json
+"view": {
+  "mark": "bar",
+  "encoding": {
+    "x": { "field": "month" },
+    "y": { "field": "volume_usd", "stack": "normalize" },
+    "color": { "field": "chain" }
+  }
+}
+```
+
+### Horizontal bars with a number format
+
+Categories are ranked by value, largest at the top.
+
+```json
+"view": {
+  "mark": "bar",
+  "encoding": {
+    "y": { "field": "country", "type": "nominal" },
+    "x": { "field": "users", "type": "quantitative", "axis": { "format": ",.0f" } }
+  }
+}
+```
+
+### Bars plus a line on two axes
+
+Daily signups as bars on the left axis, the conversion rate as a line on the right axis.
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "Signups and Conversion Rate",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT toDate(timestamp) AS date, countIf(type = 'connect') AS signups, countIf(type = 'transaction') / greatest(countIf(type = 'connect'), 1) AS conversion_rate FROM events WHERE timestamp >= {{date_from}} AND timestamp <= {{date_to}} GROUP BY date ORDER BY date"
+    },
+    "view": {
+      "layer": [
+        {
+          "mark": "bar",
+          "encoding": {
+            "x": { "field": "date" },
+            "y": { "field": "signups" }
+          }
+        },
+        {
+          "mark": "line",
+          "encoding": {
+            "x": { "field": "date" },
+            "y": { "field": "conversion_rate", "axis": { "format": ".1%" } }
+          }
+        }
+      ],
+      "resolve": { "scale": { "y": "independent" } }
+    }
+  }
+}
+```
+
+### Goal line
+
+A line chart with a dashed goal line at 5,000. The chart keeps its type.
+
+```json
+"view": {
+  "layer": [
+    {
+      "mark": "line",
+      "encoding": {
+        "x": { "field": "date" },
+        "y": { "field": "users", "axis": { "format": ",.0f" } }
+      }
+    },
+    { "mark": "rule", "encoding": { "y": { "datum": 5000 } } }
+  ]
+}
+```
+
+### Scatter
+
+One point per wallet, colored by segment.
+
+```json
+"view": {
+  "mark": "point",
+  "encoding": {
+    "x": { "field": "sessions" },
+    "y": { "field": "transactions" },
+    "color": { "field": "segment" }
+  }
+}
+```
+
+### Number with a format
+
+```json
+"view": {
+  "mark": "text",
+  "encoding": { "text": { "format": "$,.2f" } }
 }
 ```
 
@@ -544,7 +704,9 @@ For all-user retention, set both event filters to `null`:
 | Any                      | Only the keys above; `version` is `1`                                      |
 | `query.kind: "sql"`      | The SQL must run; every column the view names must be in the result      |
 | `view.mark: "text"`      | Without `encoding.text`, the query must return exactly 1 row and 1 column |
-| Stacked view             | `color` must differ from `x`                                              |
+| Split, grouped or stacked view | `color` must differ from `x`                                        |
+| `axis.format`, `text.format` | A d3-format string with width and precision of at most 2 digits     |
+| `layer`                  | The first layer is the chart; at most 2 data layers with the same `x`; `resolve.scale.y: "independent"` needs exactly 2 |
 | `query.kind: "funnel"`   | At least 2 steps; drawn with `x-funnel`                                    |
 | `query.kind: "retention"`| `settings` must include the `entryFilter` key; drawn with `x-retention`    |
 | `query.kind: "paths"`    | `settings.anchors` needs at least one entry; drawn with `x-sankey`         |

@@ -1999,7 +1999,7 @@
           },
           "mark": {
             "type": "string",
-            "description": "How the chart is drawn: `spec.view.mark` (for example `line`, `arc`, `x-table`, `x-funnel`)."
+            "description": "How the chart is drawn: `spec.view.mark` (for example `line`, `arc`, `point`, `x-table`, `x-funnel`), or `layer` for a layered view (a combo or a chart with goal lines)."
           },
           "chart_type": {
             "type": "string",
@@ -2013,7 +2013,9 @@
               "pie",
               "stacked",
               "user_paths",
-              "retention"
+              "retention",
+              "combo",
+              "scatter"
             ],
             "description": "The chart editor's type for the spec (derived, read-only)."
           },
@@ -2070,7 +2072,7 @@
       },
       "ChartSpec": {
         "type": "object",
-        "description": "Chart spec v1: `query` says what the chart computes, `view` how it is drawn (a Vega-Lite subset; channels name result columns and never compute). SQL charts: number = {mark:\"text\", encoding:{}} (1 row, 1 column); table = {mark:\"x-table\"}; bar/line/area need encoding.x and encoding.y; several y columns use transform [{fold:[cols], as:[\"series\",\"value\"]}] with y = value and color = series (bar also xOffset = series; area also y.stack true); stacked bar or area = y.stack true plus color = the breakdown column (color and stack go together; a line has neither); pie = {mark:\"arc\", encoding:{theta:{field, aggregate:\"sum\"}, color:{field}}}. Only these combinations are valid: a view must draw exactly as written. Funnel, retention and paths queries are drawn with x-funnel, x-retention and x-sankey.",
+        "description": "Chart spec v1: `query` says what the chart computes, `view` how it is drawn (a Vega-Lite subset; channels name result columns and never compute). SQL charts: number = {mark:\"text\", encoding:{}} (1 row, 1 column), or encoding.text {field?, format?} to pick and format a column of the one row; table = {mark:\"x-table\"}; bar/line/area/point need encoding.x and encoding.y. Several y columns: transform [{fold:[cols], as:[\"series\",\"value\"]}] with y = value and color = series (bar also xOffset = series; area also y.stack true). One y column split by a column: line + color = one line per value; bar + color + xOffset (same column) = grouped bars; bar or area + color + y.stack true = stacked, y.stack \"normalize\" = 100% stacked (shares). Horizontal bars: bar with y {field, type:\"nominal\"} (the category) and x {field, type:\"quantitative\"} (the value), grouped with yOffset. Number format: axis {format} on the value channel (d3-format: \"$,.2f\" money, \".1%\" fractions as percent, \".3~s\" compact). Scatter = {mark:\"point\"} with numeric x and y, optional color. Pie = {mark:\"arc\", encoding:{theta:{field, aggregate:\"sum\"}, color:{field}}}. Layered view {layer:[...], resolve?}: a chart plus goal lines {mark:\"rule\", encoding:{y:{datum:<number>}}}, or combo = one bar layer + one line layer on the same x with one y each, resolve.scale.y \"independent\" for a second axis. Only these combinations are valid: a view must draw exactly as written. Funnel, retention and paths queries are drawn with x-funnel, x-retention and x-sankey.",
         "properties": {
           "version": {
             "const": 1
@@ -2178,7 +2180,7 @@
                 "type": "object",
                 "properties": {
                   "mark": {
-                    "enum": ["bar", "line", "area", "arc", "text"]
+                    "enum": ["bar", "line", "area", "point", "arc", "text"]
                   },
                   "encoding": {
                     "type": "object",
@@ -2190,6 +2192,31 @@
                           "field": {
                             "type": "string",
                             "minLength": 1
+                          },
+                          "type": {
+                            "enum": [
+                              "quantitative",
+                              "nominal",
+                              "ordinal",
+                              "temporal"
+                            ]
+                          },
+                          "stack": {
+                            "enum": [true, "normalize"]
+                          },
+                          "axis": {
+                            "type": "object",
+                            "properties": {
+                              "format": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "pattern": "^(?:(.)?([<>=^]))?([+\\-( ])?([$#])?(0)?(\\d{1,2})?(,)?(\\.\\d{1,2})?(~)?([%bcdeEfgGnoprsxX])?$",
+                                "description": "A d3-format string, for example ',.0f', '.3~s' (compact), '.1%' (values are fractions) or '$,.2f'."
+                              }
+                            },
+                            "required": ["format"],
+                            "additionalProperties": false
                           }
                         },
                         "required": ["field"],
@@ -2203,8 +2230,30 @@
                             "type": "string",
                             "minLength": 1
                           },
+                          "type": {
+                            "enum": [
+                              "quantitative",
+                              "nominal",
+                              "ordinal",
+                              "temporal"
+                            ]
+                          },
                           "stack": {
-                            "const": true
+                            "enum": [true, "normalize"]
+                          },
+                          "axis": {
+                            "type": "object",
+                            "properties": {
+                              "format": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "pattern": "^(?:(.)?([<>=^]))?([+\\-( ])?([$#])?(0)?(\\d{1,2})?(,)?(\\.\\d{1,2})?(~)?([%bcdeEfgGnoprsxX])?$",
+                                "description": "A d3-format string, for example ',.0f', '.3~s' (compact), '.1%' (values are fractions) or '$,.2f'."
+                              }
+                            },
+                            "required": ["format"],
+                            "additionalProperties": false
                           }
                         },
                         "required": ["field"],
@@ -2234,6 +2283,18 @@
                         "required": ["field"],
                         "additionalProperties": false
                       },
+                      "yOffset": {
+                        "type": "object",
+                        "description": "One result column.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": ["field"],
+                        "additionalProperties": false
+                      },
                       "theta": {
                         "type": "object",
                         "description": "One result column.",
@@ -2247,6 +2308,24 @@
                           }
                         },
                         "required": ["field", "aggregate"],
+                        "additionalProperties": false
+                      },
+                      "text": {
+                        "type": "object",
+                        "description": "Number card: field = the column to show (default: the first number), format = its d3-format.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "format": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 32,
+                            "pattern": "^(?:(.)?([<>=^]))?([+\\-( ])?([$#])?(0)?(\\d{1,2})?(,)?(\\.\\d{1,2})?(~)?([%bcdeEfgGnoprsxX])?$",
+                            "description": "A d3-format string, for example ',.0f', '.3~s' (compact), '.1%' (values are fractions) or '$,.2f'."
+                          }
+                        },
                         "additionalProperties": false
                       }
                     },
@@ -2289,9 +2368,10 @@
                       "type": "object",
                       "properties": {
                         "mark": {
-                          "enum": ["bar", "line", "area"]
+                          "enum": ["bar", "line", "area", "point"]
                         }
-                      }
+                      },
+                      "required": ["mark"]
                     },
                     "then": {
                       "properties": {
@@ -2309,7 +2389,8 @@
                         "mark": {
                           "enum": ["arc"]
                         }
-                      }
+                      },
+                      "required": ["mark"]
                     },
                     "then": {
                       "properties": {
@@ -2321,6 +2402,301 @@
                     }
                   }
                 ]
+              },
+              {
+                "type": "object",
+                "description": "Layers share one x. The first layer is a bar, line, area or point view; the others are rules (goal lines) or, for a combo, one more bar/line/area view. At most 2 data layers, each with one y column (no fold, color or stack). resolve.scale.y \"independent\" gives the second data layer its own right axis.",
+                "properties": {
+                  "layer": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 6,
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "mark": {
+                              "enum": [
+                                "bar",
+                                "line",
+                                "area",
+                                "point",
+                                "arc",
+                                "text"
+                              ]
+                            },
+                            "encoding": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "object",
+                                  "description": "One result column.",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "type": {
+                                      "enum": [
+                                        "quantitative",
+                                        "nominal",
+                                        "ordinal",
+                                        "temporal"
+                                      ]
+                                    },
+                                    "stack": {
+                                      "enum": [true, "normalize"]
+                                    },
+                                    "axis": {
+                                      "type": "object",
+                                      "properties": {
+                                        "format": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 32,
+                                          "pattern": "^(?:(.)?([<>=^]))?([+\\-( ])?([$#])?(0)?(\\d{1,2})?(,)?(\\.\\d{1,2})?(~)?([%bcdeEfgGnoprsxX])?$",
+                                          "description": "A d3-format string, for example ',.0f', '.3~s' (compact), '.1%' (values are fractions) or '$,.2f'."
+                                        }
+                                      },
+                                      "required": ["format"],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": ["field"],
+                                  "additionalProperties": false
+                                },
+                                "y": {
+                                  "type": "object",
+                                  "description": "One result column.",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "type": {
+                                      "enum": [
+                                        "quantitative",
+                                        "nominal",
+                                        "ordinal",
+                                        "temporal"
+                                      ]
+                                    },
+                                    "stack": {
+                                      "enum": [true, "normalize"]
+                                    },
+                                    "axis": {
+                                      "type": "object",
+                                      "properties": {
+                                        "format": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 32,
+                                          "pattern": "^(?:(.)?([<>=^]))?([+\\-( ])?([$#])?(0)?(\\d{1,2})?(,)?(\\.\\d{1,2})?(~)?([%bcdeEfgGnoprsxX])?$",
+                                          "description": "A d3-format string, for example ',.0f', '.3~s' (compact), '.1%' (values are fractions) or '$,.2f'."
+                                        }
+                                      },
+                                      "required": ["format"],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": ["field"],
+                                  "additionalProperties": false
+                                },
+                                "color": {
+                                  "type": "object",
+                                  "description": "One result column.",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": ["field"],
+                                  "additionalProperties": false
+                                },
+                                "xOffset": {
+                                  "type": "object",
+                                  "description": "One result column.",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": ["field"],
+                                  "additionalProperties": false
+                                },
+                                "yOffset": {
+                                  "type": "object",
+                                  "description": "One result column.",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": ["field"],
+                                  "additionalProperties": false
+                                },
+                                "theta": {
+                                  "type": "object",
+                                  "description": "One result column.",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "aggregate": {
+                                      "const": "sum"
+                                    }
+                                  },
+                                  "required": ["field", "aggregate"],
+                                  "additionalProperties": false
+                                },
+                                "text": {
+                                  "type": "object",
+                                  "description": "Number card: field = the column to show (default: the first number), format = its d3-format.",
+                                  "properties": {
+                                    "field": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "format": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 32,
+                                      "pattern": "^(?:(.)?([<>=^]))?([+\\-( ])?([$#])?(0)?(\\d{1,2})?(,)?(\\.\\d{1,2})?(~)?([%bcdeEfgGnoprsxX])?$",
+                                      "description": "A d3-format string, for example ',.0f', '.3~s' (compact), '.1%' (values are fractions) or '$,.2f'."
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "transform": {
+                              "type": "array",
+                              "maxItems": 1,
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "fold": {
+                                    "type": "array",
+                                    "minItems": 2,
+                                    "items": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "as": {
+                                    "type": "array",
+                                    "minItems": 2,
+                                    "maxItems": 2,
+                                    "items": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  }
+                                },
+                                "required": ["fold", "as"],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": ["mark", "encoding"],
+                          "additionalProperties": false,
+                          "allOf": [
+                            {
+                              "if": {
+                                "type": "object",
+                                "properties": {
+                                  "mark": {
+                                    "enum": ["bar", "line", "area", "point"]
+                                  }
+                                },
+                                "required": ["mark"]
+                              },
+                              "then": {
+                                "properties": {
+                                  "encoding": {
+                                    "type": "object",
+                                    "required": ["x", "y"]
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "if": {
+                                "type": "object",
+                                "properties": {
+                                  "mark": {
+                                    "enum": ["arc"]
+                                  }
+                                },
+                                "required": ["mark"]
+                              },
+                              "then": {
+                                "properties": {
+                                  "encoding": {
+                                    "type": "object",
+                                    "required": ["theta", "color"]
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "mark": {
+                              "const": "rule"
+                            },
+                            "encoding": {
+                              "type": "object",
+                              "properties": {
+                                "y": {
+                                  "type": "object",
+                                  "properties": {
+                                    "datum": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": ["datum"],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": ["y"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": ["mark", "encoding"],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "resolve": {
+                    "type": "object",
+                    "properties": {
+                      "scale": {
+                        "type": "object",
+                        "properties": {
+                          "y": {
+                            "enum": ["independent", "shared"]
+                          }
+                        },
+                        "required": ["y"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": ["scale"],
+                    "additionalProperties": false
+                  }
+                },
+                "required": ["layer"],
+                "additionalProperties": false
               },
               {
                 "type": "object",
@@ -2361,7 +2737,8 @@
                       "mark": {
                         "enum": ["x-funnel", "x-retention", "x-sankey"]
                       }
-                    }
+                    },
+                    "required": ["mark"]
                   }
                 }
               }
@@ -2388,7 +2765,8 @@
                     "mark": {
                       "const": "x-funnel"
                     }
-                  }
+                  },
+                  "required": ["mark"]
                 }
               }
             }
@@ -2414,7 +2792,8 @@
                     "mark": {
                       "const": "x-retention"
                     }
-                  }
+                  },
+                  "required": ["mark"]
                 }
               }
             }
@@ -2440,7 +2819,8 @@
                     "mark": {
                       "const": "x-sankey"
                     }
-                  }
+                  },
+                  "required": ["mark"]
                 }
               }
             }
