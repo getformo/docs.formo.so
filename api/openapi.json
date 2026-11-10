@@ -2070,7 +2070,7 @@
       },
       "ChartSpec": {
         "type": "object",
-        "description": "Chart spec v1: `query` says what the chart computes, `view` how it is drawn (a Vega-Lite subset; channels name result columns and never compute). SQL charts: number = {mark:\"text\", encoding:{}} (1 row, 1 column); table = {mark:\"x-table\"}; bar/line/area need encoding.x and encoding.y; several y columns use transform [{fold:[cols], as:[\"series\",\"value\"]}] with y = value and color = series (bar also xOffset = series); stacked = y.stack true plus color = the breakdown column; pie = {mark:\"arc\", encoding:{theta:{field, aggregate:\"sum\"}, color:{field}}}. Funnel, retention and paths queries are drawn with x-funnel, x-retention and x-sankey.",
+        "description": "Chart spec v1: `query` says what the chart computes, `view` how it is drawn (a Vega-Lite subset; channels name result columns and never compute). SQL charts: number = {mark:\"text\", encoding:{}} (1 row, 1 column); table = {mark:\"x-table\"}; bar/line/area need encoding.x and encoding.y; several y columns use transform [{fold:[cols], as:[\"series\",\"value\"]}] with y = value and color = series (bar also xOffset = series; area also y.stack true); stacked bar or area = y.stack true plus color = the breakdown column (color and stack go together; a line has neither); pie = {mark:\"arc\", encoding:{theta:{field, aggregate:\"sum\"}, color:{field}}}. Only these combinations are valid: a view must draw exactly as written. Funnel, retention and paths queries are drawn with x-funnel, x-retention and x-sankey.",
         "properties": {
           "version": {
             "const": 1
@@ -2190,18 +2190,6 @@
                           "field": {
                             "type": "string",
                             "minLength": 1
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "quantitative",
-                              "temporal",
-                              "nominal",
-                              "ordinal"
-                            ]
-                          },
-                          "title": {
-                            "type": "string"
                           }
                         },
                         "required": ["field"],
@@ -2215,20 +2203,8 @@
                             "type": "string",
                             "minLength": 1
                           },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "quantitative",
-                              "temporal",
-                              "nominal",
-                              "ordinal"
-                            ]
-                          },
-                          "title": {
-                            "type": "string"
-                          },
                           "stack": {
-                            "enum": [true, "normalize"]
+                            "const": true
                           }
                         },
                         "required": ["field"],
@@ -2241,18 +2217,6 @@
                           "field": {
                             "type": "string",
                             "minLength": 1
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "quantitative",
-                              "temporal",
-                              "nominal",
-                              "ordinal"
-                            ]
-                          },
-                          "title": {
-                            "type": "string"
                           }
                         },
                         "required": ["field"],
@@ -2265,18 +2229,6 @@
                           "field": {
                             "type": "string",
                             "minLength": 1
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "quantitative",
-                              "temporal",
-                              "nominal",
-                              "ordinal"
-                            ]
-                          },
-                          "title": {
-                            "type": "string"
                           }
                         },
                         "required": ["field"],
@@ -2290,47 +2242,11 @@
                             "type": "string",
                             "minLength": 1
                           },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "quantitative",
-                              "temporal",
-                              "nominal",
-                              "ordinal"
-                            ]
-                          },
-                          "title": {
-                            "type": "string"
-                          },
                           "aggregate": {
                             "const": "sum"
                           }
                         },
-                        "required": ["field"],
-                        "additionalProperties": false
-                      },
-                      "text": {
-                        "type": "object",
-                        "description": "One result column.",
-                        "properties": {
-                          "field": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "quantitative",
-                              "temporal",
-                              "nominal",
-                              "ordinal"
-                            ]
-                          },
-                          "title": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["field"],
+                        "required": ["field", "aggregate"],
                         "additionalProperties": false
                       }
                     },

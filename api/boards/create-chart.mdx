@@ -53,10 +53,10 @@ SQL may use the `{{date_from}}` and `{{date_to}}` variables. Project scoping is 
 | Number (KPI card)     | `{ "mark": "text", "encoding": {} }`. The query must return exactly 1 row and 1 column                          |
 | Line, bar, area       | `mark` plus `encoding.x` and `encoding.y`                                                                      |
 | Several y columns     | `transform: [{ "fold": ["a", "b"], "as": ["series", "value"] }]`, `y` = `value`, `color` = `series` (bar also `xOffset` = `series`) |
-| Stacked bar or area   | `y.stack: true` and `color` = the breakdown column                                                             |
+| Stacked bar or area   | `y.stack: true` and `color` = the breakdown column (several y columns on an area: a fold with `y.stack: true`) |
 | Pie                   | `{ "mark": "arc", "encoding": { "theta": { "field": "...", "aggregate": "sum" }, "color": { "field": "..." } } }` |
 
-Channels: `x`, `y`, `color`, `xOffset`, `theta`, `text`. Each channel is `{ "field": "<column>" }` with optional `type` (`quantitative`, `temporal`, `nominal`, `ordinal`) and `title`. `data`, `params`, expressions and transforms other than `fold` are rejected.
+Channels: `x`, `y`, `color`, `xOffset`, `theta`. Each channel is `{ "field": "<column>" }`; `y` may add `"stack": true` and `theta` needs `"aggregate": "sum"`. Only the combinations in the table above are valid, so a view always draws exactly as written: `color` goes with a stack or a fold, a line has neither. `data`, `params`, expressions, channel `type` and `title`, and transforms other than `fold` are rejected.
 
 ---
 
