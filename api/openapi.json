@@ -635,7 +635,7 @@
       },
       "ChartSettings": {
         "type": "object",
-        "description": "Chart-type-specific configuration. The fields that apply depend on `chart_type`:\n\n- **funnel**: `funnelType`, `conversionWindow`, `breakdown`\n- **user_paths**: `anchors`, `maxSteps`, `nodesPerStep`, `conversionWindow`, `filters`\n- **retention**: `entryFilter`, `retentionFilter`, `retentionUserFilters`, `retentionSignalType`, `retentionLabelSignal`\n\nFields are optional at the schema level except where the selected chart type requires them. User Paths require at least one `anchors` entry. Retention requests must explicitly include `entryFilter`; use `null` for any event.",
+        "description": "`spec.query.settings` of a chart. The fields that apply depend on `spec.query.kind`:\n\n- **funnel**: `funnelType`, `conversionWindow`, `breakdown`\n- **paths** (user paths): `anchors`, `maxSteps`, `nodesPerStep`, `conversionWindow`, `filters`\n- **retention**: `entryFilter`, `retentionFilter`, `retentionUserFilters`, `retentionSignalType`, `retentionLabelSignal`\n\nFields are optional at the schema level except where the query kind requires them. User Paths require at least one `anchors` entry. Retention requests must explicitly include `entryFilter`; use `null` for any event.",
         "properties": {
           "funnelType": {
             "type": "string",
@@ -645,7 +645,7 @@
           },
           "conversionWindow": {
             "$ref": "#/components/schemas/ConversionWindow",
-            "description": "**Funnel & user_paths.** Maximum time from Step 1 for a user to complete all steps."
+            "description": "**funnel & paths.** Maximum time from Step 1 for a user to complete all steps."
           },
           "breakdown": {
             "type": "string",
@@ -671,25 +671,25 @@
             "items": {
               "$ref": "#/components/schemas/FunnelStep"
             },
-            "description": "**user_paths (required).** Ordered path anchors. The first entry starts the flow; the last entry ends it. A single entry creates an open-ended flow."
+            "description": "**paths (required).** Ordered path anchors. The first entry starts the flow; the last entry ends it. A single entry creates an open-ended flow."
           },
           "maxSteps": {
             "type": "integer",
             "minimum": 2,
             "maximum": 5,
             "default": 3,
-            "description": "**user_paths.** Maximum number of steps to show in the flow (2 to 5). Values above 5 are clamped to 5."
+            "description": "**paths.** Maximum number of steps to show in the flow (2 to 5). Values above 5 are clamped to 5."
           },
           "nodesPerStep": {
             "type": "integer",
             "minimum": 2,
-            "maximum": 8,
-            "default": 5,
-            "description": "**user_paths.** Maximum number of unique event nodes visible per step (2 to 8). Values above 8 are clamped to 8."
+            "maximum": 100,
+            "default": 20,
+            "description": "**paths.** Maximum number of events shown per step (2 to 100). Less frequent events in a step are grouped into an Others node."
           },
           "filters": {
             "type": "string",
-            "description": "**user_paths.** JSON-encoded string of additional filters applied to the path query."
+            "description": "**paths.** JSON-encoded string of additional filters applied to the path query."
           },
           "retentionFilter": {
             "oneOf": [
@@ -741,32 +741,11 @@
       },
       "CreateChartRequest": {
         "type": "object",
-        "description": "Request body for creating a chart.",
+        "description": "Request body for creating a chart: a title and a `ChartSpec` (`query` + `view`). The server validates the spec: a SQL query runs, and every column the view names must be in its result. Funnel queries need at least 2 steps; retention settings must include `entryFilter`; paths settings need at least one anchor.",
         "properties": {
           "projectId": {
             "type": "string",
             "description": "Project the chart belongs to."
-          },
-          "query": {
-            "type": "string",
-            "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: omit it; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
-          },
-          "chart_type": {
-            "type": "string",
-            "enum": [
-              "table",
-              "number",
-              "funnel",
-              "bar",
-              "line",
-              "area",
-              "pie",
-              "stacked",
-              "user_paths",
-              "retention"
-            ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
           },
           "title": {
             "type": "string",
@@ -777,38 +756,16 @@
             "type": "string",
             "description": "Optional description."
           },
-          "x_axis": {
-            "type": "string",
-            "description": "Column name for the X axis. Required for `bar`, `line`, and `stacked`."
-          },
-          "y_axis": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line`: at least 1 element required.\n- `pie` / `stacked`: exactly 1 element required."
-          },
-          "group_by": {
-            "type": "string",
-            "description": "Column to group / stack series by. Required for `stacked`."
-          },
-          "steps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FunnelStep"
-            },
-            "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property predicates in its canonical `filters` array (e.g. `\"filters\": [{ \"field\": \"rdns\", \"op\": \"eq\", \"value\": \"io.metamask\" }]`)."
-          },
-          "settings": {
-            "$ref": "#/components/schemas/ChartSettings"
+          "spec": {
+            "$ref": "#/components/schemas/ChartSpec"
           }
         },
-        "required": ["projectId", "chart_type", "title"]
+        "required": ["projectId", "title", "spec"],
+        "additionalProperties": false
       },
       "UpdateChartRequest": {
         "type": "object",
-        "description": "Request body for updating an existing chart.",
+        "description": "Request body for updating an existing chart. The title, description and spec replace the stored ones; the spec is validated as on create.",
         "properties": {
           "chartId": {
             "type": "string",
@@ -818,27 +775,6 @@
             "type": "string",
             "description": "Project the chart belongs to."
           },
-          "query": {
-            "type": "string",
-            "minLength": 1,
-            "description": "SQL query that powers the chart.\n\n- **`funnel`**: pass `\"SELECT 1\"`; the actual query is auto-generated from `steps`.\n- **`user_paths`**: omit it; the query is generated from `settings.anchors`.\n- **`retention`**: omit it; data is fetched automatically.\n- **All other types**: required; must be a valid SQL string."
-          },
-          "chart_type": {
-            "type": "string",
-            "enum": [
-              "table",
-              "number",
-              "funnel",
-              "bar",
-              "line",
-              "area",
-              "pie",
-              "stacked",
-              "user_paths",
-              "retention"
-            ],
-            "description": "Visualization type. Determines which other fields are required:\n\n| `chart_type` | Extra required fields |\n|---|---|\n| `table` | `query` |\n| `number` | `query` (must return 1 row × 1 column) |\n| `bar` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `line` | `query`, `x_axis`, `y_axis` (≥ 1) |\n| `area` | `query`, `x_axis`, `y_axis` (≥ 1; exactly 1 if `group_by` set) |\n| `pie` | `query`, `y_axis` (exactly 1) |\n| `stacked` | `query`, `x_axis`, `y_axis` (exactly 1), `group_by` |\n| `funnel` | `steps` (≥ 2), `query` placeholder `\"SELECT 1\"` |\n| `user_paths` | `settings.anchors` (≥ 1); query is generated |\n| `retention` | `settings.entryFilter` (key required; `null` means any event) |"
-          },
           "title": {
             "type": "string",
             "minLength": 1,
@@ -848,34 +784,12 @@
             "type": "string",
             "description": "Optional description."
           },
-          "x_axis": {
-            "type": "string",
-            "description": "Column name for the X axis. Required for `bar`, `line`, and `stacked`."
-          },
-          "y_axis": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Column name(s) used as Y axis metrics.\n\n- `bar` / `line`: at least 1 element required.\n- `pie` / `stacked`: exactly 1 element required."
-          },
-          "group_by": {
-            "type": "string",
-            "description": "Column to group / stack series by. Required for `stacked`."
-          },
-          "steps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FunnelStep"
-            },
-            "minItems": 2,
-            "description": "Ordered list of funnel steps. Required for `funnel` (minimum 2 steps).\n\nEach element is a `FunnelStep`; add property predicates in its canonical `filters` array (e.g. `\"filters\": [{ \"field\": \"rdns\", \"op\": \"eq\", \"value\": \"io.metamask\" }]`)."
-          },
-          "settings": {
-            "$ref": "#/components/schemas/ChartSettings"
+          "spec": {
+            "$ref": "#/components/schemas/ChartSpec"
           }
         },
-        "required": ["chartId", "projectId", "chart_type", "title"]
+        "required": ["chartId", "projectId", "title", "spec"],
+        "additionalProperties": false
       },
       "Chart": {
         "type": "object",
@@ -884,32 +798,11 @@
           "id": {
             "type": "string"
           },
-          "chart_type": {
-            "type": "string",
-            "enum": [
-              "table",
-              "number",
-              "funnel",
-              "bar",
-              "line",
-              "area",
-              "pie",
-              "stacked",
-              "user_paths",
-              "retention"
-            ],
-            "description": "Visualization type."
-          },
           "title": {
             "type": "string"
           },
           "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "query": {
-            "type": "string",
-            "description": "SQL query powering the chart. For `funnel` and `retention` charts this is a system-managed placeholder."
+            "type": ["string", "null"]
           },
           "project_id": {
             "type": "string"
@@ -917,51 +810,29 @@
           "board_id": {
             "type": "string"
           },
-          "x_axis": {
+          "position": {
+            "type": "integer",
+            "description": "Display position of the chart on its board."
+          },
+          "created_at": {
             "type": "string",
-            "nullable": true,
-            "description": "Column used as the X axis."
+            "format": "date-time"
           },
-          "y_axis": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "nullable": true,
-            "description": "Column(s) used as Y axis metric(s)."
+          "updated_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
           },
-          "group_by": {
-            "type": "string",
-            "nullable": true,
-            "description": "Column used to group/stack series."
-          },
-          "steps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FunnelStep"
-            },
-            "nullable": true,
-            "description": "Ordered list of funnel steps. Only present when `chart_type` is `funnel`."
-          },
-          "settings": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ChartSettings"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Type-specific configuration. See `ChartSettings` for all fields."
+          "spec": {
+            "$ref": "#/components/schemas/ChartSpec"
           }
         },
         "required": [
           "id",
-          "chart_type",
           "title",
-          "query",
           "project_id",
-          "board_id"
+          "board_id",
+          "position",
+          "spec"
         ]
       },
       "Contract": {
@@ -2104,10 +1975,12 @@
           "id",
           "project_id",
           "board_id",
-          "chart_type",
           "title",
           "position",
-          "created_at"
+          "created_at",
+          "kind",
+          "mark",
+          "chart_type"
         ],
         "properties": {
           "id": {
@@ -2119,8 +1992,30 @@
           "board_id": {
             "type": "string"
           },
+          "kind": {
+            "type": "string",
+            "enum": ["sql", "funnel", "retention", "paths"],
+            "description": "What the chart computes: `spec.query.kind`."
+          },
+          "mark": {
+            "type": "string",
+            "description": "How the chart is drawn: `spec.view.mark` (for example `line`, `arc`, `x-table`, `x-funnel`)."
+          },
           "chart_type": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "table",
+              "number",
+              "funnel",
+              "bar",
+              "line",
+              "area",
+              "pie",
+              "stacked",
+              "user_paths",
+              "retention"
+            ],
+            "description": "The chart editor's type for the spec (derived, read-only)."
           },
           "title": {
             "type": "string"
@@ -2141,6 +2036,500 @@
             "format": "date-time"
           }
         }
+      },
+      "BoardChart": {
+        "type": "object",
+        "description": "A chart on a board with its query results. The spec has no `query.sql` (read one chart to get it).",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "has_date_variables": {
+            "type": "boolean",
+            "description": "True when the SQL uses `{{date_from}}` / `{{date_to}}`."
+          },
+          "results": {
+            "type": "string",
+            "description": "JSON-encoded query result (`{ data, meta, rows }`). `{ \"data\": [] }` for funnel, retention and paths charts, whose data comes from their own endpoints."
+          },
+          "spec": {
+            "type": "object",
+            "description": "The chart's `ChartSpec` without `query.sql`."
+          }
+        },
+        "required": ["id", "title", "results", "spec"]
+      },
+      "ChartSpec": {
+        "type": "object",
+        "description": "Chart spec v1: `query` says what the chart computes, `view` how it is drawn (a Vega-Lite subset; channels name result columns and never compute). SQL charts: number = {mark:\"text\", encoding:{}} (1 row, 1 column); table = {mark:\"x-table\"}; bar/line/area need encoding.x and encoding.y; several y columns use transform [{fold:[cols], as:[\"series\",\"value\"]}] with y = value and color = series (bar also xOffset = series); stacked = y.stack true plus color = the breakdown column; pie = {mark:\"arc\", encoding:{theta:{field, aggregate:\"sum\"}, color:{field}}}. Funnel, retention and paths queries are drawn with x-funnel, x-retention and x-sankey.",
+        "properties": {
+          "version": {
+            "const": 1
+          },
+          "query": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "sql"
+                  },
+                  "sql": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "SELECT on Formo datasources. Project scoping is applied automatically. May use {{date_from}} and {{date_to}}."
+                  },
+                  "settings": {
+                    "type": "object",
+                    "description": "Chart settings (see ChartSettings in the REST API): funnelType, conversionWindow and breakdown for funnels; anchors, maxSteps and nodesPerStep for paths; entryFilter and retentionFilter for retention."
+                  }
+                },
+                "required": ["kind", "sql"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "funnel"
+                  },
+                  "steps": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                      "type": "object",
+                      "description": "A funnel step: {type, event, filters?: [{field, op, value}], events?: [{type, event}]} (events = match any of them).",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "event": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "filters": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "events": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "required": ["type", "event"]
+                    }
+                  },
+                  "settings": {
+                    "type": "object",
+                    "description": "Chart settings (see ChartSettings in the REST API): funnelType, conversionWindow and breakdown for funnels; anchors, maxSteps and nodesPerStep for paths; entryFilter and retentionFilter for retention."
+                  }
+                },
+                "required": ["kind", "steps"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "retention"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "description": "Retention settings. entryFilter is required (null = any event).",
+                    "required": ["entryFilter"]
+                  }
+                },
+                "required": ["kind", "settings"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "paths"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "description": "User paths settings: anchors (at least 1), maxSteps, nodesPerStep."
+                  }
+                },
+                "required": ["kind", "settings"],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "view": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "mark": {
+                    "enum": ["bar", "line", "area", "arc", "text"]
+                  },
+                  "encoding": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "object",
+                        "description": "One result column.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "quantitative",
+                              "temporal",
+                              "nominal",
+                              "ordinal"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["field"],
+                        "additionalProperties": false
+                      },
+                      "y": {
+                        "type": "object",
+                        "description": "One result column.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "quantitative",
+                              "temporal",
+                              "nominal",
+                              "ordinal"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "stack": {
+                            "enum": [true, "normalize"]
+                          }
+                        },
+                        "required": ["field"],
+                        "additionalProperties": false
+                      },
+                      "color": {
+                        "type": "object",
+                        "description": "One result column.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "quantitative",
+                              "temporal",
+                              "nominal",
+                              "ordinal"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["field"],
+                        "additionalProperties": false
+                      },
+                      "xOffset": {
+                        "type": "object",
+                        "description": "One result column.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "quantitative",
+                              "temporal",
+                              "nominal",
+                              "ordinal"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["field"],
+                        "additionalProperties": false
+                      },
+                      "theta": {
+                        "type": "object",
+                        "description": "One result column.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "quantitative",
+                              "temporal",
+                              "nominal",
+                              "ordinal"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "aggregate": {
+                            "const": "sum"
+                          }
+                        },
+                        "required": ["field"],
+                        "additionalProperties": false
+                      },
+                      "text": {
+                        "type": "object",
+                        "description": "One result column.",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "quantitative",
+                              "temporal",
+                              "nominal",
+                              "ordinal"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["field"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "transform": {
+                    "type": "array",
+                    "maxItems": 1,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "fold": {
+                          "type": "array",
+                          "minItems": 2,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "as": {
+                          "type": "array",
+                          "minItems": 2,
+                          "maxItems": 2,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      },
+                      "required": ["fold", "as"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["mark", "encoding"],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "type": "object",
+                      "properties": {
+                        "mark": {
+                          "enum": ["bar", "line", "area"]
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "encoding": {
+                          "type": "object",
+                          "required": ["x", "y"]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "type": "object",
+                      "properties": {
+                        "mark": {
+                          "enum": ["arc"]
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "encoding": {
+                          "type": "object",
+                          "required": ["theta", "color"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "mark": {
+                    "enum": ["x-table", "x-funnel", "x-retention", "x-sankey"]
+                  }
+                },
+                "required": ["mark"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": ["version", "query", "view"],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "sql"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "view": {
+                  "type": "object",
+                  "not": {
+                    "type": "object",
+                    "properties": {
+                      "mark": {
+                        "enum": ["x-funnel", "x-retention", "x-sankey"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "funnel"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "view": {
+                  "type": "object",
+                  "properties": {
+                    "mark": {
+                      "const": "x-funnel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "retention"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "view": {
+                  "type": "object",
+                  "properties": {
+                    "mark": {
+                      "const": "x-retention"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "paths"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "view": {
+                  "type": "object",
+                  "properties": {
+                    "mark": {
+                      "const": "x-sankey"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "parameters": {
@@ -3444,7 +3833,7 @@
                             "data": {
                               "type": "array",
                               "items": {
-                                "$ref": "#/components/schemas/Chart"
+                                "$ref": "#/components/schemas/BoardChart"
                               }
                             },
                             "board": {
@@ -3514,28 +3903,35 @@
                   "summary": "3-step closed funnel (7-day window)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT 1",
-                    "chart_type": "funnel",
                     "title": "Onboarding Funnel",
-                    "steps": [
-                      {
-                        "type": "event",
-                        "event": "page"
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "funnel",
+                        "steps": [
+                          {
+                            "type": "event",
+                            "event": "page"
+                          },
+                          {
+                            "type": "event",
+                            "event": "connect"
+                          },
+                          {
+                            "type": "event",
+                            "event": "transaction"
+                          }
+                        ],
+                        "settings": {
+                          "funnelType": "closed",
+                          "conversionWindow": {
+                            "value": 7,
+                            "unit": "day"
+                          }
+                        }
                       },
-                      {
-                        "type": "event",
-                        "event": "connect"
-                      },
-                      {
-                        "type": "event",
-                        "event": "transaction"
-                      }
-                    ],
-                    "settings": {
-                      "funnelType": "closed",
-                      "conversionWindow": {
-                        "value": 7,
-                        "unit": "day"
+                      "view": {
+                        "mark": "x-funnel"
                       }
                     }
                   }
@@ -3544,40 +3940,47 @@
                   "summary": "Funnel with per-step property filters (MetaMask on mainnet)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT 1",
-                    "chart_type": "funnel",
                     "title": "MetaMask Conversion Funnel",
-                    "steps": [
-                      {
-                        "type": "event",
-                        "event": "page"
-                      },
-                      {
-                        "type": "event",
-                        "event": "connect",
-                        "filters": [
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "funnel",
+                        "steps": [
                           {
-                            "field": "rdns",
-                            "op": "eq",
-                            "value": "io.metamask"
+                            "type": "event",
+                            "event": "page"
                           },
                           {
-                            "field": "chain_id",
-                            "op": "eq",
-                            "value": "1"
+                            "type": "event",
+                            "event": "connect",
+                            "filters": [
+                              {
+                                "field": "rdns",
+                                "op": "eq",
+                                "value": "io.metamask"
+                              },
+                              {
+                                "field": "chain_id",
+                                "op": "eq",
+                                "value": "1"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "event",
+                            "event": "transaction"
                           }
-                        ]
+                        ],
+                        "settings": {
+                          "funnelType": "closed",
+                          "conversionWindow": {
+                            "value": 7,
+                            "unit": "day"
+                          }
+                        }
                       },
-                      {
-                        "type": "event",
-                        "event": "transaction"
-                      }
-                    ],
-                    "settings": {
-                      "funnelType": "closed",
-                      "conversionWindow": {
-                        "value": 7,
-                        "unit": "day"
+                      "view": {
+                        "mark": "x-funnel"
                       }
                     }
                   }
@@ -3586,30 +3989,37 @@
                   "summary": "Funnel with device breakdown",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT 1",
-                    "chart_type": "funnel",
                     "title": "Onboarding Funnel by Device",
-                    "steps": [
-                      {
-                        "type": "event",
-                        "event": "page"
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "funnel",
+                        "steps": [
+                          {
+                            "type": "event",
+                            "event": "page"
+                          },
+                          {
+                            "type": "event",
+                            "event": "connect"
+                          },
+                          {
+                            "type": "event",
+                            "event": "signature"
+                          }
+                        ],
+                        "settings": {
+                          "funnelType": "closed",
+                          "conversionWindow": {
+                            "value": 30,
+                            "unit": "day"
+                          },
+                          "breakdown": "device"
+                        }
                       },
-                      {
-                        "type": "event",
-                        "event": "connect"
-                      },
-                      {
-                        "type": "event",
-                        "event": "signature"
+                      "view": {
+                        "mark": "x-funnel"
                       }
-                    ],
-                    "settings": {
-                      "funnelType": "closed",
-                      "conversionWindow": {
-                        "value": 30,
-                        "unit": "day"
-                      },
-                      "breakdown": "device"
                     }
                   }
                 },
@@ -3617,44 +4027,51 @@
                   "summary": "Open funnel with multi-value `in` filter and breakdown",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT 1",
-                    "chart_type": "funnel",
                     "title": "Mobile Onboarding Funnel",
-                    "steps": [
-                      {
-                        "type": "event",
-                        "event": "page",
-                        "filters": [
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "funnel",
+                        "steps": [
                           {
-                            "field": "device",
-                            "op": "eq",
-                            "value": "mobile"
-                          }
-                        ]
-                      },
-                      {
-                        "type": "event",
-                        "event": "connect",
-                        "filters": [
+                            "type": "event",
+                            "event": "page",
+                            "filters": [
+                              {
+                                "field": "device",
+                                "op": "eq",
+                                "value": "mobile"
+                              }
+                            ]
+                          },
                           {
-                            "field": "provider_name",
-                            "op": "in",
-                            "value": ["metamask", "rainbow", "coinbase"]
+                            "type": "event",
+                            "event": "connect",
+                            "filters": [
+                              {
+                                "field": "provider_name",
+                                "op": "in",
+                                "value": ["metamask", "rainbow", "coinbase"]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "event",
+                            "event": "transaction"
                           }
-                        ]
+                        ],
+                        "settings": {
+                          "funnelType": "open",
+                          "conversionWindow": {
+                            "value": 30,
+                            "unit": "day"
+                          },
+                          "breakdown": "device"
+                        }
                       },
-                      {
-                        "type": "event",
-                        "event": "transaction"
+                      "view": {
+                        "mark": "x-funnel"
                       }
-                    ],
-                    "settings": {
-                      "funnelType": "open",
-                      "conversionWindow": {
-                        "value": 30,
-                        "unit": "day"
-                      },
-                      "breakdown": "device"
                     }
                   }
                 },
@@ -3662,86 +4079,205 @@
                   "summary": "Daily active users (bar chart)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date",
-                    "chart_type": "bar",
                     "title": "Daily Active Users",
-                    "x_axis": "date",
-                    "y_axis": ["users"]
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "sql",
+                        "sql": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date"
+                      },
+                      "view": {
+                        "mark": "bar",
+                        "encoding": {
+                          "x": {
+                            "field": "date"
+                          },
+                          "y": {
+                            "field": "users"
+                          }
+                        }
+                      }
+                    }
                   }
                 },
                 "lineChart": {
                   "summary": "DAU last 30 days (line chart)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS daily_active_users FROM events GROUP BY date ORDER BY date DESC LIMIT 30",
-                    "chart_type": "line",
                     "title": "Daily Active Users",
-                    "x_axis": "date",
-                    "y_axis": ["daily_active_users"]
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "sql",
+                        "sql": "SELECT toDate(timestamp) AS date, countDistinct(address) AS daily_active_users FROM events GROUP BY date ORDER BY date DESC LIMIT 30"
+                      },
+                      "view": {
+                        "mark": "line",
+                        "encoding": {
+                          "x": {
+                            "field": "date"
+                          },
+                          "y": {
+                            "field": "daily_active_users"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "lineChartMultiY": {
+                  "summary": "Connects and signatures per day (line chart, two y columns)",
+                  "value": {
+                    "projectId": "proj_abc",
+                    "title": "Connects and Signatures",
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "sql",
+                        "sql": "SELECT toDate(timestamp) AS date, countIf(type = 'connect') AS connects, countIf(type = 'signature') AS signatures FROM events GROUP BY date ORDER BY date"
+                      },
+                      "view": {
+                        "mark": "line",
+                        "transform": [
+                          {
+                            "fold": ["connects", "signatures"],
+                            "as": ["series", "value"]
+                          }
+                        ],
+                        "encoding": {
+                          "x": {
+                            "field": "date"
+                          },
+                          "y": {
+                            "field": "value"
+                          },
+                          "color": {
+                            "field": "series"
+                          }
+                        }
+                      }
+                    }
                   }
                 },
                 "pieChart": {
                   "summary": "Sessions by device (pie chart)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT device, COUNT(*) AS session_count FROM (SELECT session_id, argMinMerge(device) AS device FROM sessions GROUP BY session_id) GROUP BY device ORDER BY session_count DESC LIMIT 10",
-                    "chart_type": "pie",
                     "title": "Sessions by Device",
-                    "x_axis": "device",
-                    "y_axis": ["session_count"]
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "sql",
+                        "sql": "SELECT device, COUNT(*) AS session_count FROM (SELECT session_id, argMinMerge(device) AS device FROM sessions GROUP BY session_id) GROUP BY device ORDER BY session_count DESC LIMIT 10"
+                      },
+                      "view": {
+                        "mark": "arc",
+                        "encoding": {
+                          "theta": {
+                            "field": "session_count",
+                            "aggregate": "sum"
+                          },
+                          "color": {
+                            "field": "device"
+                          }
+                        }
+                      }
+                    }
                   }
                 },
                 "stackedChart": {
                   "summary": "Sessions by device grouped by browser (stacked chart)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT device, browser, COUNT(*) AS session_count FROM (SELECT session_id, argMinMerge(device) AS device, argMinMerge(browser) AS browser FROM sessions GROUP BY session_id) GROUP BY device, browser ORDER BY session_count DESC",
-                    "chart_type": "stacked",
                     "title": "Sessions by Device and Browser",
-                    "x_axis": "device",
-                    "y_axis": ["session_count"],
-                    "group_by": "browser"
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "sql",
+                        "sql": "SELECT device, browser, COUNT(*) AS session_count FROM (SELECT session_id, argMinMerge(device) AS device, argMinMerge(browser) AS browser FROM sessions GROUP BY session_id) GROUP BY device, browser ORDER BY session_count DESC"
+                      },
+                      "view": {
+                        "mark": "bar",
+                        "encoding": {
+                          "x": {
+                            "field": "device"
+                          },
+                          "y": {
+                            "field": "session_count",
+                            "stack": true
+                          },
+                          "color": {
+                            "field": "browser"
+                          }
+                        }
+                      }
+                    }
                   }
                 },
                 "numberChart": {
                   "summary": "Total connected wallets (number / KPI card)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
-                    "chart_type": "number",
-                    "title": "Total Connected Wallets"
+                    "title": "Total Connected Wallets",
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "sql",
+                        "sql": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'"
+                      },
+                      "view": {
+                        "mark": "text",
+                        "encoding": {}
+                      }
+                    }
                   }
                 },
                 "tableChart": {
                   "summary": "Recent events (table)",
                   "value": {
                     "projectId": "proj_abc",
-                    "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
-                    "chart_type": "table",
-                    "title": "Recent Events"
+                    "title": "Recent Events",
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "sql",
+                        "sql": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10"
+                      },
+                      "view": {
+                        "mark": "x-table"
+                      }
+                    }
                   }
                 },
                 "userPathsChart": {
                   "summary": "User flow from connect (max 5 steps)",
                   "value": {
                     "projectId": "proj_abc",
-                    "chart_type": "user_paths",
                     "title": "Post-Connect User Flow",
-                    "settings": {
-                      "anchors": [
-                        {
-                          "type": "event",
-                          "event": "connect"
-                        },
-                        {
-                          "type": "event",
-                          "event": "transaction"
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "paths",
+                        "settings": {
+                          "anchors": [
+                            {
+                              "type": "event",
+                              "event": "connect"
+                            },
+                            {
+                              "type": "event",
+                              "event": "transaction"
+                            }
+                          ],
+                          "maxSteps": 5,
+                          "conversionWindow": {
+                            "value": 2,
+                            "unit": "week"
+                          }
                         }
-                      ],
-                      "maxSteps": 5,
-                      "conversionWindow": {
-                        "value": 2,
-                        "unit": "week"
+                      },
+                      "view": {
+                        "mark": "x-sankey"
                       }
                     }
                   }
@@ -3750,17 +4286,25 @@
                   "summary": "Open-ended user flow from page view",
                   "value": {
                     "projectId": "proj_abc",
-                    "chart_type": "user_paths",
                     "title": "User Discovery Paths",
-                    "settings": {
-                      "anchors": [
-                        {
-                          "type": "event",
-                          "event": "page"
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "paths",
+                        "settings": {
+                          "anchors": [
+                            {
+                              "type": "event",
+                              "event": "page"
+                            }
+                          ],
+                          "maxSteps": 5,
+                          "nodesPerStep": 8
                         }
-                      ],
-                      "maxSteps": 5,
-                      "nodesPerStep": 8
+                      },
+                      "view": {
+                        "mark": "x-sankey"
+                      }
                     }
                   }
                 },
@@ -3768,24 +4312,32 @@
                   "summary": "Weekly retention: desktop users, transaction event",
                   "value": {
                     "projectId": "proj_abc",
-                    "chart_type": "retention",
                     "title": "Weekly Retention: Desktop",
-                    "settings": {
-                      "retentionFilter": {
-                        "type": "event",
-                        "event": "transaction"
-                      },
-                      "entryFilter": {
-                        "type": "event",
-                        "event": "transaction"
-                      },
-                      "retentionUserFilters": [
-                        {
-                          "value": "desktop",
-                          "field": "device",
-                          "op": "eq"
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "retention",
+                        "settings": {
+                          "retentionFilter": {
+                            "type": "event",
+                            "event": "transaction"
+                          },
+                          "entryFilter": {
+                            "type": "event",
+                            "event": "transaction"
+                          },
+                          "retentionUserFilters": [
+                            {
+                              "value": "desktop",
+                              "field": "device",
+                              "op": "eq"
+                            }
+                          ]
                         }
-                      ]
+                      },
+                      "view": {
+                        "mark": "x-retention"
+                      }
                     }
                   }
                 },
@@ -3793,11 +4345,19 @@
                   "summary": "Overall retention (no filters)",
                   "value": {
                     "projectId": "proj_abc",
-                    "chart_type": "retention",
                     "title": "Overall Retention",
-                    "settings": {
-                      "retentionFilter": null,
-                      "entryFilter": null
+                    "spec": {
+                      "version": 1,
+                      "query": {
+                        "kind": "retention",
+                        "settings": {
+                          "retentionFilter": null,
+                          "entryFilter": null
+                        }
+                      },
+                      "view": {
+                        "mark": "x-retention"
+                      }
                     }
                   }
                 }
@@ -3918,15 +4478,29 @@
                   "id": "cht_x1y2z3a4b5c6",
                   "project_id": "proj_abc123",
                   "board_id": "brd_a1b2c3d4e5f6",
-                  "chart_type": "line",
                   "title": "Daily revenue (last 30 days)",
                   "description": null,
-                  "query": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day",
-                  "x_axis": "day",
-                  "y_axis": ["revenue"],
-                  "group_by": null,
-                  "steps": null,
-                  "settings": null
+                  "position": 0,
+                  "created_at": "2026-11-10T08:00:00.000Z",
+                  "updated_at": null,
+                  "spec": {
+                    "version": 1,
+                    "query": {
+                      "kind": "sql",
+                      "sql": "SELECT toDate(timestamp) AS day, sum(revenue) AS revenue FROM events WHERE event = 'transaction' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY day ORDER BY day"
+                    },
+                    "view": {
+                      "mark": "line",
+                      "encoding": {
+                        "x": {
+                          "field": "day"
+                        },
+                        "y": {
+                          "field": "revenue"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
