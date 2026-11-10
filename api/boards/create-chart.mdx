@@ -1,113 +1,394 @@
 ---
 title: "Create Chart"
-description: "Add a new chart to a dashboard board with a SQL query and chart type. Supports line, bar, pie, funnel, and other visualization types."
+description: "Add a chart to a board. A chart is a title and a spec: what it computes (SQL, funnel, retention or user paths) and how it is drawn (a Vega-Lite subset)."
 openapi: "POST /v0/boards/{boardId}/charts"
 ---
 
 ## Overview
 
-Creates a new chart and attaches it to a board. Returns the full chart object on success.
+Creates a chart on a board and returns the full chart object.
 
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts derive SQL from `steps` and accept `"SELECT 1"` as the placeholder. User Paths charts derive SQL from `settings.anchors`, so omit `query`.
+A chart is a `title`, an optional `description`, and a `spec`:
+
+```json
+{
+  "version": 1,
+  "query": { "kind": "sql", "sql": "SELECT ..." },
+  "view": { "mark": "line", "encoding": { "x": { "field": "date" }, "y": { "field": "users" } } }
+}
+```
+
+- **`query`** says what the chart computes: `sql`, `funnel`, `retention` or `paths`.
+- **`view`** says how it is drawn. It is a strict subset of [Vega-Lite](https://vega.github.io/vega-lite/): a `mark` and an `encoding` whose channels name columns of the query result. The view never computes; sums, sorting and limits belong in the SQL.
+
+The server validates the spec. A SQL query runs, and every column the view names must be in its result. Unknown keys are rejected with a `400` that names them.
 
 ---
 
 ## Request Fields
 
-| Field         | Type          | Required    | Description                                                                                     |
-| ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
-| `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
-| `query`       | string        | Conditional | SQL query. Omit for `user_paths` and `retention`. For `funnel`, pass `"SELECT 1"`               |
-| `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
-| `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
-| `description` | string        | No          | Optional description                                                                            |
-| `x_axis`      | string        | Conditional | Column for the X axis. Required for `bar`, `line`, `area`, `stacked`                             |
-| `y_axis`      | string[]      | Conditional | Column(s) for Y axis metrics. See per-type rules below                                          |
-| `group_by`    | string        | Conditional | Column to group/stack series by. Required for `stacked`                                         |
-| `steps`       | FunnelStep[]  | Conditional | Ordered funnel steps. Required for `funnel` (minimum 2)                                         |
-| `settings`    | ChartSettings | No          | Type-specific configuration object                                                              |
+| Field         | Type        | Required | Description                        |
+| ------------- | ----------- | -------- | ---------------------------------- |
+| `projectId`   | string      | Yes      | Project the chart belongs to       |
+| `title`       | string      | Yes      | Display name (minimum 1 character) |
+| `description` | string      | No       | Optional description               |
+| `spec`        | `ChartSpec` | Yes      | What the chart computes and how it is drawn |
+
+### `spec.query`
+
+| `kind`      | Fields                                   | Drawn with                    |
+| ----------- | ---------------------------------------- | ----------------------------- |
+| `sql`       | `sql` (required), `settings`             | Any SQL view below            |
+| `funnel`    | `steps` (at least 2), `settings`         | `{ "mark": "x-funnel" }`      |
+| `retention` | `settings` (must include `entryFilter`)  | `{ "mark": "x-retention" }`   |
+| `paths`     | `settings` (needs `anchors`)             | `{ "mark": "x-sankey" }`      |
+
+SQL may use the `{{date_from}}` and `{{date_to}}` variables. Project scoping is applied automatically.
+
+### `spec.view` for SQL charts
+
+| Chart                 | View                                                                                                           |
+| --------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Table                 | `{ "mark": "x-table" }`                                                                                        |
+| Number (KPI card)     | `{ "mark": "text", "encoding": {} }`. The query must return exactly 1 row and 1 column                          |
+| Line, bar, area       | `mark` plus `encoding.x` and `encoding.y`                                                                      |
+| Several y columns     | `transform: [{ "fold": ["a", "b"], "as": ["series", "value"] }]`, `y` = `value`, `color` = `series` (bar also `xOffset` = `series`) |
+| Line split by a column | `mark: "line"` and `color` = the column (one line per value)                                                  |
+| Grouped bars          | `mark: "bar"`, `color` and `xOffset` = the same column (bars side by side)                                     |
+| Stacked bar or area   | `y.stack: true` and `color` = the breakdown column (several y columns on an area: a fold with `y.stack: true`) |
+| 100% stacked          | `y.stack: "normalize"` instead of `true`: each x adds up to 100%                                               |
+| Horizontal bars       | `y` = the category with `"type": "nominal"`, `x` = the value with `"type": "quantitative"` (stack and group with `x.stack` and `yOffset`) |
+| Scatter               | `mark: "point"`, `x` and `y` = two number columns, optional `color`. Each row is one point                      |
+| Bars plus a line      | `layer`: a bar view and a line view with the same `x`. `resolve.scale.y: "independent"` puts the line on a right axis |
+| Goal line             | `layer`: the chart, then `{ "mark": "rule", "encoding": { "y": { "datum": 1000 } } }`                           |
+| Pie                   | `{ "mark": "arc", "encoding": { "theta": { "field": "...", "aggregate": "sum" }, "color": { "field": "..." } } }` |
+
+Channels: `x`, `y`, `color`, `xOffset`, `yOffset`, `theta`, `text`. Each channel is `{ "field": "<column>" }`. The value channel (`y`, or `x` on horizontal bars) may add `"stack": true` or `"normalize"` and `"axis": { "format": "..." }`; `x` and `y` may add a Vega-Lite `type`; `theta` needs `"aggregate": "sum"`. Only the combinations in the table above are valid, so a view always draws exactly as written: for example, a line is never stacked, and grouped bars are not also stacked. `data`, `params`, expressions, channel `title`, and transforms other than `fold` are rejected.
+
+**Number formats** use [d3-format](https://d3js.org/d3-format) strings, the same as Vega-Lite: `",.0f"` (1,234), `".2f"` (1234.57), `".3~s"` (1.23k), `".1%"` (12.3%, for values stored as fractions), `"$,.2f"` ($1,234.57). Width and precision have at most 2 digits. A number card takes `"encoding": { "text": { "format": "$,.2f" } }`, and `text.field` picks its column.
+
+**Layers:** at most 2 layers draw data (one bar layer at most, one series each, the same `x`); add any number of `rule` layers for goal lines. Horizontal bars take no layers.
 
 ---
 
-## Chart Types
+## SQL Chart Examples
 
-### `table`
-
-Renders query results in a paginated table. No axis fields needed.
+### Table
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
-  "chart_type": "table",
-  "title": "Recent Events"
+  "title": "Recent Events",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10"
+    },
+    "view": {
+      "mark": "x-table"
+    }
+  }
 }
 ```
 
----
-
-### `number`
-
-Renders a single scalar value (KPI card). The query **must** return exactly **1 row × 1 column**.
+### Number
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
-  "chart_type": "number",
-  "title": "Total Connected Wallets"
+  "title": "Total Connected Wallets",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'"
+    },
+    "view": {
+      "mark": "text",
+      "encoding": {}
+    }
+  }
 }
 ```
 
----
-
-### `bar`, `line`, and `area`
-
-All three require `x_axis` and at least **1** column in `y_axis`. `area` requires exactly **1** column in `y_axis` when `group_by` is set.
+### Line
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date DESC LIMIT 30",
-  "chart_type": "line",
   "title": "Daily Active Users",
-  "x_axis": "date",
-  "y_axis": ["users"]
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events WHERE timestamp >= {{date_from}} AND timestamp <= {{date_to}} GROUP BY date ORDER BY date"
+    },
+    "view": {
+      "mark": "line",
+      "encoding": {
+        "x": {
+          "field": "date"
+        },
+        "y": {
+          "field": "users"
+        }
+      }
+    }
+  }
 }
 ```
 
----
-
-### `pie`
-
-Requires exactly **1** column in `y_axis`. `x_axis` identifies the label column.
+### Bar with two metrics
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
-  "chart_type": "pie",
-  "title": "Sessions by Device",
-  "x_axis": "device",
-  "y_axis": ["session_count"]
+  "title": "Users and Sessions by Day",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users, countDistinct(session_id) AS sessions FROM events GROUP BY date ORDER BY date"
+    },
+    "view": {
+      "mark": "bar",
+      "transform": [
+        {
+          "fold": [
+            "users",
+            "sessions"
+          ],
+          "as": [
+            "series",
+            "value"
+          ]
+        }
+      ],
+      "encoding": {
+        "x": {
+          "field": "date"
+        },
+        "y": {
+          "field": "value"
+        },
+        "color": {
+          "field": "series"
+        },
+        "xOffset": {
+          "field": "series"
+        }
+      }
+    }
+  }
 }
 ```
 
----
-
-### `stacked`
-
-Requires `x_axis`, exactly **1** column in `y_axis`, and `group_by`.
+### Stacked bar
 
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
-  "chart_type": "stacked",
   "title": "Sessions by Device and Browser",
-  "x_axis": "device",
-  "y_axis": ["session_count"],
-  "group_by": "browser"
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC"
+    },
+    "view": {
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "device"
+        },
+        "y": {
+          "field": "session_count",
+          "stack": true
+        },
+        "color": {
+          "field": "browser"
+        }
+      }
+    }
+  }
+}
+```
+
+### Line split by a column
+
+One line per chain, from rows of (date, chain, users).
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "Daily Users by Chain",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT toDate(timestamp) AS date, toString(chain_id) AS chain, countDistinct(address) AS users FROM events WHERE timestamp >= {{date_from}} AND timestamp <= {{date_to}} GROUP BY date, chain ORDER BY date"
+    },
+    "view": {
+      "mark": "line",
+      "encoding": {
+        "x": { "field": "date" },
+        "y": { "field": "users" },
+        "color": { "field": "chain" }
+      }
+    }
+  }
+}
+```
+
+### Grouped bars
+
+```json
+"view": {
+  "mark": "bar",
+  "encoding": {
+    "x": { "field": "month" },
+    "y": { "field": "new_users" },
+    "color": { "field": "channel" },
+    "xOffset": { "field": "channel" }
+  }
+}
+```
+
+### 100% stacked bars
+
+Each month adds up to 100%, so the axis shows each chain's share of volume.
+
+```json
+"view": {
+  "mark": "bar",
+  "encoding": {
+    "x": { "field": "month" },
+    "y": { "field": "volume_usd", "stack": "normalize" },
+    "color": { "field": "chain" }
+  }
+}
+```
+
+### Horizontal bars with a number format
+
+Categories are ranked by value, largest at the top.
+
+```json
+"view": {
+  "mark": "bar",
+  "encoding": {
+    "y": { "field": "country", "type": "nominal" },
+    "x": { "field": "users", "type": "quantitative", "axis": { "format": ",.0f" } }
+  }
+}
+```
+
+### Bars plus a line on two axes
+
+Daily signups as bars on the left axis, the conversion rate as a line on the right axis.
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "Signups and Conversion Rate",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT toDate(timestamp) AS date, countIf(type = 'connect') AS signups, countIf(type = 'transaction') / greatest(countIf(type = 'connect'), 1) AS conversion_rate FROM events WHERE timestamp >= {{date_from}} AND timestamp <= {{date_to}} GROUP BY date ORDER BY date"
+    },
+    "view": {
+      "layer": [
+        {
+          "mark": "bar",
+          "encoding": {
+            "x": { "field": "date" },
+            "y": { "field": "signups" }
+          }
+        },
+        {
+          "mark": "line",
+          "encoding": {
+            "x": { "field": "date" },
+            "y": { "field": "conversion_rate", "axis": { "format": ".1%" } }
+          }
+        }
+      ],
+      "resolve": { "scale": { "y": "independent" } }
+    }
+  }
+}
+```
+
+### Goal line
+
+A line chart with a dashed goal line at 5,000. The chart keeps its type.
+
+```json
+"view": {
+  "layer": [
+    {
+      "mark": "line",
+      "encoding": {
+        "x": { "field": "date" },
+        "y": { "field": "users", "axis": { "format": ",.0f" } }
+      }
+    },
+    { "mark": "rule", "encoding": { "y": { "datum": 5000 } } }
+  ]
+}
+```
+
+### Scatter
+
+One point per wallet, colored by segment.
+
+```json
+"view": {
+  "mark": "point",
+  "encoding": {
+    "x": { "field": "sessions" },
+    "y": { "field": "transactions" },
+    "color": { "field": "segment" }
+  }
+}
+```
+
+### Number with a format
+
+```json
+"view": {
+  "mark": "text",
+  "encoding": { "text": { "format": "$,.2f" } }
+}
+```
+
+### Pie
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "Sessions by Device",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "sql",
+      "sql": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10"
+    },
+    "view": {
+      "mark": "arc",
+      "encoding": {
+        "theta": {
+          "field": "session_count",
+          "aggregate": "sum"
+        },
+        "color": {
+          "field": "device"
+        }
+      }
+    }
+  }
 }
 ```
 
@@ -115,7 +396,7 @@ Requires `x_axis`, exactly **1** column in `y_axis`, and `group_by`.
 
 ## Funnel Charts
 
-Funnel charts measure step-by-step user conversion. The SQL is auto-generated from `steps`, so `query` must be the placeholder `"SELECT 1"`. At least **2 steps** are required.
+Funnel charts measure step-by-step conversion. The query is built from `spec.query.steps`; there is no SQL. At least **2 steps** are required.
 
 ### The `FunnelStep` Object
 
@@ -197,102 +478,129 @@ The top categories are shown individually. The rest collapse into **"Others"**.
 ```json
 {
   "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
   "title": "Onboarding Funnel",
-  "steps": [
-    { "type": "event", "event": "page" },
-    { "type": "event", "event": "connect" },
-    { "type": "event", "event": "transaction" }
-  ],
-  "settings": {
-    "funnelType": "closed",
-    "conversionWindow": { "value": 7, "unit": "day" }
-  }
-}
-```
-
-#### With per-step property filters
-
-Filter step 2 to MetaMask wallets on Ethereum mainnet:
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
-  "title": "MetaMask Conversion Funnel",
-  "steps": [
-    { "type": "event", "event": "page" },
-    {
-      "type": "event",
-      "event": "connect",
-      "filters": [
-        { "field": "rdns", "op": "eq", "value": "io.metamask" },
-        { "field": "chain_id", "op": "eq", "value": "1" }
-      ]
-    },
-    { "type": "event", "event": "transaction" }
-  ],
-  "settings": {
-    "funnelType": "closed",
-    "conversionWindow": { "value": 7, "unit": "day" }
-  }
-}
-```
-
-#### With breakdown by device
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
-  "title": "Onboarding Funnel by Device",
-  "steps": [
-    { "type": "event", "event": "page" },
-    { "type": "event", "event": "connect" },
-    { "type": "event", "event": "signature" }
-  ],
-  "settings": {
-    "funnelType": "closed",
-    "conversionWindow": { "value": 30, "unit": "day" },
-    "breakdown": "device"
-  }
-}
-```
-
-#### Open funnel with multi-value `in` filter
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
-  "title": "Mobile Onboarding Funnel",
-  "steps": [
-    {
-      "type": "event",
-      "event": "page",
-      "filters": [{ "field": "device", "op": "eq", "value": "mobile" }]
-    },
-    {
-      "type": "event",
-      "event": "connect",
-      "filters": [
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "funnel",
+      "steps": [
         {
-          "field": "provider_name",
-          "op": "in",
-          "value": ["metamask", "rainbow", "coinbase"]
+          "type": "event",
+          "event": "page"
+        },
+        {
+          "type": "event",
+          "event": "connect"
+        },
+        {
+          "type": "event",
+          "event": "transaction"
         }
-      ]
+      ],
+      "settings": {
+        "funnelType": "closed",
+        "conversionWindow": {
+          "value": 7,
+          "unit": "day"
+        }
+      }
     },
-    { "type": "event", "event": "transaction" }
-  ],
-  "settings": {
-    "funnelType": "open",
-    "conversionWindow": { "value": 30, "unit": "day" },
-    "breakdown": "device"
+    "view": {
+      "mark": "x-funnel"
+    }
+  }
+}
+```
+
+#### With per-step property filters and a breakdown
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "MetaMask Conversion by Device",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "funnel",
+      "steps": [
+        {
+          "type": "event",
+          "event": "page"
+        },
+        {
+          "type": "event",
+          "event": "connect",
+          "filters": [
+            {
+              "field": "rdns",
+              "op": "eq",
+              "value": "io.metamask"
+            },
+            {
+              "field": "chain_id",
+              "op": "eq",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "event": "transaction"
+        }
+      ],
+      "settings": {
+        "funnelType": "open",
+        "conversionWindow": {
+          "value": 30,
+          "unit": "day"
+        },
+        "breakdown": "device"
+      }
+    },
+    "view": {
+      "mark": "x-funnel"
+    }
+  }
+}
+```
+
+#### Open funnel with a multi-value `in` filter
+
+```json
+{
+  "projectId": "proj_abc",
+  "title": "Mobile Onboarding Funnel",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "funnel",
+      "steps": [
+        {
+          "type": "event",
+          "event": "page",
+          "filters": [{ "field": "device", "op": "eq", "value": "mobile" }]
+        },
+        {
+          "type": "event",
+          "event": "connect",
+          "filters": [
+            {
+              "field": "provider_name",
+              "op": "in",
+              "value": ["metamask", "rainbow", "coinbase"]
+            }
+          ]
+        },
+        { "type": "event", "event": "transaction" }
+      ],
+      "settings": {
+        "funnelType": "open",
+        "conversionWindow": { "value": 30, "unit": "day" }
+      }
+    },
+    "view": {
+      "mark": "x-funnel"
+    }
   }
 }
 ```
@@ -301,7 +609,7 @@ Filter step 2 to MetaMask wallets on Ethereum mainnet:
 
 ## User Paths Charts
 
-Visualize how users navigate your app through an ordered list of path anchors. `settings.anchors` requires at least one entry. One anchor produces an open-ended exploration; two or more constrain the path in order.
+Show how users move through your app around ordered anchors. `spec.query.settings.anchors` needs at least one entry. One anchor gives an open-ended exploration; two or more constrain the path in order.
 
 ### `settings` for User Paths Charts
 
@@ -316,440 +624,32 @@ Visualize how users navigate your app through an ordered list of path anchors. `
 ```json
 {
   "projectId": "proj_abc",
-  "chart_type": "user_paths",
   "title": "Post-Connect User Flow",
-  "settings": {
-    "anchors": [
-      { "type": "event", "event": "connect" },
-      { "type": "event", "event": "transaction" }
-    ],
-    "maxSteps": 5,
-    "conversionWindow": { "value": 2, "unit": "week" }
-  }
-}
-```
-
----
-
-## Retention Charts
-
-Measures how often users return over time. Omit the `query` field; retention data is fetched automatically.
-
-### `settings` for Retention Charts
-
-| Field                  | Type                    | Description                                                                       |
-| ---------------------- | ----------------------- | --------------------------------------------------------------------------------- |
-| `entryFilter`          | `FunnelStep` \| `null`  | **Required key.** Event that enters the cohort; `null` means any event             |
-| `retentionFilter`      | `FunnelStep` \| `null`  | Event that qualifies a return as "retained"; `null` means any event                |
-| `retentionUserFilters` | `RetentionUserFilter[]` | User-segment filters that narrow the retention cohort                             |
-
-Each `RetentionUserFilter`:
-
-| Field   | Type             | Description                                                              |
-| ------- | ---------------- | ------------------------------------------------------------------------ |
-| `field` | string           | User property (e.g. `device`, `browser`, `os`, `utm_source`, `location`) |
-| `op`    | string           | Comparison operator (same set as `StepFilterCondition.op`, minus the substring operators `startsWith` / `endsWith` / `contains`)               |
-| `value` | string \| number | Value to compare against                                                 |
-
-```json
-{
-  "projectId": "proj_abc",
-  "chart_type": "retention",
-  "title": "Weekly Retention - Desktop Users",
-  "settings": {
-    "entryFilter": { "type": "event", "event": "transaction" },
-    "retentionFilter": { "type": "event", "event": "transaction" },
-    "retentionUserFilters": [
-      { "field": "device", "op": "eq", "value": "desktop" },
-      { "field": "utm_source", "op": "neq", "value": "direct" }
-    ]
-  }
-}
-```
-
-For all-user retention with no event filters, explicitly set both event filters to `null`:
-
-```json
-{
-  "projectId": "proj_abc",
-  "chart_type": "retention",
-  "title": "Overall Retention",
-  "settings": {
-    "entryFilter": null,
-    "retentionFilter": null
-  }
-}
-```
-
----
-
-## Validation Reference
-
-| Chart Type   | Validation Rule                                                                          |
-| ------------ | ---------------------------------------------------------------------------------------- |
-| `table`      | `query` must execute successfully                                                        |
-| `number`     | `query` must return exactly 1 row × 1 column                                             |
-| `bar`        | `x_axis` required; `y_axis` requires ≥ 1 element                                         |
-| `line`       | `x_axis` required; `y_axis` requires ≥ 1 element                                         |
-| `pie`        | `y_axis` requires exactly 1 element                                                      |
-| `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required              |
-| `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL |
-| `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors |
-| `retention`  | `settings.entryFilter` key is required; omit `query`                                       |
-
----
-
-## Response
-
-**`201 Created`** - returns the full chart object.
-
-```json
-{
-  "id": "chart_1a2b3c4d",
-  "chart_type": "table",
-  "title": "Recent Events",
-  "description": null,
-  "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
-  "project_id": "proj_abc",
-  "board_id": "board_xyz"
-}
-```
-
-Use the returned `id` with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
-
-**`400 Bad Request`** - validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
-
-```json
-{
-  "error": {
-    "code": "BAD_REQUEST",
-    "message": "Funnel chart must have at least 2 steps",
-    "doc_url": "https://docs.formo.so/api/errors#bad_request"
-  }
-}
-```
-
-## Overview
-
-Creates a new chart and attaches it to a board. Returns the full chart object on success.
-
-The `chart_type` field controls which other request body fields are required or validated. Funnel charts derive SQL from `steps` and accept `"SELECT 1"` as the placeholder. User Paths charts derive SQL from `settings.anchors`, so omit `query`.
-
----
-
-## Request Fields
-
-| Field         | Type          | Required    | Description                                                                                     |
-| ------------- | ------------- | ----------- | ----------------------------------------------------------------------------------------------- |
-| `projectId`   | string        | Yes         | Project the chart belongs to                                                                    |
-| `query`       | string        | Conditional | SQL query. Omit for `user_paths` and `retention`. For `funnel`, pass `"SELECT 1"`               |
-| `chart_type`  | string        | Yes         | `table` · `number` · `bar` · `line` · `area` · `pie` · `stacked` · `funnel` · `user_paths` · `retention` |
-| `title`       | string        | Yes         | Display name (minimum 1 character)                                                              |
-| `description` | string        | No          | Optional description                                                                            |
-| `x_axis`      | string        | Conditional | Column for the X axis. Required for `bar`, `line`, `area`, `stacked`                             |
-| `y_axis`      | string[]      | Conditional | Column(s) for Y axis metrics. See per-type rules below                                          |
-| `group_by`    | string        | Conditional | Column to group/stack series by. Required for `stacked`                                         |
-| `steps`       | FunnelStep[]  | Conditional | Ordered funnel steps. Required for `funnel` (minimum 2)                                         |
-| `settings`    | ChartSettings | No          | Type-specific configuration object                                                              |
-
----
-
-## Chart Types
-
-### `table`
-
-Renders query results in a paginated table. No axis fields needed.
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
-  "chart_type": "table",
-  "title": "Recent Events"
-}
-```
-
----
-
-### `number`
-
-Renders a single scalar value (KPI card). The query **must** return exactly **1 row × 1 column**.
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT COUNT(DISTINCT address) FROM events WHERE type = 'connect'",
-  "chart_type": "number",
-  "title": "Total Connected Wallets"
-}
-```
-
----
-
-### `bar`, `line`, and `area`
-
-All three require `x_axis` and at least **1** column in `y_axis`. `area` requires exactly **1** column in `y_axis` when `group_by` is set.
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date DESC LIMIT 30",
-  "chart_type": "line",
-  "title": "Daily Active Users",
-  "x_axis": "date",
-  "y_axis": ["users"]
-}
-```
-
----
-
-### `pie`
-
-Requires exactly **1** column in `y_axis`. `x_axis` identifies the label column.
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT device, COUNT(*) AS session_count FROM sessions GROUP BY device ORDER BY session_count DESC LIMIT 10",
-  "chart_type": "pie",
-  "title": "Sessions by Device",
-  "x_axis": "device",
-  "y_axis": ["session_count"]
-}
-```
-
----
-
-### `stacked`
-
-Requires `x_axis`, exactly **1** column in `y_axis`, and `group_by`.
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT device, browser, COUNT(*) AS session_count FROM sessions GROUP BY device, browser ORDER BY session_count DESC",
-  "chart_type": "stacked",
-  "title": "Sessions by Device and Browser",
-  "x_axis": "device",
-  "y_axis": ["session_count"],
-  "group_by": "browser"
-}
-```
-
----
-
-## Funnel Charts
-
-Funnel charts measure step-by-step user conversion. The SQL is auto-generated from `steps`, so `query` must be the placeholder `"SELECT 1"`. At least **2 steps** are required.
-
-### The `FunnelStep` Object
-
-Each step in the `steps` array has the following shape:
-
-```json
-{
-  "type": "event | track | decoded_log",
-  "event": "<event name>",
-  "filters": [{ "field": "<property>", "op": "<op>", "value": "<value>" }]
-}
-```
-
-| Field           | Type                  | Required | Description                                                                                                                                                                                                                                                               |
-| --------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`          | string                | Yes      | `event` - built-in events (page, connect, transaction); `track` - custom tracked events; `decoded_log` - decoded smart-contract events                                                                                                                                    |
-| `event`         | string                | Yes      | Event name (e.g. `page`, `connect`, `transaction`)                                                                                                                                                                                                                        |
-| `filters`       | `StepFilterCondition[]` | No       | Canonical `{field, op, value}` property filters. Standard columns are filtered directly; other fields are extracted from event `properties`. |
-
-### Filter Operators (`StepFilterCondition`)
-
-```json
-{ "field": "<property>", "op": "<op>", "value": "<value>" }
-```
-
-| `op`         | SQL equivalent         | Notes                                                 |
-| ------------ | ---------------------- | ----------------------------------------------------- |
-| `eq`         | `= 'value'`            | Exact match                                           |
-| `neq`        | `!= 'value'`           | Inverse match                                         |
-| `in`         | `IN (...)`             | Pipe-delimited value: `"metamask\|rainbow\|coinbase"` |
-| `nin`        | `NOT IN (...)`         | Pipe-delimited value                                  |
-| `gt`         | `> value`              | Numeric comparison                                    |
-| `gte`        | `>= value`             | Numeric comparison                                    |
-| `lt`         | `< value`              | Numeric comparison                                    |
-| `lte`        | `<= value`             | Numeric comparison                                    |
-| `startsWith` | `startsWith(col, 'v')` | String prefix                                         |
-| `endsWith`   | `endsWith(col, 'v')`   | String suffix                                         |
-| `contains`   | `like '%v%'`           | Substring match                                       |
-| `notEmpty`   | `col != ''`            | Value-less existence check; `value` is ignored        |
-| `isEmpty`    | `col = ''`             | Value-less existence check; `value` is ignored        |
-
-<Tip>
-  For `in` and `nin`, join multiple values with a pipe `|`. Escape a literal
-  pipe with `\|` and a literal backslash with `\\`. The legacy numeric long
-  forms (`greater`, `greaterOrEqual`, `less`, `lessOrEqual`) are retired and
-  rejected with a `400` naming the token. Send `gt` / `gte` / `lt` / `lte`.
-  `notEmpty` and `isEmpty` are rejected on the numeric event columns `volume` /
-  `revenue` / `points`.
-</Tip>
-
-### `settings` for Funnel Charts
-
-| Field              | Type                   | Default    | Description                                                                                                    |
-| ------------------ | ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
-| `funnelType`       | `"closed"` \| `"open"` | `"closed"` | `closed` - strict ordering, no events between steps; `open` - ordered but other events may occur between steps |
-| `conversionWindow` | `ConversionWindow`     | 2 hours    | Max time from Step 1 for a user to complete all steps                                                          |
-| `breakdown`        | string                 | -          | Split each funnel bar by this dimension                                                                        |
-
-#### `ConversionWindow`
-
-```json
-{ "value": 7, "unit": "day" }
-```
-
-`unit` must be one of: `hour` · `day` · `week` (7 days).
-
-#### `breakdown` values
-
-`device` · `browser` · `os` · `location` · `referrer` · `ref` · `utm_source` · `utm_medium` · `utm_campaign` · `utm_term` · `utm_content` · `builder_codes`
-
-The top categories are shown individually. The rest collapse into **"Others"**.
-
----
-
-### Funnel Examples
-
-#### Basic 3-step closed funnel
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
-  "title": "Onboarding Funnel",
-  "steps": [
-    { "type": "event", "event": "page" },
-    { "type": "event", "event": "connect" },
-    { "type": "event", "event": "transaction" }
-  ],
-  "settings": {
-    "funnelType": "closed",
-    "conversionWindow": { "value": 7, "unit": "day" }
-  }
-}
-```
-
-#### With per-step property filters
-
-Filter step 2 to MetaMask wallet connections on Ethereum mainnet:
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
-  "title": "MetaMask Conversion Funnel",
-  "steps": [
-    { "type": "event", "event": "page" },
-    {
-      "type": "event",
-      "event": "connect",
-      "filters": [
-        { "field": "rdns", "op": "eq", "value": "io.metamask" },
-        { "field": "chain_id", "op": "eq", "value": "1" }
-      ]
-    },
-    { "type": "event", "event": "transaction" }
-  ],
-  "settings": {
-    "funnelType": "closed",
-    "conversionWindow": { "value": 7, "unit": "day" }
-  }
-}
-```
-
-#### With breakdown by device
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
-  "title": "Onboarding Funnel by Device",
-  "steps": [
-    { "type": "event", "event": "page" },
-    { "type": "event", "event": "connect" },
-    { "type": "event", "event": "signature" }
-  ],
-  "settings": {
-    "funnelType": "closed",
-    "conversionWindow": { "value": 30, "unit": "day" },
-    "breakdown": "device"
-  }
-}
-```
-
-#### Open funnel with multi-value `in` filter
-
-```json
-{
-  "projectId": "proj_abc",
-  "query": "SELECT 1",
-  "chart_type": "funnel",
-  "title": "Mobile Onboarding Funnel",
-  "steps": [
-    {
-      "type": "event",
-      "event": "page",
-      "filters": [{ "field": "device", "op": "eq", "value": "mobile" }]
-    },
-    {
-      "type": "event",
-      "event": "connect",
-      "filters": [
-        {
-          "field": "provider_name",
-          "op": "in",
-          "value": ["metamask", "rainbow", "coinbase"]
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "paths",
+      "settings": {
+        "anchors": [
+          {
+            "type": "event",
+            "event": "connect"
+          },
+          {
+            "type": "event",
+            "event": "transaction"
+          }
+        ],
+        "maxSteps": 5,
+        "conversionWindow": {
+          "value": 2,
+          "unit": "week"
         }
-      ]
+      }
     },
-    { "type": "event", "event": "transaction" }
-  ],
-  "settings": {
-    "funnelType": "open",
-    "conversionWindow": { "value": 30, "unit": "day" },
-    "breakdown": "device"
-  }
-}
-```
-
----
-
-## User Paths Charts
-
-Visualize how users navigate your app through an ordered list of path anchors. `settings.anchors` requires at least one entry. One anchor produces an open-ended exploration; two or more constrain the path in order.
-
-### `settings` for User Paths Charts
-
-| Field              | Type               | Default | Description                                                      |
-| ------------------ | ------------------ | ------- | ---------------------------------------------------------------- |
-| `anchors`          | `FunnelStep[]`     | -       | **Required.** Ordered path anchors; one entry is open-ended       |
-| `maxSteps`         | integer (2 to 5)   | `3`     | Max steps to show in the flow. Values above 5 are clamped to 5   |
-| `nodesPerStep`     | integer (2 to 100) | `20`    | Max events shown per step; less frequent events group into "Others" |
-| `conversionWindow` | `ConversionWindow` | 2 weeks | Time window to group the flow                                    |
-| `filters`          | string             | -       | JSON-encoded string of additional path filters                   |
-
-```json
-{
-  "projectId": "proj_abc",
-  "chart_type": "user_paths",
-  "title": "Post-Connect User Flow",
-  "settings": {
-    "anchors": [
-      { "type": "event", "event": "connect" },
-      { "type": "event", "event": "transaction" }
-    ],
-    "maxSteps": 5,
-    "conversionWindow": { "value": 2, "unit": "week" }
+    "view": {
+      "mark": "x-sankey"
+    }
   }
 }
 ```
@@ -758,7 +658,7 @@ Visualize how users navigate your app through an ordered list of path anchors. `
 
 ## Retention Charts
 
-Measures how often users return over time. Omit the `query` field; retention data is fetched automatically.
+Measure how often users return over time. There is no SQL.
 
 ### `settings` for Retention Charts
 
@@ -779,29 +679,59 @@ Each `RetentionUserFilter`:
 ```json
 {
   "projectId": "proj_abc",
-  "chart_type": "retention",
-  "title": "Weekly Retention - Desktop Users",
-  "settings": {
-    "entryFilter": { "type": "event", "event": "transaction" },
-    "retentionFilter": { "type": "event", "event": "transaction" },
-    "retentionUserFilters": [
-      { "field": "device", "op": "eq", "value": "desktop" },
-      { "field": "utm_source", "op": "neq", "value": "direct" }
-    ]
+  "title": "Weekly Retention, Desktop Users",
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "retention",
+      "settings": {
+        "entryFilter": {
+          "type": "event",
+          "event": "transaction"
+        },
+        "retentionFilter": {
+          "type": "event",
+          "event": "transaction"
+        },
+        "retentionUserFilters": [
+          {
+            "field": "device",
+            "op": "eq",
+            "value": "desktop"
+          },
+          {
+            "field": "utm_source",
+            "op": "neq",
+            "value": "direct"
+          }
+        ]
+      }
+    },
+    "view": {
+      "mark": "x-retention"
+    }
   }
 }
 ```
 
-For all-user retention with no event filters, explicitly set both event filters to `null`:
+For all-user retention, set both event filters to `null`:
 
 ```json
 {
   "projectId": "proj_abc",
-  "chart_type": "retention",
   "title": "Overall Retention",
-  "settings": {
-    "entryFilter": null,
-    "retentionFilter": null
+  "spec": {
+    "version": 1,
+    "query": {
+      "kind": "retention",
+      "settings": {
+        "entryFilter": null,
+        "retentionFilter": null
+      }
+    },
+    "view": {
+      "mark": "x-retention"
+    }
   }
 }
 ```
@@ -810,45 +740,49 @@ For all-user retention with no event filters, explicitly set both event filters 
 
 ## Validation Reference
 
-| Chart Type   | Validation Rule                                                                                                                                        |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `table`      | `query` must execute successfully                                                                                                                      |
-| `number`     | `query` must return exactly 1 row × 1 column                                                                                                           |
-| `bar`        | `x_axis` required; `y_axis` requires ≥ 1 element                                                                                                       |
-| `line`       | `x_axis` required; `y_axis` requires ≥ 1 element                                                                                                       |
-| `pie`        | `y_axis` requires exactly 1 element                                                                                                                    |
-| `stacked`    | `x_axis` required; `y_axis` requires exactly 1 element; `group_by` required                                                                            |
-| `funnel`     | `steps` requires ≥ 2 `FunnelStep` objects; `query` must be `"SELECT 1"` or any valid SQL                                                               |
-| `user_paths` | `settings.anchors` requires at least one entry; the query is generated from the anchors                                                   |
-| `retention`  | `settings.entryFilter` key is required; omit `query`                                                                                                                       |
+| Spec                     | Rule                                                                      |
+| ------------------------ | ------------------------------------------------------------------------- |
+| Any                      | Only the keys above; `version` is `1`                                      |
+| `query.kind: "sql"`      | The SQL must run; every column the view names must be in the result      |
+| `view.mark: "text"`      | Without `encoding.text`, the query must return exactly 1 row and 1 column |
+| Split, grouped or stacked view | `color` must differ from `x`                                        |
+| `axis.format`, `text.format` | A d3-format string with width and precision of at most 2 digits     |
+| `layer`                  | The first layer is the chart; at most 2 data layers with the same `x`; `resolve.scale.y: "independent"` needs exactly 2 |
+| `query.kind: "funnel"`   | At least 2 steps; drawn with `x-funnel`                                    |
+| `query.kind: "retention"`| `settings` must include the `entryFilter` key; drawn with `x-retention`    |
+| `query.kind: "paths"`    | `settings.anchors` needs at least one entry; drawn with `x-sankey`         |
 
 ---
 
 ## Response
 
-**`201 Created`** - returns the full chart object.
+**`201 Created`**: returns the full chart object.
 
 ```json
 {
   "id": "chart_1a2b3c4d",
-  "chart_type": "table",
   "title": "Recent Events",
   "description": null,
-  "query": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10",
   "project_id": "proj_abc",
-  "board_id": "board_xyz"
+  "board_id": "board_xyz",
+  "position": 0,
+  "spec": {
+    "version": 1,
+    "query": { "kind": "sql", "sql": "SELECT * FROM events ORDER BY timestamp DESC LIMIT 10" },
+    "view": { "mark": "x-table" }
+  }
 }
 ```
 
 Use the returned `id` with the [Get Chart](/api/boards/get-chart), [Update Chart](/api/boards/update-chart), and [Delete Chart](/api/boards/delete-chart) endpoints.
 
-**`400 Bad Request`** - validation failed (missing required fields, invalid SQL, wrong step count, etc.). Branch on `error.code`; see [Errors](/api/errors).
+**`400 Bad Request`**: the spec is not valid (unknown key, failing SQL, a view column that is not in the result, too few funnel steps). Branch on `error.code`; see [Errors](/api/errors).
 
 ```json
 {
   "error": {
     "code": "BAD_REQUEST",
-    "message": "Funnel chart must have at least 2 steps",
+    "message": "The view names 'users', which the query result does not have. Result columns: date, user_count",
     "doc_url": "https://docs.formo.so/api/errors#bad_request"
   }
 }

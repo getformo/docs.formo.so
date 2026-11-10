@@ -78,10 +78,10 @@ formo charts query chart_abc123 --board-id board_abc123 --date-from 2026-04-01 -
 
 ## `formo charts create`
 
-Create a chart from typed flags or a raw JSON body.
+Create a chart. A chart is a title and a spec: what it computes (`spec.query`) and how it is drawn (`spec.view`, a Vega-Lite subset). See [Create Chart](/api/boards/create-chart) for the full spec.
 
 <Note>
-Requires `boards:write` scope on your API key.
+Requires `boards:write` scope on your API key. Needs CLI 2.0.0 or later.
 </Note>
 
 ### Options
@@ -89,49 +89,43 @@ Requires `boards:write` scope on your API key.
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
 | `--board-id` | `string` | ✅ | Board ID to add the chart to |
-| `--body` | `string` | ❌ | Raw JSON chart body. Typed flags override matching keys. |
+| `--body` | `string` | ❌ | Raw JSON chart body `{ title, description, spec }`. Typed flags override matching keys. |
 | `--title` | `string` | ❌ | Chart title |
 | `--description` | `string` | ❌ | Optional chart description |
-| `--chart-type` | `enum` | ❌ | `table`, `number`, `funnel`, `bar`, `line`, `area`, `pie`, `stacked`, `user_paths`, or `retention` |
-| `--query` | `string` | ❌ | SQL query for SQL-backed charts |
-| `--x-axis` | `string` | ❌ | Column used as the x-axis |
-| `--y-axis` | `string` | ❌ | Comma-separated or JSON array of y-axis columns |
-| `--group-by` | `string` | ❌ | Column used to group or stack series |
-| `--steps` | `string` | ❌ | JSON array of funnel step objects |
-| `--settings` | `string` | ❌ | JSON chart settings. User Paths require `anchors`; retention requires an `entryFilter` key. |
+| `--spec` | `string` | ❌ | Full chart spec JSON: `{"version":1,"query":{...},"view":{...}}` |
+| `--sql` | `string` | ❌ | SQL for a SQL chart. Sets `spec.query` to `{"kind":"sql","sql":...}` |
+| `--view` | `string` | ❌ | View JSON: marks `bar`, `line`, `area`, `arc`, `text`, or `x-table`, `x-funnel`, `x-retention`, `x-sankey` |
+| `--settings` | `string` | ❌ | JSON for `spec.query.settings`. Paths need `anchors`; retention needs an `entryFilter` key. |
 
-Provide either `--body` or typed chart fields such as `--title`, `--chart-type`, and `--query`.
+Provide either `--body` or chart fields such as `--title`, `--spec`, `--sql` and `--view`. Every column the view names must be in the SQL result.
 
 ### Examples
 
 ```bash
-# Create a line chart from typed flags
+# Line chart from SQL and a view
 formo charts create \
   --board-id board_abc123 \
   --title "Daily active users" \
-  --chart-type line \
-  --query "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date" \
-  --x-axis date \
-  --y-axis users
+  --sql "SELECT toDate(timestamp) AS date, countDistinct(address) AS users FROM events GROUP BY date ORDER BY date" \
+  --view '{"mark":"line","encoding":{"x":{"field":"date"},"y":{"field":"users"}}}'
 
-# Create from raw JSON
+# Table from raw JSON
 formo charts create \
   --board-id board_abc123 \
-  --body '{"title":"Recent events","chart_type":"table","query":"SELECT * FROM events LIMIT 10"}'
+  --body '{"title":"Recent events","spec":{"version":1,"query":{"kind":"sql","sql":"SELECT * FROM events LIMIT 10"},"view":{"mark":"x-table"}}}'
 
-# Create an open-ended User Paths chart; omit --query
+# Open-ended User Paths chart (no SQL)
 formo charts create \
   --board-id board_abc123 \
   --title "Post-connect paths" \
-  --chart-type user_paths \
-  --settings '{"anchors":[{"type":"event","event":"connect"}],"maxSteps":5,"nodesPerStep":3}'
+  --spec '{"version":1,"query":{"kind":"paths","settings":{"anchors":[{"type":"event","event":"connect"}],"maxSteps":5,"nodesPerStep":3}},"view":{"mark":"x-sankey"}}'
 ```
 
 ---
 
 ## `formo charts update <chartId>`
 
-Update an existing chart. You can pass partial typed fields; the CLI fetches the current chart and sends the full body required by the API.
+Update an existing chart. The CLI fetches the chart and sends the full body the API needs. `--sql`, `--view` and `--settings` change one part of the current spec and keep the rest.
 
 <Note>
 Requires `boards:write` scope on your API key.
@@ -139,9 +133,13 @@ Requires `boards:write` scope on your API key.
 
 ```bash
 formo charts update chart_abc123 --board-id board_abc123 --title "Updated chart name"
+
+# Change only how the chart is drawn
+formo charts update chart_abc123 --board-id board_abc123 \
+  --view '{"mark":"bar","encoding":{"x":{"field":"date"},"y":{"field":"users"}}}'
 ```
 
-The same typed options as `create` are available.
+The same options as `create` are available.
 
 ---
 
