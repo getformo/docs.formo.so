@@ -1326,17 +1326,18 @@
             "type": "string",
             "enum": [
               "page",
+              "screen",
               "connect",
               "disconnect",
               "chain",
               "signature",
               "transaction",
               "track",
-              "decoded_log",
               "detect",
               "identify",
               "web_vitals"
-            ]
+            ],
+            "description": "Event type. The mobile SDK sends `screen` for screen views. Any other value returns 400 and no event in the request is stored."
           },
           "channel": {
             "type": "string",
