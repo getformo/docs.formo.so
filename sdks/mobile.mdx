@@ -665,7 +665,7 @@ formo.disconnect();
 | [`chain()`](/data/events/chain) | `chainId` | `address` (defaults to the connected wallet) |
 | [`disconnect()`](/data/events/disconnect) | None | `chainId`, `address` (default to the connected wallet) |
 
-After `connect()`, the SDK attaches the wallet address to every later event, including screen views and custom events, until `disconnect()`. You do not need to call `identify()` for this. Call `identify()` only to add a `userId` or other user data.
+After `connect()`, the SDK attaches the wallet address to every later event, including screen views and custom events, until `disconnect()` or `reset()`. You do not need to call `identify()` for this. Call `identify()` only to add a `userId` or other user data.
 
 ### Signatures and transactions
 
@@ -676,18 +676,32 @@ import { useFormo, SignatureStatus, TransactionStatus } from '@formo/analytics-r
 
 const formo = useFormo();
 
+// EIP-1193 code 4001: the user declined the request in the wallet
+const isUserRejection = (error: any) => error?.code === 4001;
+
 // Signatures
 formo.signature({ status: SignatureStatus.REQUESTED, chainId, address, message });
 try {
   await signMessage(message);
   formo.signature({ status: SignatureStatus.CONFIRMED, chainId, address, message });
-} catch {
-  formo.signature({ status: SignatureStatus.REJECTED, chainId, address, message });
+} catch (error) {
+  if (isUserRejection(error)) {
+    formo.signature({ status: SignatureStatus.REJECTED, chainId, address, message });
+  }
+  throw error;
 }
 
 // Transactions
 formo.transaction({ status: TransactionStatus.STARTED, chainId, address, to, value, data });
-const hash = await sendTransaction({ to, value, data });
+let hash;
+try {
+  hash = await sendTransaction({ to, value, data });
+} catch (error) {
+  if (isUserRejection(error)) {
+    formo.transaction({ status: TransactionStatus.REJECTED, chainId, address, to, value, data });
+  }
+  throw error;
+}
 formo.transaction({ status: TransactionStatus.BROADCASTED, chainId, address, to, value, data, transactionHash: hash });
 const receipt = await waitForReceipt(hash);
 formo.transaction({
@@ -702,8 +716,6 @@ formo.transaction({
 |:-------|:---------|:---------|:---------|
 | `signature()` | `status`, `address`, `message` | `chainId` | `REQUESTED`, `CONFIRMED`, `REJECTED` |
 | `transaction()` | `status`, `chainId`, `address` | `to`, `value`, `data`, `transactionHash`, `function_name`, `function_args` | `STARTED`, `BROADCASTED`, `CONFIRMED`, `REVERTED`, `REJECTED` |
-
-Use `REJECTED` when the user declines the transaction in the wallet.
 
 ## Mobile context
 

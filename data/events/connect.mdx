@@ -10,7 +10,7 @@ The `connect` event is emitted whenever the user connects a wallet.
 | Property | Type | Description |
 |:---------|:-----|:------------|
 | `chain_id` | Number | Chain ID of the network the wallet connected to. |
-| `provider_name` | String | Wallet connector/provider name (present when auto-captured through the wagmi integration). |
+| `provider_name` | String | Wallet connector/provider name. Set by the wagmi integration, or by the `providerName` property when you call `connect()` yourself. |
 
 ## Sample Payload
 
