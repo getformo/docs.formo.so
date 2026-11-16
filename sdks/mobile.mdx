@@ -287,7 +287,9 @@ formo.identify({
 ```
 
 <Note>
-When using Wagmi integration, wallet connections are automatically tracked. Without Wagmi, see [Track wallet events without Wagmi](#track-wallet-events-without-wagmi). You only need to call `identify()` manually if you want to associate additional user data or use a custom user ID.
+When using Wagmi integration, wallet connections are automatically tracked.
+
+Without Wagmi, see [Track wallet events without Wagmi](#track-wallet-events-without-wagmi). You only need to call `identify()` manually if you want to associate additional user data or use a custom user ID.
 </Note>
 
 ## Track custom events
@@ -629,7 +631,7 @@ Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating m
 
 ## Track wallet events without Wagmi
 
-If your app does not use Wagmi (for example, it uses Reown AppKit without Wagmi, Privy, Dynamic, thirdweb, or a custom wallet), call the wallet methods yourself. The Wagmi integration calls these same methods, so the data in your dashboard is the same.
+If your app does not use Wagmi, you can call the wallet methods yourself. The Wagmi integration calls these same methods, so the data in your dashboard is the same.
 
 <Warning>
 Use `formo.connect()` for wallet connections. `formo.track('Connect', ...)` creates a custom event and does not populate wallet analytics.
@@ -702,12 +704,6 @@ formo.transaction({
 | `transaction()` | `status`, `chainId`, `address` | `to`, `value`, `data`, `transactionHash`, `function_name`, `function_args` | `STARTED`, `BROADCASTED`, `CONFIRMED`, `REVERTED`, `REJECTED` |
 
 Use `REJECTED` when the user declines the transaction in the wallet.
-
-### Validation
-
-- `connect()` and `transaction()` need a `chainId` that is not `0`. `connect()` also checks that the address is valid for that chain.
-- A call that fails validation logs a warning and sends nothing. It does not throw. Enable [logging](#logging) with the `warn` level while you integrate, so you see these warnings.
-- The `autocapture` options do not apply to manual calls. Manual calls still respect opt-out and [`excludeChains`](#tracking-control).
 
 ## Mobile context
 
