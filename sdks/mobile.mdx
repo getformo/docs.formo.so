@@ -287,7 +287,9 @@ formo.identify({
 ```
 
 <Note>
-When using Wagmi integration, wallet connections are automatically tracked. You only need to call `identify()` manually if you want to associate additional user data or use a custom user ID.
+When using Wagmi integration, wallet connections are automatically tracked.
+
+Without Wagmi, see [Track wallet events without Wagmi](#track-wallet-events-without-wagmi). You only need to call `identify()` manually if you want to associate additional user data or use a custom user ID.
 </Note>
 
 ## Track custom events
@@ -626,6 +628,94 @@ When Wagmi integration is enabled, the SDK automatically tracks:
 <Tip>
 Use the same `QueryClient` instance for both Wagmi and Formo to avoid creating multiple cache instances.
 </Tip>
+
+## Track wallet events without Wagmi
+
+If your app does not use Wagmi, you can call the wallet methods yourself. The Wagmi integration calls these same methods, so the data in your dashboard is the same.
+
+<Warning>
+Use `formo.connect()` for wallet connections. `formo.track('Connect', ...)` creates a custom event and does not populate wallet analytics.
+</Warning>
+
+### Connect, chain, and disconnect
+
+Call these methods when your wallet library reports a change, including when it restores a session on app start:
+
+```tsx
+import { useFormo } from '@formo/analytics-react-native';
+
+const formo = useFormo();
+
+// Wallet connected
+formo.connect(
+  { chainId: 1, address: '0x1234...abcd' },
+  { providerName: 'MetaMask', rdns: 'io.metamask' } // optional
+);
+
+// Network switched
+formo.chain({ chainId: 8453 });
+
+// Wallet disconnected
+formo.disconnect();
+```
+
+| Method | Required | Optional |
+|:-------|:---------|:---------|
+| [`connect()`](/data/events/connect) | `chainId`, `address` | `providerName` and `rdns` in the second argument, for wallet attribution |
+| [`chain()`](/data/events/chain) | `chainId` | `address` (defaults to the connected wallet) |
+| [`disconnect()`](/data/events/disconnect) | None | `chainId`, `address` (default to the connected wallet) |
+
+After `connect()`, the SDK attaches the wallet address to every later event, including screen views and custom events, until `disconnect()` or `reset()`. You do not need to call `identify()` for this. Call `identify()` only to add a `userId` or other user data.
+
+### Signatures and transactions
+
+Call [`signature()`](/data/events/signature) and [`transaction()`](/data/events/transaction) once for each status change:
+
+```tsx
+import { useFormo, SignatureStatus, TransactionStatus } from '@formo/analytics-react-native';
+
+const formo = useFormo();
+
+// EIP-1193 code 4001: the user declined the request in the wallet
+const isUserRejection = (error: any) => error?.code === 4001;
+
+// Signatures
+formo.signature({ status: SignatureStatus.REQUESTED, chainId, address, message });
+try {
+  await signMessage(message);
+  formo.signature({ status: SignatureStatus.CONFIRMED, chainId, address, message });
+} catch (error) {
+  if (isUserRejection(error)) {
+    formo.signature({ status: SignatureStatus.REJECTED, chainId, address, message });
+  }
+  throw error;
+}
+
+// Transactions
+formo.transaction({ status: TransactionStatus.STARTED, chainId, address, to, value, data });
+let hash;
+try {
+  hash = await sendTransaction({ to, value, data });
+} catch (error) {
+  if (isUserRejection(error)) {
+    formo.transaction({ status: TransactionStatus.REJECTED, chainId, address, to, value, data });
+  }
+  throw error;
+}
+formo.transaction({ status: TransactionStatus.BROADCASTED, chainId, address, to, value, data, transactionHash: hash });
+const receipt = await waitForReceipt(hash);
+formo.transaction({
+  status: receipt.status === 'success' ? TransactionStatus.CONFIRMED : TransactionStatus.REVERTED,
+  chainId,
+  address,
+  transactionHash: hash,
+});
+```
+
+| Method | Required | Optional | Statuses |
+|:-------|:---------|:---------|:---------|
+| `signature()` | `status`, `address`, `message` | `chainId` | `REQUESTED`, `CONFIRMED`, `REJECTED` |
+| `transaction()` | `status`, `chainId`, `address` | `to`, `value`, `data`, `transactionHash`, `function_name`, `function_args` | `STARTED`, `BROADCASTED`, `CONFIRMED`, `REVERTED`, `REJECTED` |
 
 ## Mobile context
 
