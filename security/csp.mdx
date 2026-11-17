@@ -17,7 +17,7 @@ A CSP host allowlist says *where* scripts may come from. It does not say *what* 
 Formo closes that gap in two ways:
 
 1. **Pin the exact script with [SRI](/security/sri).** The `integrity` hash locks `cdn.formo.so/analytics@<version>` to known bytes. If the file changes, the browser refuses to run it, even though the domain is allowlisted. Pinned versions on `cdn.formo.so` are immutable.
-2. **Restrict where data can go with `connect-src`.** Even if an attacker injects code into your page, the browser blocks requests to hosts you did not list.
+2. **Restrict where scripts can send data with `connect-src`.** Even if an attacker injects code into your page, the browser blocks `fetch`, XHR, WebSocket, and beacon requests to hosts you did not list. `connect-src` does not cover image loads or form submissions: use `img-src` and `form-action` to limit those.
 
 The Formo SDK does **not** need `'unsafe-eval'` or `'unsafe-inline'`. It uses no `eval()`, `new Function()`, `innerHTML`, `document.write()`, or dynamic script injection. Do not add either keyword for Formo.
 
@@ -72,9 +72,9 @@ window.formofy('<YOUR_WRITE_KEY>', {
 Get the latest version and integrity hash from your project settings or the [GitHub releases](https://github.com/getformo/sdk/releases). Keep the version in `src` and the hash in `integrity` in sync: a mismatch blocks the script.
 
 This configuration ensures:
-- Scripts can only load from your domain and the pinned Formo SDK file
+- Scripts can only load from your domain and `cdn.formo.so`, and SRI pins the SDK script to known bytes
 - The SDK bytes are cryptographically verified before execution
-- Event data can only be sent to your domain and Formo's ingestion endpoint
+- `fetch`, XHR, and beacon requests can only go to your domain and Formo's ingestion endpoint
 - No `'unsafe-inline'` or `'unsafe-eval'` is needed
 
 <Tip>
