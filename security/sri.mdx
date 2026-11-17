@@ -42,6 +42,10 @@ Enable SRI on the browser [install](/install) snippet by updating the `src` and 
 
 > [Get the latest version number and integrity hash on GitHub](https://github.com/getformo/sdk/releases).
 
+<Note>
+If your site uses a [Content Security Policy](/security/csp), do not use the inline `onload` attribute: CSP blocks it unless you allow `'unsafe-inline'`. Follow the [CSP setup](/security/csp#recommended-policy-html-snippet) instead, which moves the init call into a script on your own domain.
+</Note>
+
 The hash in the integrity attribute within the Formo install script works with SRI to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
 
 If the file is modified after this point, the hash won't match, and supporting web browsers will refuse to load it. This ensures that the script you're running is exactly the one provided by Formo, without any hidden changes or malicious code.
@@ -77,4 +81,4 @@ For maximum security, combine SRI with [Content Security Policy](/security/csp).
 - **SRI** ensures the loaded script hasn't been tampered with
 - **TLS 1.2+** encrypts all traffic in transit
 
-This defense-in-depth approach makes it effectively impossible for an attacker to compromise the Formo SDK through MITM attacks.
+SRI is what makes a CSP domain allowlist safe for a third-party script: the allowlist trusts the domain, and the hash pins the exact file.

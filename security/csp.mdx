@@ -1,6 +1,6 @@
 ---
 title: "Content Security Policy (CSP)"
-description: "Configure Content Security Policy headers to protect your site from XSS, data injection, and man-in-the-middle attacks when using Formo."
+description: "Configure a Content Security Policy that allows the Formo SDK and blocks injected or tampered scripts on your site."
 icon: "lock"
 ---
 
@@ -10,66 +10,108 @@ As [described on MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP): Co
 
 The primary use case for CSP is to control which resources, in particular JavaScript resources, a document is allowed to load. This is mainly used as a defense against cross-site scripting (XSS) attacks, in which an attacker is able to inject malicious code into the victim's site.
 
-### How CSP Prevents MITM Attacks
+### Why CSP and SRI belong together
 
-CSP provides a critical layer of protection against man-in-the-middle (MITM) attacks by:
+A CSP host allowlist says *where* scripts may come from. It does not say *what* those scripts contain. If you allowlist a third-party domain and that vendor (or its CDN) is compromised, the browser will happily run whatever the domain serves. This is how compromised analytics and A/B testing scripts have shipped malware to large sites in the past.
 
-1. **Restricting script sources** - Only scripts from whitelisted domains can execute
-2. **Blocking data exfiltration** - `connect-src` limits where data can be sent
-3. **Preventing code injection** - Even if an attacker injects malicious code, CSP blocks it from communicating with unauthorized servers
+Formo closes that gap in two ways:
 
-When combined with [SRI](/security/sri) and TLS 1.2+ encryption, CSP makes MITM attacks on the Formo SDK effectively impossible.
+1. **Pin the exact script with [SRI](/security/sri).** The `integrity` hash locks `cdn.formo.so/analytics@<version>` to known bytes. If the file changes, the browser refuses to run it, even though the domain is allowlisted. Pinned versions on `cdn.formo.so` are immutable.
+2. **Restrict where data can go with `connect-src`.** Even if an attacker injects code into your page, the browser blocks requests to hosts you did not list.
 
-If you choose to use a CSP, it is important to ensure that Formo domains are permitted.
-
-### How to Enable CSP
-
-Below is an example of a relatively restrictive CSP that limits only scripts and API calls to all Formo domains.
-
-```html
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self'; 
-  script-src 'self' https://*.formo.so; 
-  connect-src 'self' https://*.formo.so;
-">
-```
-
-Add the script above within the `<head>` tag of your site to enable CSP.
+The Formo SDK does **not** need `'unsafe-eval'` or `'unsafe-inline'`. It uses no `eval()`, `new Function()`, `innerHTML`, `document.write()`, or dynamic script injection. Do not add either keyword for Formo.
 
 ### Domains used by Formo
 
-| Domain | Usage |
-| :--- | :--- |
-| `events.formo.so` | Ingestion endpoint for SDK API calls |
-| `cdn.formo.so` | CDN for SDK assets |
+| Domain | Directive | Usage |
+| :--- | :--- | :--- |
+| `https://cdn.formo.so` | `script-src` | SDK script (HTML snippet installs only) |
+| `https://events.formo.so` | `connect-src` | Event ingestion |
 
-### Combined Protection with SRI
+Allowlist these exact hosts rather than `https://*.formo.so`. A wildcard trusts every current and future subdomain.
 
-For maximum security, combine CSP with [SRI](/security/sri):
+If you send events through a [proxy](/sdks/web#proxy) with the `apiHost` option, list your proxy host in `connect-src` instead of `events.formo.so`. A same-origin path such as `/api/ingest` is already covered by `'self'`.
+
+### Recommended policy (HTML snippet)
+
+<Warning>
+Do not initialize the SDK with an inline `onload="..."` attribute when you enable CSP. Inline event handlers are blocked unless the policy allows `'unsafe-inline'`, so the SDK script loads but `formofy()` never runs and no events are sent.
+</Warning>
+
+Move the init call into a small script served from your own domain, and load it with `defer` right after the SDK. Deferred scripts run in document order, so `window.formofy` exists when your init script runs.
 
 ```html
 <head>
-  <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' https://*.formo.so;
-    connect-src 'self' https://*.formo.so;
+    script-src 'self' https://cdn.formo.so;
+    connect-src 'self' https://events.formo.so;
+    object-src 'none';
+    base-uri 'self';
   ">
 
-  <!-- Formo SDK with SRI -->
+  <!-- Formo SDK, pinned with SRI -->
   <script
     src="https://cdn.formo.so/analytics@1.42.1"
     integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
     crossorigin="anonymous"
     defer
-    onload="window.formofy('<YOUR_WRITE_KEY>');"
   ></script>
+  <!-- Your init script, served from your own domain -->
+  <script src="/formo-init.js" defer></script>
 </head>
 ```
 
-This configuration ensures:
-- Scripts can only load from your domain and Formo's CDN
-- API calls can only be made to your domain and Formo's ingestion endpoint
-- The SDK integrity is cryptographically verified before execution
-- All traffic is encrypted with TLS 1.2+
+```js formo-init.js
+window.formofy('<YOUR_WRITE_KEY>', {
+  ready: function (formo) {
+    formo.identify();
+  },
+});
+```
 
+Get the latest version and integrity hash from your project settings or the [GitHub releases](https://github.com/getformo/sdk/releases). Keep the version in `src` and the hash in `integrity` in sync: a mismatch blocks the script.
+
+This configuration ensures:
+- Scripts can only load from your domain and the pinned Formo SDK file
+- The SDK bytes are cryptographically verified before execution
+- Event data can only be sent to your domain and Formo's ingestion endpoint
+- No `'unsafe-inline'` or `'unsafe-eval'` is needed
+
+<Tip>
+Add the directives above to your existing policy rather than replacing it. Prefer sending CSP as an HTTP response header over a `<meta>` tag: the header also supports `frame-ancestors` and reporting, which `<meta>` ignores.
+</Tip>
+
+### Nonce-based policies (`'strict-dynamic'`)
+
+If your site already uses a nonce-based CSP (for example the Next.js nonce middleware), add your per-request nonce to both Formo script tags. With `'strict-dynamic'`, host allowlists in `script-src` are ignored, so the nonce is what authorizes the scripts:
+
+```html
+<script
+  nonce="<PER_REQUEST_NONCE>"
+  src="https://cdn.formo.so/analytics@1.42.1"
+  integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+  crossorigin="anonymous"
+  defer
+></script>
+<script nonce="<PER_REQUEST_NONCE>" src="/formo-init.js" defer></script>
+```
+
+You still need `https://events.formo.so` (or your proxy host) in `connect-src`.
+
+### NPM package installs
+
+When you bundle `@formo/analytics` from npm, the SDK is served from your own domain, so no `script-src` change is needed. Add only the ingestion host:
+
+```
+connect-src 'self' https://events.formo.so;
+```
+
+### Web Vitals
+
+If you load `web-vitals` from unpkg for [Web Vitals tracking](/sdks/web#web-vitals), add `https://unpkg.com` to `script-src` and keep the pinned version and `integrity` hash on that tag too. Bundling `web-vitals` from npm avoids the extra host.
+
+### Rolling out safely
+
+To test a policy without breaking your site, send it first as a `Content-Security-Policy-Report-Only` HTTP header with a `report-uri` or `report-to` endpoint. Check the reports (or the browser console) for violations, then switch to the enforcing `Content-Security-Policy` header.
+
+To confirm Formo works under your policy, open the browser console and run `typeof window.formofy` (should print `"function"`), then check the Network tab for requests to `events.formo.so` and the console for any `Content Security Policy` errors.
