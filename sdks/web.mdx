@@ -98,7 +98,7 @@ Install this snippet at the `<head>` of your website:
 ></script>
 ```
 
-The SDK starts itself from `data-write-key` (SDK 1.43.0 and later) and identifies the connected wallet on every page load. The snippet pins one SDK version and uses [Subresource Integrity (SRI)](/security/sri), so the browser refuses to run the script if it changes. To update, copy the newest snippet from your project settings or from the [GitHub releases](https://github.com/getformo/sdk/releases). The snippet has no inline code, so it also works under a strict [Content Security Policy](/security/csp). To pass [options](#configuration) or callbacks, use the [`onload` form](/sdks/web#html-snippet-with-options) instead.
+The SDK starts itself from `data-write-key` (SDK 1.43.0 and later) and identifies the connected wallet on every page load. The snippet pins one SDK version and uses [Subresource Integrity (SRI)](/security/sri), so the browser refuses to run the script if it changes. To update, copy the newest snippet from your project settings or from the [GitHub releases](https://github.com/getformo/sdk/releases). The snippet has no inline code, so it also works under a strict [Content Security Policy](/security/csp) that allows `cdn.formo.so`. If your policy uses nonces or `'strict-dynamic'`, add your nonce to the tag, as shown in [nonce-based policies](/security/csp#nonce-based-policies-strict-dynamic). To pass [options](#configuration) or callbacks, use the [`onload` form](/sdks/web#html-snippet-with-options) instead.
 
 #### HTML snippet with options
 

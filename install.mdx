@@ -532,7 +532,7 @@ Use the same `<SDK_WRITE_KEY>` for both your website and your app. You can find 
 
     The SDK starts itself from `data-write-key` and calls [`identify`](/data/events/identify) on every page load, which links connected wallets to user sessions.
 
-    The snippet pins one SDK version and uses [Subresource Integrity (SRI)](/security/sri), so the browser refuses to run the script if it changes. To update, copy the newest snippet from your project settings or from the [GitHub releases](https://github.com/getformo/sdk/releases). The snippet has no inline code, so it also works under a strict [Content Security Policy](/security/csp). To pass [options](/sdks/web#configuration) or callbacks, use the [`onload` form](/sdks/web#html-snippet-with-options) instead.
+    The snippet pins one SDK version and uses [Subresource Integrity (SRI)](/security/sri), so the browser refuses to run the script if it changes. To update, copy the newest snippet from your project settings or from the [GitHub releases](https://github.com/getformo/sdk/releases). The snippet has no inline code, so it also works under a strict [Content Security Policy](/security/csp) that allows `cdn.formo.so`. If your policy uses nonces or `'strict-dynamic'`, add your nonce to the tag, as shown in [nonce-based policies](/security/csp#nonce-based-policies-strict-dynamic). To pass [options](/sdks/web#configuration) or callbacks, use the [`onload` form](/sdks/web#html-snippet-with-options) instead.
 
     #### 2. Track custom events
 

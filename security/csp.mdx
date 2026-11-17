@@ -90,7 +90,7 @@ Add the directives above to your existing policy rather than replacing it. Prefe
 
 ### Nonce-based policies (`'strict-dynamic'`)
 
-If your site already uses a nonce-based CSP (for example the Next.js nonce middleware), add your per-request nonce to both Formo script tags. With `'strict-dynamic'`, host allowlists in `script-src` are ignored, so the nonce is what authorizes the scripts:
+If your site already uses a nonce-based CSP (for example the Next.js nonce middleware), add your per-request nonce to the Formo script tag. With `'strict-dynamic'`, host allowlists in `script-src` are ignored, so the nonce is what authorizes the script:
 
 ```html
 <script
@@ -99,8 +99,8 @@ If your site already uses a nonce-based CSP (for example the Next.js nonce middl
   integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
   crossorigin="anonymous"
   defer
+  data-write-key="<YOUR_WRITE_KEY>"
 ></script>
-<script nonce="<PER_REQUEST_NONCE>" src="/formo-init.js" defer></script>
 ```
 
 You still need `https://events.formo.so` (or your proxy host) in `connect-src`.
