@@ -90,14 +90,37 @@ Install this snippet at the `<head>` of your website:
 
 ```html
 <script
-  src="https://cdn.formo.so/analytics@1.42.1"
-  integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+  src="https://cdn.formo.so/analytics@1.43.0"
+  integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
   crossorigin="anonymous"
-  defer onload="window.formofy('<YOUR_WRITE_KEY>');"
+  defer
+  data-write-key="<YOUR_WRITE_KEY>"
 ></script>
 ```
 
-The snippet pins one SDK version and uses [Subresource Integrity (SRI)](/security/sri), so the browser refuses to run the script if it changes. To update, copy the newest snippet from your project settings or from the [GitHub releases](https://github.com/getformo/sdk/releases). If your site sets a [Content Security Policy](/security/csp), follow the CSP setup instead: the inline `onload` attribute is blocked under a strict policy.
+The SDK starts itself from `data-write-key` (SDK 1.43.0 and later) and identifies the connected wallet on every page load. The snippet pins one SDK version and uses [Subresource Integrity (SRI)](/security/sri), so the browser refuses to run the script if it changes. To update, copy the newest snippet from your project settings or from the [GitHub releases](https://github.com/getformo/sdk/releases). The snippet has no inline code, so it also works under a strict [Content Security Policy](/security/csp) that allows `cdn.formo.so`. If your policy uses nonces or `'strict-dynamic'`, add your nonce to the tag, as shown in [nonce-based policies](/security/csp#nonce-based-policies-strict-dynamic). To pass [options](#configuration) or callbacks, use the [`onload` form](/sdks/web#html-snippet-with-options) instead.
+
+#### HTML snippet with options
+
+`data-write-key` starts the SDK with default options. To pass options or a `ready` callback, call `formofy()` from `onload` instead, and leave out `data-write-key`:
+
+```html
+<script
+  src="https://cdn.formo.so/analytics@1.43.0"
+  integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
+  crossorigin="anonymous"
+  defer
+  onload="
+    window.formofy('<YOUR_WRITE_KEY>', {
+      ready: function(formo) {
+        formo.identify();
+      }
+    });
+  "
+></script>
+```
+
+A strict Content Security Policy blocks the inline `onload` attribute. Under CSP, move the `formofy()` call into a script on your own domain, as the [CSP guide](/security/csp#options-and-callbacks) shows.
 
 ### React & Next.js (without Wagmi)
 
@@ -289,8 +312,8 @@ If no parameters are specified, the Formo SDK will attempt to auto-identify the 
   <Tab title="HTML Snippet">
     ```html
     <script
-      src="https://cdn.formo.so/analytics@1.42.1"
-      integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+      src="https://cdn.formo.so/analytics@1.43.0"
+      integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
       crossorigin="anonymous"
       defer
       onload="
@@ -578,8 +601,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   defer
 ></script>
 <script
-  src="https://cdn.formo.so/analytics@1.42.1"
-  integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+  src="https://cdn.formo.so/analytics@1.43.0"
+  integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
   crossorigin="anonymous"
   defer onload="window.formofy('<YOUR_WRITE_KEY>', { webVitals: window.webVitals });"
 ></script>
@@ -624,8 +647,8 @@ For Browser installations, you can use the ready callback in the `onload` attrib
 
 ```html
 <script
-  src="https://cdn.formo.so/analytics@1.42.1"
-  integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+  src="https://cdn.formo.so/analytics@1.43.0"
+  integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
   crossorigin="anonymous"
   defer
   onload="
@@ -761,8 +784,8 @@ To disable cross-subdomain tracking and scope cookies to the current hostname on
   <Tab title="HTML Snippet">
 ```html
 <script
-  src="https://cdn.formo.so/analytics@1.42.1"
-  integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+  src="https://cdn.formo.so/analytics@1.43.0"
+  integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
   crossorigin="anonymous"
   defer onload="window.formofy('WRITE_KEY', { crossSubdomainCookies: false });"
 ></script>
@@ -1203,7 +1226,7 @@ Here are the domains used by Formo to load the SDK and send data:
 | Domain | Use case |
 |--------|----------|
 | events.formo.so | Receives data from the SDK (`https://events.formo.so/v0/raw_events`)|
-| cdn.formo.so | Loads the HTML snippet (only for [Website installation](#html-snippet)) e.g. `https://cdn.formo.so/analytics@1.42.1` |
+| cdn.formo.so | Loads the HTML snippet (only for [Website installation](#html-snippet)) e.g. `https://cdn.formo.so/analytics@1.43.0` |
 
 ### CDN
 
@@ -1223,7 +1246,7 @@ module.exports = {
     return [
       {
         source: "/formo.js",
-        destination: "https://cdn.formo.so/analytics@1.42.1", // Only for the HTML snippet, skip if you installed via NPM
+        destination: "https://cdn.formo.so/analytics@1.43.0", // Only for the HTML snippet, skip if you installed via NPM
       },
       {
         source: "/api/ingest",
@@ -1306,8 +1329,8 @@ Alternatively, you can set up your own proxy (with CloudFront, Cloudflare, etc.)
 
 ```javascript
 <script
-  src="https://cdn.formo.so/analytics@1.42.1"
-  integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+  src="https://cdn.formo.so/analytics@1.43.0"
+  integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
   crossorigin="anonymous"
   defer
   onload="
