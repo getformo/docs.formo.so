@@ -32,18 +32,18 @@ Enable SRI on the browser [install](/install) snippet by updating the `src` and 
 
 ```html
 <script
-  src="https://cdn.formo.so/analytics@1.42.1"
-  integrity="sha384-fJhcjBbJD9oUsqdbjp2zpVxkjv/TatW8DHN0b3BFt9F3k3hkGAlnLCQhIF/gWMrT"
+  src="https://cdn.formo.so/analytics@1.43.0"
+  integrity="sha384-NO2xnqlYekQmlxU1VGN/wNSjYsbQFDAUMdPSEZC8evLHk13Cw916vT57P0NEVKih"
   crossorigin="anonymous"
   defer
-  onload="window.formofy('<YOUR_WRITE_KEY>');"
+  data-write-key="<YOUR_WRITE_KEY>"
 ></script>
 ```
 
 > [Get the latest version number and integrity hash on GitHub](https://github.com/getformo/sdk/releases).
 
 <Note>
-If your site uses a [Content Security Policy](/security/csp), do not use the inline `onload` attribute: CSP blocks it unless you allow `'unsafe-inline'`. Follow the [CSP setup](/security/csp#recommended-policy-html-snippet) instead, which moves the init call into a script on your own domain.
+This snippet has no inline code, so it also works under a strict [Content Security Policy](/security/csp). If you start the SDK with an inline `onload` attribute instead, CSP blocks it unless you allow `'unsafe-inline'`.
 </Note>
 
 The hash in the integrity attribute within the Formo install script works with SRI to lock an external JavaScript resource to its known contents at a specific point in time. This is verified by a base64-encoded cryptographic hash.
@@ -56,7 +56,7 @@ You can independently verify the SRI hash using the following methods:
 
 **Using OpenSSL (macOS/Linux):**
 ```bash
-curl -s https://cdn.formo.so/analytics@1.42.1 | openssl dgst -sha384 -binary | openssl base64 -A
+curl -s https://cdn.formo.so/analytics@1.43.0 | openssl dgst -sha384 -binary | openssl base64 -A
 ```
 
 **Using Node.js:**
@@ -64,7 +64,7 @@ curl -s https://cdn.formo.so/analytics@1.42.1 | openssl dgst -sha384 -binary | o
 const crypto = require('crypto');
 const https = require('https');
 
-https.get('https://cdn.formo.so/analytics@1.42.1', (res) => {
+https.get('https://cdn.formo.so/analytics@1.43.0', (res) => {
   const hash = crypto.createHash('sha384');
   res.on('data', (chunk) => hash.update(chunk));
   res.on('end', () => console.log('sha384-' + hash.digest('base64')));
