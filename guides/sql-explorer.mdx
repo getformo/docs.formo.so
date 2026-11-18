@@ -1,11 +1,11 @@
 ---
 title: "How to Query Your Data with the SQL Explorer"
 sidebarTitle: "How to Explore with SQL"
-description: "Write custom ClickHouse SQL queries against your Formo analytics data to build reports, export results, and connect external BI tools like Metabase and Grafana."
+description: "Write custom ClickHouse SQL queries against your Formo analytics data to build reports, export results, and use your data in other tools."
 keywords: ["SQL analytics", "ClickHouse queries", "crypto data SQL", "web3 data explorer", "DeFi SQL queries", "analytics SQL"]
 ---
 
-The SQL Explorer gives you direct access to your data. Write custom queries in ClickHouse SQL, visualize results, export as CSV, and connect external BI tools. If dashboards don't have what you need, SQL does.
+The SQL Explorer gives you direct access to your data. Write custom queries in ClickHouse SQL, visualize results, and export as CSV. If dashboards don't have what you need, SQL does.
 
 ## Part 1: Navigate to Explorer
 
@@ -315,27 +315,13 @@ Ask AI generates ClickHouse SQL automatically and runs it. You can refine with f
 
 See [How to use Ask AI](/guides/ask-ai) for details.
 
-## Part 8: Connect BI Tools
+## Part 8: Use your data in other tools
 
-Formo's SQL engine integrates with external BI tools via the **Query API**.
+The SQL that you write in the Explorer also runs outside Formo:
 
-Supported tools:
-- Grafana
-- Hex
-- Metabase
-- Superset
-- Power BI
-- Tableau
-
-Configuration details are at [/data/bi](/data/bi). You'll need your BI Read Key, found in the project settings page under "Credentials" (this is separate from your workspace API key).
-
-Example Metabase connection:
-1. In Metabase, click Settings > Databases > Add Database
-2. Choose "ClickHouse"
-3. Paste your Formo ClickHouse credentials (provided in workspace settings)
-4. Create queries and dashboards in Metabase that query your Formo data
-
-Your BI tool becomes another analytics interface alongside Formo dashboards.
+- **Your own code or a scheduled job**: send the same SQL to the [Query API](/api/overview#query-api) with a workspace API key.
+- **AI tools**: query your data from Claude, Cursor, or another AI tool with [MCP](/mcp/overview).
+- **BI tools** (Grafana, Hex, Metabase, Superset, Power BI, Tableau): export your data to Google Cloud Storage or Amazon S3 with [Data sync](/data/data-sync), load the files into your warehouse, and connect the BI tool to that warehouse.
 
 ## Best Practices
 
