@@ -600,7 +600,9 @@ When `sanitizeUrl` returns an empty string:
 
 - The deep link is ignored. No `Deep Link Opened` event is sent, and the saved attribution is unchanged, so the campaign that came before it is kept.
 - `Application Opened` is still sent for a cold launch, without the `url` property.
-- The `url` property and the `referrer` context field are removed from the event.
+- The referrer saved from an earlier link is not affected, and later events still carry it.
+
+`sanitizeUrl` is also called with the `url` property of each event and with the saved referrer itself. If it returns an empty string for one of those values, only that field is omitted from the event.
 
 <Note>
 `sanitizeUrl` receives the URL as it arrived, and excluded query parameters are then removed from its result. It must be synchronous, and it can run more than once for the same URL, so its result must not change when it is applied again. If it throws or does not return a string, the SDK drops the URL. On Android, it can also receive the Play install referrer, which is a query string (`utm_source=...&utm_medium=...`) and not a full URL.
