@@ -1,79 +1,26 @@
 ---
-title: 'BI integration'
-description: 'Connect Metabase, Grafana, Tableau, and other BI tools to your Formo data warehouse using the HTTP interface for custom SQL queries and dashboards.'
+title: 'BI integration (deprecated)'
+description: 'The Formo BI integration is deprecated. Use the SQL Explorer, the Query API, MCP, or Data sync to work with your Formo data in other tools.'
 icon: chart-line
 ---
 
-Formo is compatible with BI tools through our HTTP interface, enabling you to connect popular BI tools, SQL clients, and data visualization platforms directly to Formo.
+<Warning>
+  The BI integration is deprecated. The BI Read Key is no longer available in the project settings, and new connections are not supported.
+</Warning>
 
-This interface provides a standardized way to query your data using SQL, making it easy to integrate Formo with your existing analytics workflow and third-party tools.
+The BI integration let you connect a BI tool or SQL client to Formo with a BI Read Key. A BI Read Key expired after one week, so a connection that used one no longer works.
 
-## Configuration
+## What to use now
 
-To connect to Formo, use these standard connection parameters:
+| You want to | Use |
+| --- | --- |
+| Write SQL and build charts in Formo | The [Explorer](/features/product-analytics/explore) and [Charts](/features/product-analytics/charts) |
+| Run SQL from your own code or a scheduled job | The [Query API](/api/overview#query-api) with a workspace API key |
+| Explore your data from Claude, Cursor, or another AI tool | [MCP](/mcp/overview) |
+| Use a BI tool such as Metabase, Grafana, or Tableau | [Data sync](/data/data-sync): export to Google Cloud Storage or Amazon S3, load the files into your warehouse, and connect the BI tool there |
 
-### Connection settings
+## Why it was deprecated
 
-- **Protocol**: HTTPS
-- **Host**: `clickhouse.eu-central-1.aws.tinybird.co`
-- **Port**: `443`
-- **SSL/TLS**: Required (enabled)
+A BI tool sent its SQL straight to the database, with no Formo service in between. Formo could not apply the same query handling and safeguards there that the Explorer, the Query API, and MCP have. Those three give you the same data with full SQL support.
 
-### Authentication settings
-
-- **Database name**: `formo`
-- **Username**: `formo`
-- **Password**: `<Your BI Read Key>` (Your Formo BI Read Token)
-
-Find your **BI Read key** in the project settings page under 'Credentials'.
-
-<Frame caption="Your BI Read Key under project settings">
-  <img src="/images/project-credentials.png" />
-</Frame>
-
-BI read keys expire in one week, but you can get a fresh key on the project settings page.
-
-## Compatible tools
-
-Formo works with various BI tools and SQL clients:
-- Grafana
-- Hex 
-- Metabase
-- Superset
-- Power BI
-- Tableau
-
-
-Any tool that supports ClickHouse® HTTP interface can potentially work with Formo.
-
-## Limitations
-
-The BI interface to Formo is read-only. You can use it to query, visualize, and analyze data from your Formo Data Sources, but you cannot modify data through this connection.
-
-You cannot perform `INSERT`, `UPDATE`, `DELETE`, or any DDL operations (`CREATE`, `ALTER`, `DROP`).
-
-## Troubleshooting
-
-**Authentication failures**
-
-Error: Authentication failed
-
-- Check your BI Read Token is valid and not expired
-- Ensure the token has read permissions for the workspace
-- Verify the token is entered in the password field
-
-**SSL/TLS errors**
-
-Error: SSL connection error
-
-- Ensure SSL/TLS is enabled in your client
-- Use port 443 with HTTPS protocol
-- Check that your client supports TLS 1.2 or higher
-
-**Query timeouts**
-
-Error: Query timeout
-
-- Add appropriate WHERE clauses to filter data
-- Use LIMIT to reduce result set size
-- Consider querying materialized views instead of raw data
+If you depend on a direct BI connection, [contact support](https://formo.so/support).

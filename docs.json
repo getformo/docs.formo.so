@@ -146,7 +146,7 @@
           },
           {
             "group": "Data Warehouse",
-            "pages": ["data/catalog", "data/bi", "data/data-sync"]
+            "pages": ["data/catalog", "data/data-sync"]
           }
         ]
       },
