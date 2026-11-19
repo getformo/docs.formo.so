@@ -333,7 +333,7 @@ The SDK captures deep links automatically. On startup it reads the URL the app w
 
 No extra code is needed. Put the parameters in your campaign links, for example: `myapp://home?utm_source=twitter&utm_campaign=launch&ref=friend123`
 
-Parameters merge field by field: a later link without UTM parameters, such as `myapp://home`, does not erase the attribution that an earlier link stored. To turn capture off, see [Attribution](#attribution) and [Autocapture](#autocapture).
+Parameters merge field by field: a later link without UTM parameters, such as `myapp://home`, does not erase the attribution that an earlier link stored. To turn capture off, see [Attribution](#attribution) and [Autocapture](#autocapture). To keep sensitive parameters or whole links (such as OAuth callbacks) out of analytics, see [Filter URLs](#filter-urls).
 
 ### Set the traffic source manually
 
@@ -424,6 +424,9 @@ Not supported. Apple does not expose an install-referrer API, so an install cann
     // Tracking control
     tracking: true,           // Enable/disable tracking
 
+    // Filter URLs before they are stored or sent (see "Filter URLs")
+    sanitizeUrl: (url) => url,
+
     // Autocapture control
     autocapture: true,        // Enable/disable wallet autocapture
 
@@ -483,6 +486,8 @@ options={{
   },
 }}
 ```
+
+To strip sensitive query parameters from captured URLs with `tracking.excludeQueryParams`, see [Filter URLs](#filter-urls).
 
 ### Autocapture
 
@@ -550,6 +555,60 @@ options={{
 ```
 
 Passing `attribution: false` disables both.
+
+### Filter URLs
+
+The SDK reads deep links and the launch URL for attribution. It reports them in `Deep Link Opened` and `Application Opened`, and saves the last link as the `referrer` of the events that follow. If your links carry sensitive data (auth tokens, one-time codes, emails), filter them on the device, before any event is sent, so they are never transmitted or stored.
+
+Both controls below apply to deep links, the launch URL, the Android Play install referrer, the saved referrer, and the `url` property of each event.
+
+#### Excluding query parameters
+
+Use `tracking.excludeQueryParams` to strip parameters by name. This is the same option as in the [Web SDK](/sdks/web):
+
+```tsx
+options={{
+  tracking: {
+    excludeQueryParams: ['token', 'access_token', 'email', 'signature'],
+  },
+}}
+```
+
+Names are matched case-insensitively. The URL fragment (after `#`) is left untouched.
+
+These parameters are applied on top of an always-on built-in denylist that cannot be disabled. The following parameters are always stripped, regardless of configuration:
+
+- `privy_oauth_code`: Privy OAuth authorization code
+- `privy_oauth_state`: Privy OAuth CSRF state token
+- `privy_oauth_provider`: Privy OAuth provider identifier
+
+#### Dropping or rewriting a link
+
+`excludeQueryParams` removes parameters, but the link is still reported. To ignore a link entirely, or for a rule that a list of names cannot express, use `sanitizeUrl`. Return the URL to use, or an empty string to drop it:
+
+```tsx
+options={{
+  sanitizeUrl: (url) => {
+    // Ignore sign-in callbacks, so they do not replace campaign attribution
+    if (url.includes('privy_oauth_code=')) return '';
+    return url;
+  },
+}}
+```
+
+When `sanitizeUrl` returns an empty string:
+
+- The deep link is ignored. No `Deep Link Opened` event is sent, and the saved attribution is unchanged, so the campaign that came before it is kept.
+- `Application Opened` is still sent for a cold launch, without the `url` property.
+- The referrer saved from an earlier link is not affected, and later events still carry it.
+
+`sanitizeUrl` is also called with the `url` property of each event and with the saved referrer itself. If it returns an empty string for one of those values, only that field is omitted from the event.
+
+<Note>
+`sanitizeUrl` receives the URL as it arrived, and excluded query parameters are then removed from its result. It must be synchronous, and it can run more than once for the same URL, so its result must not change when it is applied again. If it throws or does not return a string, the SDK drops the URL. On Android, it can also receive the Play install referrer, which is a query string (`utm_source=...&utm_medium=...`) and not a full URL.
+</Note>
+
+`excludeQueryParams` requires version 1.5.0 or later. `sanitizeUrl` requires version 1.4.0 or later.
 
 ### Logging
 
