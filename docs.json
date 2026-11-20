@@ -10,6 +10,10 @@
   "favicon": "/favicon.svg",
   "redirects": [
     {
+      "source": "/features/wallet-intelligence/wallet-clusters",
+      "destination": "/features/wallet-intelligence/identity-resolution"
+    },
+    {
       "source": "/integrations/dune",
       "destination": "/integrations/overview"
     },
@@ -70,7 +74,7 @@
                 "pages": [
                   "features/wallet-intelligence/overview",
                   "features/wallet-intelligence/wallet-profiles",
-                  "features/wallet-intelligence/wallet-clusters",
+                  "features/wallet-intelligence/identity-resolution",
                   "features/wallet-intelligence/wallet-labels",
                   "features/wallet-intelligence/search",
                   "features/wallet-intelligence/audience-insights",

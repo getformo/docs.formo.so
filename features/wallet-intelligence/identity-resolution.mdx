@@ -1,21 +1,39 @@
 ---
-title: 'Wallet clusters'
-description: 'Find the wallets that one person or one team controls. Formo links wallets by shared identity and by shared funding address, and shows the reason for each link.'
+title: 'Identity resolution'
+description: 'Learn how Formo links the wallets that one person or one team controls, by shared identity and by shared funding address, and how to review each link.'
 ---
 
 <Frame caption="Clusters on the Users page, clustered by funding address.">
 	<img src="/images/wallet-intelligence-wallet-clusters.png" alt="Clusters tab with Cluster by set to Funding address, with a confidence level on each cluster" />
 </Frame>
 
-One person often uses several wallets. **Wallet clusters** group those wallets, so you can count real users, understand multi-wallet behavior, and find multi-accounting in referral, bonus, airdrop, and competition programs.
+## Overview
 
-Formo clusters wallets in two separate ways. Each way answers a different question, and Formo never mixes the two into one group.
+**Identity resolution** answers one question: which of your wallets belong to the same person or team?
+
+A wallet address is not a user. One person often has several wallets: a main wallet, a hardware wallet, a trading wallet, a wallet for each chain. Some people create many wallets on purpose, to collect a referral bonus, an airdrop, or a competition reward more than one time.
+
+When you treat each wallet as a separate user, three things go wrong:
+
+- **You overstate your audience.** 1,000 active wallets can be 600 people. Growth, retention, and conversion numbers by wallet look better or worse than the real ones.
+- **You misjudge your best users.** The value of one user is spread across several wallets, so a high-value user looks like several small ones.
+- **You pay for the same user more than one time.** Incentive programs that reward each wallet reward the people who create the most wallets.
+
+Formo groups linked wallets into **clusters**, shows the reason for every link, and lets you review and export each cluster. You decide what to do with it: merge the wallets in your own analysis, focus on a high-value user, or exclude a cluster from a program.
+
+## Two ways to link wallets
+
+Formo links wallets with two independent signals. One comes from your app and one comes from the chain. Formo keeps them separate, because they prove different things.
 
 | | Identity | Funding address |
 |:--|:--|:--|
-| **Links wallets that** | Share a device or a user ID | Were first funded onchain by the same address |
-| **Evidence** | A direct match on data from your app | Inferred from onchain data |
-| **Finds** | One user who connects several wallets | Wallets that one person or team prepared, also when each wallet uses a separate device |
+| **The wallets share** | A device or a user ID | The address that first funded them onchain |
+| **Where the signal comes from** | Your app: the Formo SDK and your `identify` calls | The chain: the first gas transfer to each wallet |
+| **Kind of evidence** | A direct match on data from your app | An inference from onchain data, with a confidence level |
+| **What it finds** | One user who connects several wallets | Wallets that one operator prepared, also when each wallet uses a separate device |
+| **What it misses** | Wallets that are never used on the same device or account | Wallets that were funded from different sources |
+
+The two signals cover each other. Identity is a direct match on data from your app, so it needs no inference. It still is not proof of one owner, because two people can share one device. And an operator who uses a new browser profile for each wallet is invisible to it. The funding address sees that operator, but it needs care, because exchanges and bridges also fund many unrelated wallets. A link that both signals confirm is the strongest one.
 
 ## Identity clusters
 
@@ -69,12 +87,12 @@ Each funding cluster shows a confidence level.
 | Level | When | What it means |
 |:--|:--|:--|
 | **High confidence** | The funding address is itself a wallet of your project, or two or more wallets in the cluster also share an identity cluster | The wallets are probably controlled by one owner |
-| **Review** | Neither is true | Check the wallets before you act. The funding address can be a service that has no label yet |
+| **Needs review** | Neither is true | Check the wallets before you act. The funding address can be a service that has no label yet |
 
 Hover the level to see the reasons, for example how many wallets share an identity cluster and within how many days the wallets were funded.
 
 <Note>
-**Review** does not mean that the cluster is wrong. A farming operation that funds its wallets from an outside address and uses a separate device for each wallet shows as **Review**. A short funding window, for example ten wallets funded within minutes, is a strong sign of one operator.
+**Needs review** does not mean that the cluster is wrong. A farming operation that funds its wallets from an outside address and uses a separate device for each wallet shows as **Needs review**. A short funding window, for example ten wallets funded within minutes, is a strong sign of one operator.
 </Note>
 
 ## Where you see clusters
@@ -116,7 +134,7 @@ Exports from the Users page include the links:
 | **Linked addresses** | Wallets, Clusters | The linked wallets, for every reason |
 | **Linked by** | Wallets, Clusters | The reasons for the links |
 | **Funding address** | Wallets, Clusters | The funding address of the wallet or of the cluster |
-| **Confidence** | Clusters, by funding address | **High** or **Review** |
+| **Confidence** | Clusters, by funding address | **High** or **Needs review** |
 
 The two count columns are separate, and a wallet that is linked both ways is in both. So they do not add up to the number in the **Links** column, which counts each linked wallet one time for every reason. The **Linked addresses** column holds that full list.
 
@@ -134,7 +152,7 @@ The two count columns are separate, and a wallet that is linked both ways is in 
 Read funding clusters as a signal, not as proof.
 
 - **The link is inferred.** One person can send gas to a friend. Wallets in one funding cluster can belong to different people.
-- **Labels arrive late.** A new service wallet can form a cluster for a short time before Formo recognises it. The confidence level marks such a cluster as **Review**.
+- **Labels arrive late.** A new service wallet can form a cluster for a short time before Formo recognises it. The confidence level marks such a cluster as **Needs review**.
 - **Coverage fills in over time.** Formo looks up the funding address when a wallet is active on your app. A wallet that was not active recently can have no funding address yet.
 - **Contract funding is not visible on every chain.** On some chains Formo sees direct transfers only. A wallet that was first funded through a contract on such a chain can show a later funding address, or none.
 - **No transitive merge.** If address A funded wallet B, and wallet B funded wallet C, Formo shows two clusters that share wallet B, not one chain.
