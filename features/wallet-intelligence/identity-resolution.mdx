@@ -29,11 +29,11 @@ Formo links wallets with two independent signals. One comes from your app and on
 |:--|:--|:--|
 | **The wallets share** | A device or a user ID | The address that first funded them onchain |
 | **Where the signal comes from** | Your app: the Formo SDK and your `identify` calls | The chain: the first gas transfer to each wallet |
-| **How certain it is** | A direct match | An inference, with a confidence level |
+| **Kind of evidence** | A direct match on data from your app | An inference from onchain data, with a confidence level |
 | **What it finds** | One user who connects several wallets | Wallets that one operator prepared, also when each wallet uses a separate device |
 | **What it misses** | Wallets that are never used on the same device or account | Wallets that were funded from different sources |
 
-The two signals cover each other. Identity is certain, but an operator who uses a new browser profile for each wallet is invisible to it. The funding address sees that operator, but it needs care, because exchanges and bridges also fund many unrelated wallets. A link that both signals confirm is the strongest one.
+The two signals cover each other. Identity is a direct match on data from your app, so it needs no inference. It still is not proof of one owner, because two people can share one device. And an operator who uses a new browser profile for each wallet is invisible to it. The funding address sees that operator, but it needs care, because exchanges and bridges also fund many unrelated wallets. A link that both signals confirm is the strongest one.
 
 ## Identity clusters
 
