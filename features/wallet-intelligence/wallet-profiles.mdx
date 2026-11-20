@@ -47,12 +47,35 @@ Each wallet profile includes key metadata aggregated across all chains:
 | **Wallet Age** | Time since the wallet's first onchain transaction. |
 | **Last Onchain** | When the wallet last had onchain activity. |
 | **Total Transactions** | Lifetime transaction count across all chains, with a per-chain breakdown. |
-| **Linked Addresses** | Other wallet addresses seen on the same device as this one (they share an anonymous ID). See the **Clusters** tab on the Users page for the full multi-wallet group. |
+| **Funding** | The address that first sent native gas to this wallet. A known exchange, bridge, or gas service is shown by name. See [Funding clusters](#funding-clusters). |
+| **Linked Addresses** | Other wallets linked to this one: wallets seen on the same device or with the same user ID, and wallets first funded by the same address. An icon on each address shows the reason for the link. See the **Clusters** tab on the Users page for the full multi-wallet group. |
 | **Sessions** | Total number of sessions on your app. |
 | **First Seen / Last Seen** | When the user first and last interacted with your app. |
 | **Country, Device, Browser, OS** | Geographic and device information from the user's sessions. |
 
-**How wallets are linked.** Formo links wallets through two shared identifiers only: the anonymous ID cookie (the same browser or device, across sessions and days) and the user ID you set with [`identify`](/data/events/identify). It does not use IP addresses, device fingerprinting, onchain transfers, or funding sources. **Linked Addresses** lists the wallets seen on the same device as this wallet. **Clusters** go further: they group wallets transitively through shared devices and shared user IDs, so a cluster can include wallets that are not in a wallet's Linked Addresses. Guards stop shared devices and bots from merging unrelated wallets, and clusters never cross projects.
+**How wallets are linked.** Formo links wallets in two separate ways, and the **Clusters** tab on the Users page has a **Cluster by** control to switch between them.
+
+### Identity clusters
+
+Identity clusters group wallets that belong to the same user. Wallets are linked through two shared identifiers: the anonymous ID cookie (the same browser or device, across sessions and days) and the user ID you set with [`identify`](/data/events/identify). This is a direct match on data from your app. It does not use IP addresses or device fingerprinting.
+
+Identity clusters group wallets transitively through shared devices and shared user IDs, so a cluster can include wallets that were never seen on the same device as each other. Guards stop shared devices and bots from merging unrelated wallets.
+
+### Funding clusters
+
+Funding clusters group wallets that were first funded onchain by the same address. The funding address of a wallet is the sender of the first native gas transfer that the wallet received on a chain. When several wallets of your project share a funding address, they form one funding cluster, and the cluster is named by that address.
+
+Funding clusters help you find wallets that one person or one team controls, for example in referral, bonus, and competition programs.
+
+Read funding clusters as a signal, not as proof:
+
+- The link is inferred from onchain data. Wallets in one funding cluster may belong to different people, for example when one person sends gas to a friend.
+- Exchanges, bridges, and gas services fund many unrelated wallets, so they never form a cluster. When the funding address of a wallet is a known service, the wallet profile shows the name or the type of the service.
+- A wallet can be in more than one funding cluster when it was funded by different addresses on different chains.
+- Formo looks up the funding address when a wallet is active on your app, on supported EVM chains and Solana. A wallet that was not active recently may have no funding address yet.
+- Funding links never change your user counts, monthly active users, or billing. Those use identity only.
+
+Funding data is visible to team members who have access to sensitive user data. Clusters of both types never cross projects.
 
 ## User Socials
 
