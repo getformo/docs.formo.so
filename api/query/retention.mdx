@@ -5,3 +5,5 @@ openapi: "GET /v0/retention"
 ---
 
 Returns the retention cohort table the dashboard renders on the Retention page. Each row is a cohort; columns are subsequent activity buckets.
+
+The `metric` tuple gives the summary in this order: `project_id`, `user_count`, `day7_retained`, `day30_retained`, `day90_retained`, `day7_retention_rate`, `day30_retention_rate`, `day90_retention_rate`, `day7_eligible`, `day30_eligible`, `day90_eligible`. A rate is the retained count as a percent of the eligible count: the users whose 7, 30 or 90 day window has passed.

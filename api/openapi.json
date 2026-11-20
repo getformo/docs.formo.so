@@ -8939,7 +8939,7 @@
       "get": {
         "operationId": "getAnalyticsLifecycle",
         "summary": "Get user lifecycle stages (New / Returning / Power user / At Risk / Churned / Resurrected)",
-        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
+        "description": "Counts wallet users by lifecycle stage based on activity within the date range. The reference date is `date_to`. Every stage is returned, also a stage with 0 users.\n\nDefault stage thresholds can be overridden per-request with the lifecycle threshold query params (`new_window_days`, `churn_window_days`, `power_user_min_active_days`, `power_user_window_days`, `resurrected_gap_days`, `at_risk_min_days_inactive`, `at_risk_prior_active_days_threshold`); each is an optional integer 1 to 90. When omitted, the project's saved Settings → Lifecycle values apply, then the platform defaults.",
         "tags": ["Query"],
         "x-required-scope": "query:read",
         "parameters": [
@@ -9274,7 +9274,7 @@
                   "meta": [
                     {
                       "name": "metric",
-                      "type": "Tuple(project_id String, user_count UInt64, day7_retained UInt64, day30_retained UInt64, day90_retained UInt64, day7_retention_rate Float64, day30_retention_rate Float64, day90_retention_rate Float64)"
+                      "type": "Tuple(project_id String, user_count UInt64, day7_retained UInt64, day30_retained UInt64, day90_retained UInt64, day7_retention_rate Float64, day30_retention_rate Float64, day90_retention_rate Float64, day7_eligible UInt64, day30_eligible UInt64, day90_eligible UInt64)"
                     },
                     {
                       "name": "user",
@@ -9291,7 +9291,10 @@
                         76,
                         0.32,
                         0.154,
-                        0.059
+                        0.059,
+                        1284,
+                        1284,
+                        1284
                       ],
                       "user": [
                         [
