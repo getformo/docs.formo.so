@@ -111,12 +111,14 @@ Exports from the Users page include the links:
 
 | Column | Tab | Meaning |
 |:--|:--|:--|
-| `linked_addresses_count` | Wallets | Wallets seen on the same device |
-| `funding_addresses_count` | Wallets | Wallets with the same funding address |
+| `linked_addresses_count` | Wallets | The number of wallets seen on the same device. It does not count wallets linked only by user ID, by the identity cluster, or by funding address |
+| `funding_addresses_count` | Wallets | The number of wallets with the same funding address |
 | **Linked addresses** | Wallets, Clusters | The linked wallets, for every reason |
 | **Linked by** | Wallets, Clusters | The reasons for the links |
 | **Funding address** | Wallets, Clusters | The funding address of the wallet or of the cluster |
 | **Confidence** | Clusters, by funding address | **High** or **Review** |
+
+The two count columns are separate, and a wallet that is linked both ways is in both. So they do not add up to the number in the **Links** column, which counts each linked wallet one time for every reason. The **Linked addresses** column holds that full list.
 
 ## How to review a funding cluster
 
