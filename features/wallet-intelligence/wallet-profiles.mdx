@@ -47,35 +47,23 @@ Each wallet profile includes key metadata aggregated across all chains:
 | **Wallet Age** | Time since the wallet's first onchain transaction. |
 | **Last Onchain** | When the wallet last had onchain activity. |
 | **Total Transactions** | Lifetime transaction count across all chains, with a per-chain breakdown. |
-| **Funding** | The address that first sent native gas to this wallet. When a wallet was funded by different addresses on different chains, the profile shows the earliest one that it shares with other wallets of your project, or the earliest one when none is shared. A known exchange, bridge, or gas service is shown by name. See [Funding clusters](#funding-clusters). |
-| **Linked Addresses** | Other wallets linked to this one: wallets seen on the same device or with the same user ID, and wallets first funded by the same address. An icon on each address shows the reason for the link. See the **Clusters** tab on the Users page for the full multi-wallet group. |
+| **Funding** | The address that first sent native gas to this wallet. When a wallet was funded by different addresses on different chains, the profile shows the earliest one that it shares with other wallets of your project, or the earliest one when none is shared. A known exchange, bridge, or other service is shown by its name or its type. See [Funding clusters](/features/wallet-intelligence/wallet-clusters#funding-clusters). |
+| **Linked Addresses** | Other wallets linked to this one: the wallets of its identity cluster, and the wallets first funded by the same address. An icon on each address shows the reason for the link. See [Wallet clusters](/features/wallet-intelligence/wallet-clusters). |
 | **Sessions** | Total number of sessions on your app. |
 | **First Seen / Last Seen** | When the user first and last interacted with your app. |
 | **Country, Device, Browser, OS** | Geographic and device information from the user's sessions. |
 
-**How wallets are linked.** Formo links wallets in two separate ways, and the **Clusters** tab on the Users page has a **Cluster by** control to switch between them.
+**How wallets are linked.** Formo links wallets in two separate ways, by shared identity and by shared funding address. See [Wallet clusters](/features/wallet-intelligence/wallet-clusters) for the full method, the confidence level, and the limits.
 
 ### Identity clusters
 
-Identity clusters group wallets that belong to the same user. Wallets are linked through two shared identifiers: the anonymous ID cookie (the same browser or device, across sessions and days) and the user ID you set with [`identify`](/data/events/identify). This is a direct match on data from your app. It does not use IP addresses or device fingerprinting.
-
-Identity clusters group wallets transitively through shared devices and shared user IDs, so a cluster can include wallets that were never seen on the same device as each other. Guards stop shared devices and bots from merging unrelated wallets.
+Identity clusters group wallets that belong to the same user. Wallets are linked through the anonymous ID (the same browser or device) and through the user ID that you set with [`identify`](/data/events/identify). It is a direct match on data from your app. See [Identity clusters](/features/wallet-intelligence/wallet-clusters#identity-clusters).
 
 ### Funding clusters
 
-Funding clusters group wallets that were first funded onchain by the same address. The funding address of a wallet is the sender of the first native gas transfer that the wallet received on a chain. When several wallets of your project share a funding address, they form one funding cluster, and the cluster is named by that address.
+Funding clusters group wallets that were first funded onchain by the same address. Exchanges, bridges, and other services fund many unrelated wallets, so they never form a cluster. Read a funding cluster as a signal, not as proof. See [Funding clusters](/features/wallet-intelligence/wallet-clusters#funding-clusters).
 
-Funding clusters help you find wallets that one person or one team controls, for example in referral, bonus, and competition programs.
-
-Read funding clusters as a signal, not as proof:
-
-- The link is inferred from onchain data. Wallets in one funding cluster may belong to different people, for example when one person sends gas to a friend.
-- Exchanges, bridges, and gas services fund many unrelated wallets, so they never form a cluster. When the funding address of a wallet is a known service, the wallet profile shows the name or the type of the service.
-- A wallet can be in more than one funding cluster when it was funded by different addresses on different chains.
-- Formo looks up the funding address when a wallet is active on your app, on supported EVM chains and Solana. A wallet that was not active recently may have no funding address yet.
-- Funding links are not used in your user counts, monthly active users, or billing.
-
-Funding data is visible to team members who have access to sensitive user data. Clusters of both types never cross projects.
+Clusters, linked addresses, and funding data are visible to team members who have access to sensitive user data. Clusters never cross projects.
 
 ## User Socials
 

@@ -70,6 +70,7 @@
                 "pages": [
                   "features/wallet-intelligence/overview",
                   "features/wallet-intelligence/wallet-profiles",
+                  "features/wallet-intelligence/wallet-clusters",
                   "features/wallet-intelligence/wallet-labels",
                   "features/wallet-intelligence/search",
                   "features/wallet-intelligence/audience-insights",
