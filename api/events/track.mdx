@@ -14,3 +14,13 @@ Send events to Formo from any source. Sending custom events? See the [event spec
   Sending events from the backend? Use the [server-side SDK](https://docs.formo.so/sdks/server).
 </Note>
 
+## Rate limits
+
+Each project can send up to 500 events per second, counted in 5-second windows (2,500 events per window). One event in a batch counts as one event.
+
+A request above the limit gets HTTP `429` with a `Retry-After` header and a body like `{"error": "...", "retry_after_seconds": 3}`. No event from that request is stored. Wait for the number of seconds in `Retry-After`, then send the request again.
+
+The Formo SDKs retry a `429` on their own. If you call this endpoint directly, for example for a bulk import, send batches at a steady rate below the limit and retry on `429`.
+
+Need a higher limit? [Contact us](mailto:support@formo.so).
+
