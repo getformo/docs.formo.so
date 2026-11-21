@@ -7332,7 +7332,7 @@
       "post": {
         "operationId": "executeQuery",
         "summary": "Execute SQL query",
-        "description": "Execute a SQL query against the project's analytics data. Only SELECT and WITH statements are allowed. LIMIT is capped at 1,000,000. Forbidden keywords: INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, etc.",
+        "description": "Execute a SQL query against the project's analytics data. Only SELECT and WITH statements are allowed. LIMIT is capped at 100,000. Forbidden keywords: INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, etc.",
         "tags": ["Query"],
         "requestBody": {
           "required": true,
