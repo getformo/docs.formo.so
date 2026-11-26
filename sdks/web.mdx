@@ -728,7 +728,16 @@ These parameters are applied on top of an always-on built-in denylist that canno
 - `privy_oauth_state`: Privy OAuth CSRF state token
 - `privy_oauth_provider`: Privy OAuth provider identifier
 
+These credential parameters are also always stripped:
+
+- `access_token`, `refresh_token`, `id_token`: OAuth and OpenID Connect tokens
+- `client_secret`, `token_hash`, `password`, `api_key`, `apikey`
+
+Generic names such as `token`, `code`, and `state` are not stripped by default, because many apps use them for a token address or a referral code. If your site puts a secret in one of them, add it to `excludeQueryParams`.
+
 Excluded parameters are removed from the `url`, `query`, `referrer`, and other event properties. Matching is case-insensitive.
+
+Excluded parameters are also removed from a URL hash that holds `key=value` pairs, such as an OAuth return (`#access_token=...`) or a hash-router query (`#/swap?access_token=...`). Any other hash is sent unchanged.
 
 
 ### Consent management
